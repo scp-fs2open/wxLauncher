@@ -8,7 +8,7 @@ bool wxLauncher::OnInit() {
 	wxBitmap::InitStandardHandlers();
 
 	MainWindow* window = new MainWindow();
-	window->ShowFullScreen(true);
+	window->Show(true);
 
 	return true;
 }

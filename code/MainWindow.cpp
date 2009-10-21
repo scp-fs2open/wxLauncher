@@ -8,10 +8,16 @@
 #include "AdvSettingsPage.h"
 #include "InstallPage.h"
 
-MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY, _("wxLauncher for the FreeSpace Source Code Project"),
-		wxDefaultPosition, wxSize(800, 600), wxCLOSE_BOX)
+#define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxBORDER_SIMPLE | wxSYSTEM_MENU\
+	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
+
+MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
+								   _("wxLauncher for the FreeSpace Source Code Project"),
+								   wxDefaultPosition,
+								   wxSize(800, 600),
+								   MAINWINDOW_STYLE)
 {
-	Centre();
+	//Centre();
 
 	// setup statusbar
 	wxStatusBar* statusbar = CreateStatusBar(2);
