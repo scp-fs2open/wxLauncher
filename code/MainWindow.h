@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include <wx/notebook.h>
+#include <wx/toolbook.h>
 
 class MainWindow: public wxFrame {
 public:
@@ -10,7 +11,7 @@ public:
 	~MainWindow();
 
 private:
-	wxNotebook* mainTab;
+	wxToolbook* mainTab;
 };
 
 #endif
