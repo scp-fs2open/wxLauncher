@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include <wx/gdicmn.h>
+#include <wx/toolbook.h>
 #include "wxIDS.h"
 #include "MainWindow.h"
 #include "WelcomePage.h"
@@ -17,23 +18,26 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 								   wxSize(800, 600),
 								   MAINWINDOW_STYLE)
 {
-	//Centre();
+	Centre();
+	wxFont* windowFont = wxFont::New(12, wxFONTFAMILY_DECORATIVE, wxFONTSTYLE_NORMAL,
+		wxFONTWEIGHT_BOLD, false);
+	SetFont((*windowFont));
 
 	// setup statusbar
 	wxStatusBar* statusbar = CreateStatusBar(2);
 	SetStatusText(_("Loading... Please Wait"),0);
 
 	// setup tabs
-	wxBitmap temp(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP);
 
-	wxImageList* images = new wxImageList(temp.GetWidth(),temp.GetHeight());
-	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
+	// Images used by wxImageList must be all the same dimentions
+	wxImageList* images = new wxImageList(64,64);
+	images->Add(wxBitmap(_T("welcome.bmp"), wxBITMAP_TYPE_BMP));
+	images->Add(wxBitmap(_T("mods.bmp"), wxBITMAP_TYPE_BMP));
+	images->Add(wxBitmap(_T("basic.bmp"), wxBITMAP_TYPE_BMP));
+	images->Add(wxBitmap(_T("advanced.bmp"), wxBITMAP_TYPE_BMP));
+	images->Add(wxBitmap(_T("install.bmp"), wxBITMAP_TYPE_BMP));
 
-	this->mainTab = new wxNotebook(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,600),	wxNB_LEFT);
+	this->mainTab = new wxToolbook(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,600),	wxNB_LEFT);
 	this->mainTab->AssignImageList(images);
 	this->mainTab->AddPage(new WelcomePage(this->mainTab), _("Welcome"), true, ID_TAB_WELCOME_IMAGE);
 	this->mainTab->AddPage(new ModsPage(this->mainTab), _("Mods"), false, ID_TAB_MOD_IMAGE);

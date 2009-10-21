@@ -30,6 +30,10 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description="Copying resources to build directory."
+				CommandLine="resources_copy.cmd $(ProjectDir) $(TargetDir)"
+				AdditionalDependencies="resources_copy.cmd"
+				Outputs="mods.png"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -259,6 +263,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath="..\..\resources\mods.c"
+				>
+			</File>
+			<File
 				RelativePath=".\small.ico"
 				>
 			</File>
@@ -281,6 +289,22 @@
 			<File
 				RelativePath=".\ReadMe.txt"
 				>
+			</File>
+		</Filter>
+		<Filter
+			Name="support"
+			>
+			<File
+				RelativePath=".\resources_copy.cmd"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
