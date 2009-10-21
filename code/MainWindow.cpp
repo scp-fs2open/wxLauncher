@@ -28,6 +28,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY, _("wxLauncher for t
 	images->Add(wxBitmap(_T("wxLauncher.bmp"), wxBITMAP_TYPE_BMP));
 
 	this->mainTab = new wxNotebook(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,600),	wxNB_LEFT);
+	this->mainTab->AssignImageList(images);
 	this->mainTab->AddPage(new WelcomePage(this->mainTab), _("Welcome"), true, ID_TAB_WELCOME_IMAGE);
 	this->mainTab->AddPage(new ModsPage(this->mainTab), _("Mods"), false, ID_TAB_MOD_IMAGE);
 	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false, ID_TAB_BASIC_SETTINGS_IMAGE);
