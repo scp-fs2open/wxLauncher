@@ -183,7 +183,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\code\AdvSettingsPage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\BasicSettingsPage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\InstallPage.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\MainWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\ModsPage.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\WelcomePage.cpp"
 				>
 			</File>
 			<File
@@ -197,11 +217,31 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\code\AdvSettingsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\BasicSettingsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\InstallPage.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\MainWindow.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\ModsPage.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\WelcomePage.h"
 				>
 			</File>
 			<File
@@ -231,10 +271,18 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
+		<Filter
+			Name="docs"
 			>
-		</File>
+			<File
+				RelativePath=".\Doxyfile"
+				>
+			</File>
+			<File
+				RelativePath=".\ReadMe.txt"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
