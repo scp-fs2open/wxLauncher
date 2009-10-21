@@ -3,8 +3,9 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="wxLauncher"
-	ProjectGUID="{40C9B821-4A4B-4B1C-B054-9B4EF95F2EE5}"
+	ProjectGUID="{5E765B3D-4935-4D4F-B863-7F80E2EC291F}"
 	RootNamespace="wxLauncher"
+	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -20,10 +21,12 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="2"
+			UseOfMFC="0"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -40,24 +43,34 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(WXPATH)\lib\vc_lib\mswud&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\include&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				ShowIncludes="false"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="comctl32.lib Rpcrt4.lib winmm.lib wxbase28ud.lib wxbase28ud_net.lib wxbase28ud_odbc.lib wxbase28ud_xml.lib wxexpatd.lib wxjpegd.lib wxmsw28ud_adv.lib wxmsw28ud_aui.lib wxmsw28ud_core.lib wxmsw28ud_dbgrid.lib wxmsw28ud_gl.lib wxmsw28ud_html.lib wxmsw28ud_media.lib wxmsw28ud_qa.lib wxmsw28ud_richtext.lib wxmsw28ud_xrc.lib wxpngd.lib wxregexud.lib wxtiffd.lib wxzlibd.lib"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(WXPATH)\lib\vc_lib&quot;;&quot;$(WXPATH)\contrib\lib&quot;"
+				IgnoreDefaultLibraryNames="libcd.lib;libcid.lib;msvcrt.lib"
 				GenerateDebugInformation="true"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -87,7 +100,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="2"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -109,10 +122,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswu&quot;"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="1"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -125,7 +141,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="comctl32.lib Rpcrt4.lib winmm.lib wxbase28u.lib wxbase28u_net.lib wxbase28u_xml.lib wxexpat.lib wxjpeg.lib wxmsw28u_adv.lib wxmsw28u_aui.lib wxmsw28u_core.lib wxmsw28u_dbgrid.lib wxmsw28u_gl.lib wxmsw28u_html.lib wxmsw28u_media.lib wxmsw28u_qa.lib wxmsw28u_richtext.lib wxmsw28u_xrc.lib wxpng.lib wxregexu.lib wxtiff.lib wxzlib.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="winmm.lib wxmsw.lib png.lib zlib.lib jpeg.lib tiff.lib"
+				IgnoreDefaultLibraryNames="libc.lib;libci.lib;msvcrtd.lib"
 				GenerateDebugInformation="true"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -161,19 +182,59 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\..\code\MainWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\wxLauncherApp.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\code\MainWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\wxIDS.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\wxLauncherApp.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\small.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\wxLauncher.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\wxLauncher.rc"
+				>
+			</File>
 		</Filter>
+		<File
+			RelativePath=".\ReadMe.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
