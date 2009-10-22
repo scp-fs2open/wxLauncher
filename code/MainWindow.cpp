@@ -1,6 +1,8 @@
 #include <wx/wx.h>
 #include <wx/gdicmn.h>
 #include <wx/toolbook.h>
+#include <wx/imagpng.h>
+#include <wx/html/htmlwin.h>
 #include "wxIDS.h"
 #include "MainWindow.h"
 #include "WelcomePage.h"
@@ -21,11 +23,13 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	Centre();
 	wxFont* windowFont = wxFont::New(12, wxFONTFAMILY_DECORATIVE, wxFONTSTYLE_NORMAL,
 		wxFONTWEIGHT_BOLD, false);
-	
 
 	// setup statusbar
 	wxStatusBar* statusbar = CreateStatusBar(2);
 	SetStatusText(_("Loading... Please Wait"),0);
+	
+
+
 
 	// setup tabs
 
@@ -49,13 +53,6 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab), _("Advanced Settings"), false, ID_TAB_ADV_SETTINGS_IMAGE);
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
 
-	//wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-	//mainSizer->Add(this->mainTab);
-	//mainSizer->AddSpacer(25);
-	//mainSizer->Add(statusbar);
-	//SetSizer(mainSizer, true);
-
-	//Layout();
 	statusbar->SetStatusText(_("Ready..."), 0);
 
 }
