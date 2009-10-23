@@ -8,6 +8,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		wxButton* close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
 		wxButton* help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
 		wxButton* fred = new wxButton(this, ID_FRED_BUTTON, _("Fred"));
+		wxButton* about = new wxButton(this, ID_ABOUT_BUTTON, _("About"));
 
 		wxButton* update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Available"));
 		wxButton* play = new wxButton(this, ID_PLAY_BUTTON, _("Play"));
@@ -17,7 +18,9 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 							   button from under the tab list. */
 		sizer->Add(close);
 		sizer->Add(help);
-		sizer->AddStretchSpacer(10);
+		sizer->AddStretchSpacer(5);
+		sizer->Add(about);
+		sizer->AddStretchSpacer(5);
 		sizer->Add(update);
 		sizer->Add(fred);
 		sizer->Add(play);

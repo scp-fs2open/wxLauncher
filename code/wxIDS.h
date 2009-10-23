@@ -4,12 +4,14 @@
 /* File contains all IDs that are to be used in the application. */
 
 enum WindowIDS: int {
-	ID_MAINTAB = 1,
+	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
+							   will use. */
 	ID_CLOSE_BUTTON,
 	ID_HELP_BUTTON,
 	ID_FRED_BUTTON,
 	ID_UPDATE_BUTTON,
 	ID_PLAY_BUTTON,
+	ID_ABOUT_BUTTON,
 };
 
 enum MainTabImageIDs: int {
