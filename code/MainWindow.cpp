@@ -63,4 +63,32 @@ MainWindow::~MainWindow() {
 	//
 }
 
+BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+	EVT_BUTTON(ID_CLOSE_BUTTON, MainWindow::OnQuit)
+	EVT_BUTTON(ID_HELP_BUTTON, MainWindow::OnHelp)
+	EVT_BUTTON(ID_FRED_BUTTON, MainWindow::OnStartFred)
+	EVT_BUTTON(ID_UPDATE_BUTTON, MainWindow::OnUpdate)
+	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnStartFS)
+	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
+END_EVENT_TABLE()
+
+void MainWindow::OnQuit(wxCommandEvent& event) {
+	wxMessageBox(_("Quit"));
+}
+void MainWindow::OnHelp(wxCommandEvent& event) {
+	wxMessageBox(_("Help"));
+}
+void MainWindow::OnStartFred(wxCommandEvent& event) {
+	wxMessageBox(_("Start Fred"));
+}
+void MainWindow::OnStartFS(wxCommandEvent& event) {
+	wxMessageBox(_("Start FS"));
+}
+void MainWindow::OnUpdate(wxCommandEvent& event) {
+	wxMessageBox(_("Update"));
+}
+void MainWindow::OnAbout(wxCommandEvent& event) {
+	wxMessageBox(_("About"));
+}
+
 

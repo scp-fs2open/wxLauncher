@@ -10,8 +10,17 @@ public:
 	MainWindow();
 	~MainWindow();
 
+	void OnQuit(wxCommandEvent& WXUNUSED(event));
+	void OnHelp(wxCommandEvent& WXUNUSED(event));
+	void OnStartFS(wxCommandEvent& WXUNUSED(event));
+	void OnStartFred(wxCommandEvent& WXUNUSED(event));
+	void OnUpdate(wxCommandEvent& WXUNUSED(event));
+	void OnAbout(wxCommandEvent& WXUNUSED(event));
+
 private:
 	wxToolbook* mainTab;
+
+	DECLARE_EVENT_TABLE();
 };
 
 #endif
