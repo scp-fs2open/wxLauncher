@@ -31,7 +31,7 @@
 			<Tool
 				Name="VCCustomBuildTool"
 				Description="Copying resources to build directory."
-				CommandLine="resources_copy.cmd $(ProjectDir) $(TargetDir)"
+				CommandLine="resources_copy.cmd $(ProjectDir) $(TargetDir)&#x0D;&#x0A;"
 				AdditionalDependencies="resources_copy.cmd"
 				Outputs="mods.png"
 			/>
@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\BottomButtons.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\InstallPage.cpp"
 				>
 			</File>
@@ -226,6 +230,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\BasicSettingsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\BottomButtons.h"
 				>
 			</File>
 			<File

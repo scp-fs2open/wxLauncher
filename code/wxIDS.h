@@ -4,7 +4,12 @@
 /* File contains all IDs that are to be used in the application. */
 
 enum WindowIDS: int {
-	ID_MAINTAB,
+	ID_MAINTAB = 1,
+	ID_CLOSE_BUTTON,
+	ID_HELP_BUTTON,
+	ID_FRED_BUTTON,
+	ID_UPDATE_BUTTON,
+	ID_PLAY_BUTTON,
 };
 
 enum MainTabImageIDs: int {
