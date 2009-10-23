@@ -10,6 +10,7 @@
 #include "BasicSettingsPage.h"
 #include "AdvSettingsPage.h"
 #include "InstallPage.h"
+#include "BottomButtons.h"
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxBORDER_SIMPLE | wxSYSTEM_MENU\
 	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
@@ -45,7 +46,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	this->mainTab->SetFont((*windowFont));
 	this->SetBackgroundStyle(wxBG_STYLE_COLOUR);
 	this->SetBackgroundColour(*wxWHITE);
-	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,600),	wxNB_LEFT);
+	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,550),	wxNB_LEFT);
 	this->mainTab->AssignImageList(images);
 	this->mainTab->AddPage(new WelcomePage(this->mainTab), _("Welcome"), true, ID_TAB_WELCOME_IMAGE);
 	this->mainTab->AddPage(new ModsPage(this->mainTab), _("Mods"), false, ID_TAB_MOD_IMAGE);
@@ -53,6 +54,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab), _("Advanced Settings"), false, ID_TAB_ADV_SETTINGS_IMAGE);
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
 
+	new BottomButtons(this, wxPoint(0, 550), wxSize(800, 50));
 	statusbar->SetStatusText(_("Ready..."), 0);
 
 }
