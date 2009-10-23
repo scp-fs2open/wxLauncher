@@ -9,7 +9,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		wxButton* help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
 		wxButton* fred = new wxButton(this, ID_FRED_BUTTON, _("Fred"));
 
-		wxButton* update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Aviable"));
+		wxButton* update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Available"));
 		wxButton* play = new wxButton(this, ID_PLAY_BUTTON, _("Play"));
 
 		wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
