@@ -25,13 +25,6 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	wxFont* windowFont = wxFont::New(12, wxFONTFAMILY_DECORATIVE, wxFONTSTYLE_NORMAL,
 		wxFONTWEIGHT_BOLD, false);
 
-	// setup statusbar
-	wxStatusBar* statusbar = CreateStatusBar(2);
-	SetStatusText(_("Loading... Please Wait"),0);
-	
-
-
-
 	// setup tabs
 
 	// Images used by wxImageList must be all the same dimentions
@@ -55,7 +48,6 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
 
 	new BottomButtons(this, wxPoint(0, 550), wxSize(800, 50));
-	statusbar->SetStatusText(_("Ready..."), 0);
 
 }
 
