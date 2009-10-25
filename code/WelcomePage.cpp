@@ -24,6 +24,11 @@ BEGIN_EVENT_TABLE(HeaderBitmap, wxPanel)
 	EVT_PAINT(HeaderBitmap::OnPaint)
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE(WelcomePage, wxWindow)
+EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
+EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
+END_EVENT_TABLE()
+
 WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	this->SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	// language
@@ -41,7 +46,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
-	wxHtmlWindow* general = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
+	wxHtmlWindow* general = new wxHtmlWindow(this, ID_SUMMARY_HTML_PANEL, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
 	general->SetPage(_("<p>Welcome to the FreeSpace Open Launcher, your one-stop-shop for Freespace 2 and releate content</p>\
 					   <p>If you're new to FreeSpace, you might want to check these links first:\
 					   <ul>\
@@ -76,7 +81,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest headlines from the front"));
-	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, wxID_ANY);
+	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
 	headlinesView->SetPage(_("<ul>\
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65861.0'>Vidmaster finally released his FortuneHunters 2261 campaign.</a></li>\
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65667.0'>Komet has released a Japanese Localization Patch for FreeSpace 2!</a></li>\
@@ -98,4 +103,9 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 
 	this->SetSizer(sizer);
 	this->Layout();
+}
+
+void WelcomePage::LinkClicked(wxHtmlLinkEvent &event) {
+	wxHtmlLinkInfo info = event.GetLinkInfo();
+	wxLaunchDefaultBrowser(info.GetHref());
 }
