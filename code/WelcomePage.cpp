@@ -25,6 +25,7 @@ BEGIN_EVENT_TABLE(HeaderBitmap, wxPanel)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
+	this->SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
 	wxComboBox* launcherLanguageCombo = new wxComboBox(this, wxID_ANY, _("English (US)"));
@@ -40,12 +41,13 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
-	wxHtmlWindow* general = new wxHtmlWindow(this, wxID_ANY );
+	wxHtmlWindow* general = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
 	general->SetPage(_("<p>Welcome to the FreeSpace Open Launcher, your one-stop-shop for Freespace 2 and releate content</p>\
 					   <p>If you're new to FreeSpace, you might want to check these links first:\
-					   <ul><li>Wiki</li>\
-					   <li>Forums</li>\
-					   <li>Wikipedia FS2 Page</li></ul>\
+					   <ul>\
+					   <li><a href='http://www.hard-light.net/wiki/index.php/Main_Page'>Wiki</a></li>\
+					   <li><a href='http://www.hard-light.net/forums/index.php/board,50.0.html'>Forums</a></li>\
+					   <li><a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 Page</a></li></ul>\
 					   </p>\
 					   <p>Select a profile below and hit Play to start the game."));
 	
@@ -65,12 +67,12 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	profileButtonsSizer->Add(deleteButton);
 	profileButtonsSizer->Add(saveButton);
 	profileButtonsSizer->AddStretchSpacer(1);
-	profileButtonsSizer->Add(saveDefaultCheck);
+	profileButtonsSizer->Add(saveDefaultCheck, 0, wxALIGN_CENTER_VERTICAL);
 
 	wxStaticBoxSizer* profileVerticalSizer = new wxStaticBoxSizer(profileBox, wxVERTICAL);
-	profileVerticalSizer->Add(profileCombo, wxSizerFlags().Expand());
-	profileVerticalSizer->Add(profileButtonsSizer);
-	profileVerticalSizer->SetMinSize(wxSize(600, 100));
+	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 4);
+	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 4);
+	profileVerticalSizer->SetMinSize(wxSize(600, -1));
 
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest headlines from the front"));
@@ -79,12 +81,13 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65861.0'>Vidmaster finally released his FortuneHunters 2261 campaign.</a></li>\
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65667.0'>Komet has released a Japanese Localization Patch for FreeSpace 2!</a></li>\
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
-							 <li><a href='http://www.hard-light.net/forums/index.php/topic,65038.0.html'>The Freespace Upgrade Team have Patched and Re-Released the 3.6.10 Media VPs</a></li>\
+							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
 							 </ul>"));
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->SetMinSize(wxSize(600, 150));
-	headlines->Add(headlinesView, wxSizerFlags().Expand().Proportion(1));
+	headlines->Add(headlinesView, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(languageSizer);
