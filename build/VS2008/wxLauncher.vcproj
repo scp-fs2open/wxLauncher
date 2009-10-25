@@ -112,6 +112,10 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description="Copying resources to build directory."
+				CommandLine="resources_copy.cmd $(ProjectDir) $(TargetDir)&#x0D;&#x0A;"
+				AdditionalDependencies="resources_copy.cmd"
+				Outputs="mods.png"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -130,7 +134,7 @@
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
 			/>
