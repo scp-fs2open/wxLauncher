@@ -54,6 +54,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	sizer->Add(this->mainTab);
 	sizer->Add(bb);
 
+	sizer->SetSizeHints(this);
 	this->SetSizerAndFit(sizer);
 	this->Layout();
 
