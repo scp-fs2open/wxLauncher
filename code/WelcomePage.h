@@ -6,6 +6,9 @@
 class WelcomePage: public wxWindow {
 public:
 	WelcomePage(wxWindow* parent);
+	void LinkClicked(wxHtmlLinkEvent& event);
+	
+	DECLARE_EVENT_TABLE();
 };
 
 #endif
