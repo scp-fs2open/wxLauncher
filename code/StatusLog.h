@@ -28,13 +28,20 @@ protected:
 		StatusLogInfoPanel(wxWindow* parent);
 
 		void OnPaint(wxPaintEvent &event);
+		void MouseEnter(wxMouseEvent &event);
+		void MouseExit(wxMouseEvent &event);
+		void MouseUp(wxMouseEvent &event);
+		void MouseDown(wxMouseEvent &event);
+
+		void OpenLogWindow();
 
 	protected:
 		void SetMessage(wxString &msg);
 	private:
 		wxString* currentMessage;
-		wxFont *enabledFont, *disabledFont;
+		wxFont *enabledFont, *disabledFont, *hoverFont;
 		wxColour *enabledColour, *disabledColour;
+		bool mouseHovering, mouseClicking;
 
 		DECLARE_EVENT_TABLE();
 	};

@@ -37,34 +37,17 @@ bool StatusLog::IsOk() {
 		&& (this->taskProgress != NULL)
 		);
 }
-#if 0
-/** Called when the launcher is not doing anything. Vanishes the progress bar and
-dims the log button. */
-void BottomButtons::Done() {
-	this->log->Disable();
-}
 
-/** Check the internal numbers and make the changes to the log button and the progress
-bar. */
-void BottomButtons::UpdateBars() {
-	wxMessageBox(wxString::Format(_("%d"), joblist->size()));
-	if ( joblist->size() == 0 ) {
-		this->log->SetFont(*(this->disabledFont));
-		this->log->SetForegroundColour(*wxLIGHT_GREY); // MODMOD: hard coded values
-		this->bar->Hide();
-	} else {
-		this->log->SetFont(*(this->enabledFont));
-		this->log->SetForegroundColour(*wxBLACK); // MODMOD: hard coded values
-		this->bar->Show();
-	}
-}
-#endif
 StatusLog::StatusLogInfoPanel::StatusLogInfoPanel(wxWindow* parent): wxPanel(parent, ID_INFO_PANEL) {
 	this->enabledFont = new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	wxASSERT_MSG( this->enabledFont->IsOk(), _("Enabled font is not valid"));
 	this->disabledFont = new wxFont(*(this->enabledFont));
 	this->disabledFont->SetStyle(wxFONTSTYLE_ITALIC);
 	wxASSERT_MSG( this->disabledFont->IsOk(), _("Disabled font is not valid"));
+
+	this->hoverFont = new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	this->hoverFont->SetStyle(wxFONTSTYLE_SLANT);
+	wxASSERT_MSG( this->hoverFont->IsOk(), _("Hover font is not valid"));
 
 	unsigned long black = 0x000000;
 	unsigned long grey = 0x555555;
@@ -74,14 +57,56 @@ StatusLog::StatusLogInfoPanel::StatusLogInfoPanel(wxWindow* parent): wxPanel(par
 	wxASSERT_MSG( this->disabledColour->IsOk(), _("Disabled colour is not valid"));
 
 	this->currentMessage = new wxString(_("Ready."));
+
+	this->mouseHovering = false;
+	this->mouseClicking = false;
 }
 
 BEGIN_EVENT_TABLE(StatusLog::StatusLogInfoPanel, wxPanel)
 EVT_PAINT( StatusLog::StatusLogInfoPanel::OnPaint)
+EVT_ENTER_WINDOW( StatusLog::StatusLogInfoPanel::MouseEnter)
+EVT_LEAVE_WINDOW( StatusLog::StatusLogInfoPanel::MouseExit)
+EVT_LEFT_UP( StatusLog::StatusLogInfoPanel::MouseUp)
+EVT_LEFT_DOWN( StatusLog::StatusLogInfoPanel::MouseDown)
 END_EVENT_TABLE()
 
 void StatusLog::StatusLogInfoPanel::OnPaint(wxPaintEvent &event) {
 	wxPaintDC dc(this);
 
+	if ( this->mouseHovering ) {
+		if ( this->mouseClicking ) {
+			dc.SetFont(*(this->enabledFont));
+		} else {
+			dc.SetFont(*(this->hoverFont));
+		}
+	} else {
+		dc.SetFont(*(this->enabledFont));
+	}
 	dc.DrawText(*(this->currentMessage), 0, 0);
+}
+
+void StatusLog::StatusLogInfoPanel::MouseEnter(wxMouseEvent &event) {
+	this->mouseHovering = true;
+	this->RefreshRect(wxRect(this->GetSize()));;
+}
+
+void StatusLog::StatusLogInfoPanel::MouseExit(wxMouseEvent &event) {
+	this->mouseHovering = false;
+	this->RefreshRect(wxRect(this->GetSize()));;
+}
+
+void StatusLog::StatusLogInfoPanel::MouseUp(wxMouseEvent &event) {
+	if ( this->mouseClicking ) {
+		this->OpenLogWindow();
+	}
+	this->mouseClicking = false;
+	this->RefreshRect(wxRect(this->GetSize()));
+}
+
+void StatusLog::StatusLogInfoPanel::MouseDown(wxMouseEvent &event) {
+	this->mouseClicking = true;
+	this->RefreshRect(wxRect(this->GetSize()));
+}
+
+void StatusLog::StatusLogInfoPanel::OpenLogWindow() {
 }
