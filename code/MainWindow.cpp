@@ -52,7 +52,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
 	sizer->Add(this->mainTab);
-	sizer->Add(bb);
+	sizer->Add(bb, wxSizerFlags().Expand());
 
 	sizer->SetSizeHints(this);
 	this->SetSizerAndFit(sizer);
