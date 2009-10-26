@@ -3,17 +3,21 @@
 #include "WelcomePage.h"
 #include "wxIDS.h"
 
+/** Class that manages the header image for the welcome tab. */
 class HeaderBitmap: public wxPanel {
 public:
-	HeaderBitmap(wxWindow* parent): wxPanel(parent, wxID_ANY) {
+	HeaderBitmap(wxWindow* parent, int width): wxPanel(parent, wxID_ANY) {
 		this->bitmap = new wxBitmap(_("SCP Header.bmp"), wxBITMAP_TYPE_BMP);
-		wxASSERT(bitmap->IsOk());
-		
+		wxASSERT_MSG(this->bitmap->IsOk(), _("Loaded bitmap is invalid."));
+
+		wxASSERT_MSG(this->bitmap->GetWidth() <= width,
+			(wxString::Format(_("Header bitmap is larger than %d pixels!"), width)));
+
+		this->SetMinSize(wxSize(width, bitmap->GetHeight()));
 	}
 	virtual void OnPaint(wxPaintEvent& event) {
 		wxPaintDC dc(this);
-
-		dc.DrawBitmap(*(this->bitmap), 0, 0);
+		dc.DrawBitmap(*(this->bitmap), (this->GetSize().GetWidth()/2) - (this->bitmap->GetWidth()/2), 0);
 	}
 private:
 	wxBitmap* bitmap;
@@ -41,8 +45,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	languageSizer->Add(launcherLanguageCombo);
 
 	// header image
-	HeaderBitmap* header = new HeaderBitmap(this);
-	header->SetMinSize(wxSize(600, 100));
+	HeaderBitmap* header = new HeaderBitmap(this, this->stuffWidth);
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
@@ -57,7 +60,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 					   <p>Select a profile below and hit Play to start the game."));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);
-	generalSizer->SetMinSize(wxSize(600, 200));
+	generalSizer->SetMinSize(wxSize(this->stuffWidth, 200));
 	generalSizer->Add(general, 1, wxEXPAND);
 
 	// Profiles
@@ -77,7 +80,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	wxStaticBoxSizer* profileVerticalSizer = new wxStaticBoxSizer(profileBox, wxVERTICAL);
 	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 4);
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 4);
-	profileVerticalSizer->SetMinSize(wxSize(600, -1));
+	profileVerticalSizer->SetMinSize(wxSize(this->stuffWidth, -1));
 
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest headlines from the front"));
@@ -90,7 +93,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 							 </ul>"));
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
-	headlines->SetMinSize(wxSize(600, 150));
+	headlines->SetMinSize(wxSize(this->stuffWidth, 150));
 	headlines->Add(headlinesView, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
 
 	// Final layout
