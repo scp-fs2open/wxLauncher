@@ -1,5 +1,9 @@
 #include "StatusLog.h"
 
+#include <wx/wx.h>
+#include <wx/listimpl.cpp>
+WX_DEFINE_LIST(JobTable);
+
 StatusLog::StatusLog() {
 	this->jobTable = new JobTable();
 
@@ -7,6 +11,10 @@ StatusLog::StatusLog() {
 	this->infoPanel = NULL;
 	this->totalProgress = NULL;
 	this->taskProgress = NULL;
+
+	this->taskProgressLock = new wxCriticalSection();
+	this->jobTableLock = new wxCriticalSection();
+	this->messageLock = new wxCriticalSection();
 }
 
 wxPanel* StatusLog::GetGaugePanel(wxWindow* parent) {
@@ -62,6 +70,14 @@ StatusLog::StatusLogInfoPanel::StatusLogInfoPanel(wxWindow* parent): wxPanel(par
 	this->mouseClicking = false;
 }
 
+void StatusLog::StatusLogInfoPanel::SetMessage(wxString& msg) {
+	wxString* temp = this->currentMessage;
+
+	this->currentMessage = new wxString(msg);
+
+	delete temp;
+}
+
 BEGIN_EVENT_TABLE(StatusLog::StatusLogInfoPanel, wxPanel)
 EVT_PAINT( StatusLog::StatusLogInfoPanel::OnPaint)
 EVT_ENTER_WINDOW( StatusLog::StatusLogInfoPanel::MouseEnter)
@@ -109,4 +125,69 @@ void StatusLog::StatusLogInfoPanel::MouseDown(wxMouseEvent &event) {
 }
 
 void StatusLog::StatusLogInfoPanel::OpenLogWindow() {
+}
+
+///////////////////////////////////////////////////////////////////////////////
+JobData::JobData(StatusLog *manager, int max, int min) {
+	wxASSERT_MSG( manager != NULL, _("Passed StatusLog manager is NULL."));
+	this->myManager = manager;
+
+	wxASSERT_MSG( max > min, _("Passed max is less than min."));
+	this->max = max;
+	this->min = min;
+
+	this->active = true;
+	this->beingShown = false;
+
+	this->value = min;
+	this->message = NULL;
+}
+
+void JobData::Pulse() {
+	wxASSERT_MSG( this->active, _("JobData is done but someone called."));
+	wxCriticalSectionLocker lock(*(this->myManager->taskProgressLock));
+	if ( this->beingShown ) {
+		this->myManager->taskProgress->Pulse();
+	}
+	this->pulseState = true;
+}
+
+void JobData::SetMessage(wxString &msg) {
+	wxASSERT_MSG( this->active, _("JobData is done but someone called."));
+	wxCriticalSectionLocker lock(*(this->myManager->messageLock));
+	if ( this->beingShown ) {
+		this->myManager->infoPanel->SetMessage(msg);
+	}
+	if ( this->message != NULL ) {
+		delete this->message;
+	}
+	if ( msg.empty() ) {
+		this->message = NULL;
+	} else {
+		this->message = new wxString(msg);
+	}
+}
+
+void JobData::SetRange(int max, int min) {
+	wxASSERT_MSG( this->active, _("JobData is done but someone called."));
+	wxASSERT_MSG( max > min, _("Max is less than or equal to min."));
+	this->max = max;
+	this->min = min;
+}
+
+void JobData::SetValue(int value) {
+	wxASSERT_MSG( this->active, _("JobData is done but someone called."));
+	wxASSERT_MSG( max >= value, _("Value is larger than max."));
+	wxASSERT_MSG( min <= value, _("Value is smaller than min."));
+	wxCriticalSectionLocker(*(this->myManager->taskProgressLock));
+	if ( this->beingShown ) {
+		this->myManager->taskProgress->SetValue(value);
+	}
+	this->pulseState = false;
+	this->value = value;
+}
+
+void JobData::Done() {
+	wxASSERT_MSG( this->active, _("Done has been called more than once."));
+	this->active = false;
 }
