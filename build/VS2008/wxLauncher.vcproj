@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\StatusLog.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\WelcomePage.cpp"
 				>
 			</File>
@@ -246,6 +250,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\ModsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\StatusLog.h"
 				>
 			</File>
 			<File

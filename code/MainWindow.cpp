@@ -56,8 +56,6 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	sizer->Add(bb);
 
 	this->SetSizerAndFit(sizer);
-
-	bb->UpdateBars();
 }
 
 MainWindow::~MainWindow() {
