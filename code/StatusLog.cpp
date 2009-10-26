@@ -1,3 +1,4 @@
+
 #include "StatusLog.h"
 
 #include <wx/wx.h>

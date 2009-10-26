@@ -57,7 +57,6 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	sizer->SetSizeHints(this);
 	this->SetSizerAndFit(sizer);
 	this->Layout();
-
 }
 
 MainWindow::~MainWindow() {
