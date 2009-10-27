@@ -50,14 +50,14 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
 	wxHtmlWindow* general = new wxHtmlWindow(this, ID_SUMMARY_HTML_PANEL, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
-	general->SetPage(_("<p>Welcome to the FreeSpace Open Launcher, your one-stop-shop for Freespace 2 and releate content</p>\
-					   <p>If you're new to FreeSpace, you might want to check these links first:\
-					   <ul>\
-					   <li><a href='http://www.hard-light.net/wiki/index.php/Main_Page'>Wiki</a></li>\
-					   <li><a href='http://www.hard-light.net/forums/index.php/board,50.0.html'>Forums</a></li>\
-					   <li><a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 Page</a></li></ul>\
-					   </p>\
-					   <p>Select a profile below and hit Play to start the game."));
+	general->SetPage(_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>\
+						If you’re  new to the Freespace 2 universe, you might want to check out these links first:<br>\
+						= <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a>  \
+						= <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> \
+						= <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> \
+						= <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
+						Also, don’t  forget the help file, there is a nice 'Getting Started' tutorial there.<br>\
+						</center></p>"));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);
 	generalSizer->SetMinSize(wxSize(this->stuffWidth, 200));
