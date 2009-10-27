@@ -36,7 +36,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	images->Add(wxBitmap(_T("install.bmp"), wxBITMAP_TYPE_BMP));
 
 	this->mainTab = new wxToolbook();
-	this->mainTab->SetFont((*windowFont));
+	this->mainTab->SetOwnFont((*windowFont));
 	this->SetBackgroundStyle(wxBG_STYLE_COLOUR);
 	this->SetBackgroundColour(*wxWHITE);
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,-1),	wxNB_LEFT);
