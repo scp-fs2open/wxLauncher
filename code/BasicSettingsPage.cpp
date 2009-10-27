@@ -30,7 +30,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxCheckBox* largeTextureCheck = new wxCheckBox(this, ID_LARGE_TEXTURE_CHECK, _("Use large textures:"));
 	wxCheckBox* fontDistortion = new wxCheckBox(this, ID_FONT_DISTORTION_CHECK, _("Fix font distortion"));
 
-	wxGridSizer* videoSizer1 = new wxGridSizer(4); // Sizer for graphics, resolution, depth, etc
+	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); // Sizer for graphics, resolution, depth, etc
 	videoSizer1->Add(graphicsText);
 	videoSizer1->Add(graphicsCombo);
 	videoSizer1->Add(resolutionText);
@@ -102,7 +102,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxTextCtrl* networkPort = new wxTextCtrl(this, ID_NETWORK_PORT, _(""));
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, _(""));
 
-	wxGridSizer* networkInsideSizer = new wxGridSizer(4);
+	wxGridSizer* networkInsideSizer = new wxFlexGridSizer(4);
 	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")));
 	networkInsideSizer->Add(networkType);
 	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("Port:")));
@@ -187,14 +187,14 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 	// Final Layout
 	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
-	leftColumnSizer->Add(videoSizer);
+	leftColumnSizer->Add(videoSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
-	leftColumnSizer->Add(networkSizer);
+	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
 
 	wxBoxSizer* rightColumnSizer = new wxBoxSizer(wxVERTICAL);
-	rightColumnSizer->Add(audioSizer);
-	rightColumnSizer->Add(joystickSizer);
-	rightColumnSizer->Add(proxySizer);
+	rightColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
+	rightColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
+	rightColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(leftColumnSizer);
