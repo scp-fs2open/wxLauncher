@@ -3,7 +3,7 @@
 
 #include <wx/wx.h>
 
-class BasicSettingsPage : public wxWindow {
+class BasicSettingsPage : public wxPanel {
 public:
 	BasicSettingsPage(wxWindow* parent);
 };
