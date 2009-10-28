@@ -4,7 +4,7 @@ Introduction
 ============
 wxLauncher aims to give one unified answer to members of 
 the Freespace 2 Open community looking for an easy way 
-to control fs2_open on various platforms and to  those 
+to control fs2_open on various platforms and to those 
 looking for an easy way to find and get updates to their
 Freespace 2 MODs and TCs.
 
@@ -16,7 +16,10 @@ support them. Use them at your own risk.
 
 Requirements
 ============
-Just find a build for your sistem and you're set.
+Just find the build for your system and you're set.
+For more info about the builds on specific system see
+the readme.txt that is in the build systems folder.  All
+building code is in the build directory.
 
 If you're looking for the source, you can find it at:
   http://code.google.com/p/wxlauncher/
