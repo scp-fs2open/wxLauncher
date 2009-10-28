@@ -1,0 +1,8 @@
+Iss Mneur <iss.mneur@telus.net>
+kkmic <killermosi@yahoo.com>
+
+We would also like to thank:
+wxWidgets Team - wxWidgets <http://www.wxwidgets.org/>
+Source Code Project (SCP) - for the wonderful fs2_open <http://scp.indiegames.us/>
+Violition, Inc. - Developer of Freespace 2 <http://www.volition-inc.com/>
+Interplay - Publisher of Freespace 2 <http://www.interplay.com/>

@@ -299,7 +299,15 @@
 			Name="docs"
 			>
 			<File
+				RelativePath=".\Authors.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Doxyfile"
+				>
+			</File>
+			<File
+				RelativePath=".\License.txt"
 				>
 			</File>
 			<File
