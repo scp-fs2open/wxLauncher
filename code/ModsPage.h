@@ -3,7 +3,7 @@
 
 #include <wx/wx.h>
 
-class ModsPage: public wxWindow {
+class ModsPage: public wxPanel {
 public:
 	ModsPage(wxWindow* parent);
 };
