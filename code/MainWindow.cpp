@@ -29,11 +29,11 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 
 	// Images used by wxImageList must be all the same dimentions
 	wxImageList* images = new wxImageList(64,64);
-	images->Add(wxBitmap(_T("welcome.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("mods.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("basic.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("advanced.bmp"), wxBITMAP_TYPE_BMP));
-	images->Add(wxBitmap(_T("install.bmp"), wxBITMAP_TYPE_BMP));
+	images->Add(wxBitmap(_T("welcome.png"), wxBITMAP_TYPE_PNG));
+	images->Add(wxBitmap(_T("mods.png"), wxBITMAP_TYPE_PNG));
+	images->Add(wxBitmap(_T("basic.png"), wxBITMAP_TYPE_PNG));
+	images->Add(wxBitmap(_T("advanced.png"), wxBITMAP_TYPE_PNG));
+	images->Add(wxBitmap(_T("install.png"), wxBITMAP_TYPE_PNG));
 
 	this->mainTab = new wxToolbook();
 	this->mainTab->SetOwnFont((*windowFont));
