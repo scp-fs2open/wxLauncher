@@ -7,7 +7,7 @@
 class HeaderBitmap: public wxPanel {
 public:
 	HeaderBitmap(wxWindow* parent, int width): wxPanel(parent, wxID_ANY) {
-		this->bitmap = new wxBitmap(_("SCP Header.bmp"), wxBITMAP_TYPE_BMP);
+		this->bitmap = new wxBitmap(_("SCP Header.png"), wxBITMAP_TYPE_PNG);
 		wxASSERT_MSG(this->bitmap->IsOk(), _("Loaded bitmap is invalid."));
 
 		wxASSERT_MSG(this->bitmap->GetWidth() <= width,
