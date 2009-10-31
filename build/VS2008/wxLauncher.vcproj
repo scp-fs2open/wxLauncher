@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\ModGrid.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\ModsPage.cpp"
 				>
 			</File>
@@ -250,6 +254,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\MainWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\ModGrid.h"
 				>
 			</File>
 			<File

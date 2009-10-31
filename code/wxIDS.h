@@ -57,6 +57,8 @@ enum WindowIDS: int {
 	ID_PROXY_HTTP_SERVER,
 	ID_PROXY_HTTP_PORT,
 	ID_PROXY_AUTO_URL,
+
+	ID_MODGRID,
 };
 
 enum MainTabImageIDs: int {
