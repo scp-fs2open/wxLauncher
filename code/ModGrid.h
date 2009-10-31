@@ -3,6 +3,9 @@
 
 #include <wx/wx.h>
 #include <wx/grid.h>
+#include <wx/fileconf.h>
+
+WX_DECLARE_HASH_MAP( wxString, wxFileConfig*, wxStringHash, wxStringEqual , ConfigHash);
 
 /** Implementation of wxGrid for use on the mod select tab. The resulting
 object is a full grid that can be just placed by the layout code. */
@@ -42,6 +45,12 @@ public:
 
 	virtual void* GetValueAsCustom(int row, int col, const wxString& typeName);
 	virtual void SetValueAsCustom(int row, int col, const wxString& typeName, void* value);
+
+private:
+	/** A hash map of the wxFileConfigs that represent the mod.ini files for
+	each mod.  The key is the the mod's folder name which is used as the mod's
+	internal name. */
+	ConfigHash* configFiles;
 
 };
 
