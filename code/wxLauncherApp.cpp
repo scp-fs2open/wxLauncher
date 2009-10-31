@@ -8,6 +8,8 @@ IMPLEMENT_APP(wxLauncher);
 bool wxLauncher::OnInit() {
 	wxInitAllImageHandlers();
 
+	wxLogInfo(_T("wxLauncher Starting up."));
+
 	MainWindow* window = new MainWindow();
 	window->Show(true);
 
