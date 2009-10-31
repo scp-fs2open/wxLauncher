@@ -1,6 +1,10 @@
 #include <wx/wx.h>
 #include <wx/grid.h>
 #include <wx/dir.h>
+#include <wx/fileconf.h>
+#include <wx/wfstream.h>
+#include <wx/tokenzr.h>
+#include <wx/arrstr.h>
 #include "ModGrid.h"
 #include "wxIDS.h"
 
@@ -26,19 +30,55 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 	size_t numberfound = wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
 	if ( foundInis.Count() > 0 ) {
 		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
-		for (size_t i = 0; i < foundInis.Count(); i++) {
-			wxLogDebug(_T("  %s"), foundInis.Item(i));
-		}
 	} else {
 		wxLogDebug(_T("I did not find any .ini files."));
 	}
 
 	// parse mod.ini's in all of the directories that contain one
+	this->configFiles = new ConfigHash();
+
+	wxLogDebug(_T("Inserting '(No MOD)'"));
+	(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig();
+
+	wxLogDebug(_T("Starting to opening mod.ini's..."));
+	for (size_t i = 0; i < foundInis.Count(); i++) {
+		wxLogDebug(_T("  Opening %s"), foundInis.Item(i));
+		wxFFileInputStream stream(foundInis.Item(i));
+		if ( stream.IsOk() ) {
+			wxLogDebug(_T("   Opened ok"));
+		} else {
+			wxLogDebug(_T("   Open failed!"));
+			continue;
+		}
+		wxFileConfig* config = new wxFileConfig(stream);
+
+		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")));
+
+		// get the mod.ini's base directory
+		// <something>/modfolder/mod.ini
+		// <something>\modfolder\mod.ini
+		wxArrayString tokens = wxStringTokenize(foundInis.Item(i), _T("\\/"),
+			wxTOKEN_STRTOK); /* breakup on folder markers and never return an
+							 empty string. */
+
+		wxASSERT_MSG( tokens.GetCount() >= 2,
+			wxString::Format(_T("Path '%s' does not seems to have enough \
+								directory markers."))
+		);
+		wxString shortname = tokens[tokens.GetCount() - 2];
+
+		wxLogDebug(_T("   Mod short name is: %s"), shortname);
+
+		(*(this->configFiles))[shortname] = config;
+	}
 
 	// create internal repesentation of the mod.ini's
 }
 /** the distructor.  Cleans up stuff. */
 ModGridTable::~ModGridTable() {
+	if ( this->configFiles != NULL ) {
+		delete this->configFiles;
+	}
 }
 
 int ModGridTable::GetNumberRows() {
