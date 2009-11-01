@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #include <wx/grid.h>
 #include <wx/fileconf.h>
+#include "Skin.h"
 
 WX_DECLARE_HASH_MAP( wxString, wxFileConfig*, wxStringHash, wxStringEqual , ConfigHash);
 
@@ -13,6 +14,25 @@ class ModGrid: public wxGrid {
 public:
 	ModGrid(wxWindow* parent, wxSize& size);
 };
+
+class FlagSetItem {
+public:
+	FlagSetItem();
+	wxString* name;
+	wxString* flagset;
+	wxString* notes;
+};
+
+WX_DECLARE_LIST(FlagSetItem, FlagSets);
+
+class I18nItem {
+public:
+	I18nItem();
+	wxString* modname;
+	wxString* infotext;
+};
+
+WX_DECLARE_LIST(I18nItem, I18nData);
 
 /** ModGridTable implements wxGridTableBase so that ModGrid can access the 
 mods for the TC and display them to the user. */
@@ -52,6 +72,31 @@ private:
 	internal name. */
 	ConfigHash* configFiles;
 
+	struct ModItem {
+		ModItem();
+		wxString* name;
+		wxBitmap* image;
+		wxString* infotext;
+		wxString* author;
+		wxString* notes;
+		bool warn;
+		wxString* website;
+		wxString* forum;
+		wxString* bugs;
+		wxString* support;
+
+		wxString* forcedon;
+		wxString* forcedoff;
+
+		wxString* primarylist;
+		wxString* secondarylist;
+
+		FlagSets* flagsets;	// set 0 is the ideal set.
+		
+		Skin* skin;
+
+		I18nData* i18n;
+	};
 };
 
 /** Renders the mod's name on the ModGrid.  Extends wxGridCellRender so that

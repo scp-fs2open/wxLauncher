@@ -144,3 +144,24 @@ void* ModGridTable::GetValueAsCustom(int row, int col, const wxString& typeName)
 void ModGridTable::SetValueAsCustom(int row, int col, const wxString& typeName, void *value) {
 	;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Flagsets
+FlagSetItem::FlagSetItem() {
+	this->name = NULL;
+	this->flagset = NULL;
+	this->notes = NULL;
+}
+
+#include <wx/listimpl.cpp>
+WX_DEFINE_LIST(FlagSets);
+
+///////////////////////////////////////////////////////////////////////////////
+// I18nData
+I18nItem::I18nItem() {
+	this->modname = NULL;
+	this->infotext = NULL;
+}
+
+#include <wx/listimpl.cpp>
+WX_DEFINE_LIST(I18nData);
