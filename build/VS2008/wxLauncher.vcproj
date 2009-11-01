@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\Skin.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\StatusLog.cpp"
 				>
 			</File>
@@ -262,6 +266,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\ModsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\Skin.h"
 				>
 			</File>
 			<File
@@ -319,11 +327,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>
