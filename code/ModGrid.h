@@ -15,9 +15,9 @@ public:
 	ModGrid(wxWindow* parent, wxSize& size);
 };
 
-class FlagSetItem {
-public:
+struct FlagSetItem {
 	FlagSetItem();
+	~FlagSetItem();
 	wxString* name;
 	wxString* flagset;
 	wxString* notes;
@@ -25,9 +25,9 @@ public:
 
 WX_DECLARE_LIST(FlagSetItem, FlagSets);
 
-class I18nItem {
-public:
+struct I18nItem {
 	I18nItem();
+	~I18nItem();
 	wxString* modname;
 	wxString* infotext;
 };

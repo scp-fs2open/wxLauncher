@@ -147,10 +147,29 @@ void ModGridTable::SetValueAsCustom(int row, int col, const wxString& typeName, 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Flagsets
+/** \struct FlagSetItem
+Structure used to store the name, notes, and the flagset itself.  Pointer's that
+are not NULL when structure is destroyed will be deleted by the structure. */
+/** Constructor. Only makes sure that the members are nulled. Does nothing
+else.*/
 FlagSetItem::FlagSetItem() {
 	this->name = NULL;
 	this->flagset = NULL;
 	this->notes = NULL;
+}
+
+/** Destructor.  Deletes any non NULL pointers that are contained in the
+structure. */
+FlagSetItem::~FlagSetItem() {
+	if ( this->name != NULL ) {
+		delete this->name;
+	}
+	if ( this->flagset != NULL ) {
+		delete this->flagset;
+	}
+	if ( this->notes != NULL ) {
+		delete this->notes;
+	}
 }
 
 #include <wx/listimpl.cpp>
@@ -158,10 +177,26 @@ WX_DEFINE_LIST(FlagSets);
 
 ///////////////////////////////////////////////////////////////////////////////
 // I18nData
+/** \struct I18nItem
+Structure to store the translation of the supported translatable strings
+(modname and infotext).  Structure will delete the non-null pointers it
+contains at the structures time of destruction. */
+/** Constructor.  Only NULL's the member variables. */
 I18nItem::I18nItem() {
 	this->modname = NULL;
 	this->infotext = NULL;
 }
+
+/** Destructor. Deletes any non-null member variables. */
+I18nItem::~I18nItem() {
+	if ( this->modname ) {
+		delete this->modname;
+	}
+	if ( this->infotext ) {
+		delete this->infotext;
+	}
+}
+
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(I18nData);
