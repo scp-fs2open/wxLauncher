@@ -73,6 +73,17 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 	}
 
 	// create internal repesentation of the mod.ini's
+	wxLogDebug(_T("Transforming mod.ini's"));
+	ConfigHash::iterator iter = this->configFiles->begin();
+
+	while ( iter != this->configFiles->end() ) {
+		ConfigHash::key_type shortname = iter->first;
+		ConfigHash::mapped_type config = iter->second;
+		wxLogDebug(_T(" %s"), shortname);
+
+		++iter;
+	}
+
 }
 /** the distructor.  Cleans up stuff. */
 ModGridTable::~ModGridTable() {
