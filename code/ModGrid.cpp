@@ -200,3 +200,32 @@ I18nItem::~I18nItem() {
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(I18nData);
+
+///////////////////////////////////////////////////////////////////////////////
+// ModGridTable::ModItem
+/** \struct ModGridTable::ModItem
+Structure that holds all of the information for a single line in the mod table.
+*/
+/** Constructor.*/
+ModGridTable::ModItem::ModItem() {
+	this->name = NULL;
+	this->image = NULL;
+	this->infotext = NULL;
+	this->author = NULL;
+	this->notes = NULL;
+	warn = false;
+	this->website = NULL;
+	this->forum = NULL;
+	this->bugs = NULL;
+	this->support = NULL;
+
+	this->forcedon = NULL;
+	this->forcedoff = NULL;
+
+	this->primarylist = NULL;
+	this->secondarylist = NULL;
+
+	this->flagsets = NULL;
+	this->skin = NULL;
+	this->i18n = NULL;
+}
