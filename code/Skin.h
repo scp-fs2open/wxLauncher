@@ -3,7 +3,7 @@
 
 #include <wx/wx.h>
 
-/** Struct that holds the skin information. */
+/** Struct that holds the skin information.  */
 struct Skin {
 	Skin();
 	wxString* windowTitle;
@@ -14,7 +14,7 @@ struct Skin {
 	wxBitmap* basicIcon;
 	wxBitmap* advancedIcon;
 	wxBitmap* installIcon;
-	wxBitmap* ideaIcon;
+	wxBitmap* idealIcon;
 	wxFont* baseFont;
 };
 
