@@ -11,32 +11,29 @@
 #include "AdvSettingsPage.h"
 #include "InstallPage.h"
 #include "BottomButtons.h"
+#include "Skin.h"
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxBORDER_SIMPLE | wxSYSTEM_MENU\
 	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
 
-MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
-								   _("wxLauncher for the FreeSpace Source Code Project"),
-								   wxDefaultPosition,
-								   wxSize(800, 600),
-								   MAINWINDOW_STYLE)
-{
-	Centre();
-	wxFont* windowFont = wxFont::New(12, wxFONTFAMILY_DECORATIVE, wxFONTSTYLE_NORMAL,
-		wxFONTWEIGHT_BOLD, false);
+MainWindow::MainWindow(SkinSystem* skin) {
+	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
+		wxDefaultPosition, wxSize(800, 600), MAINWINDOW_STYLE);
+
+	wxFont windowFont = skin->GetFont();
 
 	// setup tabs
 
 	// Images used by wxImageList must be all the same dimentions
 	wxImageList* images = new wxImageList(64,64);
-	images->Add(wxBitmap(_T("welcome.png"), wxBITMAP_TYPE_PNG));
-	images->Add(wxBitmap(_T("mods.png"), wxBITMAP_TYPE_PNG));
-	images->Add(wxBitmap(_T("basic.png"), wxBITMAP_TYPE_PNG));
-	images->Add(wxBitmap(_T("advanced.png"), wxBITMAP_TYPE_PNG));
-	images->Add(wxBitmap(_T("install.png"), wxBITMAP_TYPE_PNG));
+	images->Add(skin->GetWelcomeIcon());
+	images->Add(skin->GetModsIcon());
+	images->Add(skin->GetBasicIcon());
+	images->Add(skin->GetAdvancedIcon());
+	images->Add(skin->GetInstallIcon());
 
 	this->mainTab = new wxToolbook();
-	this->mainTab->SetOwnFont((*windowFont));
+	this->mainTab->SetFont(windowFont);
 	this->SetBackgroundStyle(wxBG_STYLE_COLOUR);
 	this->SetBackgroundColour(*wxWHITE);
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,-1),	wxNB_LEFT);
@@ -57,6 +54,7 @@ MainWindow::MainWindow() : wxFrame((wxFrame*)NULL, wxID_ANY,
 	sizer->SetSizeHints(this);
 	this->SetSizerAndFit(sizer);
 	this->Layout();
+	this->Center();
 }
 
 MainWindow::~MainWindow() {

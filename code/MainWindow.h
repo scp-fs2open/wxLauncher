@@ -4,10 +4,11 @@
 #include <wx/wx.h>
 #include <wx/notebook.h>
 #include <wx/toolbook.h>
+#include "Skin.h"
 
 class MainWindow: public wxFrame {
 public:
-	MainWindow();
+	MainWindow(SkinSystem* skin);
 	~MainWindow();
 
 	void OnQuit(wxCommandEvent& WXUNUSED(event));

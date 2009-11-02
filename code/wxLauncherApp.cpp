@@ -2,6 +2,7 @@
 #include <wx/image.h>
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
+#include "Skin.h"
 
 IMPLEMENT_APP(wxLauncher);
 
@@ -10,7 +11,9 @@ bool wxLauncher::OnInit() {
 
 	wxLogInfo(_T("wxLauncher Starting up."));
 
-	MainWindow* window = new MainWindow();
+	SkinSystem* skin = new SkinSystem();
+
+	MainWindow* window = new MainWindow(skin);
 	window->Show(true);
 
 	return true;
