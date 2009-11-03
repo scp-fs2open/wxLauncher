@@ -5,6 +5,7 @@
 #include <wx/wfstream.h>
 #include <wx/tokenzr.h>
 #include <wx/arrstr.h>
+#include <wx/filename.h>
 #include "ModGrid.h"
 #include "wxIDS.h"
 
@@ -40,7 +41,16 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 	this->configFiles = new ConfigHash();
 
 	wxLogDebug(_T("Inserting '(No MOD)'"));
-	(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig();
+	wxFileName tcmodini(_T("mod.ini"));
+	tcmodini.Normalize(wxPATH_NORM_ALL, _T("."));
+	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
+		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
+		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig(tcmodinistream);
+		wxLogDebug(_T(" Found a mod.ini in the root TC folder."));
+	} else {
+		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig();
+		wxLogDebug(_T(" Using defaults for TC."));
+	}
 
 	wxLogDebug(_T("Starting to opening mod.ini's..."));
 	for (size_t i = 0; i < foundInis.Count(); i++) {
