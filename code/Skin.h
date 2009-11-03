@@ -40,6 +40,8 @@ public:
 	void SetTCSkin(Skin *skin = NULL);
 	void SetModSkin(Skin *skin = NULL);
 
+	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
+
 private:
 	Skin* defaultSkin;
 	Skin* TCSkin;
