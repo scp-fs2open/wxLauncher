@@ -2,6 +2,7 @@
 #define SKIN_H
 
 #include <wx/wx.h>
+#include <wx/filename.h>
 
 /** Struct that holds the skin information.  */
 struct Skin {
@@ -41,6 +42,20 @@ public:
 	void SetModSkin(Skin *skin = NULL);
 
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
+	static wxBitmap* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
+	static wxBitmap* VerifyTabIcon(wxString currentTC, wxString shortmodname, wxString filepath);
+	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
+	static wxFont* VerifyFontChoice(wxString currentTC, wxString shortmodname,
+		wxString fontname=_T(""), int fontsize=0, wxString fontFamilyStr=_T(""),
+		wxString fontStyleStr=_T(""), wxString fontWeightStr=_T(""), bool underline=false );
+
+	static bool SearchFile(wxFileName* filename, wxString currentTC,
+		wxString shortmodname, wxString filepath);
+
+	static const unsigned int TabIconWidth = 64;
+	static const unsigned int TabIconHeight = 64;
+	static const unsigned int IdealIconWidth = 16;
+	static const unsigned int IdealIconHeight = 16;
 
 private:
 	Skin* defaultSkin;

@@ -83,9 +83,8 @@ wxString SkinSystem::GetTitle() {
 		&& this->defaultSkin->windowTitle != NULL ) {
 			return *(this->defaultSkin->windowTitle);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a window title. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a window title. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxString();
 	}
 }
@@ -101,9 +100,8 @@ wxBitmap SkinSystem::GetWelcomeIcon() {
 		&& this->defaultSkin->welcomeIcon != NULL ) {
 			return *(this->defaultSkin->welcomeIcon);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a welcome icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a welcome icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
@@ -119,9 +117,8 @@ wxBitmap SkinSystem::GetModsIcon() {
 		&& this->defaultSkin->modsIcon != NULL ) {
 			return *(this->defaultSkin->modsIcon);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a mods icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a mods icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
@@ -155,9 +152,8 @@ wxBitmap SkinSystem::GetAdvancedIcon() {
 		&& this->defaultSkin->advancedIcon != NULL ) {
 			return *(this->defaultSkin->advancedIcon);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a advanced icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a advanced icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
@@ -173,9 +169,8 @@ wxBitmap SkinSystem::GetInstallIcon() {
 		&& this->defaultSkin->installIcon != NULL ) {
 			return *(this->defaultSkin->installIcon);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
@@ -191,42 +186,190 @@ wxFont SkinSystem::GetFont() {
 		&& this->defaultSkin->baseFont != NULL ) {
 			return *(this->defaultSkin->baseFont);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullFont;
 	}
 }
 
-/** Opens, verifies and resizes (if nessicary) the 255x112 image that is needed
-on the mods page. */
+/** Opens, verifies and resizes (if nessisary) the 255x112 image that is needed
+on the mods page. 
+\note Does allocate memory.*/
 wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 									   wxString filepath) {
-	wxFileName filename(
-		wxString::Format(_T("%s/%s"), shortmodname, filepath));
-	if ( filename.Normalize(wxPATH_NORM_ALL, current, wxPATH_UNIX) ) {
-		if ( filename.IsOk() && filename.FileExists() ) {
-			wxLogDebug(wxString::Format(_T("   Opening: %s"), filename.GetFullPath()));
-			wxImage image(filename.GetFullPath());
-			if ( image.IsOk() ) {
-				if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
-					wxLogDebug(_T("   Resizing."));
-					image = image.Scale(255, 112, wxIMAGE_QUALITY_HIGH);
-				}
-				return new wxBitmap(image);
-			} else {
-				wxLogDebug(_T("   Image is not Ok!"));
+	wxFileName filename;
+	if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		wxImage image(filename.GetFullPath());
+		if ( image.IsOk() ) {
+			if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
+				wxLogDebug(_T("   Resizing."));
+				image = image.Scale(255, 112, wxIMAGE_QUALITY_HIGH);
 			}
+			return new wxBitmap(image);
 		} else {
-			wxLogDebug(
-				wxString::Format(
-				(filename.IsOk()) ? _T("   Image '%s' does not exist!") : _T("   Image '%s' is not valid!"),
-				filename.GetFullPath()));
+			wxLogDebug(_T("   Image is not Ok!"));
 		}
-	} else {
-		wxLogDebug(
-			wxString::Format(_T("   Unable to normalize '%s' '%s' '%s'"),
-			current, shortmodname, filepath));
 	}
 	return NULL;
 }
+
+/** Opens, verifies, the window icon, returning NULL if anything is not valid.
+\note Does allocate memory. */
+wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
+									   wxString filepath) {
+   wxFileName filename;
+   if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
+	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+
+	   wxImage image(filename.GetFullPath());
+	   if ( image.IsOk() ) {
+		   if ( image.GetWidth() == 32 && image.GetHeight() == 32 ) {
+			   return new wxBitmap(image);
+		   } else {
+			   wxLogDebug(_T("   Image size wrong"));
+		   }
+	   } else {
+		   wxLogDebug(_T("   Image not valid."));
+	   }
+   }
+   return NULL;
+}
+
+/** Returns true is function is able to get a valid filename object for the
+passed paths.  Filename is returned via the param filename. */
+bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
+							wxString shortmodname, wxString filepath) {
+	filename->Assign(
+		wxString::Format(_T("%s/%s"), shortmodname, filepath));
+	if ( filename->Normalize(wxPATH_NORM_ALL, currentTC, wxPATH_UNIX) ) {
+		if ( filename->IsOk() ) {
+			if ( filename->FileExists() ) {
+				return true;
+			} else {
+				wxLogDebug(_T("   File '%s' does not exist"),
+					filename->GetFullPath());
+			}
+		} else {
+			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath());
+		}
+	} else {
+		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC,
+			shortmodname, filepath);
+	}
+	return false;
+}
+
+/** Verifies that the icon exists, is the correct size (resizing if needed)
+and then returns a new wxBitmap that contains the file. */
+wxBitmap* SkinSystem::VerifyTabIcon(wxString currentTC, wxString shortmodname,
+									wxString filepath) {
+	wxFileName filename;
+	if ( SkinSystem::SearchFile(&filename, currentTC, shortmodname, filepath) ) {
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+
+		wxImage image(filename.GetFullPath());
+		
+		if ( image.IsOk() ) {
+			if ( image.GetWidth() != SkinSystem::TabIconWidth
+				|| image.GetHeight() != SkinSystem::TabIconHeight ) {
+					wxLogDebug(_T("   Resizing image from %dx%d"), 
+						image.GetWidth(), image.GetHeight());
+
+					image = image.Scale(
+						SkinSystem::TabIconWidth,
+						SkinSystem::TabIconHeight,
+						wxIMAGE_QUALITY_HIGH);
+			}
+			return new wxBitmap(image);
+		} else {
+			wxLogDebug(_T("   Image not valid!"));
+		}
+	}
+	return NULL;
+}
+
+/** Verifies that the ideal icon exists and is the correct size. Returns a
+new wxBitmap allocated on the heap, otherwise returns NULL if any errors.*/
+wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
+									  wxString filepath) {
+	  wxFileName filename;
+	  if ( SkinSystem::SearchFile(&filename, currentTC, shortname, filepath) ) {
+		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+
+		  wxImage image(filename.GetFullPath());
+
+		  if ( image.IsOk() ) {
+			  if ( image.GetWidth() == SkinSystem::IdealIconWidth 
+				  && image.GetHeight() == SkinSystem::IdealIconHeight ) { 
+					  return new wxBitmap(image);
+			  } else {
+				  wxLogDebug(_T("   Icon is incorrect size. Got (%d,%d); Need (%d,%d)"),
+					  image.GetWidth(), image.GetHeight(),
+					  SkinSystem::IdealIconWidth, SkinSystem::IdealIconHeight);
+			  }
+		  } else {
+			  wxLogDebug(_T("   Icon is not valid."));
+		  }
+	  }
+	  return NULL;
+}
+
+/** Returns a valid font object based on the font name and/or size passed in. */
+wxFont* SkinSystem::VerifyFontChoice(wxString currentTC, wxString shortmodname,
+									 wxString fontname, int fontsize,
+									 wxString fontFamilyStr, wxString fontStyleStr,
+									 wxString fontWeightStr, bool underline) {
+	 WXUNUSED(currentTC);
+	 WXUNUSED(shortmodname);
+	 
+	// interpret the fontfamily string
+
+	 wxFontFamily fontfamily = wxFONTFAMILY_UNKNOWN;
+	 fontFamilyStr.MakeLower();
+	 if ( fontFamilyStr.StartsWith(_T("decorative")) ) {
+		 fontfamily = wxFONTFAMILY_DECORATIVE;
+	 } else if ( fontFamilyStr.StartsWith(_T("roman")) ) {
+		 fontfamily = wxFONTFAMILY_ROMAN;
+	 } else if ( fontFamilyStr.StartsWith(_T("script")) ) {
+		 fontfamily = wxFONTFAMILY_SCRIPT;
+	 } else if ( fontFamilyStr.StartsWith(_T("swiss")) ) {
+		 fontfamily = wxFONTFAMILY_SWISS;
+	 } else if ( fontFamilyStr.StartsWith(_T("modern")) ) {
+		 fontfamily = wxFONTFAMILY_MODERN;
+	 } else if ( fontFamilyStr.StartsWith(_T("teletype")) ) {
+		 fontfamily = wxFONTFAMILY_TELETYPE;
+	 }
+
+	 wxFontStyle fontstyle = wxFONTSTYLE_MAX;
+	 fontStyleStr.MakeLower();
+	 if ( fontStyleStr.StartsWith(_T("slant")) ) {
+		fontstyle = wxFONTSTYLE_SLANT;
+	 } else if ( fontStyleStr.StartsWith(_T("italic")) ) {
+		 fontstyle = wxFONTSTYLE_ITALIC;
+	 }
+
+	 wxFontWeight fontweight = wxFONTWEIGHT_MAX;
+	 fontStyleStr.MakeLower();
+	 if ( fontStyleStr.StartsWith(_T("bold")) ) {
+		 fontweight = wxFONTWEIGHT_BOLD;
+	 } else if ( fontStyleStr.StartsWith(_T("light")) ) {
+		 fontweight = wxFONTWEIGHT_LIGHT;
+	 }
+
+	 wxFont font(
+		 (fontsize < 0) ? 12 : fontsize,	// font size
+		 (fontfamily == wxFONTFAMILY_UNKNOWN) ? wxFONTFAMILY_DEFAULT : fontfamily,
+		 (fontstyle == wxFONTSTYLE_MAX) ? wxFONTSTYLE_NORMAL : fontstyle,
+		 (fontweight == wxFONTWEIGHT_MAX) ? wxFONTWEIGHT_NORMAL : fontweight,
+		 underline,
+		 fontname);
+
+	 if ( font.IsOk() ) {
+		 return new wxFont(font);
+	 } else {
+		 return NULL;
+	 }
+}
+
+
