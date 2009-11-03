@@ -84,6 +84,8 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 		ModItem* item = new ModItem();
 		wxLogDebug(_T(" %s"), shortname);
 
+		item->shortname = new wxString(shortname);
+
 		readIniFileString(config, _T("/launcher/modname"), &(item->name));
 
 		wxString *smallimagepath = NULL;
@@ -376,6 +378,7 @@ Structure that holds all of the information for a single line in the mod table.
 /** Constructor.*/
 ModGridTable::ModItem::ModItem() {
 	this->name = NULL;
+	this->shortname = NULL;
 	this->image = NULL;
 	this->infotext = NULL;
 	this->author = NULL;

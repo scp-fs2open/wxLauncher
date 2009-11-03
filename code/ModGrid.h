@@ -87,6 +87,7 @@ private:
 	struct ModItem {
 		ModItem();
 		wxString* name;
+		wxString* shortname;
 		wxBitmap* image;
 		wxString* infotext;
 		wxString* author;
