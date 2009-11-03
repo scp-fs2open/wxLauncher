@@ -217,8 +217,15 @@ void ModGridTable::readIniFileString(ConfigHash::mapped_type config,
 			if ( (*location)->EndsWith(this->semicolon) ) {
 				(*location)->RemoveLast();
 			}
-		}
-	wxLogDebug(_T("  %s:'%s'"), keyvalue, ((*location) == NULL) ? _T("Not Specified") : **location );
+	}
+	wxLogDebug(_T("  %s:'%s'"), keyvalue,
+		((*location) == NULL) ? _T("Not Specified") : **location);
+
+	if ( (*location) != NULL && (*location)->empty() ) {
+		wxLogDebug(_T("  Nulled %s"), keyvalue);
+		delete *location;
+		*location = NULL;
+	}
 }
 
 /** */
