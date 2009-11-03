@@ -134,9 +134,8 @@ wxBitmap SkinSystem::GetBasicIcon() {
 		&& this->defaultSkin->basicIcon != NULL ) {
 			return *(this->defaultSkin->basicIcon);
 	} else {
-		wxLogFatalError(
-			wxString::Format(_T("Cannot retrive a basic icon. (0x%h, 0x%h, 0x%h)"),
-			this->modSkin, this->TCSkin, this->defaultSkin));
+		wxLogFatalError(_T("Cannot retrive a basic icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
