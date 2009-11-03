@@ -25,6 +25,8 @@ ModGrid::ModGrid(wxWindow *parent, wxSize &size) {
 and transforms that into its internal representation for ModGridTable to 
 display. */
 ModGridTable::ModGridTable(): wxGridTableBase() {
+	this->semicolon = new wxChar(';');
+	this->semicolon[1] = NULL;
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
 	size_t numberfound = wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
@@ -79,7 +81,115 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 	while ( iter != this->configFiles->end() ) {
 		ConfigHash::key_type shortname = iter->first;
 		ConfigHash::mapped_type config = iter->second;
+		ModItem* item = new ModItem();
 		wxLogDebug(_T(" %s"), shortname);
+
+		readIniFileString(config, _T("/launcher/modname"), &(item->name));
+
+		wxString *smallimagepath = NULL;
+		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
+		
+		readIniFileString(config, _T("/launcher/infotext"), &(item->infotext));
+
+		readIniFileString(config, _T("/launcher/author"), &(item->author));
+
+		readIniFileString(config, _T("/launcher/notes"), &(item->notes));
+
+		config->Read(_T("/launcher/warn"), &(item->warn), false);
+
+		readIniFileString(config, _T("/launcher/website"), &(item->website));
+		readIniFileString(config, _T("/launcher/forum"), &(item->forum));
+		readIniFileString(config, _T("/launcher/bugs"), &(item->bugs));
+		readIniFileString(config, _T("/launcher/support"), &(item->support));
+
+		readIniFileString(config, _T("/extremeforce/forcedflagson"), &(item->forcedon));
+		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), &(item->forcedoff));
+
+		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
+		if ( config->Exists(_T("/multimod/secondrylist")) ) {
+			wxLogInfo(_T("  DEPCRECIATION WARNING: Mod '%s' uses depreciated mod.ini parameter 'secondrylist'"),
+				shortname);
+		}
+		readIniFileString(config, _T("/multimod/secondrylist"), &(item->secondarylist));
+		readIniFileString(config, _T("/multimod/secondarylist"), &(item->secondarylist));
+
+		// flag sets
+		if ( config->Exists(_T("/flagsetideal")) ) {
+			item->flagsets = new FlagSets();
+
+			FlagSetItem* flagset = new FlagSetItem();
+
+			readFlagSet(config, _T("/flagsetideal"), flagset);
+
+			item->flagsets->Add(flagset);
+
+			unsigned int counter = 1;
+			bool done = false;
+			do {
+				wxString sectionname = wxString::Format(_T("/flagset%d"), counter);
+				if ( config->Exists( sectionname )) {
+					FlagSetItem* numberedflagset = new FlagSetItem();
+
+					readFlagSet(config, sectionname, numberedflagset);
+					
+					item->flagsets->Add(numberedflagset);
+				} else {
+					done = true;
+				}
+				counter++;
+			} while ( !done );
+		} else {
+			wxLogDebug(_T("  Does Not Contain An idealflagset Section."));
+		}
+
+		// skin
+		if ( config->Exists(_T("/skin")) ) {
+			item->skin = new Skin();
+
+			readIniFileString(config, _T("/skin/wtitle"), &(item->skin->windowTitle));
+			
+			wxString *windowIconFile = NULL;
+			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
+
+			wxString *welcomeIconFile = NULL,
+				*modsIconFile = NULL,
+				*basicIconFile = NULL,
+				*advancedIconFile = NULL,
+				*installIconFile = NULL;
+			readIniFileString(config, _T("/skin/iconwelcome"), &welcomeIconFile);
+			readIniFileString(config, _T("/skin/iconmods"), &modsIconFile);
+			readIniFileString(config, _T("/skin/iconbasic"), &basicIconFile);
+			readIniFileString(config, _T("/skin/iconadvanced"), &advancedIconFile);
+			readIniFileString(config, _T("/skin/iconinstall"), &installIconFile);
+
+			wxString *idealIconFile = NULL;
+			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
+
+			wxString *fontName = NULL;
+			readIniFileString(config, _T("/skin/font"), &fontName);
+			wxString *fontSize = NULL;
+			readIniFileString(config, _T("/skin/fontsize"), &fontSize);
+
+		} else {
+			wxLogDebug(_T("  Does Not Contain An skin Section."));
+		}
+
+		// langauges
+		for ( size_t i = 0;	i < SupportedLanguages.Count(); i++ ) {
+			wxString section = wxString::Format(_T("/%s"), SupportedLanguages[i]);
+			if ( config->Exists(section) ) {
+				if ( item->i18n == NULL ) {
+					item->i18n = new I18nData();
+				}
+			}
+			I18nItem *temp = NULL;
+
+			readTranslation(config, SupportedLanguages[i], &temp);
+			
+			if ( temp != NULL ) {
+				(*(item->i18n))[SupportedLanguages[i]] = temp;
+			}
+		}
 
 		++iter;
 	}
@@ -89,6 +199,43 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 ModGridTable::~ModGridTable() {
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
+	}
+}
+/** Function takes the keyvalue string to search for, and returns via location
+the pointer to value. If the keyvalue is not found *location will remain NULL.*/
+void ModGridTable::readIniFileString(ConfigHash::mapped_type config,
+									 wxString keyvalue, wxString ** location) {
+	if ( config->Exists(keyvalue) ) {
+			*location = new wxString();
+			config->Read(keyvalue, *location);
+			if ( (*location)->EndsWith(this->semicolon) ) {
+				(*location)->RemoveLast();
+			}
+		}
+	wxLogDebug(_T("  %s:'%s'"), keyvalue, ((*location) == NULL) ? _T("Not Specified") : **location );
+}
+
+/** */
+void ModGridTable::readFlagSet(ConfigHash::mapped_type config,
+							   wxString keyprefix, FlagSetItem *set) {
+	readIniFileString(config, wxString::Format(_T("%s/name"), keyprefix), &(set->name));
+	readIniFileString(config, wxString::Format(_T("%s/flagset"), keyprefix), &(set->flagset));
+	readIniFileString(config, wxString::Format(_T("%s/notes"), keyprefix), &(set->notes));
+}
+
+void ModGridTable::readTranslation(ConfigHash::mapped_type config, wxString langaugename, I18nItem **trans) {
+	wxString section = wxString::Format(_T("/%s"), langaugename);
+	if ( config->Exists(section) ) {
+		*trans = new I18nItem();
+
+		readIniFileString(config, wxString::Format(_T("%s/modname"), section),
+			&((*trans)->infotext));
+		readIniFileString(config, wxString::Format(_T("%s/infotext"), section),
+			&((*trans)->infotext));
+
+	} else {
+		wxLogDebug( 
+			wxString::Format(_T("  Section '%s' does not exist."), langaugename));
 	}
 }
 
@@ -183,8 +330,8 @@ FlagSetItem::~FlagSetItem() {
 	}
 }
 
-#include <wx/listimpl.cpp>
-WX_DEFINE_LIST(FlagSets);
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(FlagSets);
 
 ///////////////////////////////////////////////////////////////////////////////
 // I18nData
@@ -207,10 +354,19 @@ I18nItem::~I18nItem() {
 		delete this->infotext;
 	}
 }
+/** The supported langauges. */
+const wxString __SupportedLanguages[] = {
+	_T("French"),
+	_T("Romanian"),
+	_T("German"),
+	_T("Polish"),
+};
+/** Languages that are supported by the launcher and thus will search for
+translations for in mod.ini's. */
+wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguages)/sizeof(wxString), __SupportedLanguages);
 
-
-#include <wx/listimpl.cpp>
-WX_DEFINE_LIST(I18nData);
+//#include <wx/impl.cpp>
+//WX_DEFINE_OBJARRAY(I18nData);
 
 ///////////////////////////////////////////////////////////////////////////////
 // ModGridTable::ModItem
