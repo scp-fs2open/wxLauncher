@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #include <wx/grid.h>
 #include <wx/fileconf.h>
+#include <wx/arrstr.h>
 #include "Skin.h"
 
 WX_DECLARE_HASH_MAP( wxString, wxFileConfig*, wxStringHash, wxStringEqual , ConfigHash);
@@ -23,7 +24,9 @@ struct FlagSetItem {
 	wxString* notes;
 };
 
-WX_DECLARE_LIST(FlagSetItem, FlagSets);
+WX_DECLARE_OBJARRAY(FlagSetItem, FlagSets);
+
+extern wxSortedArrayString SupportedLanguages;
 
 struct I18nItem {
 	I18nItem();
@@ -32,7 +35,7 @@ struct I18nItem {
 	wxString* infotext;
 };
 
-WX_DECLARE_LIST(I18nItem, I18nData);
+WX_DECLARE_STRING_HASH_MAP(I18nItem*, I18nData);
 
 /** ModGridTable implements wxGridTableBase so that ModGrid can access the 
 mods for the TC and display them to the user. */
@@ -71,6 +74,15 @@ private:
 	each mod.  The key is the the mod's folder name which is used as the mod's
 	internal name. */
 	ConfigHash* configFiles;
+
+	wxChar* semicolon;
+
+	void readIniFileString(ConfigHash::mapped_type config,
+		wxString keyvalue, wxString ** location);
+	void readFlagSet(ConfigHash::mapped_type config,
+		wxString keyprefix, FlagSetItem * set);
+	void readTranslation(ConfigHash::mapped_type config,
+		wxString langaugename, I18nItem ** trans);
 
 	struct ModItem {
 		ModItem();
