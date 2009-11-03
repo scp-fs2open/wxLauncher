@@ -90,6 +90,10 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 
 		wxString *smallimagepath = NULL;
 		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
+		if ( smallimagepath != NULL ) {
+			item->image = SkinSystem::VerifySmallImage(_T("."), shortname,
+				*smallimagepath);
+		}
 		
 		readIniFileString(config, _T("/launcher/infotext"), &(item->infotext));
 

@@ -1,4 +1,5 @@
 #include <wx/wx.h>
+#include <wx/filename.h>
 #include "skin.h"
 
 Skin::Skin() {
@@ -195,4 +196,37 @@ wxFont SkinSystem::GetFont() {
 			this->modSkin, this->TCSkin, this->defaultSkin));
 		return wxNullFont;
 	}
+}
+
+/** Opens, verifies and resizes (if nessicary) the 255x112 image that is needed
+on the mods page. */
+wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
+									   wxString filepath) {
+	wxFileName filename(
+		wxString::Format(_T("%s/%s"), shortmodname, filepath));
+	if ( filename.Normalize(wxPATH_NORM_ALL, current, wxPATH_UNIX) ) {
+		if ( filename.IsOk() && filename.FileExists() ) {
+			wxLogDebug(wxString::Format(_T("   Opening: %s"), filename.GetFullPath()));
+			wxImage image(filename.GetFullPath());
+			if ( image.IsOk() ) {
+				if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
+					wxLogDebug(_T("   Resizing."));
+					image = image.Scale(255, 112, wxIMAGE_QUALITY_HIGH);
+				}
+				return new wxBitmap(image);
+			} else {
+				wxLogDebug(_T("   Image is not Ok!"));
+			}
+		} else {
+			wxLogDebug(
+				wxString::Format(
+				(filename.IsOk()) ? _T("   Image '%s' does not exist!") : _T("   Image '%s' is not valid!"),
+				filename.GetFullPath()));
+		}
+	} else {
+		wxLogDebug(
+			wxString::Format(_T("   Unable to normalize '%s' '%s' '%s'"),
+			current, shortmodname, filepath));
+	}
+	return NULL;
 }
