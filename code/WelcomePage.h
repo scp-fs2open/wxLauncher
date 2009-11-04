@@ -3,9 +3,11 @@
 
 #include <wx/wx.h>
 
+#include "Skin.h"
+
 class WelcomePage: public wxWindow {
 public:
-	WelcomePage(wxWindow* parent);
+	WelcomePage(wxWindow* parent, SkinSystem* skin);
 	void LinkClicked(wxHtmlLinkEvent& event);
 	
 private:
