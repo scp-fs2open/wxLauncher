@@ -1,7 +1,7 @@
-
+#include <wx/wx.h>
 #include "StatusLog.h"
 
-#include <wx/wx.h>
+#include "wxLauncherSetup.h" // Last include for memory debugging
 
 StatusLog::StatusLog() {
 	this->gaugePanel = NULL;

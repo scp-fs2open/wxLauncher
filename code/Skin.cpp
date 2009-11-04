@@ -2,6 +2,8 @@
 #include <wx/filename.h>
 #include "skin.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 Skin::Skin() {
 	this->windowTitle = NULL;
 	this->windowIcon = NULL;

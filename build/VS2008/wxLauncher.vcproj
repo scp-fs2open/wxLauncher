@@ -292,6 +292,10 @@
 				RelativePath="..\..\code\wxLauncherApp.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\code\wxLauncherSetup.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -327,11 +331,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 		</Filter>

@@ -2,6 +2,8 @@
 #include "BasicSettingsPage.h"
 #include "wxIDS.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, wxID_ANY, _("Video"));

@@ -3,6 +3,8 @@
 #include "WelcomePage.h"
 #include "wxIDS.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 /** Class that manages the header image for the welcome tab. */
 class HeaderBitmap: public wxPanel {
 public:
