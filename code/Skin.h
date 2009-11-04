@@ -5,8 +5,10 @@
 #include <wx/filename.h>
 
 /** Struct that holds the skin information.  */
-struct Skin {
+class Skin {
+public:
 	Skin();
+	~Skin();
 	wxString* windowTitle;
 	wxIcon* windowIcon;
 	wxBitmap* welcomeHeader;
@@ -26,6 +28,7 @@ can run arbitary code when the skin changes. */
 class SkinSystem {
 public:
 	SkinSystem(Skin* defaultSkin = NULL);
+	~SkinSystem();
 
 	wxString GetTitle();
 	wxIcon GetIcon();

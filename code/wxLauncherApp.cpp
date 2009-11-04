@@ -17,10 +17,18 @@ bool wxLauncher::OnInit() {
 
 	wxLogInfo(_T("wxLauncher Starting up."));
 
-	SkinSystem* skin = new SkinSystem();
+	this->skin = new SkinSystem();
 
 	MainWindow* window = new MainWindow(skin);
 	window->Show(true);
 
 	return true;
+}
+
+int wxLauncher::OnExit() {
+	if (this->skin != NULL) {
+		delete this->skin;
+	}
+
+	return 0;
 }

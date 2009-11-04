@@ -17,6 +17,19 @@ Skin::Skin() {
 	this->baseFont = NULL;
 }
 
+Skin::~Skin() {
+	if (this->windowTitle != NULL) delete this->windowTitle;
+	if (this->windowIcon != NULL) delete this->windowIcon;
+	if (this->welcomeHeader != NULL) delete this->welcomeHeader;
+	if (this->welcomeIcon != NULL) delete this->welcomeIcon;
+	if (this->modsIcon != NULL) delete this->modsIcon;
+	if (this->basicIcon != NULL) delete this->basicIcon;
+	if (this->advancedIcon != NULL) delete this->advancedIcon;
+	if (this->installIcon != NULL) delete this->installIcon;
+	if (this->idealIcon != NULL) delete this->idealIcon;
+	if (this->baseFont != NULL) delete this->baseFont;
+}
+
 SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( defaultSkin != NULL ) {
 		this->defaultSkin = defaultSkin;
@@ -42,6 +55,8 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	}
 
 	if ( this->defaultSkin->welcomeHeader == NULL ) {
+		this->defaultSkin->welcomeHeader = 
+			new wxBitmap(_("SCP Header.png"), wxBITMAP_TYPE_PNG);
 	}
 
 	if ( this->defaultSkin->welcomeIcon == NULL ) {
@@ -72,6 +87,12 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 			wxFONTSTYLE_NORMAL,
 			wxFONTWEIGHT_BOLD, false);
 	}
+}
+
+SkinSystem::~SkinSystem() {
+	if (this->defaultSkin != NULL) delete this->defaultSkin;
+	if (this->TCSkin != NULL) delete this->TCSkin;
+	if (this->modSkin != NULL) delete this->modSkin;
 }
 
 wxString SkinSystem::GetTitle() {
@@ -169,6 +190,23 @@ wxBitmap SkinSystem::GetInstallIcon() {
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->installIcon != NULL ) {
 			return *(this->defaultSkin->installIcon);
+	} else {
+		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
+		return wxNullBitmap;
+	}
+}
+
+wxBitmap SkinSystem::GetBanner() {
+	if ( this->modSkin != NULL
+		&& this->modSkin->welcomeHeader != NULL ) {
+			return *(this->modSkin->welcomeHeader);
+	} else if ( this->TCSkin != NULL
+		&& this->TCSkin->welcomeHeader != NULL ) {
+			return *(this->TCSkin->welcomeHeader);
+	} else if ( this->defaultSkin != NULL
+		&& this->defaultSkin->welcomeHeader != NULL ) {
+			return *(this->defaultSkin->welcomeHeader);
 	} else {
 		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);

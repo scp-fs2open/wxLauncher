@@ -2,27 +2,28 @@
 #include <wx/html/htmlwin.h>
 #include "WelcomePage.h"
 #include "wxIDS.h"
+#include "Skin.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
 /** Class that manages the header image for the welcome tab. */
 class HeaderBitmap: public wxPanel {
 public:
-	HeaderBitmap(wxWindow* parent, int width): wxPanel(parent, wxID_ANY) {
-		this->bitmap = new wxBitmap(_("SCP Header.png"), wxBITMAP_TYPE_PNG);
-		wxASSERT_MSG(this->bitmap->IsOk(), _("Loaded bitmap is invalid."));
+	HeaderBitmap(wxWindow* parent, int width, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
+		this->bitmap = skin->GetBanner();
+		wxASSERT_MSG(this->bitmap.IsOk(), _("Loaded bitmap is invalid."));
 
-		wxASSERT_MSG(this->bitmap->GetWidth() <= width,
+		wxASSERT_MSG(this->bitmap.GetWidth() <= width,
 			(wxString::Format(_("Header bitmap is larger than %d pixels!"), width)));
 
-		this->SetMinSize(wxSize(width, bitmap->GetHeight()));
+		this->SetMinSize(wxSize(width, bitmap.GetHeight()));
 	}
 	virtual void OnPaint(wxPaintEvent& event) {
 		wxPaintDC dc(this);
-		dc.DrawBitmap(*(this->bitmap), (this->GetSize().GetWidth()/2) - (this->bitmap->GetWidth()/2), 0);
+		dc.DrawBitmap(this->bitmap, (this->GetSize().GetWidth()/2) - (this->bitmap.GetWidth()/2), 0);
 	}
 private:
-	wxBitmap* bitmap;
+	wxBitmap bitmap;
 	DECLARE_EVENT_TABLE();
 };
 
@@ -35,7 +36,7 @@ EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
 END_EVENT_TABLE()
 
-WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
+WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
 	this->SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
@@ -47,7 +48,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxWindow(parent, wxID_ANY) {
 	languageSizer->Add(launcherLanguageCombo);
 
 	// header image
-	HeaderBitmap* header = new HeaderBitmap(this, this->stuffWidth);
+	HeaderBitmap* header = new HeaderBitmap(this, this->stuffWidth, skin);
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
