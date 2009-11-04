@@ -30,6 +30,8 @@ display. */
 ModGridTable::ModGridTable(): wxGridTableBase() {
 	this->semicolon = new wxChar(';');
 	this->semicolon[1] = NULL;
+
+	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
 	size_t numberfound = wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
@@ -239,6 +241,8 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 			}
 		}
 
+		this->tableData->Add(item);
+
 		++iter;
 	}
 
@@ -247,6 +251,9 @@ ModGridTable::ModGridTable(): wxGridTableBase() {
 ModGridTable::~ModGridTable() {
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
+	}
+	if ( this->tableData != NULL ) {
+		delete this->tableData;
 	}
 }
 /** Function takes the keyvalue string to search for, and returns via location
@@ -295,7 +302,7 @@ void ModGridTable::readTranslation(ConfigHash::mapped_type config, wxString lang
 }
 
 int ModGridTable::GetNumberRows() {
-	return 0;
+	return this->tableData->Count();
 }
 
 int ModGridTable::GetNumberCols() {
@@ -303,7 +310,7 @@ int ModGridTable::GetNumberCols() {
 }
 
 bool ModGridTable::IsEmptyCell(int row, int col) {
-	return true;
+	return false;
 }
 
 wxString ModGridTable::GetValue(int row, int col) {
@@ -429,7 +436,7 @@ wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguag
 Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
-ModGridTable::ModItem::ModItem() {
+ModItem::ModItem() {
 	this->name = NULL;
 	this->shortname = NULL;
 	this->image = NULL;
@@ -452,3 +459,6 @@ ModGridTable::ModItem::ModItem() {
 	this->skin = NULL;
 	this->i18n = NULL;
 }
+
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ModItemArray);

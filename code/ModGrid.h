@@ -37,6 +37,35 @@ struct I18nItem {
 
 WX_DECLARE_STRING_HASH_MAP(I18nItem*, I18nData);
 
+struct ModItem {
+	ModItem();
+	wxString* name;
+	wxString* shortname;
+	wxBitmap* image;
+	wxString* infotext;
+	wxString* author;
+	wxString* notes;
+	bool warn;
+	wxString* website;
+	wxString* forum;
+	wxString* bugs;
+	wxString* support;
+
+	wxString* forcedon;
+	wxString* forcedoff;
+
+	wxString* primarylist;
+	wxString* secondarylist;
+
+	FlagSets* flagsets;	// set 0 is the ideal set.
+	
+	Skin* skin;
+
+	I18nData* i18n;
+};
+
+WX_DECLARE_OBJARRAY(ModItem, ModItemArray);
+
 /** ModGridTable implements wxGridTableBase so that ModGrid can access the 
 mods for the TC and display them to the user. */
 class ModGridTable: public wxGridTableBase {
@@ -84,32 +113,7 @@ private:
 	void readTranslation(ConfigHash::mapped_type config,
 		wxString langaugename, I18nItem ** trans);
 
-	struct ModItem {
-		ModItem();
-		wxString* name;
-		wxString* shortname;
-		wxBitmap* image;
-		wxString* infotext;
-		wxString* author;
-		wxString* notes;
-		bool warn;
-		wxString* website;
-		wxString* forum;
-		wxString* bugs;
-		wxString* support;
-
-		wxString* forcedon;
-		wxString* forcedoff;
-
-		wxString* primarylist;
-		wxString* secondarylist;
-
-		FlagSets* flagsets;	// set 0 is the ideal set.
-		
-		Skin* skin;
-
-		I18nData* i18n;
-	};
+	ModItemArray* tableData;
 };
 
 /** Renders the mod's name on the ModGrid.  Extends wxGridCellRender so that
