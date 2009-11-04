@@ -3,6 +3,8 @@
 #include "BottomButtons.h"
 #include "StatusLog.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxPanel(
 	parent, wxID_ANY, pos, size) {
 		this->SetMinSize(size);

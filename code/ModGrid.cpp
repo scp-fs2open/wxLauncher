@@ -9,6 +9,8 @@
 #include "ModGrid.h"
 #include "wxIDS.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 ModGrid::ModGrid(wxWindow *parent, wxSize &size) {
 	this->Create(parent, ID_MODGRID, wxDefaultPosition, size );
 

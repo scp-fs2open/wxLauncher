@@ -13,6 +13,8 @@
 #include "BottomButtons.h"
 #include "Skin.h"
 
+#include "wxLauncherSetup.h" // Last include for memory debugging
+
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxBORDER_SIMPLE | wxSYSTEM_MENU\
 	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
 
