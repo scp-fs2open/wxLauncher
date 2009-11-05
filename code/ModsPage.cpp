@@ -1,7 +1,7 @@
 #include <wx/wx.h>
 #include "ModsPage.h"
 #include "wxIDs.h"
-#include "ModGrid.h"
+#include "ModList.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -10,7 +10,8 @@ ModsPage::ModsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 		_("Installed MODs.  Click on Install/Update in the left panel to\n\
 		  search, download, and install additional MODs and updates."));
 
-	wxGrid* modGrid = new ModGrid(this, wxSize(600, 400));
+	ModList* modGrid = new ModList(this, wxSize(600, 400));
+	modGrid->SetMinSize(wxSize(600, 400));
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(header);
