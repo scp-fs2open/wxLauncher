@@ -17,6 +17,8 @@ ModGrid::ModGrid(wxWindow *parent, wxSize &size) {
 	this->DisableCellEditControl();
 	this->EnableEditing(false);	// Grid must be read only.
 	this->EnableGridLines(false);	// no lines, we want to look like a listbox
+	this->SetLabelBackgroundColour(wxColour(_T("white")));
+	this->SetRowLabelSize(0);
 
 	this->SetTable(new ModGridTable(), true, wxGridSelectRows);
 }
