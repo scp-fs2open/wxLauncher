@@ -211,7 +211,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\ModGrid.cpp"
+				RelativePath="..\..\code\ModList.cpp"
 				>
 			</File>
 			<File
@@ -261,7 +261,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\ModGrid.h"
+				RelativePath="..\..\code\ModList.h"
 				>
 			</File>
 			<File
@@ -331,11 +331,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>
