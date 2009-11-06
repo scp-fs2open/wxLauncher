@@ -52,6 +52,7 @@ public:
 	static wxFont* VerifyFontChoice(wxString currentTC, wxString shortmodname,
 		wxString fontname=_T(""), int fontsize=0, wxString fontFamilyStr=_T(""),
 		wxString fontStyleStr=_T(""), wxString fontWeightStr=_T(""), bool underline=false );
+	static wxBitmap MakeModsListImage(const wxBitmap &orig);
 
 	static bool SearchFile(wxFileName* filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
@@ -60,6 +61,11 @@ public:
 	static const unsigned int TabIconHeight = 64;
 	static const unsigned int IdealIconWidth = 16;
 	static const unsigned int IdealIconHeight = 16;
+	static const unsigned int InfoWindowImageWidth = 255;
+	static const unsigned int InfoWindowImageHeight = 112;
+	static const unsigned int ModsListImageWidth = 182;
+	static const unsigned int ModsListImageHeight = 80;
+
 
 private:
 	Skin* defaultSkin;

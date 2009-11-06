@@ -417,4 +417,13 @@ wxFont* SkinSystem::VerifyFontChoice(wxString currentTC, wxString shortmodname,
 	 }
 }
 
-
+wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
+	wxImage temp = orig.ConvertToImage();
+	wxImage temp1 = temp.Scale(SkinSystem::ModsListImageWidth,
+		SkinSystem::ModsListImageHeight,
+		wxIMAGE_QUALITY_HIGH);
+	wxBitmap outimg = wxBitmap(temp1);
+	wxASSERT( outimg.GetWidth() == SkinSystem::ModsListImageWidth);
+	wxASSERT( outimg.GetHeight() == SkinSystem::ModsListImageHeight);
+	return outimg;
+}
