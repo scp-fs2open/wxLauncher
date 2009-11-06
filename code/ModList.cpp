@@ -87,7 +87,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	while ( iter != this->configFiles->end() ) {
 		ConfigHash::key_type shortname = iter->first;
 		ConfigHash::mapped_type config = iter->second;
-		ModItem* item = new ModItem(this, this->skinSystem);
+		ModItem* item = new ModItem(this->skinSystem);
 		wxLogDebug(_T(" %s"), shortname);
 
 		item->shortname = new wxString(shortname);
@@ -423,7 +423,7 @@ wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguag
 Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
-ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
+ModItem::ModItem(SkinSystem* skin) {
 	this->skinSystem = skin;
 
 	this->name = NULL;
@@ -448,9 +448,9 @@ ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
 	this->skin = NULL;
 	this->i18n = NULL;
 
-	this->infoTextPanel = new InfoText(parent, this);
-	this->modImagePanel = new ModImage(parent, this);
-	this->modNamePanel = new ModName(parent, this);
+	this->infoTextPanel = new InfoText(this);
+	this->modImagePanel = new ModImage(this);
+	this->modNamePanel = new ModName(this);
 
 }
 
@@ -509,20 +509,8 @@ WX_DEFINE_OBJARRAY(ArrayOfWords);
 Extends wxPanel so that it can draw the info text to the correct size in the list
 */
 /** Constructor. Sets up stuff. */
-ModItem::InfoText::InfoText(wxWindow *parent, ModItem *myData) {
-	this->Create(parent);
-
+ModItem::InfoText::InfoText(ModItem *myData) {
 	this->myData = myData;
-}
-
-/** Draws the currently set InfoText into a specific width.  If the text is too
-long, will also truncate the text so that it is not too long visually. */
-void ModItem::InfoText::OnDraw(wxPaintEvent &event) {
-	WXUNUSED(event);
-
-	wxPaintDC dc(this);
-
-	Draw(dc, wxRect(0, 0, 125, 400));
 }
 
 void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
@@ -530,12 +518,12 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		wxStringTokenizer tokens(*(this->myData->infotext));
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
-		this->SetFont(this->myData->skinSystem->GetFont());
+		wxFont currentfont = *(this->myData->skinSystem->GetFontPointer());
 
 		do {
 			wxString tok = tokens.GetNextToken();
 			int x, y;
-			this->GetTextExtent(tok, &x, &y, NULL, NULL, this->myData->skinSystem->GetFontPointer());
+			dc.GetTextExtent(tok, &x, &y, NULL, NULL, &currentfont);
 
 			Words* temp = new Words();
 			temp->size = dc.GetTextExtent(tok);
@@ -573,19 +561,13 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 	}
 }
 
-BEGIN_EVENT_TABLE(ModItem::InfoText, wxPanel)
-EVT_PAINT(ModItem::InfoText::OnDraw)
-END_EVENT_TABLE()
-
 ///////////////////////////////////////////
 /** \class ModItem::ModName
 Extends wxPanel so that it can draw the mod's name to the correct size in the list
 or the mod's short name.
 */
 /** Constructor. Sets up stuff. */
-ModItem::ModName::ModName(wxWindow *parent, ModItem *myData) {
-	this->Create(parent);
-
+ModItem::ModName::ModName(ModItem *myData) {
 	this->myData = myData;
 }
 
@@ -615,9 +597,7 @@ void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 Extends wxPanel so that it can draw the Mod's image on the list or degrade smoothly.
 */
 /** Constructor. Sets up stuff. */
-ModItem::ModImage::ModImage(wxWindow *parent, ModItem *myData) {
-	this->Create(parent);
-
+ModItem::ModImage::ModImage(ModItem *myData) {
 	this->myData = myData;
 }
 

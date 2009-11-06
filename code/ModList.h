@@ -44,7 +44,7 @@ WX_DECLARE_OBJARRAY(Words, ArrayOfWords);
 
 class ModItem{
 public:
-	ModItem(wxWindow *parent, SkinSystem* skin);
+	ModItem(SkinSystem* skin);
 	~ModItem();
 	wxString* name;
 	wxString* shortname;
@@ -76,23 +76,20 @@ private:
 	SkinSystem* skinSystem;
 
 
-	class InfoText : public wxPanel {
+	class InfoText{
 	public:
-		InfoText(wxWindow *parent, ModItem *myData);
+		InfoText(ModItem *myData);
 		
-		virtual void OnDraw(wxPaintEvent &event);
 		void Draw(wxDC &dc, const wxRect &rect);
 	private:
 		ModItem *myData;
-
-		DECLARE_EVENT_TABLE();
 	};
 	
 	InfoText *infoTextPanel;
 
-	class ModImage : public wxPanel {
+	class ModImage{
 	public:
-		ModImage(wxWindow *parent, ModItem *myData);
+		ModImage(ModItem *myData);
 
 		void Draw(wxDC &dc, const wxRect &rect);
 	private:
@@ -101,9 +98,9 @@ private:
 
 	ModImage *modImagePanel;
 
-	class ModName : public wxPanel {
+	class ModName{
 	public:
-		ModName(wxWindow *parent, ModItem *myData);
+		ModName(ModItem *myData);
 
 		void Draw(wxDC &dc, const wxRect &rect);
 	private:
