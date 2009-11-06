@@ -240,6 +240,19 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 
 	this->SetItemCount(this->tableData->Count());
 
+	this->infoButton = 
+		new wxButton(this, ID_MODLISTBOX_INFO_BUTTON, _("Info"));
+	this->activateButton = 
+		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
+
+	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
+	this->buttonSizer->AddStretchSpacer(2);
+	this->buttonSizer->Add(this->activateButton, wxSizerFlags().Proportion(1).Expand());
+	this->buttonSizer->AddStretchSpacer(1);
+	this->buttonSizer->Add(this->infoButton, wxSizerFlags().Proportion(1).Expand());
+	this->buttonSizer->AddStretchSpacer(2);
+	this->buttonSizer->Layout();
+
 }
 
 /** the distructor.  Cleans up stuff. */
@@ -249,6 +262,9 @@ ModList::~ModList() {
 	}
 	if ( this->tableData != NULL ) {
 		delete this->tableData;
+	}
+	if ( this->buttonSizer != NULL ) {
+		delete this->buttonSizer;
 	}
 }
 /** Function takes the keyvalue string to search for, and returns via location
@@ -298,7 +314,7 @@ void ModList::readTranslation(ConfigHash::mapped_type config, wxString langaugen
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
-	this->tableData->Item(n).Draw(dc, rect);
+	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->buttonSizer);
 }
 
 void ModList::OnDrawSeparator(wxDC &dc, wxRect& rect, size_t n) const {
@@ -403,7 +419,6 @@ Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
 ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
-	this->panel = new wxPanel(parent);
 	this->skinSystem = skin;
 
 	this->name = NULL;
@@ -428,25 +443,9 @@ ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
 	this->skin = NULL;
 	this->i18n = NULL;
 
-	this->infoButton = new wxButton(this->panel, wxID_ANY, _("Info"));
-	this->activateButton = new wxButton(this->panel, wxID_ANY, _("Activate"));
-
-	this->infoTextPanel = new InfoText(this->panel, this);
-	this->modImagePanel = new ModImage(this->panel, this);
-	this->modNamePanel = new ModName(this->panel, this);
-
-	wxBoxSizer* optionsButtons = new wxBoxSizer(wxVERTICAL);
-	optionsButtons->Add(this->infoButton);
-	optionsButtons->Add(this->activateButton);
-
-	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(this->modNamePanel);
-	sizer->Add(this->modImagePanel);
-	sizer->Add(this->infoTextPanel);
-	sizer->Add(optionsButtons);
-
-	this->panel->SetSizer(sizer);
-	this->panel->Layout();
+	this->infoTextPanel = new InfoText(parent, this);
+	this->modImagePanel = new ModImage(parent, this);
+	this->modNamePanel = new ModName(parent, this);
 
 }
 
@@ -468,7 +467,7 @@ ModItem::~ModItem() {
 	if (this->i18n != NULL) delete this->i18n;
 }
 
-void ModItem::Draw(wxDC &dc, const wxRect &rect) {
+void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons) {
 	wxRect titlerect = rect;
 	titlerect.width = 150;
 
@@ -483,7 +482,15 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect) {
 
 	this->modNamePanel->Draw(dc, titlerect);
 	this->modImagePanel->Draw(dc, imgrect);
-	this->infoTextPanel->Draw(dc, infotextrect);
+
+	if ( selected ) { /* If I am selected do not have info panel draw because 
+					  I am going to put the buttons over the info text. */
+		buttons->SetDimension(infotextrect.x, infotextrect.y,
+			infotextrect.width, infotextrect.height);
+		buttons->Show(true);
+	} else {
+		this->infoTextPanel->Draw(dc, infotextrect);
+	}
 }
 
 #include <wx/arrimpl.cpp>
