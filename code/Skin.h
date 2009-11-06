@@ -40,6 +40,7 @@ public:
 	wxBitmap GetInstallIcon();
 	wxBitmap GetIdealIcon();
 	wxFont GetFont();
+	const wxFont* GetFontPointer();
 
 	void SetTCSkin(Skin *skin = NULL);
 	void SetModSkin(Skin *skin = NULL);
