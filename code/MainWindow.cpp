@@ -22,7 +22,7 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
 		wxDefaultPosition, wxSize(800, 600), MAINWINDOW_STYLE);
 
-	wxFont windowFont = skin->GetFont();
+	this->SetFont(skin->GetFont());
 
 	// setup tabs
 
@@ -35,7 +35,6 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	images->Add(skin->GetInstallIcon());
 
 	this->mainTab = new wxToolbook();
-	this->mainTab->SetFont(windowFont);
 	this->SetBackgroundStyle(wxBG_STYLE_COLOUR);
 	this->SetBackgroundColour(*wxWHITE);
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(800,-1),	wxNB_LEFT);

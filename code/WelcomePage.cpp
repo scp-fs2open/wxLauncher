@@ -37,7 +37,6 @@ EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
-	this->SetFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
 	wxComboBox* launcherLanguageCombo = new wxComboBox(this, wxID_ANY, _("English (US)"));
