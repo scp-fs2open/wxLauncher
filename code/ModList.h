@@ -70,9 +70,7 @@ public:
 
 	I18nData* i18n;
 
-	void Draw(wxDC &dc, const wxRect &rect) {
-		this->infotextpanel->Draw(dc, rect);
-	}
+	void Draw(wxDC &dc, const wxRect &rect);
 
 private:
 	wxPanel *panel;
@@ -92,24 +90,29 @@ private:
 		DECLARE_EVENT_TABLE();
 	};
 	
-	InfoText *infotextpanel;
+	InfoText *infoTextPanel;
 
 	class ModImage : public wxPanel {
 	public:
 		ModImage(wxWindow *parent, ModItem *myData);
 
-		void OnDraw(wxPaintEvent &event);
+		void Draw(wxDC &dc, const wxRect &rect);
 	private:
 		ModItem *myData;
 	};
+
+	ModImage *modImagePanel;
+
 	class ModName : public wxPanel {
 	public:
 		ModName(wxWindow *parent, ModItem *myData);
 
-		void OnDraw(wxPaintEvent &event);
+		void Draw(wxDC &dc, const wxRect &rect);
 	private:
 		ModItem *myData;
 	};
+
+	ModName* modNamePanel;
 };
 
 WX_DECLARE_OBJARRAY(ModItem, ModItemArray);
