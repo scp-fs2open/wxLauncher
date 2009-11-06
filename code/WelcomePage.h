@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 
 #include "Skin.h"
+#include "wxIDS.h"
 
 class WelcomePage: public wxWindow {
 public:
@@ -12,7 +13,7 @@ public:
 	
 private:
 	/** The width of the items on the welcome tab. */
-	const static int stuffWidth = 639;
+	const static int stuffWidth = TAB_AREA_WIDTH;
 	DECLARE_EVENT_TABLE();
 };
 

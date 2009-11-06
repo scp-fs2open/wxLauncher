@@ -16,7 +16,7 @@
 ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
-	this->SetMargins(0, 0);
+	this->SetMargins(4, 5);
 
 	this->skinSystem = skin;
 
@@ -327,7 +327,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 }
 
 wxCoord ModList::OnMeasureItem(size_t n) const {
-	return (n == 0) ? 50 : 125;
+	return (n == 0) ? 25 : 80;
 }
 
 void ModList::OnSelectionChange(wxCommandEvent &event) {
@@ -438,18 +438,18 @@ ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
 	this->infoButton = new wxButton(this->panel, wxID_ANY, _("Info"));
 	this->activateButton = new wxButton(this->panel, wxID_ANY, _("Activate"));
 
-	this->infotextpanel = new InfoText(this->panel, this);
-	ModImage* modImagePanel = new ModImage(this->panel, this);
-	ModName* modNamePanel = new ModName(this->panel, this);
+	this->infoTextPanel = new InfoText(this->panel, this);
+	this->modImagePanel = new ModImage(this->panel, this);
+	this->modNamePanel = new ModName(this->panel, this);
 
 	wxBoxSizer* optionsButtons = new wxBoxSizer(wxVERTICAL);
 	optionsButtons->Add(this->infoButton);
 	optionsButtons->Add(this->activateButton);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(modNamePanel);
-	sizer->Add(modImagePanel);
-	sizer->Add(this->infotextpanel);
+	sizer->Add(this->modNamePanel);
+	sizer->Add(this->modImagePanel);
+	sizer->Add(this->infoTextPanel);
 	sizer->Add(optionsButtons);
 
 	this->panel->SetSizer(sizer);
@@ -473,6 +473,24 @@ ModItem::~ModItem() {
 	if (this->flagsets != NULL) delete this->flagsets;
 	if (this->skin != NULL) delete this->skin;
 	if (this->i18n != NULL) delete this->i18n;
+}
+
+void ModItem::Draw(wxDC &dc, const wxRect &rect) {
+	wxRect titlerect = rect;
+	titlerect.width = 150;
+
+	wxRect imgrect = rect;
+	imgrect.width = SkinSystem::ModsListImageWidth;
+	imgrect.x = titlerect.width;
+
+	wxRect infotextrect = rect;
+	// The 2 is to keep the text from touching the image.
+	infotextrect.x = titlerect.width + imgrect.width + 2;
+	infotextrect.width = rect.width - infotextrect.x;
+
+	this->modNamePanel->Draw(dc, titlerect);
+	this->modImagePanel->Draw(dc, imgrect);
+	this->infoTextPanel->Draw(dc, infotextrect);
 }
 
 #include <wx/arrimpl.cpp>
@@ -521,10 +539,10 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 			words.Add(temp);
 		} while ( tokens.HasMoreTokens() );
 
-		const int maxwidth = 200;
+		const int maxwidth = rect.width;
 		int currentx = rect.x, currenty = rect.y;
 
-		size_t currentwidth  = 0;
+		int currentwidth  = 0;
 		wxString string;
 		for( size_t i = 0; i < words.Count(); i++) {
 			if ( currentwidth + words[i].size.x > maxwidth ) {
@@ -565,6 +583,26 @@ ModItem::ModName::ModName(wxWindow *parent, ModItem *myData) {
 	this->myData = myData;
 }
 
+void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
+	wxString name;
+
+	if ( this->myData->name != NULL ) {
+		name = *this->myData->name;
+	} else {
+		name = *this->myData->shortname;
+	}
+
+	wxSize line = dc.GetTextExtent(name);
+
+	if ( line.x > rect.width ) {
+		// too wide need to wrap if possible.
+		wxLogDebug(_T("Name is to long"));
+	} else {
+		dc.DrawText(name,
+			rect.x + rect.width/2 - line.x/2,
+			rect.y + rect.height/2 - line.y/2);
+	}
+}
 
 ///////////////////////////////////////////
 /** \class ModItem::ModImage
@@ -575,4 +613,15 @@ ModItem::ModImage::ModImage(wxWindow *parent, ModItem *myData) {
 	this->Create(parent);
 
 	this->myData = myData;
+}
+
+void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
+	if ( this->myData->image != NULL ) {
+		dc.DrawBitmap(SkinSystem::MakeModsListImage(*this->myData->image), rect.x, rect.y);
+	} else {
+		dc.DrawRectangle(rect);
+		wxString noimg = _("NO IMAGE");
+		wxSize size = dc.GetTextExtent(noimg);
+		dc.DrawText(noimg, rect.x + rect.width/2 - size.x/2, rect.y + rect.height/2 - size.y/2);
+	}
 }

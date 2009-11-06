@@ -1,7 +1,11 @@
 #ifndef IDS_HPP
 #define IDS_HPP
 
-/* File contains all IDs that are to be used in the application. */
+/* File contains all IDs and other application constantants that are to be used
+in the application. */
+
+#define TAB_AREA_WIDTH (639)
+#define TAB_AREA_HEIGHT
 
 enum WindowIDS: int {
 	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
