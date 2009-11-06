@@ -486,7 +486,11 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons
 	infotextrect.x = titlerect.width + imgrect.width + 2;
 	infotextrect.width = rect.width - infotextrect.x;
 
+	wxFont titlefont = this->skinSystem->GetFont();
+	titlefont.SetWeight(wxFONTWEIGHT_BOLD);
+	dc.SetFont(titlefont);
 	this->modNamePanel->Draw(dc, titlerect);
+	dc.SetFont(this->skinSystem->GetFont());
 	this->modImagePanel->Draw(dc, imgrect);
 
 	if ( selected ) { /* If I am selected do not have info panel draw because 
@@ -519,12 +523,11 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		wxStringTokenizer tokens(*(this->myData->infotext));
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
-		wxFont currentfont = *(this->myData->skinSystem->GetFontPointer());
 
 		do {
 			wxString tok = tokens.GetNextToken();
 			int x, y;
-			dc.GetTextExtent(tok, &x, &y, NULL, NULL, &currentfont);
+			dc.GetTextExtent(tok, &x, &y);
 
 			Words* temp = new Words();
 			temp->size = dc.GetTextExtent(tok);
