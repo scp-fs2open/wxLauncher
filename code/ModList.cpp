@@ -256,6 +256,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->buttonSizer->AddStretchSpacer(1);
 	this->buttonSizer->Add(verticalSizer, wxSizerFlags().Expand());
 	this->buttonSizer->AddStretchSpacer(2);
+	this->buttonSizer->Show(false);
 
 
 }
@@ -490,9 +491,9 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons
 
 	if ( selected ) { /* If I am selected do not have info panel draw because 
 					  I am going to put the buttons over the info text. */
+		buttons->Show(true);
 		buttons->SetDimension(infotextrect.x, infotextrect.y,
 			infotextrect.width, infotextrect.height);
-		buttons->Show(true);
 	} else {
 		this->infoTextPanel->Draw(dc, infotextrect);
 	}
