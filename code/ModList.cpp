@@ -507,6 +507,7 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		wxStringTokenizer tokens(*(this->myData->infotext));
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
+		this->SetFont(this->myData->skinSystem->GetFont());
 
 		do {
 			wxString tok = tokens.GetNextToken();
@@ -514,7 +515,7 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 			this->GetTextExtent(tok, &x, &y, NULL, NULL, this->myData->skinSystem->GetFontPointer());
 
 			Words* temp = new Words();
-			temp->size = wxSize(x, y);
+			temp->size = dc.GetTextExtent(tok);
 			temp->word = tok;
 
 			words.Add(temp);
@@ -522,19 +523,28 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 
 		const int maxwidth = 200;
 		int currentx = rect.x, currenty = rect.y;
-		for( size_t i = 0; i < words.Count(); i++) {
-			if ( currentx + words[i].size.GetX() > maxwidth ) {
-				if ( currenty + words[i].size.GetY() > rect.height + rect.y ) {
-					break;
-				} else {
-					currenty += words[i].size.GetY()/2;
-				}
-				currentx = 0;
-			}
 
-			dc.DrawText(words[i].word, currentx, currenty);
-			
-			currentx += words[i].size.GetX();
+		size_t currentwidth  = 0;
+		wxString string;
+		for( size_t i = 0; i < words.Count(); i++) {
+			if ( currentwidth + words[i].size.x > maxwidth ) {
+				dc.DrawText(string, currentx, currenty);
+
+				string.Empty();
+				currentwidth = 0;
+
+				currenty += words[i].size.y;
+				if (currenty + words[i].size.y > rect.y + rect.height) {
+					break;
+				}
+			} else {
+				string.append(_T(" "));
+			}
+			string.append(words[i].word);
+			currentwidth += words[i].size.x;
+		}
+		if ( !string.IsEmpty()) {
+			dc.DrawText(string, currentx, currenty);
 		}
 	}
 }
