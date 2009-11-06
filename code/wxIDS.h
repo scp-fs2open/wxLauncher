@@ -59,6 +59,8 @@ enum WindowIDS: int {
 	ID_PROXY_AUTO_URL,
 
 	ID_MODGRID,
+	ID_MODLISTBOX,
+
 };
 
 enum MainTabImageIDs: int {
