@@ -245,13 +245,18 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->activateButton = 
 		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
 
-	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
-	this->buttonSizer->AddStretchSpacer(2);
-	this->buttonSizer->Add(this->activateButton, wxSizerFlags().Proportion(1).Expand());
+	wxSizer* verticalSizer = new wxBoxSizer(wxVERTICAL);
+	verticalSizer->AddStretchSpacer(2);
+	verticalSizer->Add(this->activateButton, wxSizerFlags().Expand());
+	verticalSizer->AddStretchSpacer(1);
+	verticalSizer->Add(this->infoButton, wxSizerFlags().Expand());
+	verticalSizer->AddStretchSpacer(2);
+
+	this->buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->buttonSizer->AddStretchSpacer(1);
-	this->buttonSizer->Add(this->infoButton, wxSizerFlags().Proportion(1).Expand());
+	this->buttonSizer->Add(verticalSizer, wxSizerFlags().Expand());
 	this->buttonSizer->AddStretchSpacer(2);
-	this->buttonSizer->Layout();
+
 
 }
 
