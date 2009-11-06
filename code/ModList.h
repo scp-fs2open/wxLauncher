@@ -70,11 +70,9 @@ public:
 
 	I18nData* i18n;
 
-	void Draw(wxDC &dc, const wxRect &rect);
+	void Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer *buttons);
 
 private:
-	wxPanel *panel;
-	wxButton *infoButton, *activateButton;
 	SkinSystem* skinSystem;
 
 
@@ -138,6 +136,9 @@ private:
 	ConfigHash* configFiles;
 	wxChar* semicolon;
 	SkinSystem* skinSystem;
+	
+	wxButton *infoButton, *activateButton;
+	wxBoxSizer *buttonSizer;
 
 	void readIniFileString(ConfigHash::mapped_type config,
 		wxString keyvalue, wxString ** location);
