@@ -82,10 +82,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 
 	if ( this->defaultSkin->baseFont == NULL ) {
 		this->defaultSkin->baseFont =
-			wxFont::New(12,
-			wxFONTFAMILY_DECORATIVE,
-			wxFONTSTYLE_NORMAL,
-			wxFONTWEIGHT_BOLD, false);
+			new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	}
 }
 
