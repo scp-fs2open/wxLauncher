@@ -13,9 +13,12 @@
 
 #include "wxLauncherSetup.h"
 
-ModList::ModList(wxWindow *parent, wxSize& size) {
-	this->Create(parent, wxID_ANY, wxDefaultPosition, size, 
-		wxLB_SINGLE | wxLB_ALWAYS_SB);
+ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
+	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
+		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
+	this->SetMargins(0, 0);
+
+	this->skinSystem = skin;
 
 	this->semicolon = new wxChar(';');
 	this->semicolon[1] = NULL;
@@ -84,7 +87,7 @@ ModList::ModList(wxWindow *parent, wxSize& size) {
 	while ( iter != this->configFiles->end() ) {
 		ConfigHash::key_type shortname = iter->first;
 		ConfigHash::mapped_type config = iter->second;
-		ModItem* item = new ModItem(this);
+		ModItem* item = new ModItem(this, this->skinSystem);
 		wxLogDebug(_T(" %s"), shortname);
 
 		item->shortname = new wxString(shortname);
@@ -294,23 +297,46 @@ void ModList::readTranslation(ConfigHash::mapped_type config, wxString langaugen
 }
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
+	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
 	if ( n == 0 ) {
 		// draw the header
 		dc.DrawText(_("HEADER"), 5, 5);
 		
 	} else {
-		dc.DrawText(
-			(this->tableData->Item(n).name != NULL) ?
-				*(this->tableData->Item(n).name)
-				:
-				*(this->tableData->Item(n).shortname),
-			2, 2);
+		this->tableData->Item(n).Draw(dc, rect);
+
+	}
+}
+
+void ModList::OnDrawSeparator(wxDC &dc, wxRect& rect, size_t n) const {
+	//dc.DrawLine(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
+}
+
+void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
+	wxLogDebug(_T(" Background %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
+	dc.DestroyClippingRegion();
+	if ( this->IsSelected(n) ) {
+		dc.SetBrush(*wxGREEN_BRUSH);
+		dc.SetBackground(*wxGREEN_BRUSH);
+		dc.DrawRoundedRectangle(rect, 5.0);
+	} else {
+		dc.SetBrush(*wxWHITE_BRUSH);
+		dc.SetBackground(*wxWHITE_BRUSH);
+		dc.DrawRectangle(rect);
 	}
 }
 
 wxCoord ModList::OnMeasureItem(size_t n) const {
-	return 125;
+	return (n == 0) ? 50 : 125;
 }
+
+void ModList::OnSelectionChange(wxCommandEvent &event) {
+	wxLogDebug(_T("Selection changed to %d."), event.GetInt());
+}
+
+BEGIN_EVENT_TABLE(ModList, wxVListBox)
+EVT_LISTBOX(ID_MODLISTBOX, ModList::OnSelectionChange)
+END_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Flagsets
@@ -383,9 +409,9 @@ wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguag
 Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
-ModItem::ModItem(wxWindow *parent) {
+ModItem::ModItem(wxWindow *parent, SkinSystem* skin) {
 	this->panel = new wxPanel(parent);
-	this->panel->SetMinSize(wxSize(500, 100));
+	this->skinSystem = skin;
 
 	this->name = NULL;
 	this->shortname = NULL;
@@ -409,10 +435,10 @@ ModItem::ModItem(wxWindow *parent) {
 	this->skin = NULL;
 	this->i18n = NULL;
 
-	this->infoButton = new wxButton(parent, wxID_ANY, _("Info"));
-	this->activateButton = new wxButton(parent, wxID_ANY, _("Activate"));
+	this->infoButton = new wxButton(this->panel, wxID_ANY, _("Info"));
+	this->activateButton = new wxButton(this->panel, wxID_ANY, _("Activate"));
 
-	InfoText* infoTextPanel = new InfoText(this->panel, this);
+	this->infotextpanel = new InfoText(this->panel, this);
 	ModImage* modImagePanel = new ModImage(this->panel, this);
 	ModName* modNamePanel = new ModName(this->panel, this);
 
@@ -423,7 +449,7 @@ ModItem::ModItem(wxWindow *parent) {
 	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(modNamePanel);
 	sizer->Add(modImagePanel);
-	sizer->Add(infoTextPanel);
+	sizer->Add(this->infotextpanel);
 	sizer->Add(optionsButtons);
 
 	this->panel->SetSizer(sizer);
@@ -473,6 +499,10 @@ void ModItem::InfoText::OnDraw(wxPaintEvent &event) {
 
 	wxPaintDC dc(this);
 
+	Draw(dc, wxRect(0, 0, 125, 400));
+}
+
+void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 	if ( this->myData->infotext != NULL ) {
 		wxStringTokenizer tokens(*(this->myData->infotext));
 		ArrayOfWords words;
@@ -481,7 +511,7 @@ void ModItem::InfoText::OnDraw(wxPaintEvent &event) {
 		do {
 			wxString tok = tokens.GetNextToken();
 			int x, y;
-			this->GetTextExtent(tok, &x, &y);
+			this->GetTextExtent(tok, &x, &y, NULL, NULL, this->myData->skinSystem->GetFontPointer());
 
 			Words* temp = new Words();
 			temp->size = wxSize(x, y);
@@ -491,14 +521,15 @@ void ModItem::InfoText::OnDraw(wxPaintEvent &event) {
 		} while ( tokens.HasMoreTokens() );
 
 		const int maxwidth = 200;
-		int currentx = 0, currenty = 0;
+		int currentx = rect.x, currenty = rect.y;
 		for( size_t i = 0; i < words.Count(); i++) {
 			if ( currentx + words[i].size.GetX() > maxwidth ) {
-				if ( currenty + words[i].size.GetY() > 125 ) {
+				if ( currenty + words[i].size.GetY() > rect.height + rect.y ) {
 					break;
 				} else {
-					currenty += words[i].size.GetY();
+					currenty += words[i].size.GetY()/2;
 				}
+				currentx = 0;
 			}
 
 			dc.DrawText(words[i].word, currentx, currenty);

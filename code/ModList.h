@@ -44,7 +44,7 @@ WX_DECLARE_OBJARRAY(Words, ArrayOfWords);
 
 class ModItem{
 public:
-	ModItem(wxWindow *parent);
+	ModItem(wxWindow *parent, SkinSystem* skin);
 	~ModItem();
 	wxString* name;
 	wxString* shortname;
@@ -70,20 +70,30 @@ public:
 
 	I18nData* i18n;
 
+	void Draw(wxDC &dc, const wxRect &rect) {
+		this->infotextpanel->Draw(dc, rect);
+	}
+
 private:
 	wxPanel *panel;
 	wxButton *infoButton, *activateButton;
+	SkinSystem* skinSystem;
+
 
 	class InfoText : public wxPanel {
 	public:
 		InfoText(wxWindow *parent, ModItem *myData);
 		
-		void OnDraw(wxPaintEvent &event);
+		virtual void OnDraw(wxPaintEvent &event);
+		void Draw(wxDC &dc, const wxRect &rect);
 	private:
 		ModItem *myData;
 
 		DECLARE_EVENT_TABLE();
 	};
+	
+	InfoText *infotextpanel;
+
 	class ModImage : public wxPanel {
 	public:
 		ModImage(wxWindow *parent, ModItem *myData);
@@ -107,20 +117,24 @@ WX_DECLARE_OBJARRAY(ModItem, ModItemArray);
 
 class ModList: public wxVListBox {
 public:
-	ModList(wxWindow *parent, wxSize& size);
+	ModList(wxWindow *parent, wxSize& size, SkinSystem *skin);
 	~ModList();
 
 	// overrides for wxVListBox
 	virtual void OnDrawItem(wxDC& dc, const wxRect& rect, size_t n) const;
+	virtual void OnDrawSeparator(wxDC &dc, wxRect& rect, size_t n) const;
+	virtual void OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual wxCoord OnMeasureItem(size_t n) const;
+
+	void OnSelectionChange(wxCommandEvent &event);
 
 private:
 	/** A hash map of the wxFileConfigs that represent the mod.ini files for
 	each mod.  The key is the the mod's folder name which is used as the mod's
 	internal name. */
 	ConfigHash* configFiles;
-
 	wxChar* semicolon;
+	SkinSystem* skinSystem;
 
 	void readIniFileString(ConfigHash::mapped_type config,
 		wxString keyvalue, wxString ** location);
@@ -131,6 +145,8 @@ private:
 
 	ModItemArray* tableData;
 	wxButton * testbutton;
+
+	DECLARE_EVENT_TABLE();
 };
 
 #endif
