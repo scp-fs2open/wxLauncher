@@ -298,14 +298,7 @@ void ModList::readTranslation(ConfigHash::mapped_type config, wxString langaugen
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
-	if ( n == 0 ) {
-		// draw the header
-		dc.DrawText(_("HEADER"), 5, 5);
-		
-	} else {
-		this->tableData->Item(n).Draw(dc, rect);
-
-	}
+	this->tableData->Item(n).Draw(dc, rect);
 }
 
 void ModList::OnDrawSeparator(wxDC &dc, wxRect& rect, size_t n) const {
@@ -327,7 +320,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 }
 
 wxCoord ModList::OnMeasureItem(size_t n) const {
-	return (n == 0) ? 25 : 80;
+	return 80;
 }
 
 void ModList::OnSelectionChange(wxCommandEvent &event) {
