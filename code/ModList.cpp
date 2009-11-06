@@ -542,24 +542,25 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		const int maxwidth = rect.width;
 		int currentx = rect.x, currenty = rect.y;
 
+		wxSize spaceSize = dc.GetTextExtent(_T(" "));
 		int currentwidth  = 0;
 		wxString string;
 		for( size_t i = 0; i < words.Count(); i++) {
-			if ( currentwidth + words[i].size.x > maxwidth ) {
+			if ( currentwidth + words[i].size.x + spaceSize.x > maxwidth ) {
 				dc.DrawText(string, currentx, currenty);
 
 				string.Empty();
 				currentwidth = 0;
 
 				currenty += words[i].size.y;
-				if (currenty + words[i].size.y > rect.y + rect.height) {
+				if (currenty + words[i].size.y> rect.y + rect.height) {
 					break;
 				}
 			} else {
 				string.append(_T(" "));
 			}
 			string.append(words[i].word);
-			currentwidth += words[i].size.x;
+			currentwidth += words[i].size.x + spaceSize.x;
 		}
 		if ( !string.IsEmpty()) {
 			dc.DrawText(string, currentx, currenty);

@@ -5,7 +5,7 @@
 in the application. */
 
 #define TAB_AREA_WIDTH (639)
-#define TAB_AREA_HEIGHT
+#define TAB_AREA_HEIGHT (595)
 
 enum WindowIDS: int {
 	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
