@@ -208,28 +208,34 @@ wxBitmap SkinSystem::GetBanner() {
 		&& this->defaultSkin->welcomeHeader != NULL ) {
 			return *(this->defaultSkin->welcomeHeader);
 	} else {
-		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+		wxLogFatalError(_T("Cannot retrive a Banner. (0x%h, 0x%h, 0x%h)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
 
 wxFont SkinSystem::GetFont() {
+	const wxFont *temp = GetFontPointer();
+	return (temp == NULL) ? wxNullFont : *temp;
+}
+
+const wxFont* SkinSystem::GetFontPointer() {
 	if ( this->modSkin != NULL
 		&& this->modSkin->baseFont != NULL ) {
-			return *(this->modSkin->baseFont);
+			return this->modSkin->baseFont;
 	} else if ( this->TCSkin != NULL
 		&& this->TCSkin->baseFont != NULL ) {
-			return *(this->TCSkin->baseFont);
+			return this->TCSkin->baseFont;
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->baseFont != NULL ) {
-			return *(this->defaultSkin->baseFont);
+			return this->defaultSkin->baseFont;
 	} else {
-		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+		wxLogFatalError(_T("Cannot retrive a font. (0x%h, 0x%h, 0x%h)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullFont;
+		return NULL;
 	}
 }
+
 
 /** Opens, verifies and resizes (if nessisary) the 255x112 image that is needed
 on the mods page. 
