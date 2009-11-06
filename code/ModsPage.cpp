@@ -12,12 +12,13 @@ ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY
 	header->Wrap(TAB_AREA_WIDTH);
 
 	ModList* modGrid = new ModList(this, wxSize(TAB_AREA_WIDTH, 400), skin);
-	modGrid->SetMinSize(wxSize(TAB_AREA_WIDTH, 400));
+	modGrid->SetMinSize(wxSize(TAB_AREA_WIDTH, 500));
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(header);
-	sizer->Add(modGrid);
+	sizer->Add(modGrid, 1);
 
+	this->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 	this->SetSizer(sizer);
 	this->Layout();
 
