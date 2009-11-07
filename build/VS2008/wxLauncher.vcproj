@@ -281,6 +281,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\version.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\WelcomePage.h"
 				>
 			</File>
@@ -304,6 +308,10 @@
 			>
 			<File
 				RelativePath=".\small.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\version.cpp"
 				>
 			</File>
 			<File
@@ -331,11 +339,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 		</Filter>
