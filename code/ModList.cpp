@@ -99,6 +99,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 		if ( smallimagepath != NULL ) {
 			item->image = SkinSystem::VerifySmallImage(_T("."), shortname,
 				*smallimagepath);
+			delete smallimagepath;
 		}
 		
 		readIniFileString(config, _T("/launcher/infotext"), &(item->infotext));
