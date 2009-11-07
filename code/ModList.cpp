@@ -20,8 +20,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 
 	this->skinSystem = skin;
 
-	this->semicolon = new wxChar(';');
-	this->semicolon[1] = NULL;
+	this->semicolon[0] = ';';
+	this->semicolon[1] = '\0';
 
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
