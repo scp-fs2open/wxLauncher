@@ -2,6 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxLauncher", "wxLauncher.vcproj", "{5E765B3D-4935-4D4F-B863-7F80E2EC291F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD} = {F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "version info", "version info.vcproj", "{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +18,10 @@ Global
 		{5E765B3D-4935-4D4F-B863-7F80E2EC291F}.Debug|Win32.Build.0 = Debug|Win32
 		{5E765B3D-4935-4D4F-B863-7F80E2EC291F}.Release|Win32.ActiveCfg = Release|Win32
 		{5E765B3D-4935-4D4F-B863-7F80E2EC291F}.Release|Win32.Build.0 = Release|Win32
+		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Debug|Win32.Build.0 = Debug|Win32
+		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Release|Win32.ActiveCfg = Release|Win32
+		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
