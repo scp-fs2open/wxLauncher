@@ -131,7 +131,7 @@ private:
 	each mod.  The key is the the mod's folder name which is used as the mod's
 	internal name. */
 	ConfigHash* configFiles;
-	wxChar* semicolon;
+	wxChar semicolon[2];
 	SkinSystem* skinSystem;
 	
 	wxButton *infoButton, *activateButton;
