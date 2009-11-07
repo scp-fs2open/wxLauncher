@@ -331,12 +331,18 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxLogDebug(_T(" Background %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
 	dc.DestroyClippingRegion();
 	if ( this->IsSelected(n) ) {
-		dc.SetBrush(*wxGREEN_BRUSH);
-		dc.SetBackground(*wxGREEN_BRUSH);
-		dc.DrawRoundedRectangle(rect, 5.0);
+		wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+		wxBrush b(highlighted);
+		dc.SetPen(wxPen(highlighted));
+		dc.SetBackground(b);
+		dc.SetBrush(b);
+		dc.DrawRoundedRectangle(rect, 10.0);
 	} else {
-		dc.SetBrush(*wxWHITE_BRUSH);
-		dc.SetBackground(*wxWHITE_BRUSH);
+		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+		wxBrush b(background);
+		dc.SetPen(wxPen(background));
+		dc.SetBrush(b);
+		dc.SetBackground(b);
 		dc.DrawRectangle(rect);
 	}
 }
