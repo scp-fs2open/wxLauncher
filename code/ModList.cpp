@@ -476,12 +476,25 @@ ModItem::~ModItem() {
 	if (this->notes != NULL) delete this->notes;
 	if (this->website != NULL) delete this->website;
 	if (this->forum != NULL) delete this->forum;
-	if (this->bugs != NULL) delete this->support;
+	if (this->bugs != NULL) delete this->bugs;
+	if (this->support != NULL) delete this->support;
 	if (this->forcedon != NULL) delete this->forcedon;
 	if (this->forcedoff != NULL) delete this->forcedoff;
+	if (this->primarylist != NULL) delete this->primarylist;
+	if (this->secondarylist != NULL) delete this->secondarylist;
 	if (this->flagsets != NULL) delete this->flagsets;
 	if (this->skin != NULL) delete this->skin;
-	if (this->i18n != NULL) delete this->i18n;
+	if (this->i18n != NULL) {
+		I18nData::iterator i18niter = this->i18n->begin();
+		while (i18niter != this->i18n->end()) {
+			delete i18niter->second;
+			i18niter++;
+		}
+		delete this->i18n;
+	}
+	if (this->infoTextPanel != NULL) delete this->infoTextPanel;
+	if (this->modImagePanel != NULL) delete this->modImagePanel;
+	if (this->modNamePanel != NULL) delete this->modNamePanel;
 }
 
 void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons) {
