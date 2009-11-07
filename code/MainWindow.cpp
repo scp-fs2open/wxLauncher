@@ -12,6 +12,7 @@
 #include "InstallPage.h"
 #include "BottomButtons.h"
 #include "Skin.h"
+#include "LauncherLogger.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -24,6 +25,8 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	this->SetFont(skin->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+
+	wxLog::SetActiveTarget(new LauncherLogger(this));
 
 	// setup tabs
 

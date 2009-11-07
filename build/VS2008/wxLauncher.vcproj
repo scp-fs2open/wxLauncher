@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\LauncherLogger.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\MainWindow.cpp"
 				>
 			</File>
@@ -254,6 +258,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\InstallPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\LauncherLogger.h"
 				>
 			</File>
 			<File
