@@ -264,6 +264,11 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 /** the distructor.  Cleans up stuff. */
 ModList::~ModList() {
 	if ( this->configFiles != NULL ) {
+		ConfigHash::iterator citer = this->configFiles->begin();
+		while ( citer != this->configFiles->end() ) {
+			delete citer->second;
+			citer++;
+		}
 		delete this->configFiles;
 	}
 	if ( this->tableData != NULL ) {
