@@ -21,6 +21,11 @@ For more info about the builds on specific system see
 the readme.txt that is in the build systems folder.  All
 building code is in the build directory.
 
+Python 2.4 or higher is required to build this project.
+This project also assumes that the python execuatble is 
+in your PATH.  See the compiler specific instructions
+on how to add Python to your PATH.
+
 If you're looking for the source, you can find it at:
   http://code.google.com/p/wxlauncher/
   
