@@ -20,14 +20,9 @@ bool wxLauncher::OnInit() {
 	wxLog::SetActiveTarget(new Logger());
 	wxLogInfo(_T("wxLauncher Version %d.%d"), MAJOR_VERSION, MINOR_VERSION);
 	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
+	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 
 	wxLogInfo(_T("wxLauncher Starting up."));
-	wxLogError(_T("ERROR"));
-	wxLogWarning(_T("WARN"));
-	wxLogMessage(_T("MSG"));
-	wxLogVerbose(_T("VERBOSE"));
-	wxLogInfo(_T("INFO"));
-	wxLogDebug(_T("DEBUG"));
 
 	this->skin = new SkinSystem();
 
