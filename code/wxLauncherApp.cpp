@@ -3,6 +3,8 @@
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
 #include "Skin.h"
+#include "Logger.h"
+#include "version.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -14,8 +16,18 @@ bool wxLauncher::OnInit() {
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+	
+	wxLog::SetActiveTarget(new Logger());
+	wxLogInfo(_T("wxLauncher Version %d.%d"), MAJOR_VERSION, MINOR_VERSION);
+	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
 
 	wxLogInfo(_T("wxLauncher Starting up."));
+	wxLogError(_T("ERROR"));
+	wxLogWarning(_T("WARN"));
+	wxLogMessage(_T("MSG"));
+	wxLogVerbose(_T("VERBOSE"));
+	wxLogInfo(_T("INFO"));
+	wxLogDebug(_T("DEBUG"));
 
 	this->skin = new SkinSystem();
 

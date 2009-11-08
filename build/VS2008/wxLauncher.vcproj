@@ -207,7 +207,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\LauncherLogger.cpp"
+				RelativePath="..\..\code\Logger.cpp"
 				>
 			</File>
 			<File
@@ -261,7 +261,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\LauncherLogger.h"
+				RelativePath="..\..\code\Logger.h"
 				>
 			</File>
 			<File
@@ -347,11 +347,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>

@@ -6,7 +6,7 @@
 
 #define FULL_VERSION (MAJOR_VERSION*1000000 + MINOR_VERSION*1000)
 
-extern char *HGVersion;
-extern char *HGDate;
+extern wchar_t *HGVersion;
+extern wchar_t *HGDate;
 
 #endif

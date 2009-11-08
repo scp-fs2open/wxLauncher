@@ -26,8 +26,6 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->SetFont(skin->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
-	wxLog::SetActiveTarget(new LauncherLogger(this));
-
 	// setup tabs
 
 	// Images used by wxImageList must be all the same dimentions
