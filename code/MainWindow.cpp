@@ -12,7 +12,7 @@
 #include "InstallPage.h"
 #include "BottomButtons.h"
 #include "Skin.h"
-#include "LauncherLogger.h"
+#include "Logger.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
