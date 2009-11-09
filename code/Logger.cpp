@@ -14,7 +14,7 @@ const wxString levels[] = {
 	_T("ERROR"),
 	_T("WARN "),
 	_T("MSG  "),
-	_T("MSG1 "),
+	_T("STSBR"),
 	_T("INFO "),
 	_T("DEBUG"),
 };
