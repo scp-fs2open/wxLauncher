@@ -14,6 +14,11 @@ public:
 
 	void OnSize(wxSizeEvent& event);
 
+	void SetMainStatusText(wxString msg);
+	void SetSecondaryStatusText(wxString msg);
+	void StartToolTipStatusText(wxString msg);
+	void EndToolTipStatusText();
+
 private:
 	wxWindow* parent;
 	wxBitmap icons[ID_SB_MAX_ID];

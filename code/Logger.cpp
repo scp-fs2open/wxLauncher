@@ -5,6 +5,7 @@
 #include <wchar.h>
 
 #include "Logger.h"
+#include "StatusBar.h"
 
 #include "wxLauncherSetup.h"
 
@@ -23,6 +24,8 @@ Logger::Logger() {
 
 	this->out = new wxFFileOutputStream(_T("wxLauncher.log"), _T("wb"));
 	wxASSERT_MSG(out->IsOk(), _T("Log output file is not valid!"));
+
+	this->statusBar = NULL;
 }
 
 /** Destructor. */
@@ -39,4 +42,16 @@ void Logger::DoLog(wxLogLevel level, const wxChar *msg, time_t time) {
 	out->Write(str.mb_str(wxConvUTF8), str.size());
 	out->Write(buf.mb_str(wxConvUTF8), buf.size());
 	out->Write("\n", 1);
+
+	if ( level == 4 && this->statusBar != NULL ) {
+		this->statusBar->SetMainStatusText(buf);
+	}		
 }
+
+/** Stores the pointer the status bar that I am to send status messages to.
+If a status bar is already set, function will do nothing to the old statusbar.
+Logger does not take over managment of the statusbar passed in. */
+void Logger::SetStatusBarTarget(StatusBar *bar) {
+	this->statusBar = bar;
+}
+
