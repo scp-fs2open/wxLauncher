@@ -4,6 +4,18 @@
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
+enum FieldIDs: int {
+	SB_FIELD_ICON = 0,
+	SB_FIELD_MAINTEXT,
+	SB_FIELD_PROGRESS_BAR,
+	SB_FIELD_PROGRESS_TEXT,
+	SB_FIELD_MAX,
+};
+
+BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
+EVT_SIZE(StatusBar::OnSize)
+END_EVENT_TABLE()
+
 StatusBar::StatusBar(wxWindow *parent)
 		:wxStatusBar(parent) {
 	this->parent = parent;
@@ -19,13 +31,41 @@ StatusBar::StatusBar(wxWindow *parent)
 		}
 	}
 
-	wxStaticBitmap statusIcon(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
-	wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
+	wxStaticBitmap* statusIcon = 
+		new wxStaticBitmap(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
+	wxGauge* bar = new wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
 
 	int widths[] = { 25, -1, 100, 200 };
 
-	this->SetFieldsCount(4, widths);
+	wxASSERT_MSG( sizeof(widths)/sizeof(int) == SB_FIELD_MAX,
+		wxString::Format(
+			_T("Number of fields (%d) and number of widths (%d) do not match"),
+			SB_FIELD_MAX, sizeof(widths)/sizeof(int)));
+
+	this->SetFieldsCount(SB_FIELD_MAX, widths);
+
+	this->SetStatusText(_T("Status bar created"), SB_FIELD_MAINTEXT);
 }
 
 StatusBar::~StatusBar() {
+}
+
+void StatusBar::OnSize(wxSizeEvent& event) {
+	WXUNUSED(event);
+	wxWindow* icon = this->GetWindowChild(ID_STATUSBAR_STATUS_ICON);
+
+	wxASSERT( icon != NULL );
+	
+	wxRect iconrect;
+	this->GetFieldRect(SB_FIELD_ICON, iconrect);
+	icon->SetSize(iconrect);
+
+	wxWindow* bar = this->GetWindowChild(ID_STATUSBAR_PROGRESS_BAR);
+
+	wxASSERT( bar != NULL );
+
+	wxRect barrect;
+	this->GetFieldRect(SB_FIELD_PROGRESS_BAR, barrect);
+	bar->SetSize(barrect);
+
 }
