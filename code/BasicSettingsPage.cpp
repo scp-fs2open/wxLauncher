@@ -5,6 +5,30 @@
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
+	// exe Selection
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("Executable Selection"));
+
+	wxStaticText* rootFolderText = new wxStaticText(this, wxID_ANY, _("FS2 Root Folder:"));
+	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, _T(""));
+	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Select"));
+
+	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("Use this FS2_Open binary: "));
+	wxChoice* useExeChoice = new wxChoice(this, ID_EXE_CHOICE_BOX);
+	useExeChoice->Disable();
+
+	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
+	rootFolderSizer->Add(rootFolderText);
+	rootFolderSizer->Add(rootFolderBox);
+	rootFolderSizer->Add(selectButton);
+
+	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
+	selectExeSizer->Add(useExeText);
+	selectExeSizer->Add(useExeChoice);
+
+	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxVERTICAL);
+	exeSizer->Add(rootFolderSizer);
+	exeSizer->Add(selectExeSizer);
+
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, wxID_ANY, _("Video"));
 
@@ -187,6 +211,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 	// Final Layout
 	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
+	leftColumnSizer->Add(exeSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(videoSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
