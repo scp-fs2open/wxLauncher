@@ -13,6 +13,7 @@
 #include "BottomButtons.h"
 #include "Skin.h"
 #include "Logger.h"
+#include "StatusBar.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -25,6 +26,8 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	this->SetFont(skin->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+
+	this->SetStatusBar(new StatusBar(this));
 
 	// setup tabs
 
