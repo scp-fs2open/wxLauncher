@@ -20,6 +20,7 @@ END_EVENT_TABLE()
 StatusBar::StatusBar(wxWindow *parent)
 		:wxStatusBar(parent) {
 	this->parent = parent;
+	this->showingToolTip = false;
 
 	this->icons[ID_SB_OK] = wxBitmap(_T("ok.png"), wxBITMAP_TYPE_ANY);
 	this->icons[ID_SB_WARNING] = wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
@@ -81,11 +82,17 @@ void StatusBar::SetMainStatusText(wxString msg) {
 called.  When EndToolTipStatusText() is called the status text will be returned
 to the original text. */
 void StatusBar::StartToolTipStatusText(wxString msg) {
-	this->PushStatusText(msg, SB_FIELD_MAINTEXT);
+	if (!this->showingToolTip) {
+		this->PushStatusText(msg, SB_FIELD_MAINTEXT);
+		this->showingToolTip = true;
+	}
 }
 
 /** Returns the statusbar text to the orginal message after a mouse over.
 See StartToolTipStatusText() for more information. */
 void StatusBar::EndToolTipStatusText() {
-	this->PopStatusText(SB_FIELD_MAINTEXT);
+	if (this->showingToolTip) {
+		this->PopStatusText(SB_FIELD_MAINTEXT);
+		this->showingToolTip = false;
+	}
 }

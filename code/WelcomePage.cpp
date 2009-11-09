@@ -3,6 +3,7 @@
 #include "WelcomePage.h"
 #include "wxIDS.h"
 #include "Skin.h"
+#include "StatusBar.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -33,10 +34,15 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(WelcomePage, wxWindow)
 EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
+EVT_HTML_CELL_HOVER(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkHover)
 EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
+EVT_HTML_CELL_HOVER(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkHover)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
+	// member varirable init
+	this->lastLinkInfo = NULL;
+
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
 	wxComboBox* launcherLanguageCombo = new wxComboBox(this, wxID_ANY, _("English (US)"));
@@ -60,6 +66,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 						= <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
 						Also, don’t  forget the help file, there is a nice 'Getting Started' tutorial there.<br>\
 						</center></p>"));
+	general->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);
 	generalSizer->SetMinSize(wxSize(this->stuffWidth, 200));
@@ -93,6 +100,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
 							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
 							 </ul>"));
+	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->SetMinSize(wxSize(this->stuffWidth, 150));
@@ -113,4 +121,44 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 void WelcomePage::LinkClicked(wxHtmlLinkEvent &event) {
 	wxHtmlLinkInfo info = event.GetLinkInfo();
 	wxLaunchDefaultBrowser(info.GetHref());
+}
+
+void WelcomePage::LinkHover(wxHtmlCellEvent &event) {
+	wxHtmlLinkInfo* info = event.GetCell()->GetLink(); // will be NULL if not a link.
+
+	wxFrame *frame = dynamic_cast<wxFrame*>(this->GetParent()->GetParent());
+	wxASSERT( frame != NULL );
+	StatusBar *bar = dynamic_cast<StatusBar*>(frame->GetStatusBar());
+	wxASSERT( bar != NULL );
+	if (info == NULL) {
+		if ( this->lastLinkInfo == NULL ) {
+			// do nothing
+		} else {
+			bar->EndToolTipStatusText();
+			this->lastLinkInfo = NULL;
+		}
+	} else  {
+		if ( info == this->lastLinkInfo ) {
+			// do nothing
+		} else if ( this->lastLinkInfo == NULL ) {
+			bar->StartToolTipStatusText(info->GetHref());
+			this->lastLinkInfo = reinterpret_cast<void *>(info);
+		} else {
+			// still on a URL but we potentially changed the URL
+			bar->EndToolTipStatusText();
+			bar->StartToolTipStatusText(info->GetHref());
+			this->lastLinkInfo = reinterpret_cast<void *>(info);
+		}
+	}
+}
+
+void WelcomePage::OnMouseOut(wxMouseEvent &event) {
+	WXUNUSED(event);
+	// clear url from status bar.
+	wxFrame *frame = dynamic_cast<wxFrame*>(this->GetParent()->GetParent()->GetParent());
+	wxASSERT( frame != NULL );
+	StatusBar *bar = dynamic_cast<StatusBar*>(frame->GetStatusBar());
+	wxASSERT( bar != NULL );
+	bar->EndToolTipStatusText();
+	this->lastLinkInfo = NULL;
 }
