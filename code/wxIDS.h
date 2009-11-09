@@ -66,6 +66,9 @@ enum WindowIDS: int {
 	ID_MODLISTBOX_ACTIVATE_BUTTON,
 	ID_MODLISTBOX_INFO_BUTTON,
 
+	ID_STATUSBAR_STATUS_ICON,
+	ID_STATUSBAR_PROGRESS_BAR,
+
 };
 
 enum MainTabImageIDs: int {
@@ -74,6 +77,14 @@ enum MainTabImageIDs: int {
 	ID_TAB_BASIC_SETTINGS_IMAGE,
 	ID_TAB_ADV_SETTINGS_IMAGE,
 	ID_TAB_INSTALL_IMAGE,
+};
+
+enum StatusBarIconIDs: int {
+	ID_SB_OK = 0,
+	ID_SB_WARNING,
+	ID_SB_ERROR,
+
+	ID_SB_MAX_ID,
 };
 
 #endif
