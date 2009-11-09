@@ -12,13 +12,13 @@ public:
 	StatusBar(wxWindow* parent);
 	virtual ~StatusBar();
 
-	void OnSize(wxCommandEvent& event);
+	void OnSize(wxSizeEvent& event);
 
 private:
 	wxWindow* parent;
 	wxBitmap icons[ID_SB_MAX_ID];
 	
-
+	DECLARE_EVENT_TABLE();
 };
 
 #endif
