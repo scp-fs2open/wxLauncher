@@ -15,7 +15,7 @@ public:
 	void OnSize(wxSizeEvent& event);
 
 	void SetMainStatusText(wxString msg);
-	void SetSecondaryStatusText(wxString msg);
+	void SetJobStatusText(int value, wxString msg=_T(""));
 	void StartToolTipStatusText(wxString msg);
 	void EndToolTipStatusText();
 

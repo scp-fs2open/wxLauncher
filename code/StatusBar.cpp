@@ -76,3 +76,16 @@ void StatusBar::OnSize(wxSizeEvent& event) {
 void StatusBar::SetMainStatusText(wxString msg) {
 	this->SetStatusText(msg, SB_FIELD_MAINTEXT);
 }
+
+/** Causes the status bar to show the msg until EndToolTipStatusText() is
+called.  When EndToolTipStatusText() is called the status text will be returned
+to the original text. */
+void StatusBar::StartToolTipStatusText(wxString msg) {
+	this->PushStatusText(msg, SB_FIELD_MAINTEXT);
+}
+
+/** Returns the statusbar text to the orginal message after a mouse over.
+See StartToolTipStatusText() for more information. */
+void StatusBar::EndToolTipStatusText() {
+	this->PopStatusText(SB_FIELD_MAINTEXT);
+}
