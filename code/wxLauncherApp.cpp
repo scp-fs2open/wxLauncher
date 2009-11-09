@@ -27,8 +27,10 @@ bool wxLauncher::OnInit() {
 	this->skin = new SkinSystem();
 
 	MainWindow* window = new MainWindow(skin);
+	wxLogStatus(_T("MainWindow is complete"));
 	window->Show(true);
 
+	wxLogStatus(_T("Ready."));
 	return true;
 }
 

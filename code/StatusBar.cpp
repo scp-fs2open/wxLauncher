@@ -1,6 +1,7 @@
 #include <wx/wx.h>
 #include "StatusBar.h"
 #include "wxIDS.h"
+#include "logger.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -45,6 +46,8 @@ StatusBar::StatusBar(wxWindow *parent)
 	this->SetFieldsCount(SB_FIELD_MAX, widths);
 
 	this->SetStatusText(_T("Status bar created"), SB_FIELD_MAINTEXT);
+
+	dynamic_cast<Logger*>(wxLog::GetActiveTarget())->SetStatusBarTarget(this);
 }
 
 StatusBar::~StatusBar() {
@@ -68,4 +71,8 @@ void StatusBar::OnSize(wxSizeEvent& event) {
 	this->GetFieldRect(SB_FIELD_PROGRESS_BAR, barrect);
 	bar->SetSize(barrect);
 
+}
+
+void StatusBar::SetMainStatusText(wxString msg) {
+	this->SetStatusText(msg, SB_FIELD_MAINTEXT);
 }
