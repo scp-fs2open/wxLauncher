@@ -75,9 +75,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxCheckBox* speechUsingTechroomCheck = new wxCheckBox(this, ID_SPEECH_USING_TECHROOM, _("Techroom"));
 	wxCheckBox* speechUsingBriefingCheck = new wxCheckBox(this, ID_SPEECH_USING_BRIEFING, _("Briefings"));
 	wxCheckBox* speechUsingIngameCheck = new wxCheckBox(this, ID_SPEECH_USING_INGAME, _("Ingame"));
-	wxStaticText* speechHowMoreVoicesTech = new wxStaticText(this, wxID_ANY, _("Consult the help file for information about how to get additional voices for you OS"));
-	speechHowMoreVoicesTech->Wrap(145);/* HACKHACK: hard coded width, using number of
-									   pixels wide the text is on the prototype.*/
+	wxButton* speechMoreVoicedButton = new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get More Voices"));
 
 	wxBoxSizer* speechLeftSizer = new wxBoxSizer(wxVERTICAL);
 	speechLeftSizer->Add(speechTestText, wxSizerFlags().Expand());
@@ -90,7 +88,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	speechRightSizer->Add(speechUsingTechroomCheck);
 	speechRightSizer->Add(speechUsingBriefingCheck);
 	speechRightSizer->Add(speechUsingIngameCheck);
-	speechRightSizer->Add(speechHowMoreVoicesTech);
+	speechRightSizer->Add(speechMoreVoicedButton);
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
 	speechSizer->Add(speechLeftSizer);
