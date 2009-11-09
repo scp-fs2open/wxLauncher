@@ -10,10 +10,13 @@ class WelcomePage: public wxWindow {
 public:
 	WelcomePage(wxWindow* parent, SkinSystem* skin);
 	void LinkClicked(wxHtmlLinkEvent& event);
+	void LinkHover(wxHtmlCellEvent& event);
+	void OnMouseOut(wxMouseEvent& event);
 	
 private:
 	/** The width of the items on the welcome tab. */
 	const static int stuffWidth = TAB_AREA_WIDTH;
+	void *lastLinkInfo;
 	DECLARE_EVENT_TABLE();
 };
 

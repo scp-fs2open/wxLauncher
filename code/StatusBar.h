@@ -22,6 +22,7 @@ public:
 private:
 	wxWindow* parent;
 	wxBitmap icons[ID_SB_MAX_ID];
+	bool showingToolTip;
 	
 	DECLARE_EVENT_TABLE();
 };
