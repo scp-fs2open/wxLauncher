@@ -4,6 +4,7 @@
 #include "wxIDS.h"
 #include "Skin.h"
 #include "StatusBar.h"
+#include "ProfileManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -42,6 +43,7 @@ END_EVENT_TABLE()
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
 	// member varirable init
 	this->lastLinkInfo = NULL;
+	ProMan* profile = ProMan::GetProfileManager();
 
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
@@ -74,11 +76,24 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 	// Profiles
 	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile"));
-	wxComboBox* profileCombo = new wxComboBox(this, ID_PROFILE_COMBO, _("Default"));
+	wxComboBox* profileCombo = new wxComboBox(this, ID_PROFILE_COMBO,
+		wxEmptyString,	// value,
+		wxDefaultPosition,
+		wxDefaultSize,
+		0,	// number of choices
+		0,	// choices
+		wxCB_SORT);
+	profileCombo->Append(profile->GetAllProfileNames());
+
+	wxString lastselected;
+	profile->Global()->Read(_T("/main/lastprofile"), &lastselected, _T("Default"));
+	profileCombo->SetValue(lastselected);
+
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("Clone"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
-	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_COMBO, _("Always save default"));
+	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Always save default"));
+
 	wxBoxSizer* profileButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 	profileButtonsSizer->Add(newButton);
 	profileButtonsSizer->Add(deleteButton);
