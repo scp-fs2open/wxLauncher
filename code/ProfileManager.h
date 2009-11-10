@@ -17,16 +17,19 @@ public:
 	wxFileConfig* Get();
 	wxFileConfig* Global();
 	wxArrayString GetAllProfileNames();
+	wxString GetCurrentName();
 
 	bool CreateNewProfile(wxString newName);
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
+	bool SwitchTo(wxString name);
 
 private:
 	static ProMan* proman;
 	static bool isInitialized;
-	static wxFileConfig* currentProfile;
+	wxFileConfig* currentProfile;
+	wxString currentProfileName;
 
 	ProMan();
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
