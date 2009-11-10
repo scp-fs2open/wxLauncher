@@ -89,6 +89,21 @@ bool ProMan::Initialize() {
 	return true;
 }
 
+/** clean up the memory that the manager is using. */
+bool ProMan::DeInitialize() {
+	if ( ProMan::isInitialized ) {
+		ProMan::isInitialized = false;
+
+		delete ProMan::proman;
+		ProMan::proman = NULL;
+		
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
 ProMan* ProMan::GetProfileManager() {
 	if ( ProMan::isInitialized ) {
 		return ProMan::proman;
@@ -122,9 +137,8 @@ ProMan::~ProMan() {
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get(false));
 	if ( config != NULL ) {
 		if ( this->isAutoSaving ) {
-			wxString* profilename = NULL;
-			config->Read(_T("/main/filename"), profilename);
-			if ( profilename == NULL ) {
+			wxString profilename;
+			if ( !config->Read(_T("/main/filename"), &profilename) ) {
 				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
@@ -177,9 +191,28 @@ wxFileConfig* ProMan::Get() {
 		return NULL;
 	}
 }
+
+/** Returns the pointer to the global profile. */
+wxFileConfig* ProMan::Global() {
+	return this->profileList;
+}
+
 /** Returns true if the named profile exists, false otherwise. */
 bool ProMan::DoesProfileExist(wxString name) {
 	/* Item exists if the returned value from find() does not equal 
 	the value of .end().  As per the HashMap docs. */
 	return (this->profiles.find(name) != this->profiles.end());
+}
+
+/** Returns an wxArrayString of all of the profile names. */
+wxArrayString ProMan::GetAllProfileNames() {
+	wxArrayString out(this->profiles.size());
+
+	ProfileMap::iterator iter = this->profiles.begin();
+	do {
+		out.Add(iter->first);
+		iter++;
+	} while (iter != this->profiles.end());
+
+	return out;
 }
