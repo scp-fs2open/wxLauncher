@@ -11,7 +11,6 @@
 
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
-wxFileConfig* ProMan::currentProfile = NULL;
 
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
 
@@ -82,7 +81,7 @@ bool ProMan::Initialize() {
 	}
 	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile);
 	wxFileConfig::Set(ProMan::proman->profiles[currentProfile]);
-	ProMan::currentProfile = ProMan::proman->profiles[currentProfile];
+	ProMan::proman->currentProfile = ProMan::proman->profiles[currentProfile];
 
 	ProMan::isInitialized = true;
 	wxLogDebug(_T(" Profile Manager is setup"));
@@ -118,6 +117,7 @@ to setup class, then call GetProfileManager() to get a pointer to the instance.
 ProMan::ProMan() {
 	this->profileList = NULL;
 	this->isAutoSaving = true;
+	this->currentProfile = NULL;
 }
 
 /** Destructor. */
@@ -215,4 +215,18 @@ wxArrayString ProMan::GetAllProfileNames() {
 	} while (iter != this->profiles.end());
 
 	return out;
+}
+
+wxString ProMan::GetCurrentName() {
+	return this->currentProfileName;
+}
+
+bool ProMan::SwitchTo(wxString name) {
+	if ( this->profiles.find(name) == this->profiles.end() ) {
+		return false;
+	} else {
+		this->currentProfileName = name;
+		this->currentProfile = this->profiles.find(name)->second;
+		return true;
+	}
 }
