@@ -48,5 +48,7 @@ int wxLauncher::OnExit() {
 		delete this->skin;
 	}
 
+	ProMan::DeInitialize();
+
 	return 0;
 }
