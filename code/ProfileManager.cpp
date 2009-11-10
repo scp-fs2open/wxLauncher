@@ -12,6 +12,8 @@
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
 
+#define GLOBAL_INI_FILE_NAME _T("global.ini")
+
 /** Sets up the profile manager. Must be called on program startup so that
 it can intercept global wxWidgets configuation functions. 
 \return true when setup was successful, false if proman is not
@@ -22,7 +24,7 @@ bool ProMan::Initialize() {
 	ProMan::proman = new ProMan();
 
 	wxFileName file;
-	file.Assign(wxStandardPaths::Get().GetUserDataDir(), _T("profiles.ini"));
+	file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
 		wxLogError(_T(" '%s' is not valid!"), file.GetFullName());
@@ -105,7 +107,9 @@ ProMan::ProMan() {
 ProMan::~ProMan() {
 	if ( this->profileList != NULL ) {
 		if ( this->isAutoSaving ) {
-			this->profileList->Flush();
+			wxFileName file;
+			file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
+			this->profileList->Save(wxFFileOutputStream(file.GetFullName()));
 		} else {
 			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
 		}
@@ -116,7 +120,16 @@ ProMan::~ProMan() {
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get(false));
 	if ( config != NULL ) {
 		if ( this->isAutoSaving ) {
-			config->Flush();
+			wxString* profilename = NULL;
+			config->Read(_T("/main/filename"), profilename);
+			if ( profilename == NULL ) {
+				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
+			} else {
+				wxFileName file;
+				file.Assign(wxStandardPaths::Get().GetUserDataDir(), *profilename);
+				wxASSERT( file.IsOk() );
+				config->Save(wxFFileOutputStream(file.GetFullName()));
+			}
 		} else {
 			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
 		}
