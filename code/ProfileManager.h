@@ -13,10 +13,12 @@ public:
 	static bool PrepareForAppShutdown();
 
 	virtual ~ProMan();
+	wxFileConfig* Get();
 
 private:
 	static ProMan* proman;
 	static bool isInitialized;
+	static wxFileConfig* currentProfile;
 
 	ProMan();
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
@@ -26,6 +28,7 @@ private:
 	bool CreateNewProfile(wxString newName);
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);
+	bool DoesProfileExist(wxString name);
 };
 
 #endif

@@ -11,6 +11,7 @@
 
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
+wxFileConfig* ProMan::currentProfile = NULL;
 
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
 
@@ -81,6 +82,7 @@ bool ProMan::Initialize() {
 	}
 	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile);
 	wxFileConfig::Set(ProMan::proman->profiles[currentProfile]);
+	ProMan::currentProfile = ProMan::proman->profiles[currentProfile];
 
 	ProMan::isInitialized = true;
 	wxLogDebug(_T(" Profile Manager is setup"));
@@ -165,4 +167,19 @@ bool ProMan::CreateNewProfile(wxString newName) {
 
 	this->profiles[newName] = config;
 	return true;
+}
+
+/** Returns the pointer to the currently selected profile. */
+wxFileConfig* ProMan::Get() {
+	if ( this->isInitialized ) {
+		return this->currentProfile;
+	} else {
+		return NULL;
+	}
+}
+/** Returns true if the named profile exists, false otherwise. */
+bool ProMan::DoesProfileExist(wxString name) {
+	/* Item exists if the returned value from find() does not equal 
+	the value of .end().  As per the HashMap docs. */
+	return (this->profiles.find(name) != this->profiles.end());
 }
