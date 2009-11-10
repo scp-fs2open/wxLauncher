@@ -75,7 +75,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	// Profiles
 	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile"));
 	wxComboBox* profileCombo = new wxComboBox(this, ID_PROFILE_COMBO, _("Default"));
-	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
+	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("Clone"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_COMBO, _("Always save default"));
