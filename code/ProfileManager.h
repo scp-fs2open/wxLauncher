@@ -9,11 +9,14 @@ WX_DECLARE_STRING_HASH_MAP( wxFileConfig*, ProfileMap );
 class ProMan {
 public:
 	static bool Initialize();
+	static bool DeInitialize();
 	static ProMan* GetProfileManager();
 	static bool PrepareForAppShutdown();
 
 	virtual ~ProMan();
 	wxFileConfig* Get();
+	wxFileConfig* Global();
+	wxArrayString GetAllProfileNames();
 
 private:
 	static ProMan* proman;
