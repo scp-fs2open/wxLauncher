@@ -18,6 +18,11 @@ public:
 	wxFileConfig* Global();
 	wxArrayString GetAllProfileNames();
 
+	bool CreateNewProfile(wxString newName);
+	bool CloneProfile(wxString orignalName, wxString copyName);
+	bool DeleteProfile(wxString name);
+	bool DoesProfileExist(wxString name);
+
 private:
 	static ProMan* proman;
 	static bool isInitialized;
@@ -27,11 +32,6 @@ private:
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* profileList;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
-
-	bool CreateNewProfile(wxString newName);
-	bool CloneProfile(wxString orignalName, wxString copyName);
-	bool DeleteProfile(wxString name);
-	bool DoesProfileExist(wxString name);
 };
 
 #endif
