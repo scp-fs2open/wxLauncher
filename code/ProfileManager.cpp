@@ -79,9 +79,12 @@ bool ProMan::Initialize() {
 		ProMan::proman->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
 		currentProfile = _T("Default");
 	}
+
 	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile);
-	wxFileConfig::Set(ProMan::proman->profiles[currentProfile]);
-	ProMan::proman->currentProfile = ProMan::proman->profiles[currentProfile];
+	if ( !ProMan::proman->SwitchTo(currentProfile) ) {
+		wxLogError(_T("Unable to set current profile to '%s'"), currentProfile);
+		return false;
+	}
 
 	ProMan::isInitialized = true;
 	wxLogDebug(_T(" Profile Manager is setup"));
@@ -227,6 +230,7 @@ bool ProMan::SwitchTo(wxString name) {
 	} else {
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
+		wxFileConfig::Set(this->currentProfile);
 		return true;
 	}
 }
