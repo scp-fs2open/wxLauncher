@@ -223,10 +223,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\ProfileManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\code\Skin.cpp"
 				>
 			</File>
@@ -278,10 +274,6 @@
 			</File>
 			<File
 				RelativePath="..\..\code\ModsPage.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\code\ProfileManager.h"
 				>
 			</File>
 			<File
