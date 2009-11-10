@@ -5,6 +5,7 @@
 #include "Skin.h"
 #include "Logger.h"
 #include "version.h"
+#include "ProfileManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -22,9 +23,17 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
 	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 
+	wxLogInfo(_T("Initing profiles..."));
+	if ( !ProMan::Initialize() ) {
+		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
+		return false;
+	}
+
+	wxLogInfo(_T("Initing Skin System..."));
+	this->skin = new SkinSystem();
+
 	wxLogInfo(_T("wxLauncher Starting up."));
 
-	this->skin = new SkinSystem();
 
 	MainWindow* window = new MainWindow(skin);
 	wxLogStatus(_T("MainWindow is complete"));
