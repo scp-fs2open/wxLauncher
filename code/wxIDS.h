@@ -73,6 +73,9 @@ enum WindowIDS: int {
 	ID_EXE_ROOT_FOLDER_BOX,
 	ID_EXE_SELECT_ROOT_BUTTON,
 	ID_EXE_CHOICE_BOX,
+
+	ID_CLONE_PROFILE_DIALOG,
+	ID_DELETE_PROFILE_DIALOG,
 };
 
 enum MainTabImageIDs: int {
@@ -89,6 +92,12 @@ enum StatusBarIconIDs: int {
 	ID_SB_ERROR,
 
 	ID_SB_MAX_ID,
+};
+
+enum ProfileDialogReturnValues: int {
+	RETURN_CANCEL,
+	RETURN_DO_CLONE,
+	RETURN_CONFRIM_DELETE,
 };
 
 #endif
