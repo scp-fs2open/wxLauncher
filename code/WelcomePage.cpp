@@ -118,6 +118,9 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Always save default"));
+	bool autosave;
+	profile->Global()->Read(_T("/main/autosaveprofiles"), &autosave, true);
+	saveDefaultCheck->SetValue(autosave);
 
 	wxBoxSizer* profileButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 	profileButtonsSizer->Add(newButton);
@@ -235,13 +238,13 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 		// I am to save all changes, so force save and disable the save button.
 		saveButton->Disable();
 		
-		profile->Global()->Write(_T("/main/autosave"), true);
+		profile->Global()->Write(_T("/main/autosaveprofiles"), true);
 		profile->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
 		saveButton->Enable();
 		
-		profile->Global()->Write(_T("/main/autosave"), false);
+		profile->Global()->Write(_T("/main/autosaveprofiles"), false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
 }
