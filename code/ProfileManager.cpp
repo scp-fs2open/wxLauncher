@@ -222,7 +222,7 @@ void ProMan::SaveCurrentProfile() {
 				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
-				file.Assign(wxStandardPaths::Get().GetUserDataDir(), *profilename);
+				file.Assign(wxStandardPaths::Get().GetUserDataDir(), profilename);
 				wxASSERT( file.IsOk() );
 				config->Save(wxFFileOutputStream(file.GetFullPath()));
 				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath());
