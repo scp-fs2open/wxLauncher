@@ -135,24 +135,8 @@ ProMan::~ProMan() {
 		}
 		delete this->profileList;
 	}
-	// We assume all profiles other than the current app profile does not have
-	// any unsaved changes. So we only check the current profile.
-	wxFileConfig* config = dynamic_cast<wxFileConfig*>(wxFileConfig::Get(false));
-	if ( config != NULL ) {
-		if ( this->isAutoSaving ) {
-			wxString profilename;
-			if ( !config->Read(_T("/main/filename"), &profilename) ) {
-				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
-			} else {
-				wxFileName file;
-				file.Assign(wxStandardPaths::Get().GetUserDataDir(), *profilename);
-				wxASSERT( file.IsOk() );
-				config->Save(wxFFileOutputStream(file.GetFullName()));
-			}
-		} else {
-			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
-		}
-	}
+
+	this->SaveCurrentProfile();
 
 	// don't leak the wxFileConfigs
 	ProfileMap::iterator iter = this->profiles.begin();
@@ -220,21 +204,34 @@ wxArrayString ProMan::GetAllProfileNames() {
 	return out;
 }
 
-/** Save the current profile to disk. Does not affect Global or anyother profile. */
+/** Save the current profile to disk. Does not affect Global or anyother profile.
+We assume all profiles other than the current app profile does not have any 
+unsaved changes. So we only check the current profile. */
 void ProMan::SaveCurrentProfile() {
-	wxString filename;
-	if ( this->currentProfile->Read(_T("/main/filename"), &filename) ) {
-		wxLogError(_T("Unable to retrive filename for current profile."));
-		wxLogWarning(_T("Unable to save profile."));
+	wxConfigBase* configbase = wxFileConfig::Get(false);
+	if ( configbase == NULL ) {
+		wxLogWarning(_T("There is no global fileconfig."));
 		return;
 	}
-
-	wxFileName out;
-	out.Assign(wxStandardPaths::Get().GetUserConfigDir(), filename);
-
-	wxCHECK_RET( out.IsOk(), _T("Out file is invalid!"));
-
-	this->currentProfile->Save(wxFFileOutputStream(out.GetFullPath()));
+	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
+	if ( config != NULL ) {
+		if ( this->isAutoSaving ) {
+			wxString profilename;
+			if ( !config->Read(_T("/main/filename"), &profilename) ) {
+				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
+			} else {
+				wxFileName file;
+				file.Assign(wxStandardPaths::Get().GetUserDataDir(), *profilename);
+				wxASSERT( file.IsOk() );
+				config->Save(wxFFileOutputStream(file.GetFullName()));
+				wxLogDebug(_T("Current config saved."));
+			}
+		} else {
+			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
+		}
+	} else {
+		wxLogWarning(_T("Configbase is not a wxFileConfig."));
+	}
 }
 
 wxString ProMan::GetCurrentName() {
@@ -252,9 +249,10 @@ bool ProMan::SwitchTo(wxString name) {
 	}
 }
 
-bool ProMan::CloneProfile(wxString orignalName, wxString copyName) {
-	if ( !this->DoesProfileExist(orignalName) ) {
-		wxLogWarning(_("Orignal Profile '%s' does not exist!"), orignalName);
+bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
+	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName, copyName);
+	if ( !this->DoesProfileExist(originalName) ) {
+		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName);
 		return false;
 	}
 	if ( this->DoesProfileExist(copyName) ) {
@@ -280,7 +278,17 @@ bool ProMan::CloneProfile(wxString orignalName, wxString copyName) {
 }
 
 bool ProMan::DeleteProfile(wxString name) {
+	wxLogDebug(_T("Deleting profile: %s"), name);
+	if ( name == _T("Default") ) {
+		wxLogWarning(_("Cannot delete Default profile."));
+		return false;
+	}
+	if ( name == this->currentProfileName ) {
+		wxLogInfo(_T("Deleting current profile. Switching current to 'Default' profile"));
+		this->SwitchTo(_T("Default"));
+	}
 	if ( this->DoesProfileExist(name) ) {
+		wxLogDebug(_T(" Profile exists"));
 		wxFileConfig* config = this->profiles[name];
 
 		wxString filename;
@@ -290,9 +298,10 @@ bool ProMan::DeleteProfile(wxString name) {
 		}
 
 		wxFileName file;
-		file.Assign(wxStandardPaths::Get().GetUserConfigDir(), filename);
+		file.Assign(wxStandardPaths::Get().GetUserDataDir(), filename);
 
 		if ( file.FileExists() ) {
+			wxLogDebug(_T(" Backing file exists"));
 			if ( wxRemoveFile(file.GetFullPath()) ) {
 				this->profiles.erase(this->profiles.find(name));
 				delete config;
