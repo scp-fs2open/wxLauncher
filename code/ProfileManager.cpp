@@ -220,6 +220,23 @@ wxArrayString ProMan::GetAllProfileNames() {
 	return out;
 }
 
+/** Save the current profile to disk. Does not affect Global or anyother profile. */
+void ProMan::SaveCurrentProfile() {
+	wxString filename;
+	if ( this->currentProfile->Read(_T("/main/filename"), &filename) ) {
+		wxLogError(_T("Unable to retrive filename for current profile."));
+		wxLogWarning(_T("Unable to save profile."));
+		return;
+	}
+
+	wxFileName out;
+	out.Assign(wxStandardPaths::Get().GetUserConfigDir(), filename);
+
+	wxCHECK_RET( out.IsOk(), _T("Out file is invalid!"));
+
+	this->currentProfile->Save(wxFFileOutputStream(out.GetFullPath()));
+}
+
 wxString ProMan::GetCurrentName() {
 	return this->currentProfileName;
 }
@@ -234,3 +251,63 @@ bool ProMan::SwitchTo(wxString name) {
 		return true;
 	}
 }
+
+bool ProMan::CloneProfile(wxString orignalName, wxString copyName) {
+	if ( !this->DoesProfileExist(orignalName) ) {
+		wxLogWarning(_("Orignal Profile '%s' does not exist!"), orignalName);
+		return false;
+	}
+	if ( this->DoesProfileExist(copyName) ) {
+		wxLogWarning(_("Target profile '%s' already exists!"), copyName);
+		return false;
+	}
+	if ( !this->CreateNewProfile(copyName) ) {
+		return false;
+	}
+
+	wxFileConfig* config = this->profiles[copyName];
+	wxCHECK_MSG( config != NULL, false, _T("Create returned true but did not create profile"));
+
+	wxString str;
+	long cookie;
+	bool cont = config->GetFirstEntry(str, cookie);
+	while ( cont ) {
+		wxLogDebug(_T("  Got: %s"), str);
+
+		cont = config->GetNextEntry(str, cookie);
+	}
+	return true;
+}
+
+bool ProMan::DeleteProfile(wxString name) {
+	if ( this->DoesProfileExist(name) ) {
+		wxFileConfig* config = this->profiles[name];
+
+		wxString filename;
+		if ( !config->Read(_T("/main/filename"), &filename) ) {
+			wxLogWarning(_T("Unable to get filename to delete %s"), name);
+			return false;
+		}
+
+		wxFileName file;
+		file.Assign(wxStandardPaths::Get().GetUserConfigDir(), filename);
+
+		if ( file.FileExists() ) {
+			if ( wxRemoveFile(file.GetFullPath()) ) {
+				this->profiles.erase(this->profiles.find(name));
+				delete config;
+				
+				wxLogMessage(_("Profile '%s' deleted."), name);
+				return true;
+			} else {
+				wxLogWarning(_("Unable to delete file for profile '%s'"), name);
+			}
+		} else {
+			wxLogWarning(_("Backing file (%s) for profile '%s' does not exist"), file.GetFullPath(), name);
+		}
+	} else {
+		wxLogWarning(_("Profile %s does not exist. Cannot delete."), name);
+	}
+	return false;
+}
+
