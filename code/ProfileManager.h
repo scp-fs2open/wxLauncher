@@ -24,6 +24,9 @@ public:
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
+	void SaveCurrentProfile();
+	bool NeedToPromptToSave() { return this->isAutoSaving; };
+	void SetAutoSave(bool value) { this->isAutoSaving = value; };
 
 private:
 	static ProMan* proman;
