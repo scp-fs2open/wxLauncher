@@ -27,18 +27,18 @@ bool ProMan::Initialize() {
 	file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
-		wxLogError(_T(" '%s' is not valid!"), file.GetFullName());
+		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath());
 		return false;
 	}
 
-	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullName());
+	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullPath());
 	if ( !wxFileName::DirExists(file.GetPath())
 		&& !wxFileName::Mkdir(file.GetPath(), wxPATH_MKDIR_FULL ) ) {
 		wxLogError(_T(" Unable to make profile directory."));
 		return false;
 	}
 
-	ProMan::proman->profileList = new wxFileConfig(wxFFileInputStream(file.GetFullName(),
+	ProMan::proman->profileList = new wxFileConfig(wxFFileInputStream(file.GetFullPath(),
 		(file.FileExists())?_T("rb"):_T("w+b")));
 
 	// fetch all profiles.
@@ -48,7 +48,8 @@ bool ProMan::Initialize() {
 	wxLogInfo(_T(" Found %d profile(s)."), foundProfiles.Count());
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
 		wxLogDebug(_T("  Opening %s"), foundProfiles[i]);
-		wxFileConfig *config = new wxFileConfig(wxFFileInputStream(foundProfiles[i]));
+		wxFFileInputStream instream(foundProfiles[i]);
+		wxFileConfig *config = new wxFileConfig(instream);
 		
 		wxString name;
 		config->Read(_T("/main/name"), &name, wxString::Format(_T("Profile %05d"), i));
@@ -129,7 +130,7 @@ ProMan::~ProMan() {
 		if ( this->isAutoSaving ) {
 			wxFileName file;
 			file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
-			this->profileList->Save(wxFFileOutputStream(file.GetFullName()));
+			this->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
 		} else {
 			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
 		}
@@ -223,8 +224,8 @@ void ProMan::SaveCurrentProfile() {
 				wxFileName file;
 				file.Assign(wxStandardPaths::Get().GetUserDataDir(), *profilename);
 				wxASSERT( file.IsOk() );
-				config->Save(wxFFileOutputStream(file.GetFullName()));
-				wxLogDebug(_T("Current config saved."));
+				config->Save(wxFFileOutputStream(file.GetFullPath()));
+				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath());
 			}
 		} else {
 			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
@@ -245,6 +246,7 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
+		this->profileList->Write(_T("/main/lastprofile"), name);
 		return true;
 	}
 }
