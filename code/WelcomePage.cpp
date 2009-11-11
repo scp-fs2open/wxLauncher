@@ -1,5 +1,7 @@
 #include <wx/wx.h>
 #include <wx/html/htmlwin.h>
+#include <wx/valgen.h>
+#include <wx/valtext.h>
 #include "WelcomePage.h"
 #include "wxIDS.h"
 #include "Skin.h"
@@ -7,6 +9,22 @@
 #include "ProfileManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
+
+class CloneProfileDialog: public wxDialog {
+public:
+	CloneProfileDialog(wxWindow* parent, wxString orignalname, wxString desinationName);
+	wxString GetOriginalName();
+	wxString GetTargetName();
+private:
+	wxString target;
+	int fromNumber;
+	wxChoice *cloneFrom;
+};
+
+class DeleteProfileDialog: public wxDialog {
+public:
+	DeleteProfileDialog(wxWindow* parent, wxString name);
+};
 
 /** Class that manages the header image for the welcome tab. */
 class HeaderBitmap: public wxPanel {
@@ -38,6 +56,13 @@ EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkHover)
 EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkHover)
+
+// Profile controls
+EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
+EVT_BUTTON(ID_DELETE_PROFILE, WelcomePage::ProfileButtonClicked)
+EVT_BUTTON(ID_SAVE_PROFILE, WelcomePage::ProfileButtonClicked)
+EVT_CHECKBOX(ID_SAVE_DEFAULT_CHECK, WelcomePage::SaveDefaultChecked)
+EVT_COMBOBOX(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
@@ -177,3 +202,214 @@ void WelcomePage::OnMouseOut(wxMouseEvent &event) {
 	bar->EndToolTipStatusText();
 	this->lastLinkInfo = NULL;
 }
+
+/** Calls the dialogs for cloning, saving or deleting profiles. */
+void WelcomePage::ProfileButtonClicked(wxCommandEvent& event) {
+	wxComboBox* combobox = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	ProMan *profile = ProMan::GetProfileManager();
+
+	switch(event.GetId()) {
+		case ID_NEW_PROFILE:
+			cloneNewProfile(combobox, profile);
+			break;
+
+		case ID_DELETE_PROFILE:
+			deleteProfile(combobox, profile);
+			break;
+
+		case ID_SAVE_PROFILE:
+			profile->SaveCurrentProfile();
+			break;
+		default:
+			wxCHECK_RET( false, _("Reached impossible location.\nHandler has been attached to a button that it cannot handle."));
+	}
+}
+
+void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
+	wxButton* saveButton = dynamic_cast<wxButton*>(wxWindow::FindWindowById(ID_SAVE_PROFILE, this));
+	wxCHECK_RET( saveButton != NULL , _("SaveDefaultChecked is unable to get the SaveButton") );
+
+	ProMan* profile = ProMan::GetProfileManager();
+
+	if ( event.IsChecked() ) {
+		// I am to save all changes, so force save and disable the save button.
+		saveButton->Disable();
+		
+		profile->Global()->Write(_T("/main/autosave"), true);
+		profile->SaveCurrentProfile();
+		wxLogStatus(_("Now autosaving profiles."));
+	} else {
+		saveButton->Enable();
+		
+		profile->Global()->Write(_T("/main/autosave"), false);
+		wxLogStatus(_("No longer autosaving profiles."));
+	}
+}
+void WelcomePage::ProfileChanged(wxCommandEvent& event) {
+	wxComboBox* saveButton = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxString newProfile = saveButton->GetValue();
+	ProMan* proman = ProMan::GetProfileManager();
+
+	if ( proman->DoesProfileExist(newProfile) ) {
+		if ( proman->NeedToPromptToSave() ) {
+			int response = wxMessageBox(
+				wxString::Format(
+					_("There are unsaved changes to your profile '%s'.\n\nWould you like to save your changes?"),
+					proman->GetCurrentName()),
+				_("Save profile changes?"), wxYES_NO, this);
+
+			if ( response == wxYES ) {
+				proman->SaveCurrentProfile();
+			}
+		}
+		if ( proman->SwitchTo(newProfile) ) {
+			wxLogMessage(_T("Profile %s is now the active profile."), proman->GetCurrentName());
+		} else {
+			wxLogWarning(_T("Unable to switch to %s, staying on %s."), newProfile, proman->GetCurrentName());
+		}
+	} else {
+		wxLogWarning(_T("Profile does not exist. Use Clone to create profile first"));
+	}
+}
+
+void WelcomePage::cloneNewProfile(wxComboBox* combobox, ProMan* profile) {
+	wxString originalName;
+	wxString targetName;
+
+	/* If the user has edited the combobox we will put the text that they 
+	editied into the new name box in the dialog and then they would only have
+	to choose the profile to choose from. The default from target would be
+	the currently active profile.
+
+	If the current value of the combobox is a valid profile name then we will
+	use that as the profile to clone from, leaving the newname blank.
+	*/
+	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetValue());
+	if ( profile->DoesProfileExist(combobox->GetValue()) ) {
+		// is a vaild profile
+		originalName = combobox->GetValue();
+		wxLogDebug(_T("  Which is an existing profile."));
+	} else {
+		targetName = combobox->GetValue();
+		originalName = profile->GetCurrentName();
+		wxLogDebug(_T("  Which is not an existing profile."));
+	}
+
+	CloneProfileDialog cloneDialog(this, originalName, targetName);
+
+	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
+		wxLogDebug(_T("User clicked clone"));
+		if ( profile->CloneProfile(
+			cloneDialog.GetOriginalName(),
+			cloneDialog.GetTargetName()) ) {
+				wxLogStatus(_("Cloned profile '%s' from '%s'"),
+					cloneDialog.GetOriginalName(),
+					cloneDialog.GetTargetName());
+		} else {
+				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
+					cloneDialog.GetOriginalName(),
+					cloneDialog.GetTargetName());							
+		}
+	} else {
+		wxLogStatus(_("Profile clone aborted"));
+	}
+}
+
+
+void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
+	wxString nametodelete = combobox->GetValue();
+	
+	if ( profile->DoesProfileExist(nametodelete) ) {
+		DeleteProfileDialog deleteDialog(this, nametodelete);
+		
+		if ( deleteDialog.ShowModal() == deleteDialog.GetAffirmativeId()) {
+			if ( profile->DeleteProfile(nametodelete) ) {
+				wxLogStatus(_("Deleted profile named '%s'."), nametodelete);
+			} else {
+				wxLogWarning(_("Unable to delete profile '%s', see log for more details."), nametodelete);
+			}
+		} else {
+			wxLogStatus(_("Deletion of profile '%s' cancelled"), nametodelete);
+		}
+	} else {
+		wxLogWarning(_T("Unable to delete non existant profile '%s'"), nametodelete);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///// DIALOGS ///
+CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, wxString destName):
+wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Clone profile..."), wxDefaultPosition, wxDefaultSize) {
+	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New Profile Name:"));
+	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, destName);
+	
+	wxBoxSizer* nameSizer = new wxBoxSizer(wxHORIZONTAL);
+	nameSizer->Add(newNameText);
+	nameSizer->Add(newName, 1);
+
+	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
+	cloneFrom = new wxChoice(this, wxID_ANY);
+
+	wxBoxSizer *fromSizer = new wxBoxSizer(wxHORIZONTAL);
+	fromSizer->Add(cloneFromText);
+	fromSizer->Add(cloneFrom);
+
+	wxButton *createButton = new wxButton(this, wxID_ANY, _("Clone"));
+	wxButton *closeButton = new wxButton(this, wxID_ANY, _("Close"));
+	this->SetAffirmativeId(createButton->GetId());
+	this->SetEscapeId(closeButton->GetId());
+
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+	buttonSizer->Add(createButton);
+	buttonSizer->Add(closeButton);
+
+	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(nameSizer, wxSizerFlags().Expand());
+	sizer->Add(cloneFrom);
+	sizer->Add(buttonSizer, wxSizerFlags().Right());
+
+	this->SetSizer(sizer);
+
+	newName->SetValidator(wxTextValidator(wxFILTER_NONE, &(this->target)));
+	cloneFrom->SetValidator(wxGenericValidator(&(this->fromNumber)));
+
+	cloneFrom->Append(ProMan::GetProfileManager()->GetAllProfileNames());
+	cloneFrom->SetStringSelection(orignalName);
+
+	this->Layout();
+	wxLogDebug(_T("Clone Profile Dialog Created"));
+}
+
+wxString CloneProfileDialog::GetTargetName() {
+	return this->target;
+}
+
+wxString CloneProfileDialog::GetOriginalName() {
+	return cloneFrom->GetStringSelection();
+}
+
+DeleteProfileDialog::DeleteProfileDialog(wxWindow* parent, wxString name):
+wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile..."), wxDefaultPosition, wxDefaultSize) {
+	wxStaticText* text = new wxStaticText(this, wxID_ANY,
+		wxString::Format(_("Are you sure you would like to delete profile %s"), name));
+
+	wxButton *deleteButton = new wxButton(this, wxID_ANY, _("Delete"));
+	wxButton *cancelButton = new wxButton(this, wxID_ANY, _("Cancel"));
+
+	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+	buttonSizer->Add(deleteButton);
+	buttonSizer->Add(cancelButton);
+
+	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(text);
+	sizer->Add(buttonSizer, wxSizerFlags().Right());
+
+	this->SetSizer(sizer);
+	this->Layout();
+
+	this->SetAffirmativeId(deleteButton->GetId());
+	this->SetEscapeId(cancelButton->GetId());
+
+	wxLogDebug(_T("Delete Profile Dialog created."));
+}
+	
