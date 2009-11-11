@@ -6,6 +6,7 @@
 #include <wx/dir.h>
 
 #include "ProfileManager.h"
+#include "wxIDS.h"
 
 #include "wxLauncherSetup.h"
 
@@ -52,7 +53,7 @@ bool ProMan::Initialize() {
 		wxFileConfig *config = new wxFileConfig(instream);
 		
 		wxString name;
-		config->Read(_T("/main/name"), &name, wxString::Format(_T("Profile %05d"), i));
+		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(_T("Profile %05d"), i));
 
 		ProMan::proman->profiles[name] = config;
 		wxLogDebug(_T("  Opened profile named: %s"), name);
@@ -60,7 +61,7 @@ bool ProMan::Initialize() {
 
 	wxString currentProfile;
 	ProMan::proman->profileList->Read(
-		_T("/main/lastprofile"), &currentProfile, _T("Default"));
+		GBL_CFG_MAIN_LASTPROFILE, &currentProfile, _T("Default"));
 	
 	wxLogDebug(_T(" Searching for profile: %s"), currentProfile);
 	if ( ProMan::proman->profiles.find(currentProfile)
@@ -76,7 +77,7 @@ bool ProMan::Initialize() {
 			ProMan::proman->CreateNewProfile(_T("Default"));
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
-		ProMan::proman->profileList->Write(_T("/main/lastprofile"), _T("Default"));
+		ProMan::proman->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, _T("Default"));
 		ProMan::proman->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
 		currentProfile = _T("Default");
 	}
@@ -163,8 +164,8 @@ bool ProMan::CreateNewProfile(wxString newName) {
 	}
 
 	wxFileConfig* config = new wxFileConfig(wxFFileInputStream(profile.GetFullPath(), _T("w+b")));
-	config->Write(_T("/main/name"), newName);
-	config->Write(_T("/main/filename"), profile.GetFullName());
+	config->Write(PRO_CFG_MAIN_NAME, newName);
+	config->Write(PRO_CFG_MAIN_FILENAME, profile.GetFullName());
 	config->Save(wxFFileOutputStream(profile.GetFullPath()));
 
 	this->profiles[newName] = config;
@@ -218,7 +219,7 @@ void ProMan::SaveCurrentProfile() {
 	if ( config != NULL ) {
 		if ( this->isAutoSaving ) {
 			wxString profilename;
-			if ( !config->Read(_T("/main/filename"), &profilename) ) {
+			if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profilename) ) {
 				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
@@ -246,7 +247,7 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
-		this->profileList->Write(_T("/main/lastprofile"), name);
+		this->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, name);
 		return true;
 	}
 }
@@ -294,7 +295,7 @@ bool ProMan::DeleteProfile(wxString name) {
 		wxFileConfig* config = this->profiles[name];
 
 		wxString filename;
-		if ( !config->Read(_T("/main/filename"), &filename) ) {
+		if ( !config->Read(PRO_CFG_MAIN_FILENAME, &filename) ) {
 			wxLogWarning(_T("Unable to get filename to delete %s"), name);
 			return false;
 		}

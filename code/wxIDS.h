@@ -100,4 +100,11 @@ enum ProfileDialogReturnValues: int {
 	RETURN_CONFRIM_DELETE,
 };
 
+// Keys used in global config file
+#define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles")
+#define GBL_CFG_MAIN_LASTPROFILE			_T("/main/lastprofile")
+
+// Keys used in profiles
+#define PRO_CFG_MAIN_NAME					_T("/main/name")
+#define PRO_CFG_MAIN_FILENAME				_T("/main/filename")
 #endif

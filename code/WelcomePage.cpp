@@ -111,7 +111,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	profileCombo->Append(profile->GetAllProfileNames());
 
 	wxString lastselected;
-	profile->Global()->Read(_T("/main/lastprofile"), &lastselected, _T("Default"));
+	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, _T("Default"));
 	profileCombo->SetValue(lastselected);
 
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("Clone"));
@@ -119,7 +119,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Always save default"));
 	bool autosave;
-	profile->Global()->Read(_T("/main/autosaveprofiles"), &autosave, true);
+	profile->Global()->Read(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
 
 	wxBoxSizer* profileButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -238,13 +238,13 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 		// I am to save all changes, so force save and disable the save button.
 		saveButton->Disable();
 		
-		profile->Global()->Write(_T("/main/autosaveprofiles"), true);
+		profile->Global()->Write(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
 		profile->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
 		saveButton->Enable();
 		
-		profile->Global()->Write(_T("/main/autosaveprofiles"), false);
+		profile->Global()->Write(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
 }
