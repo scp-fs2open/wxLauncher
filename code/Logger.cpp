@@ -30,6 +30,8 @@ Logger::Logger() {
 
 /** Destructor. */
 Logger::~Logger() {
+	char exitmsg[] = "\nLog closed.\n";
+	this->out->Write(exitmsg, sizeof(exitmsg));
 	this->out->Close();
 	delete this->out;
 }

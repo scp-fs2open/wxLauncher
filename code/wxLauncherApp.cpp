@@ -50,5 +50,7 @@ int wxLauncher::OnExit() {
 
 	ProMan::DeInitialize();
 
+	wxLogInfo(_T("wxLogger shutdown complete."));
+
 	return 0;
 }
