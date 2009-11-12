@@ -58,6 +58,7 @@ EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkHover)
 
 EVT_COMMAND( wxID_NONE, EVT_PROFILE_CHANGE, WelcomePage::ProfileCountChanged)
+EVT_COMMAND( wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, WelcomePage::ProfileCountChanged)
 
 // Profile controls
 EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
@@ -311,6 +312,7 @@ void WelcomePage::cloneNewProfile(wxComboBox* combobox, ProMan* profile) {
 				wxLogStatus(_("Cloned profile '%s' from '%s'"),
 					cloneDialog.GetOriginalName(),
 					cloneDialog.GetTargetName());
+				profile->SwitchTo(cloneDialog.GetTargetName());
 		} else {
 				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
 					cloneDialog.GetOriginalName(),
