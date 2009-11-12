@@ -16,6 +16,7 @@ public:
 	void ProfileButtonClicked(wxCommandEvent& event);
 	void SaveDefaultChecked(wxCommandEvent& event);
 	void ProfileChanged(wxCommandEvent& event);
+	void ProfileCountChanged(wxCommandEvent& event);
 	
 private:
 	/** The width of the items on the welcome tab. */
