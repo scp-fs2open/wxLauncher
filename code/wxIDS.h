@@ -87,7 +87,9 @@ enum MainTabImageIDs: int {
 };
 
 enum StatusBarIconIDs: int {
-	ID_SB_OK = 0,
+	ID_SB_NO_CHANGE = -1,
+	ID_SB_INFO,
+	ID_SB_OK,
 	ID_SB_WARNING,
 	ID_SB_ERROR,
 
