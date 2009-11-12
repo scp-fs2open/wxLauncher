@@ -25,7 +25,7 @@ bool ProMan::Initialize() {
 	ProMan::proman = new ProMan();
 
 	wxFileName file;
-	file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
+	file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
 		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath());
@@ -44,7 +44,7 @@ bool ProMan::Initialize() {
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
-	wxDir::GetAllFiles(wxStandardPaths::Get().GetUserDataDir(), &foundProfiles, _T("pro?????.ini"));
+	wxDir::GetAllFiles(GET_PROFILE_STORAGEFOLDER(), &foundProfiles, _T("pro?????.ini"));
 
 	wxLogInfo(_T(" Found %d profile(s)."), foundProfiles.Count());
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
@@ -130,7 +130,7 @@ ProMan::~ProMan() {
 	if ( this->profileList != NULL ) {
 		if ( this->isAutoSaving ) {
 			wxFileName file;
-			file.Assign(wxStandardPaths::Get().GetUserDataDir(), GLOBAL_INI_FILE_NAME);
+			file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
 			this->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
 		} else {
 			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
@@ -152,7 +152,7 @@ in the profiles map. Returns true if creation was successful. */
 bool ProMan::CreateNewProfile(wxString newName) {
 	wxFileName profile;
 	profile.Assign(
-		wxStandardPaths::Get().GetUserDataDir(),
+		GET_PROFILE_STORAGEFOLDER(),
 		wxString::Format(_T("pro%05d.ini"), this->profiles.size()));
 
 	wxASSERT_MSG( profile.IsOk(), _T("Profile filename is invalid"));
@@ -223,7 +223,7 @@ void ProMan::SaveCurrentProfile() {
 				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
-				file.Assign(wxStandardPaths::Get().GetUserDataDir(), profilename);
+				file.Assign(GET_PROFILE_STORAGEFOLDER(), profilename);
 				wxASSERT( file.IsOk() );
 				config->Save(wxFFileOutputStream(file.GetFullPath()));
 				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath());
@@ -301,7 +301,7 @@ bool ProMan::DeleteProfile(wxString name) {
 		}
 
 		wxFileName file;
-		file.Assign(wxStandardPaths::Get().GetUserDataDir(), filename);
+		file.Assign(GET_PROFILE_STORAGEFOLDER(), filename);
 
 		if ( file.FileExists() ) {
 			wxLogDebug(_T(" Backing file exists"));
