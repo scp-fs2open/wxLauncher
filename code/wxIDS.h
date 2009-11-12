@@ -100,6 +100,9 @@ enum ProfileDialogReturnValues: int {
 	RETURN_CONFRIM_DELETE,
 };
 
+// Storage locations
+#define GET_PROFILE_STORAGEFOLDER()			wxStandardPaths::Get().GetUserDataDir()
+
 // Keys used in global config file
 #define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles")
 #define GBL_CFG_MAIN_LASTPROFILE			_T("/main/lastprofile")
