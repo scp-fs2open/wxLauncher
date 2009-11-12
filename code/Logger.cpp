@@ -45,8 +45,16 @@ void Logger::DoLog(wxLogLevel level, const wxChar *msg, time_t time) {
 	out->Write(buf.mb_str(wxConvUTF8), buf.size());
 	out->Write("\n", 1);
 
-	if ( level == 4 && this->statusBar != NULL ) {
-		this->statusBar->SetMainStatusText(buf);
+	if ( this->statusBar != NULL ) {
+		if ( level == 1 ) { // error
+			this->statusBar->SetMainStatusText(buf, ID_SB_ERROR);
+		} else if ( level == 2 ) { // warning
+			this->statusBar->SetMainStatusText(buf, ID_SB_WARNING);
+		} else if ( level == 3 || level == 4 ) { // message, statubar
+			this->statusBar->SetMainStatusText(buf, ID_SB_OK);
+		} else if ( level == 5 ) { // info
+			this->statusBar->SetMainStatusText(buf, ID_SB_INFO);
+		}
 	}		
 }
 
