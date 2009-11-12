@@ -57,6 +57,8 @@ EVT_HTML_CELL_HOVER(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkHover)
 EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkHover)
 
+EVT_COMMAND( wxID_NONE, EVT_PROFILE_CHANGE, WelcomePage::ProfileCountChanged)
+
 // Profile controls
 EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_DELETE_PROFILE, WelcomePage::ProfileButtonClicked)
@@ -109,6 +111,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 		0,	// choices
 		wxCB_SORT);
 	profileCombo->Append(profile->GetAllProfileNames());
+	profile->AddEventHandler(this);
 
 	wxString lastselected;
 	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, _T("Default"));
@@ -338,6 +341,19 @@ void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
 		wxLogWarning(_T("Unable to delete non existant profile '%s'"), nametodelete);
 	}
 }
+
+void WelcomePage::ProfileCountChanged(wxCommandEvent &event) {
+	WXUNUSED(event);
+	wxComboBox* combobox = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	ProMan *profile = ProMan::GetProfileManager();
+
+	wxLogStatus(_T("ProfileCountChanged"));
+
+	combobox->Clear();
+	combobox->Append(profile->GetAllProfileNames());
+	combobox->SetStringSelection(profile->GetCurrentName());
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 ///// DIALOGS ///
