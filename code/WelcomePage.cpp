@@ -118,7 +118,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, _T("Default"));
 	profileCombo->SetValue(lastselected);
 
-	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("Clone"));
+	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Always save default"));
