@@ -43,12 +43,12 @@ void ProMan::GenerateCurrentProfileChangedEvent() {
 	wxCommandEvent event(EVT_CURRENT_PROFILE_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating current profile changed event"));
 	EventHandlers::iterator iter = this->eventHandlers.begin();
-	do {
+	while (iter != this->eventHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->ProcessEvent(event);
 		iter++;
 		wxLogDebug(_T(" Sent current profile changed event"));
-	} while (iter != this->eventHandlers.end());
+	} 
 }
 
 void ProMan::AddEventHandler(wxEvtHandler *handler) {
