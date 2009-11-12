@@ -25,6 +25,7 @@ StatusBar::StatusBar(wxWindow *parent)
 	this->icons[ID_SB_OK] = wxBitmap(_T("ok.png"), wxBITMAP_TYPE_ANY);
 	this->icons[ID_SB_WARNING] = wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
 	this->icons[ID_SB_ERROR] = wxBitmap(_T("error.png"), wxBITMAP_TYPE_ANY);
+	this->icons[ID_SB_INFO] = wxBitmap(_T("information.png"), wxBITMAP_TYPE_ANY);
 
 	for( int i = 0; i < ID_SB_MAX_ID; i++) { // Check that all icons are okay.
 		if ( !this->icons[i].IsOk() ) {
@@ -52,6 +53,7 @@ StatusBar::StatusBar(wxWindow *parent)
 }
 
 StatusBar::~StatusBar() {
+	dynamic_cast<Logger*>(wxLog::GetActiveTarget())->SetStatusBarTarget(NULL);
 }
 
 void StatusBar::OnSize(wxSizeEvent& event) {
@@ -74,8 +76,18 @@ void StatusBar::OnSize(wxSizeEvent& event) {
 
 }
 
-void StatusBar::SetMainStatusText(wxString msg) {
+void StatusBar::SetMainStatusText(wxString msg, int icon) {
 	this->SetStatusText(msg, SB_FIELD_MAINTEXT);
+	if ( icon > ID_SB_NO_CHANGE && icon < ID_SB_MAX_ID ) {
+		wxStaticBitmap* iconImage = dynamic_cast<wxStaticBitmap*>(this->GetWindowChild(ID_STATUSBAR_STATUS_ICON));
+
+		iconImage->SetBitmap(this->icons[icon]);
+		iconImage->Refresh();
+	} else {
+		if ( icon != ID_SB_NO_CHANGE ) {
+			wxLogWarning(_T("SetMainStatusText was passed (%d) as an icon, which is out of range"), icon);
+		}
+	}
 }
 
 /** Causes the status bar to show the msg until EndToolTipStatusText() is
