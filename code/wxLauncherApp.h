@@ -11,4 +11,6 @@ public:
 	SkinSystem* skin;
 };
 
+DECLARE_APP(wxLauncher);
+
 #endif
