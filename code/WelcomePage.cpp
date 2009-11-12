@@ -211,7 +211,7 @@ void WelcomePage::OnMouseOut(wxMouseEvent &event) {
 
 /** Calls the dialogs for cloning, saving or deleting profiles. */
 void WelcomePage::ProfileButtonClicked(wxCommandEvent& event) {
-	wxComboBox* combobox = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	ProMan *profile = ProMan::GetProfileManager();
 
 	switch(event.GetId()) {
@@ -252,8 +252,8 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 	}
 }
 void WelcomePage::ProfileChanged(wxCommandEvent& event) {
-	wxComboBox* saveButton = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
-	wxString newProfile = saveButton->GetValue();
+	wxChoice* saveButton = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxString newProfile = saveButton->GetStringSelection();
 	ProMan* proman = ProMan::GetProfileManager();
 
 	if ( proman->DoesProfileExist(newProfile) ) {
@@ -278,7 +278,7 @@ void WelcomePage::ProfileChanged(wxCommandEvent& event) {
 	}
 }
 
-void WelcomePage::cloneNewProfile(wxComboBox* combobox, ProMan* profile) {
+void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	wxString originalName;
 	wxString targetName;
 
@@ -290,13 +290,13 @@ void WelcomePage::cloneNewProfile(wxComboBox* combobox, ProMan* profile) {
 	If the current value of the combobox is a valid profile name then we will
 	use that as the profile to clone from, leaving the newname blank.
 	*/
-	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetValue());
-	if ( profile->DoesProfileExist(combobox->GetValue()) ) {
+	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection());
+	if ( profile->DoesProfileExist(combobox->GetStringSelection()) ) {
 		// is a vaild profile
-		originalName = combobox->GetValue();
+		originalName = combobox->GetStringSelection();
 		wxLogDebug(_T("  Which is an existing profile."));
 	} else {
-		targetName = combobox->GetValue();
+		targetName = combobox->GetStringSelection();
 		originalName = profile->GetCurrentName();
 		wxLogDebug(_T("  Which is not an existing profile."));
 	}
@@ -323,8 +323,8 @@ void WelcomePage::cloneNewProfile(wxComboBox* combobox, ProMan* profile) {
 }
 
 
-void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
-	wxString nametodelete = combobox->GetValue();
+void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
+	wxString nametodelete = combobox->GetStringSelection();
 	
 	if ( profile->DoesProfileExist(nametodelete) ) {
 		DeleteProfileDialog deleteDialog(this, nametodelete);
@@ -345,7 +345,7 @@ void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
 
 void WelcomePage::ProfileCountChanged(wxCommandEvent &event) {
 	WXUNUSED(event);
-	wxComboBox* combobox = dynamic_cast<wxComboBox*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	ProMan *profile = ProMan::GetProfileManager();
 
 	wxLogStatus(_T("ProfileCountChanged"));
