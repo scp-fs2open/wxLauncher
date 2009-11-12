@@ -343,8 +343,10 @@ void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
 ///// DIALOGS ///
 CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, wxString destName):
 wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Clone profile..."), wxDefaultPosition, wxDefaultSize) {
+	this->target = destName;
+
 	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New Profile Name:"));
-	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, destName, wxDefaultPosition, wxSize(200,-1));
+	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, this->target, wxDefaultPosition, wxSize(200,-1));
 	
 	wxSizer* nameSizer = new wxFlexGridSizer(2);
 	nameSizer->Add(newNameText);
