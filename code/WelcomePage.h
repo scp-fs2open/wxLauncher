@@ -23,8 +23,8 @@ private:
 	const static int stuffWidth = TAB_AREA_WIDTH;
 	void *lastLinkInfo;
 
-	void cloneNewProfile(wxComboBox* combobox, ProMan* profile);
-	void deleteProfile(wxComboBox* combobox, ProMan* profile);
+	void cloneNewProfile(wxChoice* combobox, ProMan* profile);
+	void deleteProfile(wxChoice* combobox, ProMan* profile);
 
 	DECLARE_EVENT_TABLE();
 };
