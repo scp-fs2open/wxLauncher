@@ -344,31 +344,28 @@ void WelcomePage::deleteProfile(wxComboBox* combobox, ProMan* profile) {
 CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, wxString destName):
 wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Clone profile..."), wxDefaultPosition, wxDefaultSize) {
 	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New Profile Name:"));
-	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, destName);
+	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, destName, wxDefaultPosition, wxSize(200,-1));
 	
-	wxBoxSizer* nameSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxSizer* nameSizer = new wxFlexGridSizer(2);
 	nameSizer->Add(newNameText);
-	nameSizer->Add(newName, 1);
+	nameSizer->Add(newName);
 
 	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
 	cloneFrom = new wxChoice(this, wxID_ANY);
 
-	wxBoxSizer *fromSizer = new wxBoxSizer(wxHORIZONTAL);
-	fromSizer->Add(cloneFromText);
-	fromSizer->Add(cloneFrom);
+	nameSizer->Add(cloneFromText);
+	nameSizer->Add(cloneFrom);
 
-	wxButton *createButton = new wxButton(this, wxID_ANY, _("Clone"));
-	wxButton *closeButton = new wxButton(this, wxID_ANY, _("Close"));
-	this->SetAffirmativeId(createButton->GetId());
-	this->SetEscapeId(closeButton->GetId());
+	wxButton *createButton = new wxButton(this, wxID_OK, _("Clone"));
+	wxButton *closeButton = new wxButton(this, wxID_CANCEL, _("Close"));
 
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->Add(createButton);
 	buttonSizer->Add(closeButton);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(nameSizer, wxSizerFlags().Expand());
-	sizer->Add(cloneFrom);
+	sizer->Add(nameSizer, wxSizerFlags().Expand().Border(wxALL, 5));
+	sizer->AddSpacer(15);
 	sizer->Add(buttonSizer, wxSizerFlags().Right());
 
 	this->SetSizer(sizer);
@@ -379,7 +376,8 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Clone profile..."), wxDefaultPositi
 	cloneFrom->Append(ProMan::GetProfileManager()->GetAllProfileNames());
 	cloneFrom->SetStringSelection(orignalName);
 
-	this->Layout();
+	this->Fit();
+	this->Center();
 	wxLogDebug(_T("Clone Profile Dialog Created"));
 }
 
