@@ -104,8 +104,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 	// Profiles
 	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile"));
-	wxComboBox* profileCombo = new wxComboBox(this, ID_PROFILE_COMBO,
-		wxEmptyString,	// value,
+	wxChoice* profileCombo = new wxChoice(this, ID_PROFILE_COMBO,
 		wxDefaultPosition,
 		wxDefaultSize,
 		0,	// number of choices
@@ -116,7 +115,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 	wxString lastselected;
 	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, _T("Default"));
-	profileCombo->SetValue(lastselected);
+	profileCombo->SetStringSelection(lastselected);
 
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
@@ -360,7 +359,7 @@ void WelcomePage::ProfileCountChanged(wxCommandEvent &event) {
 ///////////////////////////////////////////////////////////////////////////////
 ///// DIALOGS ///
 CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, wxString destName):
-wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Clone profile..."), wxDefaultPosition, wxDefaultSize) {
+wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition, wxDefaultSize) {
 	this->target = destName;
 
 	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New Profile Name:"));
