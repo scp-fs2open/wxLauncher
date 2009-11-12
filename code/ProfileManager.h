@@ -9,6 +9,8 @@ WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
 
 /** event is generated anytime the number of profiles in the manager change. */
 DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE, -1);
+/** Event is generated anytime the currently selected profile is changed. */
+DECLARE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGE, -1);
 
 class ProMan {
 public:
@@ -46,6 +48,7 @@ private:
 	wxFileConfig* profileList;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
 	void GenerateChangeEvent();
+	void GenerateCurrentProfileChangedEvent();
 
 	EventHandlers eventHandlers;
 };
