@@ -348,8 +348,6 @@ void WelcomePage::ProfileCountChanged(wxCommandEvent &event) {
 	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	ProMan *profile = ProMan::GetProfileManager();
 
-	wxLogStatus(_T("ProfileCountChanged"));
-
 	combobox->Clear();
 	combobox->Append(profile->GetAllProfileNames());
 	combobox->SetStringSelection(profile->GetCurrentName());
