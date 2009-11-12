@@ -5,6 +5,10 @@
 #include <wx/fileconf.h>
 
 WX_DECLARE_STRING_HASH_MAP( wxFileConfig*, ProfileMap );
+WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
+
+/** event is generated anytime the number of profiles in the manager change. */
+DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE, -1);
 
 class ProMan {
 public:
@@ -28,6 +32,9 @@ public:
 	bool NeedToPromptToSave() { return this->isAutoSaving; };
 	void SetAutoSave(bool value) { this->isAutoSaving = value; };
 
+	void AddEventHandler(wxEvtHandler *handler);
+	void RemoveEventHandler(wxEvtHandler *handler);
+
 private:
 	static ProMan* proman;
 	static bool isInitialized;
@@ -38,6 +45,9 @@ private:
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* profileList;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
+	void GenerateChangeEvent();
+
+	EventHandlers eventHandlers;
 };
 
 #endif

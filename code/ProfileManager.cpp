@@ -6,6 +6,7 @@
 #include <wx/dir.h>
 
 #include "ProfileManager.h"
+#include "wxLauncherApp.h"
 #include "wxIDS.h"
 
 #include "wxLauncherSetup.h"
@@ -14,6 +15,34 @@ ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
 
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
+
+/** EVT_PROFILE_EVENT */
+DEFINE_EVENT_TYPE(EVT_PROFILE_CHANGE);
+
+#include <wx/listimpl.cpp> // required magic incatation
+WX_DEFINE_LIST(EventHandlers);
+
+
+void ProMan::GenerateChangeEvent() {
+	wxCommandEvent event(EVT_PROFILE_CHANGE, wxID_NONE);
+	wxLogDebug(_T("Generating PRofile change event"));
+	EventHandlers::iterator iter = this->eventHandlers.begin();
+	do {
+		wxEvtHandler* current = *iter;
+		current->ProcessEvent(event);
+		iter++;
+		wxLogDebug(_T(" Sent Profile Change event"));
+	} while (iter != this->eventHandlers.end());
+}
+
+void ProMan::AddEventHandler(wxEvtHandler *handler) {
+	this->eventHandlers.Append(handler);
+}
+
+void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
+	this->eventHandlers.DeleteObject(handler);
+}
+	
 
 /** Sets up the profile manager. Must be called on program startup so that
 it can intercept global wxWidgets configuation functions. 
@@ -277,6 +306,7 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 
 		cont = config->GetNextEntry(str, cookie);
 	}
+	this->GenerateChangeEvent();
 	return true;
 }
 
@@ -310,6 +340,7 @@ bool ProMan::DeleteProfile(wxString name) {
 				delete config;
 				
 				wxLogMessage(_("Profile '%s' deleted."), name);
+				this->GenerateChangeEvent();
 				return true;
 			} else {
 				wxLogWarning(_("Unable to delete file for profile '%s'"), name);
