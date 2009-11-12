@@ -16,8 +16,12 @@ bool ProMan::isInitialized = false;
 
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
 
+///////////// Events
+
 /** EVT_PROFILE_EVENT */
 DEFINE_EVENT_TYPE(EVT_PROFILE_CHANGE);
+
+DEFINE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED);
 
 #include <wx/listimpl.cpp> // required magic incatation
 WX_DEFINE_LIST(EventHandlers);
@@ -32,6 +36,18 @@ void ProMan::GenerateChangeEvent() {
 		current->ProcessEvent(event);
 		iter++;
 		wxLogDebug(_T(" Sent Profile Change event"));
+	} while (iter != this->eventHandlers.end());
+}
+
+void ProMan::GenerateCurrentProfileChangedEvent() {
+	wxCommandEvent event(EVT_CURRENT_PROFILE_CHANGED, wxID_NONE);
+	wxLogDebug(_T("Generating current profile changed event"));
+	EventHandlers::iterator iter = this->eventHandlers.begin();
+	do {
+		wxEvtHandler* current = *iter;
+		current->ProcessEvent(event);
+		iter++;
+		wxLogDebug(_T(" Sent current profile changed event"));
 	} while (iter != this->eventHandlers.end());
 }
 
@@ -277,6 +293,7 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
 		this->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, name);
+		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}
 }
