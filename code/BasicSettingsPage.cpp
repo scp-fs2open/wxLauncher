@@ -1,20 +1,53 @@
 #include <wx/wx.h>
+#include <wx/filename.h>
+
 #include "BasicSettingsPage.h"
 #include "wxIDS.h"
+#include "ProfileManager.h"
+#include "TCManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
+class ExeChoice: public wxChoice {
+public:
+	ExeChoice(wxWindow * parent, wxWindowID id) : wxChoice(parent, id) {}
+	void FindAndSetSelectionWithClientData(wxString item) {
+		size_t number = this->GetStrings().size();
+		for( size_t i = 0; i < number; i++ ) {
+			FSOVersion* data = dynamic_cast<FSOVersion*>(this->GetClientObject(i));
+			wxCHECK2_MSG( data != NULL, continue, _T("Client data is not a FSOVersion pointer"));
+			if ( data->executablename == item ) {
+				this->SetSelection(i);
+				return;
+			}
+		}
+	}
+};
+		
+
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
+	ProMan* proman = ProMan::GetProfileManager();
+	TCManager::Initialize();
 	// exe Selection
+	wxString tcfolder, binary;
+	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
+	bool hasbinary = proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
+	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("Executable Selection"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, wxID_ANY, _("FS2 Root Folder:"));
-	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, _T(""));
+	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Select"));
 
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("Use this FS2_Open binary: "));
-	wxChoice* useExeChoice = new wxChoice(this, ID_EXE_CHOICE_BOX);
-	useExeChoice->Disable();
+	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
+	if ( hastcfolder ) {
+		this->FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
+		useExeChoice->FindAndSetSelectionWithClientData(binary);
+	} else {
+		useExeChoice->Disable();
+	}
+	TCManager::RegisterTCChanged(this);
 
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
 	rootFolderSizer->Add(rootFolderText);
@@ -228,4 +261,105 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	this->SetSizer(sizer);
 	this->Layout();
 
+}
+
+BasicSettingsPage::~BasicSettingsPage() {
+	TCManager::DeInitialize();
+}
+
+/// Event Handling
+BEGIN_EVENT_TABLE(BasicSettingsPage, wxPanel)
+EVT_BUTTON(ID_EXE_SELECT_ROOT_BUTTON, BasicSettingsPage::OnSelectTC)
+EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
+EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
+END_EVENT_TABLE()
+
+void BasicSettingsPage::OnSelectTC(wxCommandEvent &event) {
+	WXUNUSED(event);
+	wxString directory;
+	ProMan* proman = ProMan::GetProfileManager();
+	proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
+	wxDirDialog filechooser(this, _T("Please choose the base directory of the Total Conversion"),
+		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
+
+	wxString chosenDirectory;
+	wxFileName path;
+	while (true) {
+		if ( wxID_CANCEL == filechooser.ShowModal() ) {
+			return;
+		}
+		chosenDirectory = filechooser.GetPath();
+		if ( chosenDirectory == directory ) {
+			wxLogInfo(_T("The same was not changed."));
+			return; // User canceled, bail out.
+		}
+		path.SetPath(chosenDirectory);
+		if ( !path.IsOk() ) {
+			wxLogWarning(_T("Directory is not valid"));
+			continue;
+		} else if ( TCManager::CheckRootFolder(path) ) {
+			break;
+		} else {
+			wxLogWarning(_T("Directory does not have supported executables in it"));
+		}
+	}
+	wxLogDebug(_T("User choose '%s' as the TC directory"), path.GetPath());
+	proman->Get()->Write(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
+	TCManager::GenerateTCChanged();
+}
+
+void BasicSettingsPage::OnTCChanged(wxCommandEvent &event) {
+	WXUNUSED(event);
+
+	wxChoice *exeChoice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
+	wxCHECK_RET( exeChoice != NULL, 
+		_T("Cannot find executable choice control"));
+
+	wxTextCtrl* tcFolder = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_EXE_ROOT_FOLDER_BOX, this));
+	wxCHECK_RET( tcFolder != NULL, 
+		_T("Cannot find Text Control to show folder in."));
+
+	wxString tcPath;
+	exeChoice->Clear();
+	ProMan::GetProfileManager()
+		->Get()
+			->DeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+
+	if ( ProMan::GetProfileManager()->Get()
+			->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
+		tcFolder->SetValue(tcPath);
+
+		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
+	}
+	this->GetSizer()->Layout();
+	TCManager::GenerateTCBinaryChanged();
+}
+
+void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
+	wxArrayString exes = TCManager::GetBinariesFromRootFolder(path);
+	wxArrayString::iterator iter = exes.begin();
+	while ( iter != exes.end() ) {
+		wxFileName path(*iter);
+		FSOVersion ver = TCManager::GetBinaryVersion(path.GetFullName());
+		exeChoice->Insert(TCManager::MakeVersionStringFromVersion(ver), 0, new FSOVersion(ver));
+		iter++;
+	}
+}
+
+void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &event) {
+	ExeChoice* choice = dynamic_cast<ExeChoice*>(
+		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
+	wxCHECK_RET( choice != NULL, 
+		_T("OnSelectExecutable: cannot find choice drop box"));
+
+	FSOVersion* ver = dynamic_cast<FSOVersion*>(
+		choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( ver != NULL,
+		_T("OnSelectExecutable: choice does not have FSOVersion data"));
+	wxLogDebug(_T("Have selected ver for %s"), ver->executablename);
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->executablename);
 }
