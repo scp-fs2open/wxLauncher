@@ -235,6 +235,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\TCManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\WelcomePage.cpp"
 				>
 			</File>
@@ -297,6 +301,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\TCManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\version.h"
 				>
 			</File>
@@ -355,11 +363,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>

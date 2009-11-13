@@ -112,4 +112,8 @@ enum ProfileDialogReturnValues: int {
 // Keys used in profiles
 #define PRO_CFG_MAIN_NAME					_T("/main/name")
 #define PRO_CFG_MAIN_FILENAME				_T("/main/filename")
+
+#define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")
+#define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")
+
 #endif
