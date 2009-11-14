@@ -12,9 +12,11 @@ public:
 	void OnTCChanged(wxCommandEvent &event);
 
 	void OnSelectExecutable(wxCommandEvent &event);
+	void OnSelectResolution(wxCommandEvent &event);
 
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
+	void FillResolutionDropBox(wxChoice* exeChoice);
 	DECLARE_EVENT_TABLE();
 };
 

@@ -116,4 +116,8 @@ enum ProfileDialogReturnValues: int {
 #define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")
 #define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")
 
+#define PRO_CFG_SETTINGS_RESOLUTION_WIDTH	_T("/video/width")
+#define PRO_CFG_SETTINGS_RESOLUTION_HEIGHT	_T("/video/height")
+#define CFG_RES_FORMAT_STRING				_T("%d x %d")
+
 #endif
