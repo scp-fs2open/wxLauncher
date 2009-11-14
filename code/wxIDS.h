@@ -24,6 +24,7 @@ enum WindowIDS: int {
 	ID_SUMMARY_HTML_PANEL,
 	ID_HEADLINES_HTML_PANEL,
 
+	ID_VIDEO_STATIC_BOX,
 	ID_GRAPHICS_COMBO,
 	ID_RESOLUTION_COMBO,
 	ID_DEPTH_COMBO,
@@ -116,16 +117,16 @@ enum ProfileDialogReturnValues: int {
 #define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")
 #define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")
 
-#define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")
-#define PRO_CFG_VIDEO_RESOLUTION_HEIGHT		_T("/video/height")
+#define PRO_CFG_VIDEO_API					_T("/video/api")		// string
+#define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		// int
+#define PRO_CFG_VIDEO_RESOLUTION_HEIGHT		_T("/video/height")		// int
 #define CFG_RES_FORMAT_STRING				_T("%d x %d")
-#define PRO_CFG_VIDEO_API					_T("/video/api")
-#define PRO_CFG_VIDEO_BIT_DEPTH				_T("/video/depth")
-#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anistropic")
-#define PRO_CFG_VIDEO_ANTI_ALIAS			_T("/video/antialias")
-#define PRO_CFG_VIDEO_TEXTURE_FILTER		_T("/video/trilinear")
-#define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")
-#define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")
-#define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")
+#define PRO_CFG_VIDEO_BIT_DEPTH				_T("/video/depth")		// int
+#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anistropic")	// string %d.0
+#define PRO_CFG_VIDEO_ANTI_ALIAS			_T("/video/antialias")	// int
+#define PRO_CFG_VIDEO_TEXTURE_FILTER		_T("/video/trilinear")	// string
+#define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")	// int
+#define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")	// bool
+#define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")	// bool
 
 #endif
