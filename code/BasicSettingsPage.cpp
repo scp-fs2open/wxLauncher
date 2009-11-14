@@ -68,8 +68,15 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxStaticText* graphicsText = new wxStaticText(this, wxID_ANY, _("Graphics:"));
 	wxComboBox* graphicsCombo = new wxComboBox(this, ID_GRAPHICS_COMBO, _("OpenGL"));
 
-	wxStaticText* resolutionText = new wxStaticText(this, wxID_ANY, _("Resolution:"));
-	wxComboBox* resolutionCombo = new wxComboBox(this, ID_RESOLUTION_COMBO, _("1024x768"));
+	wxStaticText* resolutionText = 
+		new wxStaticText(this, wxID_ANY, _("Resolution:"));
+	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
+	this->FillResolutionDropBox(resolutionCombo);
+	int width, height;
+	proman->Get()->Read(PRO_CFG_SETTINGS_RESOLUTION_WIDTH, &width, 800);
+	proman->Get()->Read(PRO_CFG_SETTINGS_RESOLUTION_HEIGHT, &height, 600);
+	resolutionCombo->SetStringSelection(
+		wxString::Format(CFG_RES_FORMAT_STRING, width, height));
 
 	wxStaticText* depthText = new wxStaticText(this, wxID_ANY, _("Depth:"));
 	wxComboBox* depthCombo = new wxComboBox(this, ID_DEPTH_COMBO, _("32 Bit"));
@@ -272,6 +279,7 @@ BEGIN_EVENT_TABLE(BasicSettingsPage, wxPanel)
 EVT_BUTTON(ID_EXE_SELECT_ROOT_BUTTON, BasicSettingsPage::OnSelectTC)
 EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
 EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
+EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectResolution)
 END_EVENT_TABLE()
 
 void BasicSettingsPage::OnSelectTC(wxCommandEvent &event) {
@@ -362,4 +370,77 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &event) {
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->executablename);
+}
+
+class Resolution: public wxClientData {
+public:
+	Resolution(int height, int width) {
+		this->height = height;
+		this->width = width;
+	}
+	virtual ~Resolution() {}
+	int GetHeight() { return this->height; }
+	int GetWidth() { return this->width; }
+private:
+	int height;
+	int width;
+};
+
+void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
+	DEVMODE deviceMode;
+	DWORD modeCounter = 0;
+	BOOL result;
+
+	wxLogDebug(_T("Enumerating graphics modes"));
+
+	do {
+		memset(&deviceMode, 0, sizeof(DEVMODE));
+		deviceMode.dmSize = sizeof(DEVMODE);
+
+		result = EnumDisplaySettings(NULL, modeCounter, &deviceMode);
+
+		if ( result == TRUE ) {
+			wxLogDebug(_T(" %dx%d %d bit %d hertz (%d)"),
+				deviceMode.dmPelsWidth,
+				deviceMode.dmPelsHeight,
+				deviceMode.dmBitsPerPel,
+				deviceMode.dmDisplayFrequency,
+				deviceMode.dmDisplayFlags);
+			wxString resolution = wxString::Format(
+				CFG_RES_FORMAT_STRING, deviceMode.dmPelsWidth, deviceMode.dmPelsHeight);
+			// check to see if the resolution has already been added.
+			wxArrayString strings = exeChoice->GetStrings();
+			wxArrayString::iterator iter = strings.begin();
+			bool exists = false;
+			while ( iter != strings.end() ) {
+				if ( *iter == resolution ) {
+					exists = true;
+				}
+				iter++;
+			}
+			if ( !exists ) {
+				exeChoice->Insert(
+					resolution,
+					0,
+					new Resolution(deviceMode.dmPelsHeight, deviceMode.dmPelsWidth));
+			}
+		}
+		modeCounter++;
+	} while ( result == TRUE );
+}
+
+void BasicSettingsPage::OnSelectResolution(wxCommandEvent &event) {
+	WXUNUSED(event);
+	wxChoice* choice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
+	wxCHECK_RET( choice != NULL, _T("Unable to find resolution combo"));
+
+	Resolution* res = dynamic_cast<Resolution*>(
+		choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( res != NULL, _T("Choice does not have Resolution objects"));
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SETTINGS_RESOLUTION_WIDTH, res->GetWidth());
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SETTINGS_RESOLUTION_HEIGHT, res->GetHeight());
 }
