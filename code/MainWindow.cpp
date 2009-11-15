@@ -74,22 +74,22 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
 END_EVENT_TABLE()
 
-void MainWindow::OnQuit(wxCommandEvent& event) {
+void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Quit"));
 }
-void MainWindow::OnHelp(wxCommandEvent& event) {
+void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Help"));
 }
-void MainWindow::OnStartFred(wxCommandEvent& event) {
+void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Start Fred"));
 }
-void MainWindow::OnStartFS(wxCommandEvent& event) {
+void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Start FS"));
 }
-void MainWindow::OnUpdate(wxCommandEvent& event) {
+void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Update"));
 }
-void MainWindow::OnAbout(wxCommandEvent& event) {
+void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("About"));
 }
 
