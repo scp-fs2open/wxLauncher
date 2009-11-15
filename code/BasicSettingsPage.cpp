@@ -83,25 +83,113 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	resolutionCombo->SetStringSelection(
 		wxString::Format(CFG_RES_FORMAT_STRING, width, height));
 
-	wxStaticText* depthText = new wxStaticText(this, wxID_ANY, _("Depth:"));
+	wxStaticText* depthText = 
+		new wxStaticText(this, wxID_ANY, _("Depth:"));
 	wxChoice* depthCombo = new wxChoice(this, ID_DEPTH_COMBO);
+	int bitDepth;
+	depthCombo->Append(_("16 bit"));
+	depthCombo->Append(_("32 bit"));
+	proman->Get()->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 16);
+	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
-	wxStaticText* textureFilterText = new wxStaticText(this, wxID_ANY, _("Texture Filter:"));
+	wxStaticText* textureFilterText = 
+		new wxStaticText(this, wxID_ANY, _("Texture Filter:"));
 	wxChoice* textureFilterCombo = new wxChoice(this, ID_TEXTURE_FILTER_COMBO);
+	wxString filter;
+	textureFilterCombo->Append(_("Bilinear"));
+	textureFilterCombo->Append(_("Trilinear"));
+	proman->Get()->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"));
+	filter.MakeLower();
+	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
-	wxStaticText* anisotropicText = new wxStaticText(this, wxID_ANY, _("Anisotropic:"));
+	wxStaticText* anisotropicText = 
+		new wxStaticText(this, wxID_ANY, _("Anisotropic:"));
 	wxChoice* anisotropicCombo = new wxChoice(this, ID_ANISOTROPIC_COMBO);
+	int anisotropic;
+	anisotropicCombo->Append(_("Off"));
+	anisotropicCombo->Append(_T(" 1x"));
+	anisotropicCombo->Append(_T(" 2x"));
+	anisotropicCombo->Append(_T(" 4x"));
+	anisotropicCombo->Append(_T(" 8x"));
+	anisotropicCombo->Append(_T("16x"));
+	proman->Get()->Read(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0);
+	switch(anisotropic) {
+		case 1:
+			anisotropic = 1;
+			break;
+		case 2:
+			anisotropic = 2;
+			break;
+		case 4:
+			anisotropic = 3;
+			break;
+		case 8:
+			anisotropic = 4;
+			break;
+		case 16:
+			anisotropic = 5;
+			break;
+		default:
+			anisotropic = 0;
+	}
+	anisotropicCombo->SetSelection(anisotropic);
+
 
 	wxStaticText* aaText = new wxStaticText(this, wxID_ANY, _("Anti-Alias:"));
 	wxChoice* aaCombo = new wxChoice(this, ID_AA_COMBO);
+	int antialias;
+	aaCombo->Append(_("Off"));
+	aaCombo->Append(_T(" 1x"));
+	aaCombo->Append(_T(" 2x"));
+	aaCombo->Append(_T(" 4x"));
+	aaCombo->Append(_T(" 8x"));
+	aaCombo->Append(_T("16x"));
+	proman->Get()->Read(PRO_CFG_VIDEO_ANISOTROPIC, &antialias, 0);
+	switch(antialias) {
+		case 1:
+			antialias = 1;
+			break;
+		case 2:
+			antialias = 2;
+			break;
+		case 4:
+			antialias = 3;
+			break;
+		case 8:
+			antialias = 4;
+			break;
+		case 16:
+			antialias = 5;
+			break;
+		default:
+			antialias = 0;
+	}
+	aaCombo->SetSelection(antialias);
 
-	wxStaticText* gsText = new wxStaticText(this, wxID_ANY, _("General settings (recommend: highest):"));
+	wxStaticText* gsText = 
+		new wxStaticText(this, wxID_ANY, _("General settings (recommend: highest):"));
 	wxChoice* gsCombo = new wxChoice(this, ID_GS_COMBO);
+	gsCombo->Append(_("1. Lowest"));
+	gsCombo->Append(_("2. Low"));
+	gsCombo->Append(_("3. High"));
+	gsCombo->Append(_("4. Highest"));
+	int gamespeed;
+	proman->Get()->Read(PRO_CFG_VIDEO_GENERAL_SETTINGS, &gamespeed, 3);
+	gsCombo->SetSelection(gamespeed);
 
-	wxCheckBox* largeTextureCheck = new wxCheckBox(this, ID_LARGE_TEXTURE_CHECK, _("Use large textures:"));
-	wxCheckBox* fontDistortion = new wxCheckBox(this, ID_FONT_DISTORTION_CHECK, _("Fix font distortion"));
-
-	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); // Sizer for graphics, resolution, depth, etc
+	wxCheckBox* largeTextureCheck = 
+		new wxCheckBox(this, ID_LARGE_TEXTURE_CHECK, _("Use large textures"));
+	bool largeTextures;
+	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &largeTextures, false);
+	largeTextureCheck->SetValue(largeTextures);
+	wxCheckBox* fontDistortion = 
+		new wxCheckBox(this, ID_FONT_DISTORTION_CHECK, _("Fix font distortion"));
+	bool fixFont;
+	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &fixFont, false);
+	fontDistortion->SetValue(fixFont);
+	
+	// Sizer for graphics, resolution, depth, etc
+	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); 
 	videoSizer1->Add(graphicsText);
 	videoSizer1->Add(graphicsCombo);
 	videoSizer1->Add(resolutionText);
