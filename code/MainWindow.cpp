@@ -48,7 +48,9 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab), _("Advanced Settings"), false, ID_TAB_ADV_SETTINGS_IMAGE);
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
 
-	BottomButtons* bb = new BottomButtons(this, wxPoint(0, -1), wxSize(800, -1));
+	wxPoint bbpoint(0, -1);
+	wxSize bbsize(800, -1);
+	BottomButtons* bb = new BottomButtons(this, bbpoint, bbsize);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 

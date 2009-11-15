@@ -38,7 +38,7 @@ public:
 
 		this->SetMinSize(wxSize(width, bitmap.GetHeight()));
 	}
-	virtual void OnPaint(wxPaintEvent& event) {
+	virtual void OnPaint(wxPaintEvent& WXUNUSED(event)) {
 		wxPaintDC dc(this);
 		dc.DrawBitmap(this->bitmap, (this->GetSize().GetWidth()/2) - (this->bitmap.GetWidth()/2), 0);
 	}
@@ -198,7 +198,7 @@ void WelcomePage::LinkHover(wxHtmlCellEvent &event) {
 	}
 }
 
-void WelcomePage::OnMouseOut(wxMouseEvent &event) {
+void WelcomePage::OnMouseOut(wxMouseEvent &WXUNUSED(event)) {
 	WXUNUSED(event);
 	// clear url from status bar.
 	wxFrame *frame = dynamic_cast<wxFrame*>(this->GetParent()->GetParent()->GetParent());
@@ -251,7 +251,7 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
 }
-void WelcomePage::ProfileChanged(wxCommandEvent& event) {
+void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 	wxChoice* saveButton = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	wxString newProfile = saveButton->GetStringSelection();
 	ProMan* proman = ProMan::GetProfileManager();
@@ -343,7 +343,7 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
 	}
 }
 
-void WelcomePage::ProfileCountChanged(wxCommandEvent &event) {
+void WelcomePage::ProfileCountChanged(wxCommandEvent &WXUNUSED(event)) {
 	WXUNUSED(event);
 	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	ProMan *profile = ProMan::GetProfileManager();

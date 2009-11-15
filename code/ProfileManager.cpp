@@ -84,8 +84,9 @@ bool ProMan::Initialize() {
 		return false;
 	}
 
-	ProMan::proman->profileList = new wxFileConfig(wxFFileInputStream(file.GetFullPath(),
-		(file.FileExists())?_T("rb"):_T("w+b")));
+	wxFFileInputStream profileListInput(file.GetFullPath(),
+		(file.FileExists())?_T("rb"):_T("w+b"));
+	ProMan::proman->profileList = new wxFileConfig(profileListInput);
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
@@ -123,7 +124,8 @@ bool ProMan::Initialize() {
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
 		ProMan::proman->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, _T("Default"));
-		ProMan::proman->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
+		wxFFileOutputStream profileListOutput(file.GetFullPath());
+		ProMan::proman->profileList->Save(profileListOutput);
 		currentProfile = _T("Default");
 	}
 
@@ -176,7 +178,8 @@ ProMan::~ProMan() {
 		if ( this->isAutoSaving ) {
 			wxFileName file;
 			file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
-			this->profileList->Save(wxFFileOutputStream(file.GetFullPath()));
+			wxFFileOutputStream profileListOutput(file.GetFullPath());
+			this->profileList->Save(profileListOutput);
 		} else {
 			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
 		}
@@ -208,10 +211,12 @@ bool ProMan::CreateNewProfile(wxString newName) {
 		return false;
 	}
 
-	wxFileConfig* config = new wxFileConfig(wxFFileInputStream(profile.GetFullPath(), _T("w+b")));
+	wxFFileInputStream configInput(profile.GetFullPath(), _T("w+b"));
+	wxFileConfig* config = new wxFileConfig(configInput);
 	config->Write(PRO_CFG_MAIN_NAME, newName);
 	config->Write(PRO_CFG_MAIN_FILENAME, profile.GetFullName());
-	config->Save(wxFFileOutputStream(profile.GetFullPath()));
+	wxFFileOutputStream configOutput(profile.GetFullPath());
+	config->Save(configOutput);
 
 	this->profiles[newName] = config;
 	return true;
@@ -270,7 +275,8 @@ void ProMan::SaveCurrentProfile() {
 				wxFileName file;
 				file.Assign(GET_PROFILE_STORAGEFOLDER(), profilename);
 				wxASSERT( file.IsOk() );
-				config->Save(wxFFileOutputStream(file.GetFullPath()));
+				wxFFileOutputStream configOutput(file.GetFullPath());
+				config->Save(configOutput);
 				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath());
 			}
 		} else {
