@@ -7,7 +7,7 @@ in the application. */
 #define TAB_AREA_WIDTH (639)
 #define TAB_AREA_HEIGHT (595)
 
-enum WindowIDS: int {
+enum WindowIDS {
 	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
 							   will use. */
 	ID_CLOSE_BUTTON,
@@ -79,7 +79,7 @@ enum WindowIDS: int {
 	ID_DELETE_PROFILE_DIALOG,
 };
 
-enum MainTabImageIDs: int {
+enum MainTabImageIDs {
 	ID_TAB_WELCOME_IMAGE,
 	ID_TAB_MOD_IMAGE,
 	ID_TAB_BASIC_SETTINGS_IMAGE,
@@ -87,7 +87,7 @@ enum MainTabImageIDs: int {
 	ID_TAB_INSTALL_IMAGE,
 };
 
-enum StatusBarIconIDs: int {
+enum StatusBarIconIDs {
 	ID_SB_NO_CHANGE = -1,
 	ID_SB_INFO,
 	ID_SB_OK,
@@ -97,7 +97,7 @@ enum StatusBarIconIDs: int {
 	ID_SB_MAX_ID,
 };
 
-enum ProfileDialogReturnValues: int {
+enum ProfileDialogReturnValues {
 	RETURN_CANCEL,
 	RETURN_DO_CLONE,
 	RETURN_CONFRIM_DELETE,

@@ -31,7 +31,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	// exe Selection
 	wxString tcfolder, binary;
 	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
-	bool hasbinary = proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
+	proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("Executable Selection"));
 
@@ -386,8 +386,7 @@ EVT_CHECKBOX(ID_FONT_DISTORTION_CHECK, BasicSettingsPage::OnToggleVideoFixFontDi
 
 END_EVENT_TABLE()
 
-void BasicSettingsPage::OnSelectTC(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
@@ -420,8 +419,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &event) {
 	TCManager::GenerateTCChanged();
 }
 
-void BasicSettingsPage::OnTCChanged(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxChoice *exeChoice = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
@@ -460,7 +458,7 @@ void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName pa
 	}
 }
 
-void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &event) {
+void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 	ExeChoice* choice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
 	wxCHECK_RET( choice != NULL, 
@@ -476,8 +474,7 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &event) {
 		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->executablename);
 }
 
-void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* api = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_GRAPHICS_COMBO, this));
 	wxCHECK_RET( api != NULL, _T("Cannot find graphics api choice box"));
@@ -548,8 +545,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 	} while ( result == TRUE );
 }
 
-void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* choice = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
 	wxCHECK_RET( choice != NULL, _T("Unable to find resolution combo"));
@@ -564,8 +560,7 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &event) {
 		->Write(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, res->GetHeight());
 }
 
-void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* depth = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
 	wxCHECK_RET( depth != NULL, _T("Unable to find depth choice box"));
@@ -575,8 +570,7 @@ void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &event) {
 		(depth->GetSelection() == 0) ? 16 : 32);
 }
 
-void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* tex = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_TEXTURE_FILTER_COMBO, this));
 	wxCHECK_RET( tex != NULL, _T("Unable to find texture filter choice"));
@@ -586,8 +580,7 @@ void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &event) {
 		(tex->GetSelection() == 0) ? _T("Bilinear") : _T("Trilinear"));
 }
 
-void BasicSettingsPage::OnSelectVideoAnistropic(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoAnistropic(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* as = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_ANISOTROPIC_COMBO, this));
 	wxCHECK_RET( as != NULL, _T("Unable to find anisotropic choice"));
@@ -597,8 +590,7 @@ void BasicSettingsPage::OnSelectVideoAnistropic(wxCommandEvent &event) {
 		(as->GetSelection() == 0) ? 0 : 1 << as->GetSelection());
 }
 
-void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* aa = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_AA_COMBO, this));
 	wxCHECK_RET( aa != NULL, _T("Unable to find anti-alias choice"));
@@ -608,8 +600,7 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &event) {
 
 }
 
-void BasicSettingsPage::OnSelectVideoGeneralSettings(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnSelectVideoGeneralSettings(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* gs = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_GS_COMBO, this));
 	wxCHECK_RET( gs != NULL, _T("Unable to find general settings choice"));
@@ -618,8 +609,7 @@ void BasicSettingsPage::OnSelectVideoGeneralSettings(wxCommandEvent &event) {
 		->Write(PRO_CFG_VIDEO_GENERAL_SETTINGS, gs->GetSelection());
 }
 
-void BasicSettingsPage::OnToggleVideoUseLargeTexture(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnToggleVideoUseLargeTexture(wxCommandEvent &WXUNUSED(event)) {
 	wxCheckBox* large = dynamic_cast<wxCheckBox*>(
 		wxWindow::FindWindowById(ID_LARGE_TEXTURE_CHECK));
 	wxCHECK_RET( large != NULL, _T("Unable to find large texture checkbox"));
@@ -628,8 +618,7 @@ void BasicSettingsPage::OnToggleVideoUseLargeTexture(wxCommandEvent &event) {
 		->Write(PRO_CFG_VIDEO_USE_LARGE_TEXTURES,  large->IsChecked());
 }
 
-void BasicSettingsPage::OnToggleVideoFixFontDistortion(wxCommandEvent &event) {
-	WXUNUSED(event);
+void BasicSettingsPage::OnToggleVideoFixFontDistortion(wxCommandEvent &WXUNUSED(event)) {
 	wxCheckBox* font = dynamic_cast<wxCheckBox*>(
 		wxWindow::FindWindowById(ID_FONT_DISTORTION_CHECK));
 	wxCHECK_RET( font != NULL, _T("Unable to find font distortion checkbox"));
