@@ -26,7 +26,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
-	size_t numberfound = wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
+	wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
 	if ( foundInis.Count() > 0 ) {
 		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
 	} else {
@@ -329,7 +329,7 @@ void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->buttonSizer);
 }
 
-void ModList::OnDrawSeparator(wxDC &dc, wxRect& rect, size_t n) const {
+void ModList::OnDrawSeparator(wxDC &WXUNUSED(dc), wxRect& WXUNUSED(rect), size_t WXUNUSED(n)) const {
 	//dc.DrawLine(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
 }
 
@@ -353,7 +353,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	}
 }
 
-wxCoord ModList::OnMeasureItem(size_t n) const {
+wxCoord ModList::OnMeasureItem(size_t WXUNUSED(n)) const {
 	return 80;
 }
 

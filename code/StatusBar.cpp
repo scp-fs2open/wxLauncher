@@ -5,7 +5,7 @@
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
-enum FieldIDs: int {
+enum FieldIDs {
 	SB_FIELD_ICON = 0,
 	SB_FIELD_MAINTEXT,
 	SB_FIELD_PROGRESS_BAR,
@@ -34,9 +34,9 @@ StatusBar::StatusBar(wxWindow *parent)
 		}
 	}
 
-	wxStaticBitmap* statusIcon = 
-		new wxStaticBitmap(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
-	wxGauge* bar = new wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
+	// Just creating these now, will place them in the OnSize event handler
+	new wxStaticBitmap(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
+	new wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
 
 	int widths[] = { 25, -1, 100, 200 };
 
@@ -56,8 +56,7 @@ StatusBar::~StatusBar() {
 	dynamic_cast<Logger*>(wxLog::GetActiveTarget())->SetStatusBarTarget(NULL);
 }
 
-void StatusBar::OnSize(wxSizeEvent& event) {
-	WXUNUSED(event);
+void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
 	wxWindow* icon = this->GetWindowChild(ID_STATUSBAR_STATUS_ICON);
 
 	wxASSERT( icon != NULL );

@@ -287,8 +287,7 @@ void TCManager::GenerateTCSelectedModChanged() {
 	}
 }
 
-void TCManager::CurrentProfileChanged(wxCommandEvent &event) {
-	WXUNUSED(event);
+void TCManager::CurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	TCManager::GenerateTCChanged();
 	TCManager::GenerateTCBinaryChanged();
