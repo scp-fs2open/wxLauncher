@@ -5,6 +5,7 @@
 #include "wxIDS.h"
 #include "ProfileManager.h"
 #include "TCManager.h"
+#include "SpeechManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -219,20 +220,26 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 	// Speech
 	wxStaticBox* speechBox = new wxStaticBox(this, wxID_ANY, _("Speech"));
-
 	wxTextCtrl* speechTestText = new wxTextCtrl(this, ID_SPEECH_TEST_TEXT,
 		_("Press play to test this string"),
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE);
-	wxComboBox* speechVoiceCombo = new wxComboBox(this, ID_SPEECH_VOICE_COMBO, _("Microsoft Anna (United States)"));
-	wxSlider* speechVoiceVolume = new wxSlider(this, ID_SPEECH_VOICE_VOLUME, 50, 0, 100);
-	wxButton* speechPlayButton = new wxButton(this, ID_SPEECH_PLAY_BUTTON, _("Play String"));
+	wxChoice* speechVoiceCombo = new wxChoice(this, ID_SPEECH_VOICE_COMBO);
+	wxSlider* speechVoiceVolume = 
+		new wxSlider(this, ID_SPEECH_VOICE_VOLUME, 50, 0, 100);
+	wxButton* speechPlayButton = 
+		new wxButton(this, ID_SPEECH_PLAY_BUTTON, _("Play String"));
+	wxStaticText* speechUseInText = 
+		new wxStaticText(this, wxID_ANY, _("Use simulated speech:"));
+	wxCheckBox* speechInTechroomCheck = 
+		new wxCheckBox(this, ID_SPEECH_IN_TECHROOM, _("Techroom"));
+	wxCheckBox* speechInBriefingCheck = 
+		new wxCheckBox(this, ID_SPEECH_IN_BRIEFING, _("Briefings"));
+	wxCheckBox* speechInGameCheck = 
+		new wxCheckBox(this, ID_SPEECH_IN_GAME, _("Ingame"));
 
-	wxStaticText* speechUsingText = new wxStaticText(this, wxID_ANY, _("Use simulated speech:"));
-	wxCheckBox* speechUsingTechroomCheck = new wxCheckBox(this, ID_SPEECH_USING_TECHROOM, _("Techroom"));
-	wxCheckBox* speechUsingBriefingCheck = new wxCheckBox(this, ID_SPEECH_USING_BRIEFING, _("Briefings"));
-	wxCheckBox* speechUsingIngameCheck = new wxCheckBox(this, ID_SPEECH_USING_INGAME, _("Ingame"));
-	wxButton* speechMoreVoicedButton = new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get More Voices"));
+	wxButton* speechMoreVoicesButton = 
+		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get More Voices"));
 
 	wxBoxSizer* speechLeftSizer = new wxBoxSizer(wxVERTICAL);
 	speechLeftSizer->Add(speechTestText, wxSizerFlags().Expand());
@@ -241,16 +248,77 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	speechLeftSizer->Add(speechPlayButton, wxSizerFlags().Center());
 
 	wxBoxSizer* speechRightSizer = new wxBoxSizer(wxVERTICAL);
-	speechRightSizer->Add(speechUsingText);
-	speechRightSizer->Add(speechUsingTechroomCheck);
-	speechRightSizer->Add(speechUsingBriefingCheck);
-	speechRightSizer->Add(speechUsingIngameCheck);
-	speechRightSizer->Add(speechMoreVoicedButton);
+	speechRightSizer->Add(speechUseInText);
+	speechRightSizer->Add(speechInTechroomCheck);
+	speechRightSizer->Add(speechInBriefingCheck);
+	speechRightSizer->Add(speechInGameCheck);
+	speechRightSizer->Add(speechMoreVoicesButton);
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
 	speechSizer->Add(speechLeftSizer);
 	speechSizer->Add(speechRightSizer);
 
+	if ( SpeechMan::WasBuiltIn() && SpeechMan::Initialize() ) {
+
+		speechVoiceCombo->Append(SpeechMan::EnumVoices());
+		int speechVoice;
+		int speechSystemVoice = SpeechMan::GetVoice();
+		if ( speechSystemVoice < 0 ) {
+			wxLogWarning(_T("Had problem retriving the system voice, using voice 0"));
+			speechSystemVoice = 0;
+		}
+		// set the voice to what is in the profile, if not set in profile use
+		// system settings
+		proman->Get()->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, speechSystemVoice);
+		// there should not be more than MAX_INT voices installed on a system so
+		// the cast of an unsigned int to a signed int should not result in a 
+		// loss of data.
+		if ( speechVoice >= static_cast<int>(speechVoiceCombo->GetCount()) ) {
+			wxLogWarning(_T("Profile speech voice index out of range,")
+				_T(" setting to system default"));
+			speechVoice = speechSystemVoice;
+		}
+		speechVoiceCombo->SetSelection(speechVoice);
+
+		int speechVolume;
+		int speechSystemVolume = SpeechMan::GetVolume();
+		if (speechSystemVolume < 0) {
+			wxLogWarning(_T("Had problem in retriving the system speech volume,")
+				_T(" setting to 50"));
+			speechSystemVolume = 50;
+		}
+		proman->Get()->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume);
+		if ( speechVolume < 0 || speechVolume > 100 ) {
+			wxLogWarning(_T("Speech Volume recorded in profile is out of range,")
+				_T(" resetting to 50"));
+			speechVolume = 50;
+		}
+		speechVoiceVolume->SetValue(speechVolume);
+
+
+		bool speechInTechroom;
+		proman->Get()->Read(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true);
+		speechInTechroomCheck->SetValue(speechInTechroom);
+
+		bool speechInBriefings;
+		proman->Get()->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true);
+		speechInBriefingCheck->SetValue(speechInBriefings);
+
+		bool speechInGame;
+		proman->Get()->Read(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true);
+		speechInGameCheck->SetValue(speechInGame);
+	} else {
+		speechBox->Disable();
+		speechTestText->Disable();
+		speechVoiceCombo->Disable();
+		speechVoiceVolume->Disable();
+		speechPlayButton->Disable();
+		speechUseInText->Disable();
+		speechInTechroomCheck->Disable();
+		speechInBriefingCheck->Disable();
+		speechInGameCheck->Disable();
+		speechMoreVoicesButton->Disable();
+	}
 	// Network
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
 
@@ -365,6 +433,9 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 BasicSettingsPage::~BasicSettingsPage() {
 	TCManager::DeInitialize();
+	if ( SpeechMan::IsInitialized() ) {
+		SpeechMan::DeInitialize();
+	}
 }
 
 /// Event Handling
@@ -383,6 +454,15 @@ EVT_CHOICE(ID_AA_COMBO, BasicSettingsPage::OnSelectVideoAntiAlias)
 EVT_CHOICE(ID_GS_COMBO, BasicSettingsPage::OnSelectVideoGeneralSettings)
 EVT_CHECKBOX(ID_LARGE_TEXTURE_CHECK, BasicSettingsPage::OnToggleVideoUseLargeTexture)
 EVT_CHECKBOX(ID_FONT_DISTORTION_CHECK, BasicSettingsPage::OnToggleVideoFixFontDistortion)
+
+// Speech Controls
+EVT_CHOICE(ID_SPEECH_VOICE_COMBO, BasicSettingsPage::OnSelectSpeechVoice)
+EVT_SLIDER(ID_SPEECH_VOICE_VOLUME, BasicSettingsPage::OnChangeSpeechVolume)
+EVT_BUTTON(ID_SPEECH_PLAY_BUTTON, BasicSettingsPage::OnPlaySpeechText)
+EVT_CHECKBOX(ID_SPEECH_IN_TECHROOM, BasicSettingsPage::OnToggleSpeechInTechroom)
+EVT_CHECKBOX(ID_SPEECH_IN_BRIEFING, BasicSettingsPage::OnToggleSpeechInBriefing)
+EVT_CHECKBOX(ID_SPEECH_IN_GAME, BasicSettingsPage::OnToggleSpeechInGame)
+EVT_BUTTON(ID_SPEECH_MORE_VOICES_BUTTON, BasicSettingsPage::OnGetMoreVoices)
 
 END_EVENT_TABLE()
 
@@ -625,4 +705,74 @@ void BasicSettingsPage::OnToggleVideoFixFontDistortion(wxCommandEvent &WXUNUSED(
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_FIX_FONT_DISTORTION, font->IsChecked());
+}
+
+void BasicSettingsPage::OnSelectSpeechVoice(wxCommandEvent &WXUNUSED(event)) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxChoice* voice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_SPEECH_VOICE_COMBO, this));
+	wxCHECK_RET( voice != NULL, _T("Unable to find voice choice box"));
+
+	int v = voice->GetSelection();
+	
+	SpeechMan::SetVoice(v);
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_VOICE, v);
+}
+
+void BasicSettingsPage::OnChangeSpeechVolume(wxCommandEvent &WXUNUSED(event)) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxSlider* volume = dynamic_cast<wxSlider*>(
+		wxWindow::FindWindowById(ID_SPEECH_VOICE_VOLUME, this));
+	wxCHECK_RET( volume != NULL, _T("Unable to find speech volume slider"));
+
+	int v = volume->GetValue();
+
+	SpeechMan::SetVolume(v);
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_VOLUME, v);
+}
+
+void BasicSettingsPage::OnPlaySpeechText(wxCommandEvent &WXUNUSED(event)) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxTextCtrl *text = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_SPEECH_TEST_TEXT, this));
+	wxCHECK_RET( text != NULL, _T("Unable to find text control to get play text"));
+
+	wxString str = text->GetValue();
+
+	SpeechMan::Speak(str);
+}
+
+void BasicSettingsPage::OnToggleSpeechInTechroom(wxCommandEvent &event) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	bool checked = event.IsChecked();
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_IN_TECHROOM, checked);
+}
+
+void BasicSettingsPage::OnToggleSpeechInBriefing(wxCommandEvent &event) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	bool checked = event.IsChecked();
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, checked);
+}
+
+void BasicSettingsPage::OnToggleSpeechInGame(wxCommandEvent &event) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	bool checked = event.IsChecked();
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_IN_GAME, checked);
+}
+
+void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxString msg(_("Popup Microsoft Download Center to download more voices"));
+
+	::wxMessageBox(msg, _("Warning"));
 }

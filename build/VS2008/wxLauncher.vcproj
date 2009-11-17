@@ -55,6 +55,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				DebugInformationFormat="4"
+				CallingConvention="0"
 				ShowIncludes="false"
 			/>
 			<Tool
@@ -131,7 +132,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswu&quot;"
-				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;USE_SPEECH=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -231,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\SpeechManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\StatusBar.cpp"
 				>
 			</File>
@@ -290,6 +295,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\Skin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\SpeechManager.h"
 				>
 			</File>
 			<File
@@ -363,11 +372,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>

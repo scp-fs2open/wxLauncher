@@ -22,6 +22,14 @@ public:
 	void OnToggleVideoUseLargeTexture(wxCommandEvent &event);
 	void OnToggleVideoFixFontDistortion(wxCommandEvent &event);
 
+	void OnSelectSpeechVoice(wxCommandEvent &event);
+	void OnChangeSpeechVolume(wxCommandEvent &event);
+	void OnPlaySpeechText(wxCommandEvent &event);
+	void OnToggleSpeechInTechroom(wxCommandEvent &event);
+	void OnToggleSpeechInBriefing(wxCommandEvent &event);
+	void OnToggleSpeechInGame(wxCommandEvent &event);
+	void OnGetMoreVoices(wxCommandEvent &event);
+
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	void FillResolutionDropBox(wxChoice* exeChoice);
