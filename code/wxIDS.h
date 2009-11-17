@@ -39,9 +39,9 @@ enum WindowIDS {
 	ID_SPEECH_VOICE_COMBO,
 	ID_SPEECH_VOICE_VOLUME,
 	ID_SPEECH_PLAY_BUTTON,
-	ID_SPEECH_USING_TECHROOM,
-	ID_SPEECH_USING_BRIEFING,
-	ID_SPEECH_USING_INGAME,
+	ID_SPEECH_IN_TECHROOM,
+	ID_SPEECH_IN_BRIEFING,
+	ID_SPEECH_IN_GAME,
 	ID_SPEECH_MORE_VOICES_BUTTON,
 
 	ID_NETWORK_TYPE,
@@ -128,5 +128,11 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")	// int
 #define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")	// bool
 #define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")	// bool
+
+#define PRO_CFG_SPEECH_VOICE				_T("/speech/voice")		// int, same as what the current engine uses
+#define PRO_CFG_SPEECH_VOLUME				_T("/speech/volume")	// int
+#define PRO_CFG_SPEECH_IN_TECHROOM			_T("/speech/intechroom")// bool
+#define PRO_CFG_SPEECH_IN_BRIEFINGS			_T("/speech/inbriefings")// bool
+#define PRO_CFG_SPEECH_IN_GAME				_T("/speech/ingame")	// bool
 
 #endif

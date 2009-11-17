@@ -35,6 +35,11 @@ To get the source, you'll need HG:
 You'll need wxWidgets to compile it. Get the wxWidgets 
 package (2.8.10 or above) at:
   http://www.wxwidgets.org/
+  
+Building
+========
+Define USE_SPEECH=1 to have the launcher use the Windows 
+Speech API.
 
 License
 =======
