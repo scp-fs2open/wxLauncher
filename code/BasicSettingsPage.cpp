@@ -322,22 +322,51 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	// Network
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
 
-	wxComboBox* networkType = new wxComboBox(this, ID_NETWORK_TYPE, _("None"));
-	wxComboBox* networkSpeed = new wxComboBox(this, ID_NETWORK_SPEED, _("None"));
-	wxTextCtrl* networkPort = new wxTextCtrl(this, ID_NETWORK_PORT, _(""));
-	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, _(""));
+	wxChoice* networkType = new wxChoice(this, ID_NETWORK_TYPE);
+	networkType->Append(_T("None"));
+	networkType->Append(_T("Dialup"));
+	networkType->Append(_T("LAN/Direct Connection"));
+	wxString type;
+	proman->Get()->Read(PRO_CFG_NETWORK_TYPE, &type, _T("None"));
+	networkType->SetStringSelection(type);
+	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
+	networkSpeed->Append(_T("None"));
+	networkSpeed->Append(_T("Slow"));
+	networkSpeed->Append(_T("56K"));
+	networkSpeed->Append(_T("ISDN"));
+	networkSpeed->Append(_T("Cable"));
+	networkSpeed->Append(_T("Fast"));
+	wxString speed;
+	proman->Get()->Read(PRO_CFG_NETWORK_SPEED, &speed, _T("None"));
+	networkSpeed->SetStringSelection(speed);
+
+	wxTextCtrl* networkPort = n
+		ew wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
+	int port;
+	proman->Get()->Read(PRO_CFG_NETWORK_PORT, &port, 0);
+	networkPort->SetValue(wxString::Format(_T("%d"), port));
+	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
+	wxString ip;
+	proman->Get()->Read(PRO_CFG_NETWORK_IP, &ip, _T(""));
+	networkIP->SetValue(ip);
 
 	wxGridSizer* networkInsideSizer = new wxFlexGridSizer(4);
-	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")));
+	networkInsideSizer->Add(
+		new wxStaticText(this, wxID_ANY, _("Connection type:")));
 	networkInsideSizer->Add(networkType);
-	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("Port:")));
+	networkInsideSizer->Add(
+		new wxStaticText(this, wxID_ANY, _("Port:")));
 	networkInsideSizer->Add(networkPort);
-	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("Connection speed:")));
+	networkInsideSizer->Add(
+		new wxStaticText(this, wxID_ANY, _("Connection speed:")));
 	networkInsideSizer->Add(networkSpeed);
-	networkInsideSizer->Add(new wxStaticText(this, wxID_ANY, _("IP:")));
+	networkInsideSizer->Add(
+		new wxStaticText(this, wxID_ANY, _("IP:")));
 	networkInsideSizer->Add(networkIP);
 
-	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxVERTICAL);
+	wxStaticBoxSizer* networkSizer = 
+		new wxStaticBoxSizer(networkBox, wxVERTICAL);
 	networkSizer->Add(networkInsideSizer);
 
 	// Audio
@@ -463,6 +492,12 @@ EVT_CHECKBOX(ID_SPEECH_IN_TECHROOM, BasicSettingsPage::OnToggleSpeechInTechroom)
 EVT_CHECKBOX(ID_SPEECH_IN_BRIEFING, BasicSettingsPage::OnToggleSpeechInBriefing)
 EVT_CHECKBOX(ID_SPEECH_IN_GAME, BasicSettingsPage::OnToggleSpeechInGame)
 EVT_BUTTON(ID_SPEECH_MORE_VOICES_BUTTON, BasicSettingsPage::OnGetMoreVoices)
+
+// Network
+EVT_CHOICE(ID_NETWORK_TYPE, BasicSettingsPage::OnSelectNetworkType)
+EVT_CHOICE(ID_NETWORK_SPEED, BasicSettingsPage::OnSelectNetworkSpeed)
+EVT_TEXT(ID_NETWORK_PORT, BasicSettingsPage::OnChangePort)
+EVT_TEXT(ID_NETWORK_IP, BasicSettingsPage::OnChangeIP)
 
 END_EVENT_TABLE()
 
@@ -775,4 +810,54 @@ void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
 	wxString msg(_("Popup Microsoft Download Center to download more voices"));
 
 	::wxMessageBox(msg, _("Warning"));
+}
+
+void BasicSettingsPage::OnChangeIP(wxCommandEvent &event) {
+	wxTextCtrl* ip = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(ip != NULL, _T("Unable to find IP Text Control"));
+
+	wxString string(ip->GetValue());
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_NETWORK_IP, string);
+}
+
+void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
+	wxTextCtrl* port = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(port != NULL, _T("Unable to find Port Text Control"));
+
+	long portNumber;
+	if ( port->GetValue().ToLong(&portNumber) ) {
+		if ( portNumber < 0 ) {
+			wxLogInfo(_T("Port number must be greater than or equal to 0"));
+		} else if ( portNumber > 65535 ) {
+			wxLogInfo(_T("Port number must be less than 65536"));
+		} else {
+			int portNumber1 = static_cast<int>(portNumber);
+			ProMan::GetProfileManager()->Get()
+				->Write(PRO_CFG_NETWORK_PORT, portNumber1);
+		}
+	} else {
+		wxLogWarning(_T("Port number is not a number"));
+	}
+}
+
+void BasicSettingsPage::OnSelectNetworkSpeed(wxCommandEvent &event) {
+	wxChoice* networkSpeed = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(networkSpeed != NULL, _T("Unable to find Network speed choice"));
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_NETWORK_SPEED, networkSpeed->GetStringSelection());
+}
+
+void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
+	wxChoice* networkType = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(networkType != NULL, _T("Unable to find Network type choice"));
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_NETWORK_SPEED, networkType->GetStringSelection());
 }
