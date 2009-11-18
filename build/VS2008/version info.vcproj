@@ -24,9 +24,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="python $(ProjectDir)version.cpp.maker.py $(ProjectDir)..\..\code\version.cpp"
-				ReBuildCommandLine=""
-				CleanCommandLine=""
+				BuildCommandLine="python $(ProjectDir)version.cpp.maker.py build $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
+				ReBuildCommandLine="python $(ProjectDir)version.cpp.maker.py rebuild $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
+				CleanCommandLine="python $(ProjectDir)version.cpp.maker.py clean $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
 				Output="$(ProjectDir)..\..\code\version.cpp"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
@@ -44,10 +44,10 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="python "
-				ReBuildCommandLine=""
-				CleanCommandLine=""
-				Output=""
+				BuildCommandLine="python $(ProjectDir)version.cpp.maker.py build $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
+				ReBuildCommandLine="python $(ProjectDir)version.cpp.maker.py rebuild $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
+				CleanCommandLine="python $(ProjectDir)version.cpp.maker.py clean $(ProjectDir)..\..\code\version.cpp $(ProjectDir)$(ConfigurationName)\version.tmp"
+				Output="$(ProjectDir)..\..\code\version.cpp"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
