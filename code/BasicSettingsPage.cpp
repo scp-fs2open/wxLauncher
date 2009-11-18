@@ -340,8 +340,8 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	proman->Get()->Read(PRO_CFG_NETWORK_SPEED, &speed, _T("None"));
 	networkSpeed->SetStringSelection(speed);
 
-	wxTextCtrl* networkPort = n
-		ew wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
+	wxTextCtrl* networkPort = 
+		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
 	int port;
 	proman->Get()->Read(PRO_CFG_NETWORK_PORT, &port, 0);
 	networkPort->SetValue(wxString::Format(_T("%d"), port));
