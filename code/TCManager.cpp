@@ -122,7 +122,7 @@ FSOVersion TCManager::GetBinaryVersion(wxString binaryname) {
 		wxString temp;
 
 		if ( token.StartsWith(_T("exe")) ) {
-			;
+			; // do nothing
 		} else if ( token.IsNumber() && ver.major == 0 ) {
 			// must be major version number
 			long version = 0;
@@ -141,7 +141,7 @@ FSOVersion TCManager::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("minor out of range (%d)"), version);
 			}
-		} else if ( token.IsNumber() ) {
+		} else if ( token.IsNumber() && ver.revision == 0) {
 			// must be revision version number
 			long version = 0;
 			bool ok = token.ToLong(&version);
@@ -178,6 +178,18 @@ FSOVersion TCManager::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Token ending in 'r' is not a number (%s)"), token);
 			}
+		} else if ( token.IsNumber() && token.size() == 8 ) {
+			// must be a date from SirKnightly's builds
+			// just ignore it the date
+		} else if ( token.StartsWith(_T("r"), &temp) && temp.IsNumber() ) {
+			// must be a revision number from SirKnightly's builds
+			long version = 0;
+			bool ok = temp.ToLong(&version);
+			if ( ok && version > 0 ) {
+				ver.build = (int)version;
+			} else {
+				wxLogWarning(_T("SirKightly build number out of range (%d)"), version);
+			}
 		} else if ( token.StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
 		} else if ( token.StartsWith(_T("sse2")) ) {
@@ -189,7 +201,9 @@ FSOVersion TCManager::GetBinaryVersion(wxString binaryname) {
 		} else if ( token.StartsWith(_T("debug")) ){
 			ver.debug = true;
 		} else if ( token.EndsWith(_T("t"), &temp) && temp.size() == 8 ) {
-			ver.string = token;
+			ver.string += token;
+		} else {
+			wxLogWarning(_T(" Got token I don't understand (%s)"), token);
 		}
 	}
 	if ( ver.string.StartsWith(_T("ant")) ) {
@@ -212,9 +226,10 @@ Fred 2 Open 3.6.11 Debug
 */
 wxString TCManager::MakeVersionStringFromVersion(FSOVersion ver) {
 	bool hasfullversion = (ver.major != 0 && ver.minor != 0 && ver.revision != 0);
-	return wxString::Format(_T("%s %s%s %s%s%s"),
+	return wxString::Format(_T("%s %s%s%s %s%s%s"),
 		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname, // Freespace 2 Open
 		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision) : wxEmptyString,
+		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build),
 		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string),
 		(ver.debug) ? _T("Debug") : _T("Release"),
 		(ver.inferno) ? _T(" Inferno") : wxEmptyString,
