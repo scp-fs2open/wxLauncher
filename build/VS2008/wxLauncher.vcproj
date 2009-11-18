@@ -224,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\OpenALManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\ProfileManager.cpp"
 				>
 			</File>
@@ -287,6 +291,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\ModsPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\OpenAlManager.h"
 				>
 			</File>
 			<File
