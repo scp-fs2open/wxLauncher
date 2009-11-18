@@ -135,4 +135,9 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_SPEECH_IN_BRIEFINGS			_T("/speech/inbriefings")// bool
 #define PRO_CFG_SPEECH_IN_GAME				_T("/speech/ingame")	// bool
 
+#define PRO_CFG_NETWORK_TYPE				_T("/network/type")		// string
+#define PRO_CFG_NETWORK_SPEED				_T("/network/speed")	// string
+#define PRO_CFG_NETWORK_PORT				_T("/network/prot")		// int
+#define PRO_CFG_NETWORK_IP					_T("/network/ip")		// string
+
 #endif

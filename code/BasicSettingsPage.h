@@ -30,6 +30,11 @@ public:
 	void OnToggleSpeechInGame(wxCommandEvent &event);
 	void OnGetMoreVoices(wxCommandEvent &event);
 
+	void OnSelectNetworkType(wxCommandEvent &event);
+	void OnSelectNetworkSpeed(wxCommandEvent &event);
+	void OnChangePort(wxCommandEvent &event);
+	void OnChangeIP(wxCommandEvent &event);
+
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	void FillResolutionDropBox(wxChoice* exeChoice);
