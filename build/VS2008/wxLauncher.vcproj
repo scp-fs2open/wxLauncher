@@ -47,8 +47,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(WXPATH)\lib\vc_lib\mswud&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1;USE_SPEECH=1"
+				AdditionalIncludeDirectories="&quot;$(OPENALPATH)\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswud&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\include&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1;USE_SPEECH=1;USE_OPENAL=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -294,7 +294,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\OpenAlManager.h"
+				RelativePath="..\..\code\OpenALManager.h"
 				>
 			</File>
 			<File

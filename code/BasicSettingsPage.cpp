@@ -6,6 +6,7 @@
 #include "ProfileManager.h"
 #include "TCManager.h"
 #include "SpeechManager.h"
+#include "OpenALManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -373,9 +374,9 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxStaticBox* audioBox = new wxStaticBox(this, wxID_ANY, _("Audio"));
 
 	wxStaticText* soundDeviceText = new wxStaticText(this, wxID_ANY, _("Sound device:"));
-	wxComboBox* soundDeviceCombo = new wxComboBox(this, ID_SELECT_SOUND_DEVICE, _("Generic device"));
+	wxChoice* soundDeviceCombo = new wxChoice(this, ID_SELECT_SOUND_DEVICE);
 
-	wxStaticText* openALVersion = new wxStaticText(this, wxID_ANY, _("OpenAL version v1.2.34"));
+	wxStaticText* openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
 	openALVersion->Wrap(153); /* HACKHACK: hard coded width, using number of
 							  pixels wide the text is on the prototype.*/
 	wxButton* downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
@@ -387,6 +388,29 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	audioSizer->Add(openALVersion, wxSizerFlags().Center());
 	audioSizer->Add(downloadOpenALButton, wxSizerFlags().Center());
 	audioSizer->Add(detectOpenALButton, wxSizerFlags().Center());
+
+	// fill in controls
+	if ( !OpenALMan::WasCompliedIn() ) {
+		openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
+		soundDeviceText->Disable();
+		soundDeviceCombo->Disable();
+		downloadOpenALButton->Disable();
+		detectOpenALButton->Disable();
+	} else if ( !OpenALMan::Initialize() ) {
+		openALVersion->SetLabel(_("Unable to initialize OpenAL"));
+		soundDeviceText->Disable();
+		soundDeviceCombo->Disable();
+		detectOpenALButton->SetLabel(_("Redetect OpenAL"));
+	} else {
+		// have working openal
+		soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
+		soundDeviceCombo->SetStringSelection(
+			OpenALMan::SystemDefaultDevice());
+		openALVersion->SetLabel(OpenALMan::GetCurrentVersion());
+		downloadOpenALButton->Disable();
+		detectOpenALButton->Disable();
+	}
+		
 
 	// Joystick
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
