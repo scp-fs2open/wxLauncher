@@ -373,14 +373,14 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	// Audio
 	wxStaticBox* audioBox = new wxStaticBox(this, wxID_ANY, _("Audio"));
 
-	wxStaticText* soundDeviceText = new wxStaticText(this, wxID_ANY, _("Sound device:"));
-	wxChoice* soundDeviceCombo = new wxChoice(this, ID_SELECT_SOUND_DEVICE);
+	this->soundDeviceText = new wxStaticText(this, wxID_ANY, _("Sound device:"));
+	this->soundDeviceCombo = new wxChoice(this, ID_SELECT_SOUND_DEVICE);
 
-	wxStaticText* openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	this->openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
 	openALVersion->Wrap(153); /* HACKHACK: hard coded width, using number of
 							  pixels wide the text is on the prototype.*/
-	wxButton* downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
-	wxButton* detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect"));
+	this->downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
+	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect"));
 
 	wxStaticBoxSizer* audioSizer = new wxStaticBoxSizer(audioBox, wxVERTICAL);
 	audioSizer->Add(soundDeviceText);
@@ -390,27 +390,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	audioSizer->Add(detectOpenALButton, wxSizerFlags().Center());
 
 	// fill in controls
-	if ( !OpenALMan::WasCompliedIn() ) {
-		openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
-		soundDeviceText->Disable();
-		soundDeviceCombo->Disable();
-		downloadOpenALButton->Disable();
-		detectOpenALButton->Disable();
-	} else if ( !OpenALMan::Initialize() ) {
-		openALVersion->SetLabel(_("Unable to initialize OpenAL"));
-		soundDeviceText->Disable();
-		soundDeviceCombo->Disable();
-		detectOpenALButton->SetLabel(_("Redetect OpenAL"));
-	} else {
-		// have working openal
-		soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
-		soundDeviceCombo->SetStringSelection(
-			OpenALMan::SystemDefaultDevice());
-		openALVersion->SetLabel(OpenALMan::GetCurrentVersion());
-		downloadOpenALButton->Disable();
-		detectOpenALButton->Disable();
-	}
-		
+	this->SetupOpenALSection();
 
 	// Joystick
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
@@ -522,6 +502,11 @@ EVT_CHOICE(ID_NETWORK_TYPE, BasicSettingsPage::OnSelectNetworkType)
 EVT_CHOICE(ID_NETWORK_SPEED, BasicSettingsPage::OnSelectNetworkSpeed)
 EVT_TEXT(ID_NETWORK_PORT, BasicSettingsPage::OnChangePort)
 EVT_TEXT(ID_NETWORK_IP, BasicSettingsPage::OnChangeIP)
+
+// OpenAL
+EVT_CHOICE(ID_SELECT_SOUND_DEVICE, BasicSettingsPage::OnSelectOpenALDevice)
+EVT_BUTTON(ID_DOWNLOAD_OPENAL, BasicSettingsPage::OnDownloadOpenAL)
+EVT_BUTTON(ID_DETECT_OPENAL, BasicSettingsPage::OnDetectOpenAL)
 
 END_EVENT_TABLE()
 
@@ -885,3 +870,60 @@ void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_NETWORK_SPEED, networkType->GetStringSelection());
 }
+
+void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
+	wxChoice* openaldevice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(openaldevice != NULL, _T("Unable to find OpenAL Device choice"));
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
+}
+
+void BasicSettingsPage::OnDownloadOpenAL(wxCommandEvent &WXUNUSED(event)) {
+	this->OpenNonSCPWebSite(_T("http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx"));
+}
+
+void BasicSettingsPage::OnDetectOpenAL(wxCommandEvent& WXUNUSED(event)) {
+	if ( !OpenALMan::IsInitialized() ) {
+		this->SetupOpenALSection();
+	}
+}
+
+void BasicSettingsPage::SetupOpenALSection() {
+	if ( !OpenALMan::WasCompliedIn() ) {
+		this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
+		this->soundDeviceText->Disable();
+		this->soundDeviceCombo->Disable();
+		this->downloadOpenALButton->Disable();
+		this->detectOpenALButton->Disable();
+	} else if ( !OpenALMan::Initialize() ) {
+		this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));
+		this->soundDeviceText->Disable();
+		this->soundDeviceCombo->Disable();
+		this->detectOpenALButton->SetLabel(_("Redetect OpenAL"));
+		this->downloadOpenALButton->Enable();
+	} else {
+		// have working openal
+		this->soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
+		wxString openaldevice;
+		if ( ProMan::GetProfileManager()->Get()
+			->Read(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
+				soundDeviceCombo->SetStringSelection(
+					openaldevice);
+		} else {
+			soundDeviceCombo->SetStringSelection(
+				OpenALMan::SystemDefaultDevice());
+		}
+		this->soundDeviceText->Enable();
+		this->soundDeviceCombo->Enable();
+		this->openALVersion->SetLabel(OpenALMan::GetCurrentVersion());
+		this->downloadOpenALButton->Disable();
+		this->detectOpenALButton->Disable();
+	}
+}
+
+void BasicSettingsPage::OpenNonSCPWebSite(wxString url) {
+	::wxLaunchDefaultBrowser(url);
+}
+
