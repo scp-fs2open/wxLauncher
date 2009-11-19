@@ -26,6 +26,13 @@ This project also assumes that the python execuatble is
 in your PATH.  See the compiler specific instructions
 on how to add Python to your PATH.
 
+The OpenAL Software Development Kit is an optional component
+needed to build this program.  OpenAL support is not
+compiled in by default and requires the preprocessor
+symbol USE_OPENAL=1.  See the compiler specific
+instructions for getting your compiler ready to build
+with OpenAL.
+
 If you're looking for the source, you can find it at:
   http://code.google.com/p/wxlauncher/
   
