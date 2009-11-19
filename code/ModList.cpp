@@ -169,6 +169,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 				delete windowIconFile;
 			}
 
+			readIniFileString(config, _T("/skin/welcometxt"), &(item->skin->welcomePageText));
+
 			// read in file names of the icons
 			wxString *welcomeIconFile = NULL,
 				*modsIconFile = NULL,
