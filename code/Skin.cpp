@@ -15,6 +15,7 @@ Skin::Skin() {
 	this->installIcon = NULL;
 	this->idealIcon = NULL;
 	this->baseFont = NULL;
+	this->welcomePageText = NULL;
 }
 
 Skin::~Skin() {
@@ -28,6 +29,7 @@ Skin::~Skin() {
 	if (this->installIcon != NULL) delete this->installIcon;
 	if (this->idealIcon != NULL) delete this->idealIcon;
 	if (this->baseFont != NULL) delete this->baseFont;
+	if (this->welcomePageText != NULL) delete this->welcomePageText;
 }
 
 SkinSystem::SkinSystem(Skin *defaultSkin) {
@@ -83,6 +85,19 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( this->defaultSkin->baseFont == NULL ) {
 		this->defaultSkin->baseFont =
 			new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	}
+
+	if ( this->defaultSkin->welcomePageText == NULL ) {
+		this->defaultSkin->welcomePageText =
+			new wxString(
+_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>\
+If you’re  new to the Freespace 2 universe, you might want to check out these links first:<br>\
+= <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a>  \
+= <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> \
+= <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> \
+= <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
+Also, don’t  forget the help file, there is a nice 'Getting Started' tutorial there.<br>\
+</center></p>"));
 	}
 }
 
@@ -230,6 +245,23 @@ const wxFont* SkinSystem::GetFontPointer() {
 		wxLogFatalError(_T("Cannot retrive a font. (0x%h, 0x%h, 0x%h)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);
 		return NULL;
+	}
+}
+
+wxString SkinSystem::GetWelcomePageText() {
+	if ( this->modSkin != NULL
+		&& this->modSkin->welcomePageText != NULL ) {
+			return *(this->modSkin->welcomePageText);
+	} else if ( this->TCSkin != NULL
+		&& this->TCSkin->welcomePageText != NULL ) {
+			return *(this->TCSkin->welcomePageText);
+	} else if ( this->defaultSkin != NULL
+		&& this->defaultSkin->welcomePageText ) {
+			return *(this->defaultSkin->welcomePageText);
+	} else {
+		wxLogFatalError(_T("Cannot retrive a font. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
+		return wxEmptyString;
 	}
 }
 
