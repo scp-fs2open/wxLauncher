@@ -140,4 +140,6 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_NETWORK_PORT				_T("/network/prot")		// int
 #define PRO_CFG_NETWORK_IP					_T("/network/ip")		// string
 
+#define PRO_CFG_OPENAL_DEVICE				_T("/openal/device")	// string
+
 #endif

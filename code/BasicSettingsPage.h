@@ -35,10 +35,23 @@ public:
 	void OnChangePort(wxCommandEvent &event);
 	void OnChangeIP(wxCommandEvent &event);
 
+	void OnSelectOpenALDevice(wxCommandEvent &event);
+	void OnDownloadOpenAL(wxCommandEvent& event);
+	void OnDetectOpenAL(wxCommandEvent& event);
+
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	void FillResolutionDropBox(wxChoice* exeChoice);
+	void OpenNonSCPWebSite(wxString url);
+	void SetupOpenALSection();
 	DECLARE_EVENT_TABLE();
+
+private:
+	wxStaticText* soundDeviceText;
+	wxChoice* soundDeviceCombo;
+	wxStaticText* openALVersion;
+	wxButton* downloadOpenALButton;
+	wxButton* detectOpenALButton;
 };
 
 #endif
