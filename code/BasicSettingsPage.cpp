@@ -816,9 +816,7 @@ void BasicSettingsPage::OnToggleSpeechInGame(wxCommandEvent &event) {
 
 void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
-	wxString msg(_("Popup Microsoft Download Center to download more voices"));
-
-	::wxMessageBox(msg, _("Warning"));
+	this->OpenNonSCPWebSite(_T("http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en"));
 }
 
 void BasicSettingsPage::OnChangeIP(wxCommandEvent &event) {
