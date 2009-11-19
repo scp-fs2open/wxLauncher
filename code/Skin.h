@@ -19,6 +19,7 @@ public:
 	wxBitmap* installIcon;
 	wxBitmap* idealIcon;
 	wxFont* baseFont;
+	wxString* welcomePageText;
 };
 
 /** Class used to manage the skinning of the launcher.  The skinable parts of
@@ -41,6 +42,7 @@ public:
 	wxBitmap GetIdealIcon();
 	wxFont GetFont();
 	const wxFont* GetFontPointer();
+	wxString GetWelcomePageText();
 
 	void SetTCSkin(Skin *skin = NULL);
 	void SetModSkin(Skin *skin = NULL);
