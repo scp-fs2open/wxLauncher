@@ -163,9 +163,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			
 			wxString *windowIconFile = NULL;
 			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
-			item->skin->welcomeIcon = SkinSystem::VerifyWindowIcon(_T("."),
-				shortname, *windowIconFile);
 			if ( windowIconFile != NULL ) {
+				item->skin->welcomeIcon = SkinSystem::VerifyWindowIcon(_T("."),
+					shortname, *windowIconFile);
 				delete windowIconFile;
 			}
 
@@ -184,36 +184,51 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			readIniFileString(config, _T("/skin/iconinstall"), &installIconFile);
 
 			// Verify the icon will fit
-			item->skin->welcomeIcon = SkinSystem::VerifyTabIcon(_T("."),
-				shortname, *welcomeIconFile);
-			item->skin->modsIcon = SkinSystem::VerifyTabIcon(_T("."),
-				shortname, *modsIconFile);
-			item->skin->basicIcon = SkinSystem::VerifyTabIcon(_T("."),
-				shortname, *basicIconFile);
-			item->skin->advancedIcon = SkinSystem::VerifyTabIcon(_T("."),
-				shortname, *advancedIconFile);
-			item->skin->installIcon = SkinSystem::VerifyTabIcon(_T("."),
-				shortname, *installIconFile);
+			
 
-			if ( welcomeIconFile != NULL ) delete welcomeIconFile;
-			if ( modsIconFile != NULL )	delete modsIconFile;
-			if ( basicIconFile != NULL ) delete basicIconFile;
-			if ( advancedIconFile != NULL ) delete advancedIconFile;
-			if ( installIconFile != NULL ) delete installIconFile;
+			if ( welcomeIconFile != NULL ) {
+				item->skin->welcomeIcon = SkinSystem::VerifyTabIcon(_T("."),
+					shortname, *welcomeIconFile);
+				delete welcomeIconFile;
+			}
+			if ( modsIconFile != NULL )	{
+				item->skin->modsIcon = SkinSystem::VerifyTabIcon(_T("."),
+					shortname, *modsIconFile);
+				delete modsIconFile;
+			}
+			if ( basicIconFile != NULL ) {
+				item->skin->basicIcon = SkinSystem::VerifyTabIcon(_T("."),
+					shortname, *basicIconFile);
+				delete basicIconFile;
+			}
+			if ( advancedIconFile != NULL ) {
+				item->skin->advancedIcon = SkinSystem::VerifyTabIcon(_T("."),
+					shortname, *advancedIconFile);
+				delete advancedIconFile;
+			}
+			if ( installIconFile != NULL ) {
+				item->skin->installIcon = SkinSystem::VerifyTabIcon(_T("."),
+					shortname, *installIconFile);
+				delete installIconFile;
+			}
 
 			wxString *idealIconFile = NULL;
 			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
-			item->skin->idealIcon = SkinSystem::VerifyIdealIcon(_T("."),
-				shortname, *idealIconFile);
-			if ( idealIconFile != NULL ) delete idealIconFile;
+			if ( idealIconFile != NULL ) {
+				item->skin->idealIcon = SkinSystem::VerifyIdealIcon(_T("."),
+					shortname, *idealIconFile);
+				delete idealIconFile;
+			}
 
 			wxString *fontName = NULL;
 			readIniFileString(config, _T("/skin/font"), &fontName);
 			int fontSize = 0;
 			config->Read(_T("/skin/fontsize"), &fontSize);
-			item->skin->baseFont = SkinSystem::VerifyFontChoice(_T("."),
-				shortname, *fontName, fontSize);
-			if ( fontName != NULL ) delete fontName;
+			if ( fontName != NULL ) {
+				item->skin->baseFont = SkinSystem::VerifyFontChoice(_T("."),
+					shortname, *fontName, fontSize);
+				delete fontName;
+			}
 
 		} else {
 			wxLogDebug(_T("  Does Not Contain An skin Section."));
