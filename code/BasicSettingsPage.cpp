@@ -7,6 +7,7 @@
 #include "TCManager.h"
 #include "SpeechManager.h"
 #include "OpenALManager.h"
+#include "JoystickManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -396,11 +397,13 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
 
 	wxStaticText* selectedJoystickText = new wxStaticText(this, wxID_ANY, _("Selected joystick:"));
-	wxComboBox* joystickSelected = new wxComboBox(this, ID_JOY_SELECTED, _("No joystick"));
-	wxCheckBox* joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
-	wxCheckBox* joystickDirectionalHit = new wxCheckBox(this, ID_JOY_DIRECTIONAL_HIT, _("Directional hit"));
-	wxButton* joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
-	wxButton* joystickDetectButton = new wxButton(this, ID_JOY_DETECT_BUTTON, _("Detect"));
+	this->joystickSelected = new wxChoice(this, ID_JOY_SELECTED);
+	this->joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
+	this->joystickDirectionalHit = new wxCheckBox(this, ID_JOY_DIRECTIONAL_HIT, _("Directional hit"));
+	this->joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
+	this->joystickDetectButton = new wxButton(this, ID_JOY_DETECT_BUTTON, _("Detect"));
+
+	this->SetupJoystickSection();
 
 	wxBoxSizer* joyButtonSizer = new wxBoxSizer(wxHORIZONTAL);
 	joyButtonSizer->Add(joystickCalibrateButton);
@@ -507,6 +510,13 @@ EVT_TEXT(ID_NETWORK_IP, BasicSettingsPage::OnChangeIP)
 EVT_CHOICE(ID_SELECT_SOUND_DEVICE, BasicSettingsPage::OnSelectOpenALDevice)
 EVT_BUTTON(ID_DOWNLOAD_OPENAL, BasicSettingsPage::OnDownloadOpenAL)
 EVT_BUTTON(ID_DETECT_OPENAL, BasicSettingsPage::OnDetectOpenAL)
+
+// Joystick
+EVT_CHOICE(ID_JOY_SELECTED, BasicSettingsPage::OnSelectJoystick)
+EVT_CHECKBOX(ID_JOY_FORCE_FEEDBACK, BasicSettingsPage::OnCheckForceFeedback)
+EVT_CHECKBOX(ID_JOY_DIRECTIONAL_HIT, BasicSettingsPage::OnCheckDirectionalHit)
+EVT_BUTTON(ID_JOY_CALIBRATE_BUTTON, BasicSettingsPage::OnCalibrateJoystick)
+EVT_BUTTON(ID_JOY_DETECT_BUTTON, BasicSettingsPage::OnDetectJoystick)
 
 END_EVENT_TABLE()
 
@@ -923,5 +933,154 @@ void BasicSettingsPage::SetupOpenALSection() {
 
 void BasicSettingsPage::OpenNonSCPWebSite(wxString url) {
 	::wxLaunchDefaultBrowser(url);
+}
+
+/** Client data for the Joystick Choice box. Stores the joysticks
+Windows ID so that we can pass it back correctly to the engine. */
+class JoyNumber: public wxClientData {
+public:
+	JoyNumber(unsigned int i) {
+		this->number = i;
+	}
+	int GetNumber() {
+		return static_cast<int>(this->number);
+	}
+private:
+	unsigned int number;
+};
+
+void BasicSettingsPage::SetupJoystickSection() {
+	this->joystickSelected->Clear();
+	if ( !JoyMan::WasCompiledIn() ) {
+		this->joystickSelected->Disable();
+		this->joystickSelected->Append(_("No Launcher Support"));
+		this->joystickForceFeedback->Disable();
+		this->joystickDirectionalHit->Disable();
+		this->joystickCalibrateButton->Disable();
+		this->joystickDetectButton->Disable();
+	} else if ( !JoyMan::Initialize() ) {
+		this->joystickSelected->Disable();
+		this->joystickSelected->Append(_("Initialize Failed"));
+		this->joystickForceFeedback->Disable();
+		this->joystickDirectionalHit->Disable();
+		this->joystickCalibrateButton->Disable();
+		this->joystickDetectButton->Enable();
+	} else {
+		this->joystickSelected
+			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVAILD_JOYSTICK));
+		unsigned int pluggedInCount = 0;
+		for ( unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++ ) {
+			if ( JoyMan::IsJoystickPluggedIn(i) ) {
+				pluggedInCount++;
+				this->joystickSelected
+					->Append(JoyMan::JoystickName(i), new JoyNumber(i));
+			}
+		}
+		wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
+			JoyMan::NumberOfJoysticks(), pluggedInCount);
+
+		if ( pluggedInCount == 0 ) {
+			this->joystickSelected->SetSelection(0);
+			this->joystickSelected->Disable();
+			this->joystickForceFeedback->Disable();
+			this->joystickDirectionalHit->Disable();
+			this->joystickCalibrateButton->Disable();
+			this->joystickDetectButton->Enable();
+		} else {
+			int profileJoystick;
+			unsigned int i;
+			this->joystickDetectButton->Enable();
+			ProMan::GetProfileManager()->Get()
+				->Read(PRO_CFG_JOYSTICK_ID,
+					&profileJoystick,
+					JOYMAN_INVAILD_JOYSTICK);
+			// set current joystick
+			for ( i = 0; i < this->joystickSelected->GetCount(); i++ ) {
+				JoyNumber* data = dynamic_cast<JoyNumber*>(
+					this->joystickSelected->GetClientObject(i));
+				wxCHECK2_MSG( data != NULL, continue,
+					_T("JoyNumber is not the clientObject in joystickSelected"));
+
+				if ( profileJoystick == data->GetNumber() ) {
+					this->joystickSelected->SetSelection(i);
+					this->SetupControlsForJoystick(i);
+					return; // All joystick controls are now setup
+				}
+			}
+			// Getting here means that the joystick is no longer installed
+			// or is not plugged in
+			if ( JoyMan::IsJoystickPluggedIn(profileJoystick) ) {
+				wxLogWarning(_T("Last selected joystick is not plugged in"));
+			} else {
+				wxLogWarning(_T("Last selected joystick does not seem to be installed"));
+			}
+			// set to no joystick (the first selection)
+			this->joystickSelected->SetSelection(0);
+			this->SetupControlsForJoystick(0);
+		}
+	}
+}
+
+void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
+	JoyNumber* joynumber = dynamic_cast<JoyNumber*>(
+		this->joystickSelected->GetClientObject(i));
+	wxCHECK_RET( joynumber != NULL,
+		_T("JoyNumber is not joystickSelected's client data"));
+	if ( JoyMan::HasCalibrateTool(joynumber->GetNumber()) ) {
+		this->joystickCalibrateButton->Enable();
+	} else {
+		this->joystickCalibrateButton->Disable();
+	}
+
+	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
+		bool ff, direct;
+		ProMan::GetProfileManager()->Get()
+			->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false);
+		ProMan::GetProfileManager()->Get()
+			->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false);
+		this->joystickDirectionalHit->SetValue(direct);
+		this->joystickForceFeedback->SetValue(ff);
+
+		this->joystickDirectionalHit->Enable();
+		this->joystickForceFeedback->Enable();
+	} else {
+		this->joystickDirectionalHit->Disable();
+		this->joystickForceFeedback->Disable();
+	}
+}
+
+void BasicSettingsPage::OnSelectJoystick(
+	wxCommandEvent &WXUNUSED(event)) {
+	this->SetupControlsForJoystick(
+		this->joystickSelected->GetSelection());
+}
+
+void BasicSettingsPage::OnCheckForceFeedback(
+	wxCommandEvent &event) {
+		ProMan::GetProfileManager()->Get()
+			->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, event.IsChecked());
+}
+
+void BasicSettingsPage::OnCheckDirectionalHit(
+	wxCommandEvent &event) {
+		ProMan::GetProfileManager()->Get()
+			->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, event.IsChecked());
+}
+
+void BasicSettingsPage::OnCalibrateJoystick(
+	wxCommandEvent &WXUNUSED(event)) {
+		JoyNumber *data = dynamic_cast<JoyNumber*>(
+			this->joystickSelected->GetClientObject(
+			this->joystickSelected->GetSelection()));
+		wxCHECK_RET( data != NULL,
+			_T("joystickSelected does not have JoyNumber as clientdata"));
+
+		JoyMan::LaunchCalibrateTool(data->GetNumber());
+}
+
+void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
+		if ( JoyMan::DeInitialize() ) {
+			this->SetupJoystickSection();
+		}
 }
 
