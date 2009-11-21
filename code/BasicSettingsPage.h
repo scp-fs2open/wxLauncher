@@ -39,11 +39,19 @@ public:
 	void OnDownloadOpenAL(wxCommandEvent& event);
 	void OnDetectOpenAL(wxCommandEvent& event);
 
+	void OnSelectJoystick(wxCommandEvent& event);
+	void OnCheckForceFeedback(wxCommandEvent& event);
+	void OnCheckDirectionalHit(wxCommandEvent& event);
+	void OnCalibrateJoystick(wxCommandEvent& event);
+	void OnDetectJoystick(wxCommandEvent& event);
+
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	void FillResolutionDropBox(wxChoice* exeChoice);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
+	void SetupJoystickSection();
+	void SetupControlsForJoystick(unsigned int i);
 	DECLARE_EVENT_TABLE();
 
 private:
@@ -52,6 +60,12 @@ private:
 	wxStaticText* openALVersion;
 	wxButton* downloadOpenALButton;
 	wxButton* detectOpenALButton;
+
+	wxChoice* joystickSelected;
+	wxCheckBox* joystickForceFeedback;
+	wxCheckBox* joystickDirectionalHit;
+	wxButton* joystickCalibrateButton;
+	wxButton* joystickDetectButton;
 };
 
 #endif

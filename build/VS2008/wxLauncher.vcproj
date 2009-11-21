@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(OPENALPATH)\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswud&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1;USE_SPEECH=1;USE_OPENAL=1"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1;USE_SPEECH=1;USE_OPENAL=1;USE_JOYSTICK=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -132,7 +132,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswu&quot;"
-				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;USE_SPEECH=1"
+				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;USE_SPEECH=1;USE_OPENAL=1;USE_JOYSTICK=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\JoystickManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\Logger.cpp"
 				>
 			</File>
@@ -275,6 +279,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\InstallPage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\JoystickManager.h"
 				>
 			</File>
 			<File

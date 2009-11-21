@@ -142,4 +142,7 @@ enum ProfileDialogReturnValues {
 
 #define PRO_CFG_OPENAL_DEVICE				_T("/openal/device")	// string
 
+#define PRO_CFG_JOYSTICK_ID					_T("/joystick/id")		// int
+#define PRO_CFG_JOYSTICK_FORCE_FEEDBACK		_T("/joystick/forcefeedback") // bool
+#define PRO_CFG_JOYSTICK_DIRECTIONAL		_T("/joystick/directional") // bool
 #endif
