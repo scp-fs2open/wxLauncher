@@ -360,7 +360,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\version.cpp"
+				RelativePath="..\..\generated\version.cpp"
 				>
 			</File>
 			<File
@@ -388,11 +388,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 		</Filter>
