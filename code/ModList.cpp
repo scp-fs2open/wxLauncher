@@ -38,11 +38,19 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 
 	wxLogDebug(_T("Inserting '(No MOD)'"));
 	wxFileName tcmodini(_T("mod.ini"));
-	tcmodini.Normalize(wxPATH_NORM_ALL, _T("."));
+	tcmodini.AppendDir(_T("."));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
 		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig(tcmodinistream);
-		wxLogDebug(_T(" Found a mod.ini in the root TC folder."));
+		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath());
+
+		// make sure that a mod.ini in the root TC folder is not apart of this set
+		// because it will be addressed shortly and specificly
+		int pos = foundInis.Index(tcmodini.GetFullPath());
+		if ( pos != wxNOT_FOUND ) {
+			foundInis.RemoveAt(pos);
+		}
+
 	} else {
 		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig();
 		wxLogDebug(_T(" Using defaults for TC."));
