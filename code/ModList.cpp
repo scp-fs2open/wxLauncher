@@ -308,7 +308,7 @@ void ModList::readIniFileString(ConfigHash::mapped_type config,
 			}
 	}
 	wxLogDebug(_T("  %s:'%s'"), keyvalue,
-		((*location) == NULL) ? _T("Not Specified") : **location);
+		((*location) == NULL) ? _T("Not Specified") : excapeSpecials(**location));
 
 	if ( (*location) != NULL && (*location)->empty() ) {
 		wxLogDebug(_T("  Nulled %s"), keyvalue);
@@ -316,6 +316,24 @@ void ModList::readIniFileString(ConfigHash::mapped_type config,
 		*location = NULL;
 	}
 }
+
+/** reexcape the newlines in the mod.ini values. */
+wxString ModList::excapeSpecials(wxString toexcape) {
+	wxString::iterator iter;
+	for ( iter = toexcape.begin(); iter != toexcape.end(); iter++ ) {
+		if ( *iter == wxChar('\n') ) {
+			wxString::iterator end = iter;
+			end++;
+			toexcape.replace(iter, end, _T("\\n"));
+
+			// have to start from the begining because we wrote to the string
+			// in invalidated the iterator.
+			iter = toexcape.begin();
+		}
+	}
+	return toexcape;
+}
+
 
 /** */
 void ModList::readFlagSet(ConfigHash::mapped_type config,

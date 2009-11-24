@@ -143,6 +143,7 @@ private:
 		wxString keyprefix, FlagSetItem * set);
 	void readTranslation(ConfigHash::mapped_type config,
 		wxString langaugename, I18nItem ** trans);
+	wxString excapeSpecials(wxString toexcape);
 
 	ModItemArray* tableData;
 	wxButton * testbutton;
