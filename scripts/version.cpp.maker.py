@@ -100,15 +100,15 @@ def make_directory_for_output(output):
   path = os.path.dirname(output)
   if os.path.exists(path):
     if os.path.isdir(path):
-      print " ", path, " already exists"
+      print " ", path, "already exists"
     else:
-      print " ", path, " exists but is not a directory!"
+      print " ", path, "exists but is not a directory!"
   else:
     # can only throw an exception user does not have permission
     try:
       os.makedirs(path)
     except:
-      print " ", path, " is not createable"
+      print " ", path, "is not createable"
       raise
 
 if __name__ == "__main__":
