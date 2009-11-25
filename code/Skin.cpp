@@ -58,7 +58,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 
 	if ( this->defaultSkin->welcomeHeader == NULL ) {
 		this->defaultSkin->welcomeHeader = 
-			new wxBitmap(_("SCP Header.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(_("SCP_Header.png"), wxBITMAP_TYPE_PNG);
 	}
 
 	if ( this->defaultSkin->welcomeIcon == NULL ) {
