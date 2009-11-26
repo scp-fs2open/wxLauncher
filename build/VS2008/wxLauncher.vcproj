@@ -131,7 +131,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswu&quot;"
+				AdditionalIncludeDirectories="&quot;$(OPENALPATH)\include&quot;;&quot;$(WXPATH)\include&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswu&quot;"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS;__WINDOWS__;__WXMSW__;__WIN95__;USE_SPEECH=1;USE_OPENAL=1;USE_JOYSTICK=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -388,11 +388,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>
