@@ -42,11 +42,13 @@ bool JoyMan::Initialize() {
 #if USE_JOYSTICK
 	UINT num = joyGetNumDevs();
 	if ( num > 16 ) {
-		/* 16 is the max because MSDN says that on windows 2000 and later
+		/* 16 is the max because, according to MSDN, windows 2000 and later
 		the MM api only supports -1 to 16 as the joystick ID to pass into 
 		joyGetDevCaps() or joyGetPos() */
 		wxLogError(_T("Windows reports that the system has more 16 joysticks!"));
 		return false;
+	} else {
+		wxLogInfo(_T("Windows says there are %d joysticks"), num);
 	}
 
 	MMRESULT result = JOYERR_NOERROR;
