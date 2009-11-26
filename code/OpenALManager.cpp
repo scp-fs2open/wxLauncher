@@ -237,7 +237,7 @@ wxString OpenALMan::GetCurrentVersion() {
 		const ALCchar* version = (*GetString)(AL_VERSION);
 		wxCHECK( checkForALError(), _("Error"));
 		if ( version == NULL ) {
-			wxLogError(_T("Unable to retrive Version String"));
+			wxLogError(_T("OpenAL: Unable to retrive Version String"));
 			return _("Unknown version");
 		} else {
 			wxString Version(version, wxConvUTF8);
