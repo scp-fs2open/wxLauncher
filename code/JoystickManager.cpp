@@ -84,7 +84,7 @@ bool JoyMan::Initialize() {
 		joysticks.Add(joystickName);
 	}
 	wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
-			totalNumberOfJoysticks, JoyMan::NumberOfJoysticks());
+			totalNumberOfJoysticks, numOfJoysticks );
 	return true;
 #else
 	return false;
@@ -130,7 +130,7 @@ unsigned int JoyMan::NumberOfJoysticks() {
 unsigned int JoyMan::NumberOfPluggedInJoysticks() {
 	unsigned int total = JoyMan::NumberOfJoysticks();
 	unsigned int pluggedIn = 0;
-	for ( int i = 0; i < total; i++) {
+	for ( unsigned int i = 0; i < total; i++) {
 		if ( JoyMan::IsJoystickPluggedIn(i) ) {
 			pluggedIn++;
 		}
