@@ -8,7 +8,7 @@ namespace JoyMan {
 #if USE_JOYSTICK
 	bool isInitialized = false;
 	wxArrayString joysticks;
-	unsigned int numOfJoysticks = 0;
+	unsigned int numOfJoysticks = 0; //!< number of plugged in joysticks
 #endif
 };
 
@@ -40,20 +40,20 @@ bool JoyMan::IsInitialized() {
 */
 bool JoyMan::Initialize() {
 #if USE_JOYSTICK
-	UINT num = joyGetNumDevs();
+	UINT num = joyGetNumDevs(); // get the number of joys supported by windows.
 	if ( num > 16 ) {
-		/* 16 is the max because, according to MSDN, windows 2000 and later
-		the MM api only supports -1 to 16 as the joystick ID to pass into 
-		joyGetDevCaps() or joyGetPos() */
-		wxLogError(_T("Windows reports that the system has more 16 joysticks!"));
-		return false;
-	} else {
-		wxLogInfo(_T("Windows says there are %d joysticks"), num);
+		/* greater than 16 is cause for a warning because according to MSDN,
+		Windows 2000 and later support -1 thru 16 in the MM api (and windows NT
+		only supports 1 or 2).  MSDN also notes if you want more than 16 use
+		DirectInput. */
+		wxLogWarning(_T("Windows reports that the joystick driver ")
+			_T("supports more than 16 joysticks (reports %d)!"), num);
 	}
 
 	MMRESULT result = JOYERR_NOERROR;
 	JOYINFO joyinfo;
 	JOYCAPS joycaps;
+	int totalNumberOfJoysticks = 0;
 	
 	for (UINT counter = 0; counter < num; counter++) {
 		memset(reinterpret_cast<void*>(&joyinfo), 0, sizeof(JOYINFO));
@@ -63,6 +63,7 @@ bool JoyMan::Initialize() {
 
 		if ( result == JOYERR_NOERROR ) {
 			// joystick plugged in
+			totalNumberOfJoysticks++;
 			memset(reinterpret_cast<void*>(&joycaps), 0, sizeof(JOYCAPS));
 
 			result = joyGetDevCaps(counter, &joycaps, sizeof(JOYCAPS));
@@ -74,12 +75,15 @@ bool JoyMan::Initialize() {
 				continue;
 			}
 		} else if ( result == JOYERR_UNPLUGGED ) {
-			// unplugged, do nothing
+			// unplugged
+			totalNumberOfJoysticks++;
 		} else {
-			wxLogError(_T("Error in getting joystick position"));
+			// Joystick doesn't exist, do nothing
 		}
 		joysticks.Add(joystickName);
 	}
+	wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
+			totalNumberOfJoysticks, JoyMan::NumberOfJoysticks());
 	return true;
 #else
 	return false;

@@ -968,18 +968,14 @@ void BasicSettingsPage::SetupJoystickSection() {
 	} else {
 		this->joystickSelected
 			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVAILD_JOYSTICK));
-		unsigned int pluggedInCount = 0;
 		for ( unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++ ) {
 			if ( JoyMan::IsJoystickPluggedIn(i) ) {
-				pluggedInCount++;
 				this->joystickSelected
 					->Append(JoyMan::JoystickName(i), new JoyNumber(i));
 			}
 		}
-		wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
-			JoyMan::NumberOfJoysticks(), pluggedInCount);
 
-		if ( pluggedInCount == 0 ) {
+		if ( JoyMan::NumberOfJoysticks() == 0 ) {
 			this->joystickSelected->SetSelection(0);
 			this->joystickSelected->Disable();
 			this->joystickForceFeedback->Disable();
