@@ -14,8 +14,9 @@ namespace JoyMan {
 
 /** \namespace JoyMan
 The JoyMan namespace contains helper functions for working with joysticks on 
-the compiled platform.  The interface of this namespace is always aviable
-but will only work if preprocessor symbol USE_JOYSTICK is set to 1.
+the compiled platform.  The interface of this namespace is always available
+but will only work if preprocessor symbol USE_JOYSTICK is set to 1, and of
+course if the platform supports it.
 \sa JoyMan::WasCompiledIn();
 */
 
@@ -90,7 +91,7 @@ bool JoyMan::Initialize() {
 #endif
 }
 
-/** Dismantals JoyMan and frees any memory used.
+/** Dismantles JoyMan and frees any memory used.
 \note Will always return true when JoyMan is not compiled in.
 \return Return true if DeInitializtion was successful.
 */
@@ -113,14 +114,28 @@ bool JoyMan::WasCompiledIn() {
 #endif
 }
 
-/** \return number of in joysticks that the system reports.
+/** \return number of joysticks that the system reports as existing.
 \sa JoyMan::IsPluggedIn() */
 unsigned int JoyMan::NumberOfJoysticks() {
 #if USE_JOYSTICK
-	return JoyMan::numOfJoysticks;
+	return JoyMan::joysticks.size();
 #else
 	return 0;
 #endif
+}
+
+/** \return number of joystsicks that are plugged in.
+\sa JoyMan::NumberOfJoysticks()
+\sa JoyMan::IsPluggedIn() */
+unsigned int JoyMan::NumberOfPluggedInJoysticks() {
+	unsigned int total = JoyMan::NumberOfJoysticks();
+	unsigned int pluggedIn = 0;
+	for ( int i = 0; i < total; i++) {
+		if ( JoyMan::IsJoystickPluggedIn(i) ) {
+			pluggedIn++;
+		}
+	}
+	return pluggedIn;
 }
 
 /** \bug Assumes all joysticks support ForceFeedback */

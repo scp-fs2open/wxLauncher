@@ -975,7 +975,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 			}
 		}
 
-		if ( JoyMan::NumberOfJoysticks() == 0 ) {
+		if ( JoyMan::NumberOfPluggedInJoysticks() == 0 ) {
 			this->joystickSelected->SetSelection(0);
 			this->joystickSelected->Disable();
 			this->joystickForceFeedback->Disable();
