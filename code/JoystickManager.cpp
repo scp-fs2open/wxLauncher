@@ -72,7 +72,7 @@ bool JoyMan::Initialize() {
 				numOfJoysticks++;
 				joystickName = wxString(joycaps.szPname, wxMBConvUTF16());
 			} else {
-				wxLogError(_T("Error in retiving joystick caps"));
+				wxLogError(_T("Error in retrieving joystick caps"));
 				continue;
 			}
 		} else if ( result == JOYERR_UNPLUGGED ) {
