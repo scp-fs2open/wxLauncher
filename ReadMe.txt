@@ -1,4 +1,5 @@
 wxLauncher - A multi-platform dual-purpose application
+	http://code.google.com/p/wxlauncher/
 
 Introduction
 ============
@@ -14,17 +15,32 @@ wxLauncher is built for the 3.6.9+ versions of fs2_open.
 while older versions might function, we don't officially
 support them. Use them at your own risk.
 
-Requirements
-============
+Download binaries
+=============
+Precompiled binaries can be found on the project downloads
+page:
+	http://code.google.com/p/wxlauncher/downloads/list
+
 Just find the build for your system and you're set.
+
+Building from source
+============
 For more info about the builds on specific system see
 the readme.txt that is in the build systems folder.  All
 building code is in the build directory.
 
+wxLauncher is a wxWidgets based application, thus can 
+only be built with wxWidgets version 2.8.10 or higher 
+installed on your system.
+wxWidgets homepage:
+	http://www.wxwidgets.org/
+	
 Python 2.4 or higher is required to build this project.
 This project also assumes that the python execuatble is 
 in your PATH.  See the compiler specific instructions
 on how to add Python to your PATH.
+Python homepage:
+	http://www.python.org/
 
 The OpenAL Software Development Kit is an optional component
 needed to build this program.  OpenAL support is not
@@ -32,16 +48,20 @@ compiled in by default and requires the preprocessor
 symbol USE_OPENAL=1.  See the compiler specific
 instructions for getting your compiler ready to build
 with OpenAL.
+OpenAL homepage:
+	http://connect.creativelabs.com/openal/default.aspx
 
-If you're looking for the source, you can find it at:
-  http://code.google.com/p/wxlauncher/
+
+Launcher's source can be explored from the project's
+source page:
+	http://code.google.com/p/wxlauncher/source/checkout
   
-To get the source, you'll need HG:
-  hg clone https://wxlauncher.googlecode.com/hg/ wxlauncher  
+To get the source, you'll need Mercurial:
+	http://mercurial.selenic.com/
 
-You'll need wxWidgets to compile it. Get the wxWidgets 
-package (2.8.10 or above) at:
-  http://www.wxwidgets.org/
+Once Mercurial is installed, you can get a copy of the source
+by runningthe following command (in a folder of your choice):
+	hg clone https://wxlauncher.googlecode.com/hg/ wxlauncher  
   
 Building
 ========
