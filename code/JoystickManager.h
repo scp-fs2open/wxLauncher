@@ -12,6 +12,7 @@ namespace JoyMan {
 	bool WasCompiledIn();
 
 	unsigned int NumberOfJoysticks();
+	unsigned int NumberOfPluggedInJoysticks();
 	bool SupportsForceFeedback(unsigned int i);
 	bool HasCalibrateTool(unsigned int i);
 	void LaunchCalibrateTool(unsigned int i);
