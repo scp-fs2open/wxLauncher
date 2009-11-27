@@ -323,7 +323,8 @@ def process_input_stage2(file, options, files, helparray):
   outfile.close()
 
   if parser.control:
-    helparray.append((parser.control, file))
+    filename_in_archive = change_filename(outname, ".htm", files['stage2'], ".")
+    helparray.append((parser.control, filename_in_archive))
     logging.debug(" Control name %s", parser.control)
       
   return outname
@@ -333,9 +334,9 @@ def process_input_stage3(file, options, files):
   input = infile.read()
   infile.close()
 
-  class Stage3Parser(HTMLParser.HTMLParser):
-    def __init__(self, options, files):
-      HTMLParser.HTMLParser.__init__(self)
+  class Stage3Parser(OutputParser):
+    def __init__(self, options, files, *args, **kwargs):
+      OutputParser.__init__(self, *args, **kwargs)
       self.options = options
       self.files = files
 
@@ -353,11 +354,12 @@ def process_input_stage3(file, options, files):
         else:
           # get extention
           basename = os.path.basename(attrs[1][1])
-          (name, ext) = os.path.split(basename)
+          (name, ext) = os.path.splitext(basename)
           (file, outname) = tempfile.mkstemp(ext, name, self.files['stage3'])
           dst1 = outname.replace(os.getcwd(), ".") # make into a relative path
 
         dst = os.path.normpath(dst1)
+        attrs = update_attribute(attrs, 'src', change_filename(dst, os.path.splitext(dst)[1], self.files['stage3'], ".", makedirs=False))
         logging.debug(" Image (%s) should be in %s and copying to %s", attrs[0][1], location, dst)
         try:
           shutil.copy2(location, dst)
@@ -365,11 +367,26 @@ def process_input_stage3(file, options, files):
           traceback.print_exc()
           logging.error(" '%s' does not exist", location )
           sys.exit(3)
+      OutputParser.handle_startendtag(self, tag, attrs)
 
-  parser = Stage3Parser(options, files)
+  outname = change_filename(file, ".stage3", files['stage2'], files['stage3'])
+  outfile = open(outname, mode="w")
+  parser = Stage3Parser(options, files, file=outfile)
   parser.feed(input)
   parser.close()
+  outfile.close()
 
+def update_attribute(attributes, name, value):
+  """Finds the attribute name and sets it to value in the attributes tuple of tuples, returns the attributes tuple of tuples with the changed attribute."""
+  ret = list()
+  # find name in attributes
+  for n, v in attributes:
+    if n == name:
+      ret.append((name, value))
+    else:
+      ret.append((n,v))
+  return tuple(ret)
+  
 if __name__ == "__main__":
   main(sys.argv)
 
