@@ -256,7 +256,7 @@ def generate_input_files_list(options):
         
   return file_list
   
-def change_filename(filename, newext, orginaldir, destdir):
+def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
   """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
   logging.debug("   change_filename('%s', '%s', '%s', '%s')", filename, newext, orginaldir, destdir)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
@@ -270,15 +270,16 @@ def change_filename(filename, newext, orginaldir, destdir):
   outfile_name = os.path.normpath(outfile_name4)
   logging.debug(outfile_name)
   
-  # make sure that the folder exists to output 
-  outfile_path = os.path.dirname(outfile_name)
-  if os.path.exists(outfile_path):
-    if os.path.isdir(outfile_path):
-      pass # do nothing because the folder already exists
+  # make sure that the folder exists to output, if wanted
+  if makedirs:
+    outfile_path = os.path.dirname(outfile_name)
+    if os.path.exists(outfile_path):
+      if os.path.isdir(outfile_path):
+        pass # do nothing because the folder already exists
+      else:
+        raise Exception("%s already exists but is not a directory"%(outfile_path))
     else:
-      raise Exception("%s already exists but is not a directory"%(outfile_path))
-  else:
-    os.makedirs(outfile_path)
+      os.makedirs(outfile_path)
     
   return outfile_name
 
