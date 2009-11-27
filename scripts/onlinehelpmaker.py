@@ -95,9 +95,11 @@ def main(argv):
   parser.add_option("-t", "--temp",
     help="use TEMPDIR to store the intermedite build files",
     metavar="TEMPDIR")
-  parser.add_option("-q", "--quiet", action="store_false",
+  parser.add_option("-q", "--quiet", action="store_true",
     dest="quiet", default=False,
-    help="don't print status messages to stdout")
+    help="don't print most status messages to stdout")
+  parser.add_option("-d", "--debug", action="store_true",
+    default=False, help="print debugging information to the screen")
 
   (options, args) = parser.parse_args(argv)
 
@@ -108,9 +110,14 @@ def main(argv):
   options.outfile = args[2]
   options.indir = args[3]
   
-  logging.basicConfig(level=logging.DEBUG,
-    format='%(levelname)7s:%(message)s')
+  loglevel=logging.INFO
   logging.addLevelName(NOTICE, "NOTICE")
+  if options.quiet:
+    loglevel=NOTICE
+  elif options.debug:
+    loglevel=logging.DEBUG
+  
+  logging.basicConfig(level=loglevel, format='%(levelname)7s:%(message)s')
 
   if options.type == "build":
     pass
