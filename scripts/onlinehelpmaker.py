@@ -221,20 +221,13 @@ def generate_input_files_list(options):
     for file in file_list:
       print "  %s"%(file)
   return file_list
-
-def process_input_stage1(file, options, files, helparray):
-  infile = open(file, mode="r")
-  input = infile.read()
-  infile.close()
-
-  output = markdown.markdown(input)
-
-  outfile_name1 = file.replace(options.indir, ".") # files name
-  print outfile_name1 #debug
+  
+def change_filename(filename, newext, orginaldir, destdir):
+  """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
+  outfile_name1 = filename.replace(orginaldir, ".") # files relative name
   outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
-  print outfile_name2
-  outfile_name3 = outfile_name2 + ".stage1"
-  outfile_name4 = os.path.join(files['stage1'], outfile_name3)
+  outfile_name3 = outfile_name2 + newext
+  outfile_name4 = os.path.join(destdir, outfile_name3)
   outfile_name = os.path.normpath(outfile_name4)
   
   # make sure that the folder exists to output 
@@ -246,6 +239,17 @@ def process_input_stage1(file, options, files, helparray):
       raise Exception("%s already exists but is not a directory"%(outfile_path))
   else:
     os.makedirs(outfile_path)
+    
+  return outfile_name
+
+def process_input_stage1(file, options, files, helparray):
+  infile = open(file, mode="r")
+  input = infile.read()
+  infile.close()
+
+  output = markdown.markdown(input)
+
+  outfile_name = change_filename(file, ".stage1", files['stage1'], options.indir)
   
   outfile = open(outfile_name, mode="w")
   outfile.write(output)
