@@ -195,8 +195,8 @@ def build(options):
 
   Compiled in several stages:
     stage1: Transform all input files with markdown placing the results into options.temp+"/stage1".
-    stage2: Parses and strips the output of stage1 to build the c-array that contains the compiled names for the detailed help.
-    stage3: Parses the output of stage1 to grab the images that are refered to in the the output of stage1
+    stage2: Parses and strips the output of stage1 to build the list that will be made into the c-array that contains the compiled names for the detailed help of each control.
+    stage3: Parses the output of stage2 to grab the images that are refered to in the the output of stage1
     stage4: Parses the output of stage1 to fix the relative hyperlinks in the output so that they will refer correctly to the correct files when in output file.
     stage5: Generate the index and table of contents for the output file.
     stage6: Zip up the output of stage5 and put it in the output location.
@@ -221,6 +221,9 @@ def build(options):
       
       name3 = process_input_stage3(name2, options, files)
       logging.info("   Stage 4")
+      
+      name4 = process_input_stage4(name3, options, files)
+      logging.info("   Stage 5")
 
     print helparray
 
@@ -258,7 +261,7 @@ def generate_input_files_list(options):
   
 def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
   """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
-  logging.debug("   change_filename('%s', '%s', '%s', '%s')", filename, newext, orginaldir, destdir)
+  logging.debug("   change_filename('%s', '%s', '%s', '%s', %s)", filename, newext, orginaldir, destdir, makedirs)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
   logging.debug(outfile_name1)
   outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
@@ -376,6 +379,8 @@ def process_input_stage3(file, options, files):
   parser.close()
   outfile.close()
 
+  return outname
+
 def update_attribute(attributes, name, value):
   """Finds the attribute name and sets it to value in the attributes tuple of tuples, returns the attributes tuple of tuples with the changed attribute."""
   ret = list()
@@ -386,6 +391,41 @@ def update_attribute(attributes, name, value):
     else:
       ret.append((n,v))
   return tuple(ret)
+  
+def process_input_stage4(file, options, files):
+  """Fix the a tags so that they point to the htm files that will be in the output archive."""
+  infile = open(file, mode="r")
+  input = infile.read()
+  infile.close()
+  
+  outname = change_filename(file, ".stage4", files['stage3'], files['stage4'])
+  outfile = open(outname, mode="w")
+
+  class Stage4Parser(OutputParser):
+    def __init__(self, files, *args, **kwargs):
+      OutputParser.__init__(self, *args, **kwargs)
+      self.files = files
+      
+    def handle_starttag(self, tag, attrs):
+      if tag == "a":
+        for name,value in attrs:
+          if name == "href" and not value.startswith("http://"):
+            # make sure the file being refered to exists in stage3
+            check_ref = change_filename(value, ".stage3", ".", files['stage3'], makedirs=False)
+            if not os.path.exists(check_ref):
+              logging.warning(" File (%s) does not exist to be bundled into archive!", check_ref)
+              
+            fixed_ref = change_filename(value, ".htm", ".", ".", makedirs=False)
+            attrs = update_attribute(attrs, "href", fixed_ref)
+      
+      OutputParser.handle_starttag(self, tag, attrs)
+
+  parser = Stage4Parser(files=files, file=outfile)
+  parser.feed(input)
+  parser.close()
+  outfile.close()  
+  
+  return outname
   
 if __name__ == "__main__":
   main(sys.argv)
