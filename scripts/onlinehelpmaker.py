@@ -1,22 +1,10 @@
 import sqlite3, os, sys, tempfile, atexit, traceback, shutil
 from optparse import OptionParser
 
+import logging
+NOTICE = 25
+
 import HTMLParser
-
-class DebugParser(HTMLParser.HTMLParser):
-  def handle_starttag(self, tag, attrs):
-    print " Handle starttag: %s" %(tag)
-    print "  %s"%(attrs)
-
-  def handle_startendtag(self, tag, attrs):
-    print " Handle start and end tag: %s" % (tag)
-    print "  %s"%(attrs)
-
-  def handle_endtag(self, tag):
-    print " End tag: %s" %(tag)
-
-  def handle_data(self, data):
-    print " Data: %s" %( data)
 
 class Tag:
   def __init__(self, name, attrs, data=None):
@@ -38,20 +26,20 @@ class OutputParser(HTMLParser.HTMLParser):
     self.tagstack = list()
   
   def handle_starttag(self, tag, attrs):
-    print " Handle starttag: %s" %(tag)
-    print "  %s"%(attrs)
+    logging.debug(" Handle starttag: %s", tag)
+    logging.debug("  %s", attrs)
     self.tagstack.append(Tag(tag, attrs))
   def handle_startendtag(self, tag, attrs):
-    print " Handle start and end tag: %s" % (tag)
-    print "  %s"%(attrs)
+    logging.debug(" Handle start and end tag: %s", tag)
+    logging.debug("  %s", attrs)
     self.write_tag(Tag(tag, attrs))
   def handle_endtag(self, tagname):
     """Finds the matching tag. If the tags are miss matched, function will go down the stack until it finds the match"""
-    print " End tag: %s" %(tagname)
+    logging.debug(" End tag: %s", tagname)
     tag = self.find_match(tagname)
     self.write_tag(tag)
   def handle_data(self, data):
-    print " Data: %s" %( data)
+    logging.debug(" Data: %s", data)
     if len(self.tagstack) > 0:
       tag = self.tagstack.pop()
       if tag.data == None:
@@ -65,7 +53,7 @@ class OutputParser(HTMLParser.HTMLParser):
     """Recursive function to match the tag"""
     tag = self.tagstack.pop()
     if not tag.name == tagtofind:
-      print "WARNING: %smismatched tag found (expected %d, found %s)" %(" "*indent, tagtofind, tag.name)
+      logging.warning(" %smismatched tag found (expected %d, found %s)", " "*indent, tagtofind, tag.name)
       self.write_tag(tag)
       tag = self.find_match(tagtofind)
       
@@ -100,6 +88,7 @@ except ImportError:
   print "ERROR: Unable to import markdown the markup parser."
   print " Make sure that markdown has been installed"
   print "  see the ReadMe.txt for more information"
+  raise
 
 def main(argv):
   parser = OptionParser(usage="%prog <jobtype> <outfile> <indir> [options]")
@@ -118,6 +107,10 @@ def main(argv):
   options.type = args[1]
   options.outfile = args[2]
   options.indir = args[3]
+  
+  logging.basicConfig(level=logging.DEBUG,
+    format='%(levelname)7s:%(message)s')
+  logging.addLevelName(NOTICE, "NOTICE")
 
   if options.type == "build":
     pass
@@ -129,8 +122,7 @@ def main(argv):
     parser.error("jobtype must be one of: build, rebuild, or clean")
 
   if not options.temp:
-    if not options.quiet:
-      print "Not working directory set. Creating one in system temp."
+    logging.info("No working directory set. Creating one in system temp.")
     options.temp = tempfile.mkdtemp()
 
     def cleanup(dir):
@@ -139,56 +131,56 @@ def main(argv):
 
     atexit.register(cleanup, options.temp)
 
-
-  if not options.quiet:
-    print "Doing a '%s'" % ( options.type )
-    print "Using '%s' as working directory" % ( options.temp )
-    print "Using '%s' as output file" % ( options.outfile )
-    print "Using '%s' as input directory" %( options.indir )
+  logging.info("Doing a '%s'", options.type)
+  logging.info("Using '%s' as working directory", options.temp )
+  logging.info("Using '%s' as output file", options.outfile )
+  logging.info("Using '%s' as input directory", options.indir )
 
   if options.type == "build":
-    build(options)
+    call_logging_exceptions(build, options)
   elif options.type == "rebuild":
-    rebuild(options)
+    call_logging_exceptions(rebuild, options)
   else:
-    clean(options)
+    call_logging_exceptions(clean, options)
 
+def call_logging_exceptions(func, *args, **kwargs):
+  """Protects the caller from all exceptions that occur in the callee. Logs the exceptions that do occur."""
+  try:
+    func(*args, **kwargs)
+  except:
+    ( type, value, tb ) = sys.exc_info()
+    logging.error("***EXCEPTION:")
+    logging.error(" %s: %s", type.__name__, value)
+    for filename, line, function, text in traceback.extract_tb(tb):
+      logging.error("%s:%d %s", os.path.basename(filename), line, function)
+      logging.error("   %s", text)
+    
 def rebuild(options):
-  print "Rebuilding"
-  try:
-    clean(options)
-  except:
-    traceback.print_exc()
-  try:
-    build(options)
-  except:
-    traceback.print_exc()
+  logging.log(NOTICE, "Rebuilding")
+  call_logging_exceptions(clean, options)
+  call_logging_exceptions(build, options)
 
 def clean(options):
-  print "Cleaning.."
-  if not options.quiet:
-    print "Removing outfile: %s" % ( options.outfile )
+  logging.log(NOTICE, "Cleaning..")
+  logging.info("Removing outfile: %s", options.outfile )
   if os.path.exists(options.outfile):
     if os.path.isfile(options.outfile):
       os.remove(options.outfile)
     else:
-      print "ERROR: outfile is not a file. Make sure your parameters are in the correct order"
+      logging.error(" <outfile> is not a file. Make sure your parameters are in the correct order")
       sys.exit(2)
   else:
-    if not options.quiet:
-      print " Outfile (%s) does not exist" % (options.outfile)
+    logging.info(" Outfile (%s) does not exist", options.outfile)
 
-  if not options.quiet:
-    print "Removing workdirectory: %s" % ( options.temp )
+  logging.info("Removing workdirectory: %s", options.temp )
   if os.path.exists(options.temp):
     if os.path.isdir(options.temp):
       shutil.rmtree(options.temp, ignore_errors=True)
     else:
-      print "ERROR: tempdir is not a file. Make sure your parameters are in the correct order"
+      logging.error("tempdir is not a file. Make sure your parameters are in the correct order")
       sys.exit(2)
   else:
-    if not options.quiet:
-      print " Work directory (%s) does not exist" % (options.temp)
+    logging.info(" Work directory (%s) does not exist", options.temp)
 
 
 def build(options):
@@ -202,27 +194,26 @@ def build(options):
     stage5: Generate the index and table of contents for the output file.
     stage6: Zip up the output of stage5 and put it in the output location.
     """
+  logging.log(NOTICE, "Building...")
   files = generate_paths(options)
 
   if should_build(options, files):
     input_files = generate_input_files_list(options)
 
     helparray = list()
-    if not options.quiet:
-      print " Processing input files:"
+    logging.info(" Processing input files:")
     for file in input_files:
-      if not options.quiet:
-        print "  %s"%(file)
-        print "   Stage 1"
+      logging.info("  %s", file)
+      logging.info("   Stage 1")
+      
       name1 = process_input_stage1(file, options, files)
-      if not options.quiet:
-        print "   Stage 2"
+      logging.info("   Stage 2")
+      
       name2 = process_input_stage2(name1, options, files, helparray)
-      if not options.quiet:
-        print "   Stage 3"
+      logging.info("   Stage 3")
+      
       name3 = process_input_stage3(name2, options, files)
-      if not options.quiet:
-        print "   Stage 4"
+      logging.info("   Stage 4")
 
     print helparray
 
@@ -236,7 +227,7 @@ def generate_paths(options):
 
   for path in paths.values():
     if not os.path.exists(path):
-      print " Making %s" % (path)
+      logging.debug(" Making %s", path)
       os.makedirs(path)
 
   return paths
@@ -260,17 +251,17 @@ def generate_input_files_list(options):
   
 def change_filename(filename, newext, orginaldir, destdir):
   """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
-  print "   change_filename('%s', '%s', '%s', '%s')" %(filename, newext, orginaldir, destdir)
+  logging.debug("   change_filename('%s', '%s', '%s', '%s')", filename, newext, orginaldir, destdir)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
-  print outfile_name1
+  logging.debug(outfile_name1)
   outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
-  print outfile_name2
+  logging.debug(outfile_name2)
   outfile_name3 = outfile_name2 + newext
-  print outfile_name3
+  logging.debug(outfile_name3)
   outfile_name4 = os.path.join(destdir, outfile_name3)
-  print outfile_name4
+  logging.debug(outfile_name4)
   outfile_name = os.path.normpath(outfile_name4)
-  print outfile_name
+  logging.debug(outfile_name)
   
   # make sure that the folder exists to output 
   outfile_path = os.path.dirname(outfile_name)
@@ -325,8 +316,7 @@ def process_input_stage2(file, options, files, helparray):
 
   if parser.control:
     helparray.append((parser.control, file))
-    if not options.quiet:
-      print " Control name %s"%(parser.control)
+    logging.debug(" Control name %s", parser.control)
       
   return outname
 
@@ -360,12 +350,12 @@ def process_input_stage3(file, options, files):
           dst1 = outname.replace(os.getcwd(), ".") # make into a relative path
 
         dst = os.path.normpath(dst1)
-        print " Image (%s) should be in %s and copying to %s" %( attrs[0][1], location, dst)
+        logging.debug(" Image (%s) should be in %s and copying to %s", attrs[0][1], location, dst)
         try:
           shutil.copy2(location, dst)
         except:
           traceback.print_exc()
-          print "ERROR: '%s' does not exist" % ( location )
+          logging.error(" '%s' does not exist", location )
           sys.exit(3)
 
   parser = Stage3Parser(options, files)
