@@ -18,18 +18,19 @@ class DebugParser(HTMLParser.HTMLParser):
   def handle_data(self, data):
     print " Data: %s" %( data)
 
+class Tag:
+  def __init__(self, name, attrs, data=None):
+    self.name = name
+    self.attributes = attrs
+    self.data = data
+    
 class OutputParser(HTMLParser.HTMLParser):
   """The class is designed to be used as a base class.  It will output the same html structure as the input file into a file like object (only needs write)."""
-  class Tag:
-    def __init__(self, name, attrs, data=None):
-      self.name = name
-      self.attributes = attrs
-      self.data = data
       
   def __init__(self, file, *args, **kwargs):
     HTMLParser.HTMLParser.__init__(self, *args, **kwargs)
     
-    if file.hasattr(file, 'write'):
+    if hasattr(file, 'write'):
       self.outputfile = file
     else:
       raise Exception("file is not a file like object with a write function")
@@ -37,30 +38,55 @@ class OutputParser(HTMLParser.HTMLParser):
     self.tagstack = list()
   
   def handle_starttag(self, tag, attrs):
+    print " Handle starttag: %s" %(tag)
+    print "  %s"%(attrs)
     self.tagstack.append(Tag(tag, attrs))
   def handle_startendtag(self, tag, attrs):
+    print " Handle start and end tag: %s" % (tag)
+    print "  %s"%(attrs)
     self.write_tag(Tag(tag, attrs))
   def handle_endtag(self, tagname):
     """Finds the matching tag. If the tags are miss matched, function will go down the stack until it finds the match"""
+    print " End tag: %s" %(tagname)
     tag = self.find_match(tagname)
-    
     self.write_tag(tag)
+  def handle_data(self, data):
+    print " Data: %s" %( data)
+    if len(self.tagstack) > 0:
+      tag = self.tagstack.pop()
+      if tag.data == None:
+        tag.data = data
+      else:
+        tag.data += data
+      self.tagstack.append(tag)
+    else:
+      self.outputfile.write(data)
   def find_match(self, tagtofind, indent=0):
     """Recursive function to match the tag"""
     tag = self.tagstack.pop()
-    if not tag.name == tagname:
+    if not tag.name == tagtofind:
       print "WARNING: %smismatched tag found (expected %d, found %s)" %(" "*indent, tagtofind, tag.name)
       self.write_tag(tag)
       tag = self.find_match(tagtofind)
       
     return tag
   def write_tag(self, tag):
-    """Writes tag to file passed in the constructor."""
+    """When tag stack is empty, writes tag to file passed in the constructor. When tag stack is not empty formats the tag and sets (or if the next tag.data is not None, appends) the formated string."""
     if tag.data == None:
-      self.write("<%s%s />" %(tag.name, self.format_attributes(tag)))
+      str = "<%s%s />" %(tag.name, self.format_attributes(tag))
     else:
-      self.write("<%s%s>%s</%s>" %(
-        tag.name, self.format_attributes(tag), tag.data, tag.name))
+      str = "<%s%s>%s</%s>" %(
+        tag.name, self.format_attributes(tag), tag.data, tag.name)
+        
+    if len(self.tagstack) > 0:
+      tag = self.tagstack.pop()
+      if tag.data == None:
+        tag.data = str
+      else:
+        tag.data += str
+      self.tagstack.append(tag)
+    else:
+      self.outputfile.write(str)
   def format_attributes(self, tag):
     """Returns the attributes formatted to be placed in a tag."""
     ret = ""
@@ -182,8 +208,21 @@ def build(options):
     input_files = generate_input_files_list(options)
 
     helparray = list()
+    if not options.quiet:
+      print " Processing input files:"
     for file in input_files:
-      process_input_stage1(file, options, files, helparray)
+      if not options.quiet:
+        print "  %s"%(file)
+        print "   Stage 1"
+      name1 = process_input_stage1(file, options, files)
+      if not options.quiet:
+        print "   Stage 2"
+      name2 = process_input_stage2(name1, options, files, helparray)
+      if not options.quiet:
+        print "   Stage 3"
+      name3 = process_input_stage3(name2, options, files)
+      if not options.quiet:
+        print "   Stage 4"
 
     print helparray
 
@@ -215,20 +254,23 @@ def generate_input_files_list(options):
       if os.path.splitext(file)[1] == ".help":
         # I only want the .help files
         file_list.append(os.path.join(path, file))
-
-  if not options.quiet:
-    print " Input files:"
-    for file in file_list:
-      print "  %s"%(file)
+        
+        
   return file_list
   
 def change_filename(filename, newext, orginaldir, destdir):
   """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
+  print "   change_filename('%s', '%s', '%s', '%s')" %(filename, newext, orginaldir, destdir)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
+  print outfile_name1
   outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
+  print outfile_name2
   outfile_name3 = outfile_name2 + newext
+  print outfile_name3
   outfile_name4 = os.path.join(destdir, outfile_name3)
+  print outfile_name4
   outfile_name = os.path.normpath(outfile_name4)
+  print outfile_name
   
   # make sure that the folder exists to output 
   outfile_path = os.path.dirname(outfile_name)
@@ -242,44 +284,51 @@ def change_filename(filename, newext, orginaldir, destdir):
     
   return outfile_name
 
-def process_input_stage1(file, options, files, helparray):
+def process_input_stage1(file, options, files):
   infile = open(file, mode="r")
   input = infile.read()
   infile.close()
 
   output = markdown.markdown(input)
 
-  outfile_name = change_filename(file, ".stage1", files['stage1'], options.indir)
+  outfile_name = change_filename(file, ".stage1", options.indir, files['stage1'])
   
   outfile = open(outfile_name, mode="w")
   outfile.write(output)
   outfile.close()
-  process_input_stage2(outfile_name, options, files, helparray)
-  process_input_stage3(outfile_name, options, files)
+  return outfile_name
 
 def process_input_stage2(file, options, files, helparray):
   infile = open(file, mode="r")
   input = infile.read()
   infile.close()
+  
+  outname = change_filename(file, ".stage2", files['stage1'], files['stage2'])
+  outfile = open(outname, mode="w")
 
-  class Stage2Parser(HTMLParser.HTMLParser):
-    def __init__(self):
-      HTMLParser.HTMLParser.__init__(self)
+  class Stage2Parser(OutputParser):
+    def __init__(self, *args, **kwargs):
+      OutputParser.__init__(self, *args, **kwargs)
       self.control = None
 
     def handle_starttag(self, tag, attrs):
       if tag == "meta":
         if attrs[0][0] == "name" and attrs[0][1] == "control" and attrs[1][0] == "content":
           self.control = attrs[1][1]
+      else:
+        OutputParser.handle_starttag(self, tag, attrs)
 
-  parser = Stage2Parser()
+  parser = Stage2Parser(file=outfile)
   parser.feed(input)
   parser.close()
+  outfile.close()
 
   if parser.control:
     helparray.append((parser.control, file))
     if not options.quiet:
       print " Control name %s"%(parser.control)
+      
+  return outname
 
 def process_input_stage3(file, options, files):
   infile = open(file, mode="r")
