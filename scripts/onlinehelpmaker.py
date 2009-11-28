@@ -448,7 +448,7 @@ def process_input_stage5(options, files, extrafiles):
   headerfile_name = os.path.join(files['stage5'], "header.hhp")
   headerfile = open(headerfile_name, mode="w")
   headerfile.write(
-  """Contents=%(contents)s\nIndex file=%(index)s\nTitle=%(title)s\nDefault topic=%(default)s\nCharset=UTF-8\n""" %
+  """Contents file=%(contents)s\nIndex file=%(index)s\nTitle=%(title)s\nDefault topic=%(default)s\nCharset=UTF-8\n""" %
   { "contents": "contents.hhc",
   "index": "index.hhk",
   "title": "wxLauncher User Guide",
