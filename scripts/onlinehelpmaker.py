@@ -493,18 +493,36 @@ def process_input_stage5(options, files, extrafiles):
     level = len(enum_directories(filename_in_archive))
     logging.debug(" Level %d\tLast Level %d" % (level, last_level))
     if level > last_level:
-      # increased level
+      # increased a level
+      #name is the top level directory name
+      name = enum_directories(filename_in_archive).pop()
+      # generate path and check that the index.htm for each directory exists
+      index_name = os.path.join(os.path.dirname(filename_in_archive), "index.htm")
+      #   check in stage4 because stage5 may not have processed the file yet
+      #   this way we don't give off a false negative
+      stage4_name1 = os.path.join(files['stage4'], index_name)
+      stage4_name = change_filename(stage4_name1, ".stage4", ".", ".")
+      
+      if os.path.exists(stage4_name):
+        if os.path.isfile(stage4_name):
+          pass # exists and is file we are fine
+        else:
+          logging.warning(" Index for section %s exists but is not a file at %s", name, index_name)
+      else:
+        logging.warning(" Index for section %s does not exist at %s", name, index_name)
+        
       tocfile.write(
       """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s</object>\n%(tab)s\t<ul>\n""" % {
       "tab": "\t"*toclevel,
-      "name": enum_directories(filename_in_archive).pop(),
-      "file": "index.htm" })
+      "name": name,
+      "file": index_name })
       toclevel += 1
     elif level < last_level:
       # decreased level
       tocfile.write("""%(tab)s</ul>\n""" % { tab: "\t"*toclevel })
       toclevel -= 1
     last_level = level
+    
     tocfile.write(
     """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
     "tab": "\t"*toclevel,
