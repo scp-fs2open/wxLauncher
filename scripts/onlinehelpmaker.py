@@ -208,6 +208,7 @@ def build(options):
     input_files = generate_input_files_list(options)
 
     helparray = list()
+    extrafiles = list()
     logging.info(" Processing input files:")
     for file in input_files:
       logging.info("  %s", file)
@@ -218,16 +219,14 @@ def build(options):
       name2 = process_input_stage2(name1, options, files, helparray)
       
       logging.info("   Stage 3")      
-      name3 = process_input_stage3(name2, options, files)
+      name3 = process_input_stage3(name2, options, files, extrafiles)
       
       logging.info("   Stage 4")
       name4 = process_input_stage4(name3, options, files)
       
     
-    logging.info("   Stage 5")
-    process_input_stage5(options, files, list())
-
-    print helparray
+    logging.info(" Stage 5")
+    process_input_stage5(options, files, extrafiles)
 
 
 def generate_paths(options):
@@ -339,16 +338,17 @@ def process_input_stage2(file, options, files, helparray):
       
   return outname
 
-def process_input_stage3(file, options, files):
+def process_input_stage3(file, options, files, extrafiles):
   infile = open(file, mode="r")
   input = infile.read()
   infile.close()
 
   class Stage3Parser(OutputParser):
-    def __init__(self, options, files, *args, **kwargs):
+    def __init__(self, options, files, extrafiles, *args, **kwargs):
       OutputParser.__init__(self, *args, **kwargs)
       self.options = options
       self.files = files
+      self.extrafiles = extrafiles
 
     def handle_startendtag(self, tag, attrs):
       """Find the image and copy it to the stage3 folder where it should
@@ -377,11 +377,12 @@ def process_input_stage3(file, options, files):
           traceback.print_exc()
           logging.error(" '%s' does not exist", location )
           sys.exit(3)
+        self.extrafiles.append(dst)
       OutputParser.handle_startendtag(self, tag, attrs)
 
   outname = change_filename(file, ".stage3", files['stage2'], files['stage3'])
   outfile = open(outname, mode="w")
-  parser = Stage3Parser(options, files, file=outfile)
+  parser = Stage3Parser(options, files, file=outfile, extrafiles=extrafiles)
   parser.feed(input)
   parser.close()
   outfile.close()
@@ -524,6 +525,13 @@ def process_input_stage5(options, files, extrafiles):
   tocfile.close()
   indexfile.write("</ul>")
   indexfile.close()
+  
+  # copy the extra files (i.e. images) from stage3
+  for extrafilename in extrafiles:
+    logging.debug(" Copying: %s", extrafilename)
+    dst = change_filename(extrafilename, None, orginaldir=files['stage3'], destdir=files['stage5'])
+    shutil.copy2(extrafilename, dst)
+    
   
 def enum_directories(dir):
   ret = os.path.dirname(dir).split(os.path.sep)
