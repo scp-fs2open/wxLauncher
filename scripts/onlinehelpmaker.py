@@ -1,4 +1,4 @@
-import sqlite3, os, sys, tempfile, atexit, traceback, shutil
+import sqlite3, os, sys, tempfile, atexit, traceback, shutil, zipfile
 from optparse import OptionParser
 
 import logging
@@ -227,7 +227,11 @@ def build(options):
     
     logging.info(" Stage 5")
     process_input_stage5(options, files, extrafiles)
-
+    
+    logging.info(" Stage 6")
+    process_input_stage6(options, files)
+    
+    logging.log(NOTICE, "....Done.")
 
 def generate_paths(options):
   """Generates the names of the paths that will be needed by the compiler during it's run, storing them in a dictionary that is returned."""
@@ -549,7 +553,28 @@ def process_input_stage5(options, files, extrafiles):
     logging.debug(" Copying: %s", extrafilename)
     dst = change_filename(extrafilename, None, orginaldir=files['stage3'], destdir=files['stage5'])
     shutil.copy2(extrafilename, dst)
+
+def process_input_stage6(options, stage_dirs):
+  #make sure that the directories exist before creating file
+  outfile_path = os.path.dirname(options.outfile)
+  if os.path.exists(outfile_path):
+    if os.path.isdir(outfile_path):
+      pass
+    else:
+      log.error(" %s exists but is not a directory", outfile_path)
+  else:
+    os.makedirs(outfile_path)
     
+  outzip = zipfile.ZipFile(options.outfile, mode="w", compression=zipfile.ZIP_DEFLATED)
+  
+  for path, dirs, files in os.walk(stage_dirs['stage5']):
+    for filename in files:
+      full_filename = os.path.join(path, filename)
+      arcname = change_filename(full_filename, None, stage_dirs['stage5'], ".", False)
+      logging.debug(" Added %s as %s", full_filename, arcname)
+      outzip.write(full_filename, arcname)
+  
+  outzip.close()  
   
 def enum_directories(dir):
   ret = os.path.dirname(dir).split(os.path.sep)
