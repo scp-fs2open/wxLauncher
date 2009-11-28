@@ -268,9 +268,12 @@ def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
   logging.debug("   change_filename('%s', '%s', '%s', '%s', %s)", filename, newext, orginaldir, destdir, makedirs)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
   logging.debug(outfile_name1)
-  outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
-  logging.debug(outfile_name2)
-  outfile_name3 = outfile_name2 + newext
+  if newext == None:
+    outfile_name3 = outfile_name1
+  else:
+    outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
+    logging.debug(outfile_name2)
+    outfile_name3 = outfile_name2 + newext
   logging.debug(outfile_name3)
   outfile_name4 = os.path.join(destdir, outfile_name3)
   logging.debug(outfile_name4)
