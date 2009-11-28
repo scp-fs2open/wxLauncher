@@ -198,7 +198,7 @@ def build(options):
     stage2: Parses and strips the output of stage1 to build the list that will be made into the c-array that contains the compiled names for the detailed help of each control.
     stage3: Parses the output of stage2 to grab the images that are refered to in the the output of stage1
     stage4: Parses the output of stage1 to fix the relative hyperlinks in the output so that they will refer correctly to the correct files when in output file.
-    stage5: Generate the index and table of contents for the output file.
+    stage5: Generate the index and table of contents for the output file from the output of stage4.
     stage6: Zip up the output of stage5 and put it in the output location.
     """
   logging.log(NOTICE, "Building...")
@@ -212,18 +212,20 @@ def build(options):
     for file in input_files:
       logging.info("  %s", file)
       logging.info("   Stage 1")
-      
       name1 = process_input_stage1(file, options, files)
+      
       logging.info("   Stage 2")
-      
       name2 = process_input_stage2(name1, options, files, helparray)
-      logging.info("   Stage 3")
       
+      logging.info("   Stage 3")      
       name3 = process_input_stage3(name2, options, files)
-      logging.info("   Stage 4")
       
+      logging.info("   Stage 4")
       name4 = process_input_stage4(name3, options, files)
-      logging.info("   Stage 5")
+      
+    
+    logging.info("   Stage 5")
+    process_input_stage5(options, files, list())
 
     print helparray
 
@@ -248,15 +250,17 @@ def should_build(options, files):
 
 def generate_input_files_list(options):
   """Returns a list of all input (.help) files that need to be parsed by markdown."""
+  return generate_file_list(options.indir, ".help")
+
+def generate_file_list(directory, extension):
   file_list = list()
 
-  for path, dirs, files in os.walk(options.indir):
+  for path, dirs, files in os.walk(directory):
     for file in files:
-      if os.path.splitext(file)[1] == ".help":
+      if os.path.splitext(file)[1] == extension:
         # I only want the .help files
         file_list.append(os.path.join(path, file))
-        
-        
+  
   return file_list
   
 def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
@@ -426,6 +430,104 @@ def process_input_stage4(file, options, files):
   outfile.close()  
   
   return outname
+  
+def process_input_stage5(options, files, extrafiles):
+  """Generate the index and table of contents for the output file from the output of stage4."""
+  class Stage5Parser(OutputParser):
+    def __init__(self, *args, **kwargs):
+      OutputParser.__init__(self, *args, **kwargs)
+      self.title = "Untitled"
+    def handle_endtag(self, tag):
+      if tag == "title":
+        t = self.tagstack.pop()
+        self.title = t.data
+        self.tagstack.append(t)
+      OutputParser.handle_endtag(self, tag)
+  
+  # write header file
+  headerfile_name = os.path.join(files['stage5'], "header.hhp")
+  headerfile = open(headerfile_name, mode="w")
+  headerfile.write(
+  """Contents=%(contents)s\nIndex file=%(index)s\nTitle=%(title)s\nDefault topic=%(default)s\nCharset=UTF-8\n""" %
+  { "contents": "contents.hhc",
+  "index": "index.hhk",
+  "title": "wxLauncher User Guide",
+  "default": "index.htm"
+  })
+  headerfile.close()
+  
+  # generate both index and table of contents
+  tocfile_name = os.path.join(files['stage5'], "contents.hhc")
+  tocfile = open(tocfile_name, mode="w")
+  tocfile.write("<ul>\n")
+  toclevel = 1
+  
+  indexfile_name = os.path.join(files['stage5'], "index.hhk")
+  indexfile = open(indexfile_name, mode="w")
+  indexfile.write("<ul>\n")
+  
+  help_files = generate_file_list(files['stage4'], ".stage4")
+  level = 0
+  last_level = 0
+  for file in help_files:
+    # find the title
+    outfile_name = change_filename(file, ".htm", files['stage4'], files['stage5'])
+    outfile = open(outfile_name, mode="w")
+    
+    infile = open(file, mode="r")
+    input = infile.read()
+    infile.close()
+    
+    parser = Stage5Parser(file=outfile)
+    parser.feed(input)
+    parser.close()
+    outfile.close()
+    
+    # relativize filename for being in the archive
+    filename_in_archive = change_filename(file, ".htm", files['stage4'], ".", False)
+    
+    level = len(enum_directories(filename_in_archive))
+    logging.debug(" Level %d\tLast Level %d" % (level, last_level))
+    if level > last_level:
+      # increased level
+      tocfile.write(
+      """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s</object>\n%(tab)s\t<ul>\n""" % {
+      "tab": "\t"*toclevel,
+      "name": enum_directories(filename_in_archive).pop(),
+      "file": "index.htm" })
+      toclevel += 1
+    elif level < last_level:
+      # decreased level
+      tocfile.write("""%(tab)s</ul>\n""" % { tab: "\t"*toclevel })
+      toclevel -= 1
+    last_level = level
+    tocfile.write(
+    """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
+    "tab": "\t"*toclevel,
+    "name": parser.title,
+    "file": filename_in_archive, })
+    
+    indexfile.write(
+    """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
+    "tab": "\t",
+    "name": parser.title,
+    "file": filename_in_archive, })
+    
+  while toclevel > 0:
+    tocfile.write("%s</ul>\n" % ( "\t"*(toclevel-1)))
+    toclevel -= 1
+  
+  
+  tocfile.close()
+  indexfile.write("</ul>")
+  indexfile.close()
+  
+def enum_directories(dir):
+  ret = os.path.dirname(dir).split(os.path.sep)
+  if len(ret) == 1 and len(ret[0]) == 0:
+    ret = list()
+  logging.debug(" Enum directories %s", str(ret))
+  return ret
   
 if __name__ == "__main__":
   main(sys.argv)
