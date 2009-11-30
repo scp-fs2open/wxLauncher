@@ -54,16 +54,16 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
 	rootFolderSizer->Add(rootFolderText);
-	rootFolderSizer->Add(rootFolderBox);
+	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1));
 	rootFolderSizer->Add(selectButton);
 
 	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
 	selectExeSizer->Add(useExeText);
-	selectExeSizer->Add(useExeChoice);
+	selectExeSizer->Add(useExeChoice, wxSizerFlags().Proportion(1));
 
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxVERTICAL);
-	exeSizer->Add(rootFolderSizer);
-	exeSizer->Add(selectExeSizer);
+	exeSizer->Add(rootFolderSizer, wxSizerFlags().Expand());
+	exeSizer->Add(selectExeSizer,  wxSizerFlags().Expand());
 
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, ID_VIDEO_STATIC_BOX, _("Video"));
@@ -448,7 +448,6 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 	// Final Layout
 	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
-	leftColumnSizer->Add(exeSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(videoSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
@@ -458,9 +457,14 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	rightColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
 	rightColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
 
-	wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-	sizer->Add(leftColumnSizer);
-	sizer->Add(rightColumnSizer);
+	wxBoxSizer* columnsSizer = new wxBoxSizer(wxHORIZONTAL);
+	columnsSizer->Add(leftColumnSizer);
+	columnsSizer->Add(rightColumnSizer);
+
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	exeSizer->SetMinSize(TAB_AREA_WIDTH, -1);
+	sizer->Add(exeSizer);
+	sizer->Add(columnsSizer);
 
 	this->SetSizer(sizer);
 	this->Layout();
