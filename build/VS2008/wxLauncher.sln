@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxLauncher", "wxLauncher.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "version info", "version info.vcproj", "{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Online Help Maker", "Online Help Maker.vcproj", "{0952C69B-635A-491E-9718-21753723547C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +24,10 @@ Global
 		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Debug|Win32.Build.0 = Debug|Win32
 		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Release|Win32.ActiveCfg = Release|Win32
 		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}.Release|Win32.Build.0 = Release|Win32
+		{0952C69B-635A-491E-9718-21753723547C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0952C69B-635A-491E-9718-21753723547C}.Debug|Win32.Build.0 = Debug|Win32
+		{0952C69B-635A-491E-9718-21753723547C}.Release|Win32.ActiveCfg = Release|Win32
+		{0952C69B-635A-491E-9718-21753723547C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
