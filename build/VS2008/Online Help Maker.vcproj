@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="Online Help Maker"
+	ProjectGUID="{0952C69B-635A-491E-9718-21753723547C}"
+	RootNamespace="Online Help Maker"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="196613"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="..\..\output\VS2008\$(ConfigurationName)"
+			IntermediateDirectory="$(InputName)\$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="python ..\..\scripts\onlinehelpmaker.py build $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				ReBuildCommandLine="python ..\..\scripts\onlinehelpmaker.py rebuild $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				CleanCommandLine="python ..\..\scripts\onlinehelpmaker.py clean $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				Output="help.htb"
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="python ..\..\scripts\onlinehelpmaker.py build $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				ReBuildCommandLine="python ..\..\scripts\onlinehelpmaker.py rebuild $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				CleanCommandLine="python ..\..\scripts\onlinehelpmaker.py clean $(OutDir)\$(TargetFileName) ..\..\onlinehelp -t &quot;$(IntDir)&quot; -c ..\..\generated\helplinks.cpp"
+				Output="help.htb"
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
