@@ -134,7 +134,7 @@ def main(argv):
 
     def cleanup(dir):
       if os.path.exists(dir):
-        os.rmdir(dir)
+        shutil.rmtree(options.temp, ignore_errors=True)
 
     atexit.register(cleanup, options.temp)
 
@@ -182,7 +182,7 @@ def clean(options):
   logging.info("Removing workdirectory: %s", options.temp )
   if os.path.exists(options.temp):
     if os.path.isdir(options.temp):
-      shutil.rmtree(options.temp, ignore_errors=True)
+      shutil.rmtree(options.temp)
     else:
       logging.error("tempdir is not a file. Make sure your parameters are in the correct order")
       sys.exit(2)
