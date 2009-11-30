@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\HelpManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\InstallPage.cpp"
 				>
 			</File>
@@ -275,6 +279,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\BottomButtons.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\HelpManager.h"
 				>
 			</File>
 			<File
@@ -388,11 +396,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 		</Filter>
