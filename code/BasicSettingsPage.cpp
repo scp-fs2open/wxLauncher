@@ -476,6 +476,8 @@ BasicSettingsPage::~BasicSettingsPage() {
 	if ( SpeechMan::IsInitialized() ) {
 		SpeechMan::DeInitialize();
 	}
+	JoyMan::DeInitialize();
+	OpenALMan::DeInitialize();
 }
 
 /// Event Handling
