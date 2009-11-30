@@ -539,7 +539,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		}
 		chosenDirectory = filechooser.GetPath();
 		if ( chosenDirectory == directory ) {
-			wxLogInfo(_T("The same was not changed."));
+			wxLogInfo(_T("The exe folder selection was not changed."));
 			return; // User canceled, bail out.
 		}
 		path.SetPath(chosenDirectory);
