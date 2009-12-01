@@ -38,8 +38,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\..\output\VS2008\$(ConfigurationName)"
+			IntermediateDirectory="$(InputName)\$(ConfigurationName)"
 			ConfigurationType="0"
 			>
 			<Tool
