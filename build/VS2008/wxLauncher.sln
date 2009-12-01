@@ -4,6 +4,7 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxLauncher", "wxLauncher.vcproj", "{5E765B3D-4935-4D4F-B863-7F80E2EC291F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD} = {F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}
+		{0952C69B-635A-491E-9718-21753723547C} = {0952C69B-635A-491E-9718-21753723547C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "version info", "version info.vcproj", "{F8D50D0C-7D90-4AE9-A0DB-A30DB0B127CD}"
