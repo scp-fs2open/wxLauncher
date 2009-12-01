@@ -10,6 +10,7 @@ namespace HelpManager {
 	bool IsInitialized();
 
 	void OpenHelpById(WindowIDS id);
+	void OpenMainHelpPage();
 };
 
 #endif
