@@ -14,6 +14,7 @@
 #include "Skin.h"
 #include "Logger.h"
 #include "StatusBar.h"
+#include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -21,6 +22,7 @@
 	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
 
 MainWindow::MainWindow(SkinSystem* skin) {
+	this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
 		wxDefaultPosition, wxSize(800, 600), MAINWINDOW_STYLE);
 
@@ -74,6 +76,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_UPDATE_BUTTON, MainWindow::OnUpdate)
 	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnStartFS)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
+	EVT_HELP(wxID_ANY, MainWindow::OnHelp)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -95,4 +98,7 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("About"));
 }
 
+void MainWindow::OnHelp(wxHelpEvent& event) {
+	HelpManager::OpenHelpById((WindowIDS)event.GetId());
+}
 
