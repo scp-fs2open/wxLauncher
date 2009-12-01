@@ -24,6 +24,7 @@ Logger::Logger() {
 
 	this->out = new wxFFileOutputStream(_T("wxLauncher.log"), _T("wb"));
 	wxASSERT_MSG(out->IsOk(), _T("Log output file is not valid!"));
+	this->out->Write("\357\273\277", 3);
 
 	this->statusBar = NULL;
 }
