@@ -1,11 +1,14 @@
 #include <wx/wx.h>
 #include <wx/image.h>
+#include <wx/filesys.h>
+#include <wx/fs_arc.h>
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
 #include "Skin.h"
 #include "Logger.h"
 #include "version.h"
 #include "ProfileManager.h"
+#include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -32,6 +35,9 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("Initing Skin System..."));
 	this->skin = new SkinSystem();
 
+	wxFileSystem::AddHandler(new wxArchiveFSHandler);
+	HelpManager::Initialize();
+
 	wxLogInfo(_T("wxLauncher Starting up."));
 
 
@@ -49,6 +55,7 @@ int wxLauncher::OnExit() {
 	}
 
 	ProMan::DeInitialize();
+	HelpManager::DeInitialize();
 
 	wxLogInfo(_T("wxLogger shutdown complete."));
 

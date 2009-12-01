@@ -17,6 +17,7 @@ public:
 	void OnStartFred(wxCommandEvent& WXUNUSED(event));
 	void OnUpdate(wxCommandEvent& WXUNUSED(event));
 	void OnAbout(wxCommandEvent& WXUNUSED(event));
+	void OnHelp(wxHelpEvent& event);
 
 private:
 	wxToolbook* mainTab;

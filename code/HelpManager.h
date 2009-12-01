@@ -7,6 +7,7 @@
 namespace HelpManager {
 	bool Initialize();
 	bool DeInitialize();
+	bool IsInitialized();
 
 	void OpenHelpById(WindowIDS id);
 };
