@@ -63,3 +63,8 @@ void HelpManager::OpenHelpById(WindowIDS id) {
 	}
 	::wxLogInfo(_T(" ID %d does not have more specific help"), id);
 }
+
+void HelpManager::OpenMainHelpPage() {
+	wxCHECK_RET( HelpManager::IsInitialized(), _T("Help is not initialized"));
+	HelpManager::controller->DisplayContents();
+}

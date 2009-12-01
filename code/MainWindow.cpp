@@ -83,7 +83,11 @@ void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Quit"));
 }
 void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("Help"));
+	if (HelpManager::IsInitialized()) {
+		HelpManager::OpenMainHelpPage();
+	} else {
+		wxLogWarning(_("Help Manager is not initialized"));
+	}
 }
 void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Start Fred"));
