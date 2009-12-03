@@ -357,7 +357,7 @@ void ModList::readTranslation(ConfigHash::mapped_type config, wxString langaugen
 		*trans = new I18nItem();
 
 		readIniFileString(config, wxString::Format(_T("%s/modname"), section),
-			&((*trans)->infotext));
+			&((*trans)->modname));
 		readIniFileString(config, wxString::Format(_T("%s/infotext"), section),
 			&((*trans)->infotext));
 
