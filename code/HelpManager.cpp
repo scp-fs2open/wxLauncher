@@ -42,6 +42,7 @@ bool HelpManager::Initialize() {
 bool HelpManager::DeInitialize() {
 	if ( HelpManager::IsInitialized()) {
 		HelpManager::initialized = false;
+		delete controller;
 	}
 	return true;
 }
