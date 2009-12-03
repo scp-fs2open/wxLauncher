@@ -199,7 +199,6 @@ void WelcomePage::OnMouseOut(wxMouseEvent &WXUNUSED(event)) {
 	StatusBar *bar = dynamic_cast<StatusBar*>(frame->GetStatusBar());
 	wxASSERT( bar != NULL );
 	bar->EndToolTipStatusText();
-	this->lastLinkInfo = NULL;
 }
 
 /** Calls the dialogs for cloning, saving or deleting profiles. */
