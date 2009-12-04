@@ -110,6 +110,10 @@ enum ProfileDialogReturnValues {
 #define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles")
 #define GBL_CFG_MAIN_LASTPROFILE			_T("/main/lastprofile")
 
+#define GBL_CFG_PROXY_TYPE					_T("/proxy/type")	// string
+#define GBL_CFG_PROXY_SERVER				_T("/proxy/server")	// string
+#define GBL_CFG_PROXY_PORT					_T("/proxy/port")	// int
+
 // Keys used in profiles
 #define PRO_CFG_MAIN_NAME					_T("/main/name")
 #define PRO_CFG_MAIN_FILENAME				_T("/main/filename")
