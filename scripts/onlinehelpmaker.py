@@ -379,6 +379,13 @@ def process_input_stage2(file, options, files, helparray):
           self.control = attrs[1][1]
       else:
         OutputParser.handle_starttag(self, tag, attrs)
+    
+    def handle_startendtag(self, tag, attrs):
+      if tag == "meta":
+        if attrs[0][0] == "name" and attrs[0][1] == "control" and attrs[1][0] == "content":
+          self.control = attrs[1][1]
+      else:
+        OutputParser.handle_startendtag(self, tag, attrs)
 
   parser = Stage2Parser(file=outfile)
   parser.feed(input)
@@ -386,7 +393,7 @@ def process_input_stage2(file, options, files, helparray):
   outfile.close()
 
   if parser.control:
-    filename_in_archive = change_filename(outname, ".htm", files['stage2'], ".")
+    filename_in_archive = change_filename(outname, ".htm", files['stage2'], ".", makedirs=False)
     helparray.append((parser.control, filename_in_archive))
     logging.debug(" Control name %s", parser.control)
       
