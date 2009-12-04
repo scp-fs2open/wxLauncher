@@ -102,6 +102,9 @@ def main(argv):
     default=False, help="print debugging information to the screen")
   parser.add_option("-c", "--cfile", default=None, dest="carrayfilename", 
   metavar="FILE", help="filename to output the c array to. Defaults to same folder as outfile.")
+  parser.add_option("-a", "--alwaysbuild", action="store_true",
+    default=False, dest="always_build",
+    help="when building, builder should always build source files. (Usally used with filesystems that do not update the modified time)")
 
   (options, args) = parser.parse_args(argv)
 
@@ -269,7 +272,34 @@ def generate_paths(options):
 
 def should_build(options, files):
   """Checks the all of the files touched by the compiler to see if we need to rebuild. Returns True if so."""
-  return True
+  if options.always_build:
+    return True
+  elif not os.path.exists(options.outfile):
+    return True
+  elif check_source_newer_than_outfile(options, files):
+    return True
+  return False
+  
+def check_source_newer_than_outfile(options, files):
+  """Checks to see if any file in the source directory is newer than the output file."""
+  try:
+    outfile_time = os.path.getmtime(options.outfile)
+    
+    for dirpath, dirnames, filenames in os.walk(options.indir):
+      for file in filenames:
+        filepath = os.path.join(dirpath, file)
+        if os.path.getmtime(filepath) > outfile_time:
+          logging.info("%s has been changed since outfile. Causing build", filepath)
+          return True
+        elif os.path.getctime(filepath) > outfile_time:
+          logging.info("%s has been created since outfile. Causing build", filepath)
+          return True
+    
+  except OSError:
+    logging.warning("Encountered a file (%s) that the os does not like. Forcing build.", "TODO")
+    return True
+  return False
+    
 
 def generate_input_files_list(options):
   """Returns a list of all input (.help) files that need to be parsed by markdown."""
