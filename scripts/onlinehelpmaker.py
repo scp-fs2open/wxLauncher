@@ -507,6 +507,11 @@ def process_input_stage5(options, files, extrafiles):
         t = self.tagstack.pop()
         self.title = t.data
         self.tagstack.append(t)
+      elif tag == "h1" and self.title == "Untitled":
+        # make first h1 tag found into the title, will be overwritten by a title tag if it exists.
+        t = self.tagstack.pop()
+        self.title = t.data
+        self.tagstack.append(t)
       OutputParser.handle_endtag(self, tag)
   
   # write header file
