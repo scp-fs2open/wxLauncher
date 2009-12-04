@@ -276,7 +276,7 @@ void TCManager::GenerateTCChanged() {
 		wxEvtHandler* current = *iter;
 		current->ProcessEvent(event);
 		iter++;
-		wxLogDebug(_T(" Sent event"));
+		wxLogDebug(_T(" Sent event to %p"), iter);
 	}
 }
 void TCManager::GenerateTCBinaryChanged() {
@@ -287,7 +287,7 @@ void TCManager::GenerateTCBinaryChanged() {
 		wxEvtHandler* current = *iter;
 		current->ProcessEvent(event);
 		iter++;
-		wxLogDebug(_T(" Sent event"));
+		wxLogDebug(_T(" Sent event to %p"), iter);
 	}
 }
 void TCManager::GenerateTCSelectedModChanged() {
@@ -298,7 +298,7 @@ void TCManager::GenerateTCSelectedModChanged() {
 		wxEvtHandler* current = *iter;
 		current->ProcessEvent(event);
 		iter++;
-		wxLogDebug(_T(" Sent event"));
+		wxLogDebug(_T(" Sent event to %p"), iter);
 	}
 }
 

@@ -606,6 +606,7 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->executablename);
+	TCManager::GenerateTCBinaryChanged();
 }
 
 void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &WXUNUSED(event)) {

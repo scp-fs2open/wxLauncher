@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include <wx/clntdata.h>
+#include <wx/filename.h>
 
 class FSOVersion: public wxClientData {
 public:

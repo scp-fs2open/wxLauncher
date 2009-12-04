@@ -9,6 +9,11 @@ public:
 private:
 	wxButton *close, *help, *fred, *update, *play;
 
+public:
+	void OnTCChanges(wxCommandEvent &event);
+
+	DECLARE_EVENT_TABLE()
+
 };
 
 #endif

@@ -1,8 +1,11 @@
 #include <wx/wx.h>
 #include "wxIDS.h"
 #include "BottomButtons.h"
+#include "TCManager.h"
+#include "ProfileManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
+
 
 BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxPanel(
 	parent, wxID_ANY, pos, size) {
@@ -22,4 +25,28 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 
 		this->SetSizer(sizer);
 		this->Layout();
+
+		TCManager::RegisterTCBinaryChanged(this);
+		TCManager::RegisterTCChanged(this);
+		wxCommandEvent nullEvent;
+		this->OnTCChanges(nullEvent);
+}
+
+BEGIN_EVENT_TABLE(BottomButtons, wxPanel)
+EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BottomButtons::OnTCChanges)
+EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BottomButtons::OnTCChanges)
+END_EVENT_TABLE()
+
+void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
+	wxString tc, binary;
+	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tc, wxEmptyString);
+	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
+	if ( tc.IsEmpty() || binary.IsEmpty() ) {
+		this->play->Disable();
+	} else if ( wxFileName(tc, binary).FileExists() ) {
+		this->play->Enable();
+	} else {
+		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName());
+		this->play->Disable();
+	}
 }
