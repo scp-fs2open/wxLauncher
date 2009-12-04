@@ -1,5 +1,6 @@
 #include <wx/wx.h>
 #include <wx/filename.h>
+#include <wx/choicebk.h>
 
 #include "BasicSettingsPage.h"
 #include "wxIDS.h"
@@ -10,6 +11,21 @@
 #include "JoystickManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
+
+class ProxyChoice: public wxChoicebook {
+public:
+	ProxyChoice(wxWindow *parent, wxWindowID id);
+	virtual ~ProxyChoice();
+
+	void OnChangeServer(wxCommandEvent &event);
+	void OnChangePort(wxCommandEvent &event);
+	void OnProxyTypeChange(wxChoicebookEvent &event);
+
+private:
+
+
+	DECLARE_EVENT_TABLE();
+};
 
 class ExeChoice: public wxChoice {
 public:
@@ -419,32 +435,10 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	// Proxy
 	wxStaticBox* proxyBox = new wxStaticBox(this, wxID_ANY, _("Proxy"));
 
-	wxStaticText* proxyTypeText = new wxStaticText(this, wxID_ANY, _("Type:"));
-	wxComboBox* proxyType = new wxComboBox(this, ID_PROXY_TYPE, _("None"));
-
-	wxStaticText* proxyHttpText = new wxStaticText(this, wxID_ANY, _("HTTP Proxy:"));
-	wxTextCtrl* proxyHttpServer = new wxTextCtrl(this, ID_PROXY_HTTP_SERVER, _(""));
-	wxStaticText* proxyHttpPortText = new wxStaticText(this, wxID_ANY, _("Port:"));
-	wxTextCtrl* proxyHttpPort = new wxTextCtrl(this, ID_PROXY_HTTP_PORT, _(""));
-
-	wxStaticText* proxyAutoText = new wxStaticText(this, wxID_ANY, _("Auto Proxy Config URL:"));
-	wxTextCtrl* proxyAuto = new wxTextCtrl(this, ID_PROXY_AUTO_URL, _(""));
-
-	wxBoxSizer* proxyTypeSizer = new wxBoxSizer(wxHORIZONTAL);
-	proxyTypeSizer->Add(proxyTypeText);
-	proxyTypeSizer->Add(proxyType);
-
-	wxBoxSizer* proxyPortSizer = new wxBoxSizer(wxHORIZONTAL);
-	proxyPortSizer->Add(proxyHttpPortText);
-	proxyPortSizer->Add(proxyHttpPort);
+	wxChoicebook* proxyChoice = new ProxyChoice(this, ID_PROXY_TYPE);
 
 	wxStaticBoxSizer* proxySizer = new wxStaticBoxSizer(proxyBox, wxVERTICAL);
-	proxySizer->Add(proxyTypeSizer);
-	proxySizer->Add(proxyHttpText);
-	proxySizer->Add(proxyHttpServer);
-	proxySizer->Add(proxyPortSizer);
-	proxySizer->Add(proxyAutoText);
-	proxySizer->Add(proxyAuto, wxSizerFlags().Expand());
+	proxySizer->Add(proxyChoice, wxSizerFlags().Expand());
 
 	// Final Layout
 	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
@@ -1086,3 +1080,90 @@ void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
 		}
 }
 
+//////////// ProxyChoice
+ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
+:wxChoicebook(parent, id) {
+	wxString type;
+	ProMan::GetProfileManager()->Global()
+		->Read(GBL_CFG_PROXY_TYPE, &type, _T("none"));
+
+	wxPanel* noneProxyPanel = new wxPanel(this);
+	this->AddPage(noneProxyPanel, _("None"));
+
+	/// Manual Proxy
+	wxPanel* manualProxyPanel = new wxPanel(this);
+	wxStaticText* proxyHttpText = new wxStaticText(manualProxyPanel, wxID_ANY, _("HTTP Proxy:"));
+	wxString server;
+	ProMan::GetProfileManager()->Global()
+		->Read(GBL_CFG_PROXY_SERVER, &server, _T(""));
+	wxTextCtrl* proxyHttpServer = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_SERVER, server);
+	wxStaticText* proxyHttpPortText = new wxStaticText(manualProxyPanel, wxID_ANY, _("Port:"));
+
+	int port;
+	ProMan::GetProfileManager()->Global()
+		->Read(GBL_CFG_PROXY_PORT, &port, 0);
+	wxTextCtrl* proxyHttpPort = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_PORT, wxString::Format(_T("%d"), port));
+
+	wxBoxSizer* manualProxyPortSizer = new wxBoxSizer(wxHORIZONTAL);
+	manualProxyPortSizer->Add(proxyHttpPortText);
+	manualProxyPortSizer->Add(proxyHttpPort, wxSizerFlags().Proportion(1));
+
+	wxBoxSizer* manualProxySizer = new wxBoxSizer(wxVERTICAL);
+	manualProxySizer->Add(proxyHttpText);
+	manualProxySizer->Add(proxyHttpServer, wxSizerFlags().Expand());
+	manualProxySizer->Add(manualProxyPortSizer, wxSizerFlags().Expand());
+	manualProxySizer->SetContainingWindow(this);
+	manualProxyPanel->SetSizer(manualProxySizer);
+
+	this->AddPage(manualProxyPanel, _T("Manual"));
+
+	if ( type == _T("manual") ) {
+		this->SetSelection(1);
+	} else {
+		this->SetSelection(0);
+	}
+}
+
+ProxyChoice::~ProxyChoice() {
+}
+
+BEGIN_EVENT_TABLE(ProxyChoice, wxChoicebook)
+EVT_TEXT(ID_PROXY_HTTP_SERVER, ProxyChoice::OnChangeServer)
+EVT_TEXT(ID_PROXY_HTTP_PORT, ProxyChoice::OnChangePort)
+EVT_CHOICEBOOK_PAGE_CHANGED(ID_PROXY_TYPE, ProxyChoice::OnProxyTypeChange)
+END_EVENT_TABLE()
+
+void ProxyChoice::OnChangeServer(wxCommandEvent &event) {
+	wxString str = event.GetString();
+
+	if ( str == wxEmptyString ) {
+		// do nothing
+	} else {
+		ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_SERVER, str);
+	}
+}
+
+void ProxyChoice::OnChangePort(wxCommandEvent &event) {
+	int port = event.GetInt();
+
+	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_PORT, port);
+}
+
+void ProxyChoice::OnProxyTypeChange(wxChoicebookEvent &event) {
+	int page = event.GetSelection();
+	wxString str;
+
+	switch (page) {
+		case 0:
+			str = _T("none");
+			break;
+		case 1:
+			str = _T("manual");
+			break;
+		default:
+			wxFAIL_MSG(wxString::Format(_T("Proxy type changed to invalid id %d"), page));
+			return;
+	}
+
+	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_TYPE, str);
+}
