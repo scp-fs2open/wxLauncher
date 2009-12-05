@@ -9,6 +9,7 @@
 #include "SpeechManager.h"
 #include "OpenALManager.h"
 #include "JoystickManager.h"
+#include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -826,8 +827,7 @@ void BasicSettingsPage::OnToggleSpeechInGame(wxCommandEvent &event) {
 }
 
 void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
-	this->OpenNonSCPWebSite(_T("http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en"));
+	HelpManager::OpenHelpById(ID_SPEECH_MORE_VOICES_BUTTON);
 }
 
 void BasicSettingsPage::OnChangeIP(wxCommandEvent &event) {
