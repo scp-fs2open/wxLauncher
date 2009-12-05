@@ -1,4 +1,5 @@
 build
+personal
 glob:code/version.cpp
 glob:generated
 glob:output
