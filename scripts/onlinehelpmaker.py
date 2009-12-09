@@ -584,14 +584,14 @@ def process_input_stage5(options, files, extrafiles):
         logging.warning("Directory %s does not have an index.help", path_in_arc)
     
     for file in thefiles:
+      full_filename = os.path.join(path, file)
       # relativize filename for being in the archive
-      filename_in_archive = change_filename(file, ".htm", files['stage4'], ".", False)
+      filename_in_archive = change_filename(full_filename, ".htm", files['stage4'], ".", False)
       # find the title
-      outfile_name = change_filename(file, ".htm", files['stage4'], files['stage5'])
+      outfile_name = change_filename(full_filename, ".htm", files['stage4'], files['stage5'])
       outfile = open(outfile_name, mode="w")
       
-      infile_name = os.path.join(path, file)
-      infile = open(infile_name, mode="r")
+      infile = open(full_filename, mode="r")
       input = infile.read()
       infile.close()
       
