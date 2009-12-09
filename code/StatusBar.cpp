@@ -1,6 +1,6 @@
 #include <wx/wx.h>
 #include "StatusBar.h"
-#include "wxIDS.h"
+#include "ids.h"
 #include "logger.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging

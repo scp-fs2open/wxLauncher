@@ -2,7 +2,7 @@
 #define HELPMANAGER_H
 
 #include <wx/wx.h>
-#include "wxIDS.h"
+#include "ids.h"
 
 namespace HelpManager {
 	bool Initialize();

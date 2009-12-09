@@ -8,7 +8,7 @@
 #include <wx/dir.h>
 
 #include "Skin.h"
-#include "wxIDs.h"
+#include "ids.h"
 #include "ModList.h"
 
 #include "wxLauncherSetup.h"

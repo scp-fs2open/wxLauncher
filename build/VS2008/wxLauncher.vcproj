@@ -288,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\ids.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\InstallPage.h"
 				>
 			</File>
@@ -348,10 +352,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\code\wxIDS.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\code\wxLauncherApp.h"
 				>
 			</File>
@@ -398,11 +398,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 		</Filter>

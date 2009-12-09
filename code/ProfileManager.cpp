@@ -7,7 +7,7 @@
 
 #include "ProfileManager.h"
 #include "wxLauncherApp.h"
-#include "wxIDS.h"
+#include "ids.h"
 
 #include "wxLauncherSetup.h"
 

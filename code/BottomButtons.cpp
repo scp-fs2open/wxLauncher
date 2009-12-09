@@ -1,5 +1,5 @@
 #include <wx/wx.h>
-#include "wxIDS.h"
+#include "ids.h"
 #include "BottomButtons.h"
 #include "TCManager.h"
 #include "ProfileManager.h"

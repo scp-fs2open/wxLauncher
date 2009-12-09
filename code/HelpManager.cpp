@@ -1,7 +1,7 @@
 #include "HelpManager.h"
 
 #include <wx/html/helpctrl.h>
-#include "wxIDS.h"
+#include "ids.h"
 #include "wxLauncherSetup.h"
 
 using namespace HelpManager;

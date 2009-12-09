@@ -3,7 +3,7 @@
 #include <wx/valgen.h>
 #include <wx/valtext.h>
 #include "WelcomePage.h"
-#include "wxIDS.h"
+#include "ids.h"
 #include "Skin.h"
 #include "StatusBar.h"
 #include "ProfileManager.h"
