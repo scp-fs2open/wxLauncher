@@ -537,85 +537,125 @@ def process_input_stage5(options, files, extrafiles):
   indexfile.write("<ul>\n")
   
   help_files = generate_file_list(files['stage4'], ".stage4")
-  level = 0
-  last_level = 0
-  for file in help_files:
-    # find the title
-    outfile_name = change_filename(file, ".htm", files['stage4'], files['stage5'])
-    outfile = open(outfile_name, mode="w")
-    
-    infile = open(file, mode="r")
-    input = infile.read()
-    infile.close()
-    
-    parser = Stage5Parser(file=outfile)
-    parser.feed(input)
-    parser.close()
-    outfile.close()
-    
-    # relativize filename for being in the archive
-    filename_in_archive = change_filename(file, ".htm", files['stage4'], ".", False)
-    
-    level = len(enum_directories(filename_in_archive))
-    logging.debug(" Level %d\tLast Level %d" % (level, last_level))
-    if level > last_level:
-      # increased a level
-      #name is the top level directory name
-      name = enum_directories(filename_in_archive).pop()
-      # generate path and check that the index.htm for each directory exists
-      index_name = os.path.join(os.path.dirname(filename_in_archive), "index.htm")
-      #   check in stage4 because stage5 may not have processed the file yet
-      #   this way we don't give off a false negative
-      stage4_name1 = os.path.join(files['stage4'], index_name)
-      stage4_name = change_filename(stage4_name1, ".stage4", ".", ".")
-      
-      if os.path.exists(stage4_name):
-        if os.path.isfile(stage4_name):
-          pass # exists and is file we are fine
-        else:
-          logging.warning(" Index for section %s exists but is not a file at %s", name, index_name)
-      else:
-        logging.warning(" Index for section %s does not exist at %s", name, index_name)
-        
-      tocfile.write(
-      """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s</object>\n%(tab)s\t<ul>\n""" % {
-      "tab": "\t"*toclevel,
-      "name": name,
-      "file": index_name })
-      toclevel += 1
-    elif level < last_level:
-      # decreased level
-      tocfile.write("""%(tab)s</ul>\n""" % { tab: "\t"*toclevel })
-      toclevel -= 1
-    last_level = level
-    
-    tocfile.write(
-    """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
-    "tab": "\t"*toclevel,
-    "name": parser.title,
-    "file": filename_in_archive, })
-    
-    indexfile.write(
-    """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
-    "tab": "\t",
-    "name": parser.title,
-    "file": filename_in_archive, })
-    
-  while toclevel > 0:
-    tocfile.write("%s</ul>\n" % ( "\t"*(toclevel-1)))
-    toclevel -= 1
-  
-  
-  tocfile.close()
-  indexfile.write("</ul>")
-  indexfile.close()
-  
-  # copy the extra files (i.e. images) from stage3
-  for extrafilename in extrafiles:
-    logging.debug(" Copying: %s", extrafilename)
-    dst = change_filename(extrafilename, None, orginaldir=files['stage3'], destdir=files['stage5'])
-    shutil.copy2(extrafilename, dst)
 
+  last_path_list = []
+  for path, dirs, thefiles in os.walk(files['stage4']):
+    """new directory. If the directory is not the base directory then check if there will be an index.htm for this directory.
+    If there is an index.htm then parse it for the title so that the subsection will have the title of the index.htm as the name of the subsection.
+    If there is no index.htm then make a default one and use the name of the directory as the subsection name.
+    
+    Note that this algorithm requires that os.walk generates the names in alphabetical order."""
+    # relativize directory path for being in the archive
+    path_in_arc = make_path_in_archive(path, files['stage4'])
+    logging.debug("Processing directory '%s'", path_in_arc)
+    
+    path_list = path_in_arc.split(os.path.sep)
+    if len(path_list) == 1 and path_list[0] == '':
+      path_list = []
+    level = len(path_list)
+    
+    tocfile.write(generate_sections(path_list, last_path_list))
+    last_path_list = path_list
+    
+    if level > 0:
+      # remove index.htm from thefiles because they are used by the section names
+      try:
+        thefiles.remove('index.stage4')
+      except ValueError:
+        logging.warning("Directory %s does not have an index.help", path_in_arc)
+    
+    for file in thefiles:
+      # relativize filename for being in the archive
+      filename_in_archive = change_filename(file, ".htm", files['stage4'], ".", False)
+      # find the title
+      outfile_name = change_filename(file, ".htm", files['stage4'], files['stage5'])
+      outfile = open(outfile_name, mode="w")
+      
+      infile_name = os.path.join(path, file)
+      infile = open(infile_name, mode="r")
+      input = infile.read()
+      infile.close()
+      
+      parser = Stage5Parser(file=outfile)
+      parser.feed(input)
+      parser.close()
+      outfile.close()
+      
+      tocfile.write(
+      """%(tab)s<li> <object type="text/sitemap">\n%(tab)s     <param name="Name" value="%(name)s">\n%(tab)s     <param name="Local" value="%(file)s">\n%(tab)s    </object>\n""" % {
+      "tab": "     "*level,
+      "name": parser.title,
+      "file": filename_in_archive, })
+      
+      indexfile.write(
+      """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
+      "tab": "\t",
+      "name": parser.title,
+      "file": filename_in_archive, })
+  
+  tocfile.write(generate_sections([], last_path_list))
+  tocfile.write("</ul>\n")
+  tocfile.close()
+  indexfile.close()
+
+def generate_sections(path_list, last_path_list, basetab=0):
+  """Return the string that will allow me to write in the correct section."""
+  logging.debug("   generate_sections(%s, %s, %d)", str(path_list), str(last_path_list), basetab)
+  if len(path_list) > 0 and len(last_path_list) > 0 and path_list[0] == last_path_list[0]:
+    logging.debug("    matches don't need to do anything")
+    return generate_sections(path_list[1:], last_path_list[1:], basetab+1)
+    
+  elif len(path_list) > 0 and len(last_path_list) > 0:
+    logging.debug("    go down then up")
+    s = generate_sections([], last_path_list, basetab)
+    s += generate_sections(path_list, [], basetab)
+    return s
+    
+  elif len(path_list) > 0 and len(last_path_list) == 0:
+    logging.debug("    go up (deeper)")
+    s = ""
+    for path in path_list:
+      s += """%(tab)s<li> <object type="text/sitemap">\n%(tab)s     <param name="Name" value="%(name)s">\n%(tab)s     <param name="Local" value="%(file)s">\n%(tab)s    </object>\n%(tab)s     <ul>\n""" % {
+      "tab": "     "*basetab,
+      "name": path,
+      "file": "index.htm" }
+    
+    return s
+  elif len(path_list) == 0 and len(last_path_list) > 0:
+    logging.debug("    do down")
+    s = ""
+    basetab += len(last_path_list)
+    for path in last_path_list:
+      s += """%(tab)s</ul>\n""" % { 'tab': "     "*(basetab) }
+      basetab -= 1
+    return s
+   
+  elif len(path_list) == 0 and len(last_path_list) == 0:
+    logging.debug("    both lists empty, doing nothing")
+    return ''
+    
+  else:
+    raise Exception("Should never get here")
+    return ""
+    
+def make_path_in_archive(path, path1):
+  """Return the part of the path that is in 'path' but not in 'path1'"""
+  path = os.path.normpath(path)
+  path1 = os.path.normpath(path1)
+  
+  list = path.split(os.path.sep)
+  list1 = path1.split(os.path.sep)
+  
+  return os.path.sep.join(make_path_in_archive_helper(list, list1))
+  
+def make_path_in_archive_helper(list, list1):
+  if len(list) > 0 and len(list1) > 0 and list[0] == list1[0]:
+    return make_path_in_archive_helper(list[1:], list1[1:])
+  elif len(list) > 0 and len(list1) == 0:
+    return os.path.join(list)
+  else:
+    return []
+    
 def process_input_stage6(options, stage_dirs):
   #make sure that the directories exist before creating file
   outfile_path = os.path.dirname(options.outfile)
@@ -636,8 +676,8 @@ def process_input_stage6(options, stage_dirs):
       logging.debug(" Added %s as %s", full_filename, arcname)
       outzip.write(full_filename, arcname)
   
-  outzip.close()  
-  
+  outzip.close()
+    
 def enum_directories(dir):
   ret = os.path.dirname(dir).split(os.path.sep)
   if len(ret) == 1 and len(ret[0]) == 0:
