@@ -55,7 +55,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("Executable Selection"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, wxID_ANY, _("FS2 Root Folder:"));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 Root Folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Select"));
 
