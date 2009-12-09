@@ -2,7 +2,7 @@
 #include <wx/dynlib.h>
 
 #include "OpenALManager.h"
-#include "wxIDS.h"
+#include "ids.h"
 
 #if USE_OPENAL
 #include <al.h>

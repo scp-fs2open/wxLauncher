@@ -4,7 +4,7 @@
 #include <wx/wx.h>
 
 #include "Skin.h"
-#include "wxIDS.h"
+#include "ids.h"
 #include "ProfileManager.h"
 
 class WelcomePage: public wxWindow {

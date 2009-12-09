@@ -3,7 +3,7 @@
 #include <wx/choicebk.h>
 
 #include "BasicSettingsPage.h"
-#include "wxIDS.h"
+#include "ids.h"
 #include "ProfileManager.h"
 #include "TCManager.h"
 #include "SpeechManager.h"

@@ -1,6 +1,6 @@
 #include <wx/wx.h>
 #include "ModsPage.h"
-#include "wxIDs.h"
+#include "ids.h"
 #include "ModList.h"
 #include "Skin.h"
 

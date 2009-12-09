@@ -2,7 +2,7 @@
 #define STATUSLOG_H
 
 #include <wx/wx.h>
-#include "wxIDS.h"
+#include "ids.h"
 
 /** Extends wxStatusBar.  Provides the a 4 section status bar: icon, main text,
 progress bar, and small text for the progress bar.  This class will interface

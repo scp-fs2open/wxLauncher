@@ -3,7 +3,7 @@
 #include <wx/toolbook.h>
 #include <wx/imagpng.h>
 #include <wx/html/htmlwin.h>
-#include "wxIDS.h"
+#include "ids.h"
 #include "MainWindow.h"
 #include "WelcomePage.h"
 #include "ModsPage.h"
