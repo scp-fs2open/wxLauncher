@@ -35,7 +35,7 @@ installed on your system.
 wxWidgets homepage:
 	http://www.wxwidgets.org/
 	
-Python 2.4 or higher is required to build this project.
+Python 2.5 or higher is required to build this project.
 This project also assumes that the python execuatble is 
 in your PATH.  See the compiler specific instructions
 on how to add Python to your PATH.
@@ -51,13 +51,26 @@ with OpenAL.
 OpenAL homepage:
 	http://connect.creativelabs.com/openal/default.aspx
 
+The Microsoft Windows SDK (formorly the Platform SDK) is
+required to build both this application and wxWidgets when
+ on windows.  Note that only the Windows SDK for Windows
+Vista and Windows 7 have been tested with this application.
 
-Launcher's source can be explored from the project's
+wxLauncher has only been built with Microsoft's Visual Studio
+2008 Express edition.  Other VS2008 versions should work, as
+well as any version of VS2005 should work, but have not been
+tested.  Visual Studio 2008 C++ Express can be downloaded
+from [Microsoft] for free.
+[Microsoft]: http://www.microsoft.com/express/download/
+
+wxLauncher's source can be explored from the project's
 source page:
 	http://code.google.com/p/wxlauncher/source/checkout
   
 To get the source, you'll need Mercurial:
 	http://mercurial.selenic.com/
+or TortiseHG:
+	http://tortoisehg.bitbucket.org/
 
 Once Mercurial is installed, you can get a copy of the source
 by runningthe following command (in a folder of your choice):
@@ -67,6 +80,10 @@ Building
 ========
 Define USE_SPEECH=1 to have the launcher use the Windows 
 Speech API.
+Define USE_JOYSTICK=1 to have the launcher setup and configure
+Joysticks using (currently) the window MMSystem API.
+Define USE_OPENAL=1 to have the launcher allow setup and
+testing of the OpenAL api and installation.
 
 License
 =======
