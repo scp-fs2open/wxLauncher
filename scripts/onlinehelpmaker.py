@@ -498,6 +498,7 @@ def process_input_stage4(file, options, files):
   
 def process_input_stage5(options, files, extrafiles):
   """Generate the index and table of contents for the output file from the output of stage4."""
+  
   class Stage5Parser(OutputParser):
     def __init__(self, *args, **kwargs):
       OutputParser.__init__(self, *args, **kwargs)
@@ -558,6 +559,7 @@ def process_input_stage5(options, files, extrafiles):
     index_file_name = os.path.join(path, "index.stage4")
     # relativize filename for being in the archive
     index_in_archive = change_filename(index_file_name, ".htm", files['stage4'], ".", False)
+    index_in_archive = index_in_archive.replace(os.path.sep, "/") # make the separators the same so that it doesn't matter what platform the launcher is built on.
     # find the title
     outindex_name = change_filename(index_file_name, ".htm", files['stage4'], files['stage5'])
     outindex = open(outindex_name, mode="w")
@@ -614,6 +616,12 @@ def process_input_stage5(options, files, extrafiles):
   tocfile.write("</ul>\n")
   tocfile.close()
   indexfile.close()
+  
+  # copy the extra files (i.e. images) from stage3
+  for extrafilename in extrafiles:
+    logging.debug(" Copying: %s", extrafilename)
+    dst = change_filename(extrafilename, None, orginaldir=files['stage3'], destdir=files['stage5'])
+    shutil.copy2(extrafilename, dst)
 
 def generate_sections(path_list, last_path_list, basetab=0, orginal_path_list=None, index_filename=None, section_title=None):
   """Return the string that will allow me to write in the correct section."""
