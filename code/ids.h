@@ -1,12 +1,18 @@
 #ifndef IDS_HPP
 #define IDS_HPP
 
-/* File contains all IDs and other application constantants that are to be used
+/* File contains all IDs and other application constants that are to be used
 in the application. */
 
-#define TAB_AREA_WIDTH (639)
-#define TAB_AREA_HEIGHT (595)
+#define TAB_AREA_WIDTH (639)	//!< the number of pixels wide for the useable area of the tab
+#define TAB_AREA_HEIGHT (595)	//!< the number of pixels high for the useable area of the tab
 
+/** The IDs that wxLauncher uses to identify its controls to wxWidgets.  These
+are in no particular order, but they are grouped into the tab or section of the
+the control that it represents is located on.  
+
+These IDs are also used by the help manager to open the correct help page 
+for the context help. */
 enum WindowIDS {
 	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
 							   will use. */
@@ -16,6 +22,7 @@ enum WindowIDS {
 	ID_UPDATE_BUTTON,
 	ID_PLAY_BUTTON,
 	ID_ABOUT_BUTTON,
+
 	ID_PROFILE_COMBO,
 	ID_NEW_PROFILE,
 	ID_DELETE_PROFILE,
@@ -104,50 +111,56 @@ enum ProfileDialogReturnValues {
 	RETURN_CONFRIM_DELETE,
 };
 
-// Storage locations
+/** \defgroup Storeage Storage locations */
+/** @{*/
 #define GET_PROFILE_STORAGEFOLDER()			wxStandardPaths::Get().GetUserDataDir()
+/** @}*/
 
-// Keys used in global config file
-#define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles")
-#define GBL_CFG_MAIN_LASTPROFILE			_T("/main/lastprofile")
+/** \defgroup globalkeys Keys used in global config file */
+/** @{*/
+#define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles") //!< bool
+#define GBL_CFG_MAIN_LASTPROFILE			_T("/main/lastprofile")		//!< string, internal profile name
 
-#define GBL_CFG_PROXY_TYPE					_T("/proxy/type")	// string
-#define GBL_CFG_PROXY_SERVER				_T("/proxy/server")	// string
-#define GBL_CFG_PROXY_PORT					_T("/proxy/port")	// int
+#define GBL_CFG_PROXY_TYPE					_T("/proxy/type")	//!< string
+#define GBL_CFG_PROXY_SERVER				_T("/proxy/server")	//!< string
+#define GBL_CFG_PROXY_PORT					_T("/proxy/port")	//!< int
+/** @}*/
 
-// Keys used in profiles
-#define PRO_CFG_MAIN_NAME					_T("/main/name")		// string, absolute path
-#define PRO_CFG_MAIN_FILENAME				_T("/main/filename")	// string, binary name
+/** \defgroup profilekeys Keys used in profiles */
+/** @{*/
+#define PRO_CFG_MAIN_NAME					_T("/main/name")		//!< string, absolute path
+#define PRO_CFG_MAIN_FILENAME				_T("/main/filename")	//!< string, binary name
 
 #define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")
 #define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")
 
-#define PRO_CFG_VIDEO_API					_T("/video/api")		// string
-#define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		// int
-#define PRO_CFG_VIDEO_RESOLUTION_HEIGHT		_T("/video/height")		// int
+#define PRO_CFG_VIDEO_API					_T("/video/api")		//!< string
+#define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		//!< int
+#define PRO_CFG_VIDEO_RESOLUTION_HEIGHT		_T("/video/height")		//!< int
 #define CFG_RES_FORMAT_STRING				_T("%d x %d")
-#define PRO_CFG_VIDEO_BIT_DEPTH				_T("/video/depth")		// int
-#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anistropic")	// int
-#define PRO_CFG_VIDEO_ANTI_ALIAS			_T("/video/antialias")	// int
-#define PRO_CFG_VIDEO_TEXTURE_FILTER		_T("/video/texturefilter")	// string
-#define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")	// int
-#define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")	// bool
-#define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")	// bool
+#define PRO_CFG_VIDEO_BIT_DEPTH				_T("/video/depth")		//!< int
+#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anistropic")	//!< int
+#define PRO_CFG_VIDEO_ANTI_ALIAS			_T("/video/antialias")	//!< int
+#define PRO_CFG_VIDEO_TEXTURE_FILTER		_T("/video/texturefilter")	//!< string
+#define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")	//!< int
+#define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")	//!< bool
+#define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")	//!< bool
 
-#define PRO_CFG_SPEECH_VOICE				_T("/speech/voice")		// int, same as what the current engine uses
-#define PRO_CFG_SPEECH_VOLUME				_T("/speech/volume")	// int
-#define PRO_CFG_SPEECH_IN_TECHROOM			_T("/speech/intechroom")// bool
-#define PRO_CFG_SPEECH_IN_BRIEFINGS			_T("/speech/inbriefings")// bool
-#define PRO_CFG_SPEECH_IN_GAME				_T("/speech/ingame")	// bool
+#define PRO_CFG_SPEECH_VOICE				_T("/speech/voice")		//!< int, same as what the current engine uses
+#define PRO_CFG_SPEECH_VOLUME				_T("/speech/volume")	//!< int
+#define PRO_CFG_SPEECH_IN_TECHROOM			_T("/speech/intechroom")//!< bool
+#define PRO_CFG_SPEECH_IN_BRIEFINGS			_T("/speech/inbriefings")//!< bool
+#define PRO_CFG_SPEECH_IN_GAME				_T("/speech/ingame")	//!< bool
 
-#define PRO_CFG_NETWORK_TYPE				_T("/network/type")		// string
-#define PRO_CFG_NETWORK_SPEED				_T("/network/speed")	// string
-#define PRO_CFG_NETWORK_PORT				_T("/network/prot")		// int
-#define PRO_CFG_NETWORK_IP					_T("/network/ip")		// string
+#define PRO_CFG_NETWORK_TYPE				_T("/network/type")		//!< string
+#define PRO_CFG_NETWORK_SPEED				_T("/network/speed")	//!< string
+#define PRO_CFG_NETWORK_PORT				_T("/network/prot")		//!< int
+#define PRO_CFG_NETWORK_IP					_T("/network/ip")		//!< string
 
-#define PRO_CFG_OPENAL_DEVICE				_T("/openal/device")	// string
+#define PRO_CFG_OPENAL_DEVICE				_T("/openal/device")	//!< string
 
-#define PRO_CFG_JOYSTICK_ID					_T("/joystick/id")		// int
-#define PRO_CFG_JOYSTICK_FORCE_FEEDBACK		_T("/joystick/forcefeedback") // bool
-#define PRO_CFG_JOYSTICK_DIRECTIONAL		_T("/joystick/directional") // bool
+#define PRO_CFG_JOYSTICK_ID					_T("/joystick/id")		//!< int
+#define PRO_CFG_JOYSTICK_FORCE_FEEDBACK		_T("/joystick/forcefeedback") //!< bool
+#define PRO_CFG_JOYSTICK_DIRECTIONAL		_T("/joystick/directional") //!< bool
+/** @}*/
 #endif
