@@ -554,7 +554,24 @@ def process_input_stage5(options, files, extrafiles):
       path_list = []
     level = len(path_list)
     
-    tocfile.write(generate_sections(path_list, last_path_list))
+    # parse the index.help to get the name of the section
+    index_file_name = os.path.join(path, "index.stage4")
+    # relativize filename for being in the archive
+    index_in_archive = change_filename(index_file_name, ".htm", files['stage4'], ".", False)
+    # find the title
+    outindex_name = change_filename(index_file_name, ".htm", files['stage4'], files['stage5'])
+    outindex = open(outindex_name, mode="w")
+    
+    inindex = open(index_file_name, mode="r")
+    input = inindex.read()
+    inindex.close()
+    
+    parser = Stage5Parser(file=outindex)
+    parser.feed(input)
+    parser.close()
+    outindex.close()
+    
+    tocfile.write(generate_sections(path_list, last_path_list,index_filename=index_in_archive, section_title=parser.title))
     last_path_list = path_list
     
     if level > 0:
@@ -598,27 +615,38 @@ def process_input_stage5(options, files, extrafiles):
   tocfile.close()
   indexfile.close()
 
-def generate_sections(path_list, last_path_list, basetab=0):
+def generate_sections(path_list, last_path_list, basetab=0, orginal_path_list=None, index_filename=None, section_title=None):
   """Return the string that will allow me to write in the correct section."""
-  logging.debug("   generate_sections(%s, %s, %d)", str(path_list), str(last_path_list), basetab)
+  logging.debug("   generate_sections(%s, %s, %d, %s)", str(path_list), str(last_path_list), basetab, orginal_path_list)
+  
+  if orginal_path_list == None:
+    orginal_path_list = path_list
+    
   if len(path_list) > 0 and len(last_path_list) > 0 and path_list[0] == last_path_list[0]:
     logging.debug("    matches don't need to do anything")
-    return generate_sections(path_list[1:], last_path_list[1:], basetab+1)
+    return generate_sections(path_list[1:], last_path_list[1:], basetab+1, orginal_path_list, index_filename, section_title)
     
   elif len(path_list) > 0 and len(last_path_list) > 0:
     logging.debug("    go down then up")
-    s = generate_sections([], last_path_list, basetab)
-    s += generate_sections(path_list, [], basetab)
+    s = generate_sections([], last_path_list, basetab, orginal_path_list, index_filename, section_title)
+    s += generate_sections(path_list, [], basetab, orginal_path_list, index_filename, section_title)
     return s
     
   elif len(path_list) > 0 and len(last_path_list) == 0:
     logging.debug("    go up (deeper)")
+    if index_filename == None:
+      raise Exception("index_filename is None")
+    if section_title == None:
+      title = path_list[len(path_list)-1]
+    else:
+      title = section_title
+      
     s = ""
     for path in path_list:
       s += """%(tab)s<li> <object type="text/sitemap">\n%(tab)s     <param name="Name" value="%(name)s">\n%(tab)s     <param name="Local" value="%(file)s">\n%(tab)s    </object>\n%(tab)s     <ul>\n""" % {
       "tab": "     "*basetab,
-      "name": path,
-      "file": "index.htm" }
+      "name": title,
+      "file": index_filename }
     
     return s
   elif len(path_list) == 0 and len(last_path_list) > 0:
