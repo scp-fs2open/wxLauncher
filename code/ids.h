@@ -22,6 +22,7 @@ enum WindowIDS {
 	ID_UPDATE_BUTTON,
 	ID_PLAY_BUTTON,
 	ID_ABOUT_BUTTON,
+	ID_FS2_PROCESS,
 
 	ID_PROFILE_COMBO,
 	ID_NEW_PROFILE,
@@ -128,11 +129,11 @@ enum ProfileDialogReturnValues {
 
 /** \defgroup profilekeys Keys used in profiles */
 /** @{*/
-#define PRO_CFG_MAIN_NAME					_T("/main/name")		//!< string, absolute path
-#define PRO_CFG_MAIN_FILENAME				_T("/main/filename")	//!< string, binary name
+#define PRO_CFG_MAIN_NAME					_T("/main/name")		//!< string, name of profile
+#define PRO_CFG_MAIN_FILENAME				_T("/main/filename")	//!< string, full path to profile
 
-#define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")
-#define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")
+#define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")		//!< string, absolute path
+#define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")	//!< string, binary name
 
 #define PRO_CFG_VIDEO_API					_T("/video/api")		//!< string
 #define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		//!< int

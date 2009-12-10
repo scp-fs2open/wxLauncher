@@ -26,6 +26,8 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
 		wxDefaultPosition, wxSize(800, 600), MAINWINDOW_STYLE);
 
+	this->FS2_pid = 0;
+
 	this->SetFont(skin->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
@@ -77,6 +79,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnStartFS)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
 	EVT_HELP(wxID_ANY, MainWindow::OnHelp)
+	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -93,7 +96,37 @@ void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Start Fred"));
 }
 void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("Start FS"));
+	wxButton* play = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
+	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
+	play->SetLabel(_T("Running"));
+	play->Disable();
+	
+	ProMan* p = ProMan::GetProfileManager();
+	wxString folder, binary;
+	if ( !p->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
+		wxLogError(_T("TC folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
+		return;
+	}
+	if ( !p->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary) ) {
+		wxLogError(_T("Binary to execute is not set (%s)"), PRO_CFG_TC_CURRENT_BINARY);
+		return;
+	}
+
+	wxFileName path(folder, binary, wxPATH_NATIVE);
+	if ( !path.FileExists() ) {
+		wxLogError(_T("Binary %s does not exist"), path.GetFullName());
+		return;
+	}
+
+	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
+	wxString command(wxString::Format(_T("%s"), path.GetFullPath()));
+	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
+	if ( pid == 0 ) {
+		return;
+	}
+	this->FS2_pid = pid;
+	wxLogInfo(_T("FreeSpace 2 Open is now running..."));
 }
 void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Update"));
@@ -104,5 +137,23 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::OnHelp(wxHelpEvent& event) {
 	HelpManager::OpenHelpById((WindowIDS)event.GetId());
+}
+
+void MainWindow::OnFS2Exited(wxProcessEvent &event) {
+	if ( this->FS2_pid == 0 ) {
+		wxLogError(_T("OnFS2Exited called before there is a process running"));
+		return;
+	}
+
+	int exitCode = event.GetExitCode();
+
+	wxLogInfo(_T("FS2 Open exited with a status of %d"), exitCode);
+	
+	wxButton* play = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
+	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
+	play->SetLabel(_T("Play"));
+	play->Enable();
+	
 }
 
