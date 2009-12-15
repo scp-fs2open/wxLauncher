@@ -119,6 +119,10 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 
+	if ( ProMan::NoError != ProMan::PushProfile(p->Get()) ) {
+		return;
+	}
+
 	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
 	wxString command(wxString::Format(_T("%s"), path.GetFullPath()));
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);

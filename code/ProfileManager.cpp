@@ -6,6 +6,7 @@
 #include <wx/dir.h>
 
 #include "ProfileManager.h"
+#include "PlatformProfileManager.h"
 #include "wxLauncherApp.h"
 #include "ids.h"
 
@@ -376,4 +377,13 @@ bool ProMan::DeleteProfile(wxString name) {
 	}
 	return false;
 }
+/** Applies the passed wxFileConfig profile to the registry where 
+Freespace 2 can read it. */
+ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
+	return PlatformPushProfile(cfg);
+}
 
+/** Takes the settings in the registry and puts them into the wxFileConfig */
+ProMan::RegistryCodes ProMan::PullProfile(wxFileConfig *cfg) {
+	return PlatformPullProfile(cfg);
+}

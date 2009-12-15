@@ -262,6 +262,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\Win32ProfileManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\wxLauncherApp.cpp"
 				>
 			</File>
@@ -317,6 +321,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\OpenALManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\PlatformProfileManager.h"
 				>
 			</File>
 			<File
@@ -398,11 +406,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ReadMe.txt"
+				RelativePath="..\..\ReadMe.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ReadMe.txt"
+				RelativePath=".\ReadMe.txt"
 				>
 			</File>
 		</Filter>
