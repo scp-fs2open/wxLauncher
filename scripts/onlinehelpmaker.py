@@ -143,10 +143,10 @@ def main(argv):
 
     atexit.register(cleanup, options.temp)
 
-  logging.info("Doing a '%s'", options.type)
-  logging.info("Using '%s' as working directory", options.temp )
-  logging.info("Using '%s' as output file", options.outfile )
-  logging.info("Using '%s' as input directory", options.indir )
+  logging.debug("Doing a '%s'", options.type)
+  logging.debug("Using '%s' as working directory", options.temp )
+  logging.debug("Using '%s' as output file", options.outfile )
+  logging.debug("Using '%s' as input directory", options.indir )
 
   if options.type == "build":
     call_logging_exceptions(build, options)
@@ -255,6 +255,8 @@ def build(options):
     generate_cpp_files(options, files, helparray)
     
     logging.log(NOTICE, "....Done.")
+  else:
+    logging.log(NOTICE, " Up to date.")
 
 def generate_paths(options):
   """Generates the names of the paths that will be needed by the compiler during it's run, storing them in a dictionary that is returned."""
