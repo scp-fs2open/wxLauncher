@@ -37,6 +37,20 @@ public:
 	void AddEventHandler(wxEvtHandler *handler);
 	void RemoveEventHandler(wxEvtHandler *handler);
 
+	enum RegistryCodes {
+		InvalidParameters = -1,
+		NoError = 0,
+		AccessDenied,
+
+		FileIsNotOK,
+		InputFileDoesNotExist,
+		UnknownError,
+	};
+
+	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
+	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
+
+
 private:
 	static ProMan* proman;
 	static bool isInitialized;
