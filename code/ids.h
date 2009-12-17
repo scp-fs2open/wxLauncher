@@ -125,6 +125,8 @@ enum ProfileDialogReturnValues {
 #define GBL_CFG_PROXY_TYPE					_T("/proxy/type")	//!< string
 #define GBL_CFG_PROXY_SERVER				_T("/proxy/server")	//!< string
 #define GBL_CFG_PROXY_PORT					_T("/proxy/port")	//!< int
+
+#define GBL_CFG_NET_DOWNLOAD_NEWS			_T("/net/downloadnews")	//!< bool, true means autodownload
 /** @}*/
 
 /** \defgroup profilekeys Keys used in profiles */
