@@ -556,6 +556,13 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	TCManager::GenerateTCChanged();
 }
 
+/** Handles TCChanged events from TCManager.
+
+Currently function only changes the executable dropbox control (clearing, and 
+filling in the executables that are in the new TC folder) and removes the
+currently select executable from the active profile (thus disabling the play
+button).
+\note Emits a EVT_TC_BINARY_CHANGED in any case.*/
 void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxChoice *exeChoice = dynamic_cast<wxChoice*>(
@@ -579,11 +586,16 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		tcFolder->SetValue(tcPath);
 
 		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
+		exeChoice->Enable();
 	}
 	this->GetSizer()->Layout();
 	TCManager::GenerateTCBinaryChanged();
 }
 
+/** Puts the pretty description of all of the executables in the TCs folder
+into the Executable DropBox.  This function does nothing else to the choice
+control, not even clearing the drop box (call the Clear function if you don't
+want the old items to stay. */
 void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
 	wxArrayString exes = TCManager::GetBinariesFromRootFolder(path);
 	wxArrayString::iterator iter = exes.begin();
