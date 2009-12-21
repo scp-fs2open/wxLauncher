@@ -154,6 +154,7 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_SPEECH_IN_TECHROOM			_T("/speech/intechroom")//!< bool
 #define PRO_CFG_SPEECH_IN_BRIEFINGS			_T("/speech/inbriefings")//!< bool
 #define PRO_CFG_SPEECH_IN_GAME				_T("/speech/ingame")	//!< bool
+#define PRO_CFG_SPEECH_IN_MULTI				_T("/speech/inmulti")	//!< bool
 
 #define PRO_CFG_NETWORK_TYPE				_T("/network/type")		//!< string
 #define PRO_CFG_NETWORK_SPEED				_T("/network/speed")	//!< string
