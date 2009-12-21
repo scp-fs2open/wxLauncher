@@ -28,6 +28,7 @@ public:
 	void OnToggleSpeechInTechroom(wxCommandEvent &event);
 	void OnToggleSpeechInBriefing(wxCommandEvent &event);
 	void OnToggleSpeechInGame(wxCommandEvent &event);
+	void OnToggleSpeechInMulti(wxCommandEvent &event);
 	void OnGetMoreVoices(wxCommandEvent &event);
 
 	void OnSelectNetworkType(wxCommandEvent &event);
