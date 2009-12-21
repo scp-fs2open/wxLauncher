@@ -13,7 +13,7 @@
 
 #include "wxLauncherSetup.h"
 
-ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
+ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(4, 5);
@@ -26,7 +26,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
-	wxDir::GetAllFiles(_("."), &foundInis, _("mod.ini"));
+	wxDir::GetAllFiles(tcPath, &foundInis, _("mod.ini"));
 	if ( foundInis.Count() > 0 ) {
 		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
 	} else {
@@ -37,8 +37,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 	this->configFiles = new ConfigHash();
 
 	wxLogDebug(_T("Inserting '(No MOD)'"));
-	wxFileName tcmodini(_T("mod.ini"));
-	tcmodini.AppendDir(_T("."));
+	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
 		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig(tcmodinistream);
@@ -56,7 +55,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 		wxLogDebug(_T(" Using defaults for TC."));
 	}
 
-	wxLogDebug(_T("Starting to opening mod.ini's..."));
+	wxLogDebug(_T("Starting to parse mod.ini's..."));
 	for (size_t i = 0; i < foundInis.Count(); i++) {
 		wxLogDebug(_T("  Opening %s"), foundInis.Item(i));
 		wxFFileInputStream stream(foundInis.Item(i));
@@ -78,8 +77,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 							 empty string. */
 
 		wxASSERT_MSG( tokens.GetCount() >= 2,
-			wxString::Format(_T("Path '%s' does not seems to have enough \
-								directory markers."), foundInis.Item(i))
+			wxString::Format(_T("Path '%s' does not seems to have enough "
+								"directory markers."), foundInis.Item(i))
 		);
 		wxString shortname = tokens[tokens.GetCount() - 2];
 
@@ -105,7 +104,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 		wxString *smallimagepath = NULL;
 		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
 		if ( smallimagepath != NULL ) {
-			item->image = SkinSystem::VerifySmallImage(_T("."), shortname,
+			item->image = SkinSystem::VerifySmallImage(tcPath, shortname,
 				*smallimagepath);
 			delete smallimagepath;
 		}
@@ -172,7 +171,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			wxString *windowIconFile = NULL;
 			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
 			if ( windowIconFile != NULL ) {
-				item->skin->welcomeIcon = SkinSystem::VerifyWindowIcon(_T("."),
+				item->skin->welcomeIcon = SkinSystem::VerifyWindowIcon(tcPath,
 					shortname, *windowIconFile);
 				delete windowIconFile;
 			}
@@ -195,27 +194,27 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			
 
 			if ( welcomeIconFile != NULL ) {
-				item->skin->welcomeIcon = SkinSystem::VerifyTabIcon(_T("."),
+				item->skin->welcomeIcon = SkinSystem::VerifyTabIcon(tcPath,
 					shortname, *welcomeIconFile);
 				delete welcomeIconFile;
 			}
 			if ( modsIconFile != NULL )	{
-				item->skin->modsIcon = SkinSystem::VerifyTabIcon(_T("."),
+				item->skin->modsIcon = SkinSystem::VerifyTabIcon(tcPath,
 					shortname, *modsIconFile);
 				delete modsIconFile;
 			}
 			if ( basicIconFile != NULL ) {
-				item->skin->basicIcon = SkinSystem::VerifyTabIcon(_T("."),
+				item->skin->basicIcon = SkinSystem::VerifyTabIcon(tcPath,
 					shortname, *basicIconFile);
 				delete basicIconFile;
 			}
 			if ( advancedIconFile != NULL ) {
-				item->skin->advancedIcon = SkinSystem::VerifyTabIcon(_T("."),
+				item->skin->advancedIcon = SkinSystem::VerifyTabIcon(tcPath,
 					shortname, *advancedIconFile);
 				delete advancedIconFile;
 			}
 			if ( installIconFile != NULL ) {
-				item->skin->installIcon = SkinSystem::VerifyTabIcon(_T("."),
+				item->skin->installIcon = SkinSystem::VerifyTabIcon(tcPath,
 					shortname, *installIconFile);
 				delete installIconFile;
 			}
@@ -223,7 +222,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			wxString *idealIconFile = NULL;
 			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
 			if ( idealIconFile != NULL ) {
-				item->skin->idealIcon = SkinSystem::VerifyIdealIcon(_T("."),
+				item->skin->idealIcon = SkinSystem::VerifyIdealIcon(tcPath,
 					shortname, *idealIconFile);
 				delete idealIconFile;
 			}
@@ -233,7 +232,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin) {
 			int fontSize = 0;
 			config->Read(_T("/skin/fontsize"), &fontSize);
 			if ( fontName != NULL ) {
-				item->skin->baseFont = SkinSystem::VerifyFontChoice(_T("."),
+				item->skin->baseFont = SkinSystem::VerifyFontChoice(tcPath,
 					shortname, *fontName, fontSize);
 				delete fontName;
 			}

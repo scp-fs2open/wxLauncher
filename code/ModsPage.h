@@ -7,6 +7,12 @@
 class ModsPage: public wxPanel {
 public:
 	ModsPage(wxWindow* parent, SkinSystem *skin);
+
+	void OnTCChanged(wxCommandEvent &event);
+
+private:
+	SkinSystem* skin;
+	DECLARE_EVENT_TABLE();
 };
 
 #endif
