@@ -115,7 +115,7 @@ WX_DECLARE_OBJARRAY(ModItem, ModItemArray);
 
 class ModList: public wxVListBox {
 public:
-	ModList(wxWindow *parent, wxSize& size, SkinSystem *skin);
+	ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath);
 	~ModList();
 
 	// overrides for wxVListBox
