@@ -1058,6 +1058,8 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 		this->joystickDirectionalHit->Disable();
 		this->joystickForceFeedback->Disable();
 	}
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_JOYSTICK_ID, joynumber->GetNumber());
 }
 
 void BasicSettingsPage::OnSelectJoystick(
