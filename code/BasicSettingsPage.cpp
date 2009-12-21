@@ -258,6 +258,8 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 		new wxCheckBox(this, ID_SPEECH_IN_BRIEFING, _("Briefings"));
 	wxCheckBox* speechInGameCheck = 
 		new wxCheckBox(this, ID_SPEECH_IN_GAME, _("Ingame"));
+	wxCheckBox* speechInMultiCheck=
+		new wxCheckBox(this, ID_SPEECH_IN_MULTI, _("Multiplayer"));
 
 	wxButton* speechMoreVoicesButton = 
 		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get More Voices"));
@@ -273,6 +275,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	speechRightSizer->Add(speechInTechroomCheck);
 	speechRightSizer->Add(speechInBriefingCheck);
 	speechRightSizer->Add(speechInGameCheck);
+	speechRightSizer->Add(speechInMultiCheck);
 	speechRightSizer->Add(speechMoreVoicesButton);
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
@@ -328,6 +331,10 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 		bool speechInGame;
 		proman->Get()->Read(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true);
 		speechInGameCheck->SetValue(speechInGame);
+
+		bool speechInMulti;
+		proman->Get()->Read(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true);
+		speechInMultiCheck->SetValue(speechInMulti);
 	} else {
 		speechBox->Disable();
 		speechTestText->Disable();
@@ -338,8 +345,10 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 		speechInTechroomCheck->Disable();
 		speechInBriefingCheck->Disable();
 		speechInGameCheck->Disable();
+		speechInMultiCheck->Disable();
 		speechMoreVoicesButton->Disable();
 	}
+
 	// Network
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
 
