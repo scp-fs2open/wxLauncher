@@ -2,6 +2,8 @@
 #include <wx/vlbox.h>
 #include <wx/fileconf.h>
 #include <wx/wfstream.h>
+#include <wx/sstream.h>
+#include <wx/mstream.h>
 #include <wx/tokenzr.h>
 #include <wx/arrstr.h>
 #include <wx/filename.h>
@@ -65,7 +67,42 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			wxLogDebug(_T("   Open failed!"));
 			continue;
 		}
-		wxFileConfig* config = new wxFileConfig(stream);
+
+		wxFileConfig* config;
+
+		// check if the stream is a UTF-8 File
+		char header[3];
+		stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
+		stream.SeekI(0);
+		if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
+			// is a UTF-8 file
+			config = new wxFileConfig(stream);
+		} else {
+			// Convert any input stream into UTF8 so that the wxFileConfig will not
+			// choke on the high ASCII characters.
+			wxMemoryOutputStream tempStream;
+			tempStream.Write(stream);
+
+			wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
+			size_t size = buf->GetBufferSize();
+
+			char* characterBuffer = new char[size+1];
+			characterBuffer[size] = '\0';
+
+			buf->Seek(0, wxFromStart);
+			size_t read = buf->Read(reinterpret_cast<void*>(characterBuffer), size);
+			if ( read != size ) {
+				wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+				delete[] characterBuffer;
+				continue;
+			}
+
+			wxString stringBuffer(characterBuffer, wxConvLocal);
+			wxStringInputStream finalBuffer(stringBuffer);
+
+			config = new wxFileConfig(finalBuffer);
+			delete[] characterBuffer;
+		}
 
 		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")));
 
