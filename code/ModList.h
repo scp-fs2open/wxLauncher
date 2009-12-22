@@ -8,7 +8,14 @@
 
 #include "Skin.h"
 
-WX_DECLARE_HASH_MAP( wxString, wxFileConfig*, wxStringHash, wxStringEqual , ConfigHash);
+class ConfigPair {
+public:
+	ConfigPair(wxString &shortname, wxFileConfig* config);
+	~ConfigPair();
+	wxString shortname;
+	wxFileConfig* config;
+};
+WX_DECLARE_OBJARRAY(ConfigPair, ConfigArray);
 
 
 class FlagSetItem {
@@ -130,18 +137,19 @@ private:
 	/** A hash map of the wxFileConfigs that represent the mod.ini files for
 	each mod.  The key is the the mod's folder name which is used as the mod's
 	internal name. */
-	ConfigHash* configFiles;
+	ConfigArray* configFiles;
 	wxChar semicolon[2];
 	SkinSystem* skinSystem;
+	wxString stringNoMod;
 	
 	wxButton *infoButton, *activateButton;
 	wxBoxSizer *buttonSizer;
 
-	void readIniFileString(ConfigHash::mapped_type config,
+	void readIniFileString(wxFileConfig* config,
 		wxString keyvalue, wxString ** location);
-	void readFlagSet(ConfigHash::mapped_type config,
+	void readFlagSet(wxFileConfig* config,
 		wxString keyprefix, FlagSetItem * set);
-	void readTranslation(ConfigHash::mapped_type config,
+	void readTranslation(wxFileConfig* config,
 		wxString langaugename, I18nItem ** trans);
 	wxString excapeSpecials(wxString toexcape);
 

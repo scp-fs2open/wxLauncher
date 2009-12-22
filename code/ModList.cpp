@@ -15,6 +15,20 @@
 
 #include "wxLauncherSetup.h"
 
+ConfigPair::ConfigPair(wxString &shortname, wxFileConfig *config)  {
+	this->shortname = shortname;
+	this->config = config;
+}
+
+ConfigPair::~ConfigPair() {
+	if ( this->config != NULL ) {
+		delete this->config;
+	}
+}
+
+#include <wx/arrimpl.cpp>
+WX_DEFINE_OBJARRAY(ConfigArray);
+
 ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
@@ -24,6 +38,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->semicolon[0] = ';';
 	this->semicolon[1] = '\0';
+
+	this->stringNoMod = _("(No MOD)");
 
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
@@ -36,13 +52,13 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	}
 
 	// parse mod.ini's in all of the directories that contain one
-	this->configFiles = new ConfigHash();
+	this->configFiles = new ConfigArray();
 
 	wxLogDebug(_T("Inserting '(No MOD)'"));
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
-		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig(tcmodinistream);
+		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig(tcmodinistream)));
 		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath());
 
 		// make sure that a mod.ini in the root TC folder is not apart of this set
@@ -53,7 +69,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		}
 
 	} else {
-		(*(this->configFiles))[_T("(No Mod)")] = new wxFileConfig();
+		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig()));
 		wxLogDebug(_T(" Using defaults for TC."));
 	}
 
@@ -122,16 +138,15 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 		wxLogDebug(_T("   Mod short name is: %s"), shortname);
 
-		(*(this->configFiles))[shortname] = config;
+		this->configFiles->Add(new ConfigPair(shortname, config));
 	}
 
 	// create internal repesentation of the mod.ini's
 	wxLogDebug(_T("Transforming mod.ini's"));
-	ConfigHash::iterator iter = this->configFiles->begin();
-
-	while ( iter != this->configFiles->end() ) {
-		ConfigHash::key_type shortname = iter->first;
-		ConfigHash::mapped_type config = iter->second;
+	
+	for(size_t i = 0; i < this->configFiles->size(); i++) {
+		wxString shortname = this->configFiles->Item(i).shortname;
+		wxFileConfig* config = this->configFiles->Item(i).config;
 		ModItem* item = new ModItem(this->skinSystem);
 		wxLogDebug(_T(" %s"), shortname);
 
@@ -297,8 +312,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		}
 
 		this->tableData->Add(item);
-
-		++iter;
 	}
 
 	this->SetItemCount(this->tableData->Count());
@@ -327,11 +340,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 /** the distructor.  Cleans up stuff. */
 ModList::~ModList() {
 	if ( this->configFiles != NULL ) {
-		ConfigHash::iterator citer = this->configFiles->begin();
-		while ( citer != this->configFiles->end() ) {
-			delete citer->second;
-			citer++;
-		}
 		delete this->configFiles;
 	}
 	if ( this->tableData != NULL ) {
@@ -343,7 +351,7 @@ ModList::~ModList() {
 }
 /** Function takes the keyvalue string to search for, and returns via location
 the pointer to value. If the keyvalue is not found *location will remain NULL.*/
-void ModList::readIniFileString(ConfigHash::mapped_type config,
+void ModList::readIniFileString(wxFileConfig* config,
 									 wxString keyvalue, wxString ** location) {
 	if ( config->Exists(keyvalue) ) {
 			*location = new wxString();
@@ -381,14 +389,14 @@ wxString ModList::excapeSpecials(wxString toexcape) {
 
 
 /** */
-void ModList::readFlagSet(ConfigHash::mapped_type config,
+void ModList::readFlagSet(wxFileConfig* config,
 							   wxString keyprefix, FlagSetItem *set) {
 	readIniFileString(config, wxString::Format(_T("%s/name"), keyprefix), &(set->name));
 	readIniFileString(config, wxString::Format(_T("%s/flagset"), keyprefix), &(set->flagset));
 	readIniFileString(config, wxString::Format(_T("%s/notes"), keyprefix), &(set->notes));
 }
 
-void ModList::readTranslation(ConfigHash::mapped_type config, wxString langaugename, I18nItem **trans) {
+void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nItem **trans) {
 	wxString section = wxString::Format(_T("/%s"), langaugename);
 	if ( config->Exists(section) ) {
 		*trans = new I18nItem();
