@@ -12,6 +12,8 @@
 #include "Skin.h"
 #include "ids.h"
 #include "ModList.h"
+#include "ProfileManager.h"
+#include "TCManager.h"
 
 #include "wxLauncherSetup.h"
 
@@ -316,6 +318,29 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->SetItemCount(this->tableData->Count());
 
+	// set currently select mod as selected or
+	// set (No MOD) if non or previous does not exist
+	wxString currentMod;
+	ProMan::GetProfileManager()->Get()
+		->Read(PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No MOD)"));
+
+	{
+		size_t i;
+		for ( i = 0; i < this->tableData->size(); i++) {
+			if ( *(this->tableData->Item(i).shortname) == currentMod ) {
+				break;
+			}
+		}
+
+		if ( i < this->tableData->size() ) {
+			// found it
+			this->SetSelection(i);
+		} else {
+			this->SetSelection(0);
+		}
+	}
+
+
 	this->infoButton = 
 		new wxButton(this, ID_MODLISTBOX_INFO_BUTTON, _("Info"));
 	this->activateButton = 
@@ -446,11 +471,29 @@ wxCoord ModList::OnMeasureItem(size_t WXUNUSED(n)) const {
 }
 
 void ModList::OnSelectionChange(wxCommandEvent &event) {
-	wxLogDebug(_T("Selection changed to %d."), event.GetInt());
+	wxLogDebug(_T("Selection changed to %d (%s)."),
+		event.GetInt(),
+		*(this->tableData->Item(event.GetInt()).shortname));
+}
+
+void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
+	int selected = this->GetSelection();
+	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_TC_CURRENT_MOD,
+			*(this->tableData->Item(selected).shortname));
+
+	TCManager::GenerateTCSelectedModChanged();
+}
+
+void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 }
 
 BEGIN_EVENT_TABLE(ModList, wxVListBox)
 EVT_LISTBOX(ID_MODLISTBOX, ModList::OnSelectionChange)
+EVT_BUTTON(ID_MODLISTBOX_ACTIVATE_BUTTON, ModList::OnActivateMod)
+EVT_BUTTON(ID_MODLISTBOX_INFO_BUTTON, ModList::OnInfoMod)
 END_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////////////////

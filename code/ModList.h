@@ -132,6 +132,8 @@ public:
 	virtual wxCoord OnMeasureItem(size_t n) const;
 
 	void OnSelectionChange(wxCommandEvent &event);
+	void OnActivateMod(wxCommandEvent &event);
+	void OnInfoMod(wxCommandEvent &event);
 
 private:
 	/** A hash map of the wxFileConfigs that represent the mod.ini files for
