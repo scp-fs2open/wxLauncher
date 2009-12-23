@@ -137,7 +137,8 @@ enum ProfileDialogReturnValues {
 
 #define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")		//!< string, absolute path
 #define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")	//!< string, binary name
-#define PRO_CFG_TC_CURRENT_MOD				_T("/tc/currentmod")	//!< string, mod shortname
+#define PRO_CFG_TC_CURRENT_MODLINE			_T("/tc/currentmodline")	//!< string, the entire line that should follow -mod
+#define PRO_CFG_TC_CURRENT_MOD				_T("/tc/currentmod")	//!< string, the mod shortname (for modlist)
 
 #define PRO_CFG_VIDEO_API					_T("/video/api")		//!< string
 #define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		//!< int

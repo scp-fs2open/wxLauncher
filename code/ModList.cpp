@@ -319,7 +319,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	this->SetItemCount(this->tableData->Count());
 
 	// set currently select mod as selected or
-	// set (No MOD) if non or previous does not exist
+	// set (No MOD) if none or previous does not exist
 	wxString currentMod;
 	ProMan::GetProfileManager()->Get()
 		->Read(PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No MOD)"));
@@ -480,9 +480,46 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	int selected = this->GetSelection();
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
 
+	wxString modline;
+	wxString* shortname = this->tableData->Item(selected).shortname;
+	wxString* prependmods = this->tableData->Item(selected).primarylist;
+	wxString* appendmods = this->tableData->Item(selected).secondarylist;
+
+	if ( prependmods != NULL ) {
+		wxStringTokenizer prependtokens(*prependmods, _T(", "), wxTOKEN_STRTOK); // no empty tokens
+		while ( prependtokens.HasMoreTokens() ) {
+			if ( !modline.IsEmpty() ) {
+				modline += _T(",");
+			}
+			modline += prependtokens.GetNextToken();
+		}
+	}
+
+	wxCHECK_RET( shortname != NULL, _T("Mod shortname is NULL!"));
+	if ( !modline.IsEmpty() ) {
+		modline += _T(",");
+	}
+	if ( selected != 0 ) {
+		// put current mods name into the list unless it is (No MOD)
+		modline += *shortname;
+	}
+
+	if ( appendmods != NULL ) {
+		wxStringTokenizer appendtokens(*appendmods, _T(", "), wxTOKEN_STRTOK);
+		while ( appendtokens.HasMoreTokens() ) {
+			if ( !modline.IsEmpty() ) {
+				modline += _T(",");
+			}
+			modline += appendtokens.GetNextToken();
+		}
+	}
+
+	wxLogDebug(_T("New modline is %s"), modline);
+
 	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_MOD,
-			*(this->tableData->Item(selected).shortname));
+		->Write(PRO_CFG_TC_CURRENT_MODLINE, modline);
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_TC_CURRENT_MOD, *shortname);
 
 	TCManager::GenerateTCSelectedModChanged();
 }
