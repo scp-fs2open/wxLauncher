@@ -69,3 +69,18 @@ void HelpManager::OpenMainHelpPage() {
 	wxCHECK_RET( HelpManager::IsInitialized(), _T("Help is not initialized"));
 	HelpManager::controller->DisplayContents();
 }
+
+/** Opens the help file passing str to the help controller.
+The help controller tries to find a page in the manual in 4 ways:
+\li as a direct filename of the document in the manual
+\li as a chapter name (based on the page title displayed in the contents)
+\li a word from the index
+\li any word (will open search pane and do a search)
+
+\note Capitalization matters.
+*/
+void HelpManager::OpenHelpByString(wxString& str) {
+	wxCHECK_RET( HelpManager::IsInitialized(), _("Help manager is not initialized"));
+
+	HelpManager::controller->Display(str);
+}
