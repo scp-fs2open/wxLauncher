@@ -59,27 +59,38 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( this->defaultSkin->welcomeHeader == NULL ) {
 		this->defaultSkin->welcomeHeader = 
 			new wxBitmap(_("SCP_Header.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->welcomeHeader->IsOk());
 	}
 
 	if ( this->defaultSkin->welcomeIcon == NULL ) {
 		this->defaultSkin->welcomeIcon =
 			new wxBitmap(_T("welcome.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->welcomeIcon->IsOk());
 	}
 	if ( this->defaultSkin->modsIcon == NULL ) {
 		this->defaultSkin->modsIcon =
 			new wxBitmap(_T("mods.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->modsIcon->IsOk());
 	}
 	if ( this->defaultSkin->basicIcon == NULL ) {
 		this->defaultSkin->basicIcon =
 			new wxBitmap(_T("basic.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->basicIcon->IsOk());
 	}
 	if ( this->defaultSkin->advancedIcon == NULL ) {
 		this->defaultSkin->advancedIcon = 
 			new wxBitmap(_T("advanced.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->advancedIcon->IsOk());
 	}
 	if ( this->defaultSkin->installIcon == NULL ) {
 		this->defaultSkin->installIcon =
 			new wxBitmap(_T("install.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->installIcon->IsOk());
+	}
+	if ( this->defaultSkin->idealIcon == NULL ) {
+		this->defaultSkin->idealIcon = 
+			new wxBitmap(_T("recommended.png"), wxBITMAP_TYPE_PNG);
+		wxASSERT(this->defaultSkin->idealIcon->IsOk());
 	}
 
 	if ( this->defaultSkin->baseFont == NULL ) {
@@ -96,7 +107,7 @@ If you’re  new to the Freespace 2 universe, you might want to check out these li
 = <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> \
 = <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> \
 = <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
-Also, don’t  forget the help file, there is a nice 'Getting Started' tutorial there.<br>\
+Also, don’t  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>\
 </center></p>"));
 	}
 }
@@ -204,6 +215,23 @@ wxBitmap SkinSystem::GetInstallIcon() {
 			return *(this->defaultSkin->installIcon);
 	} else {
 		wxLogFatalError(_T("Cannot retrive a install icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
+		return wxNullBitmap;
+	}
+}
+
+wxBitmap SkinSystem::GetIdealIcon() {
+	if ( this->modSkin != NULL
+		&& this->modSkin->idealIcon != NULL ) {
+			return *(this->modSkin->idealIcon);
+	} else if ( this->TCSkin != NULL
+		&& this->TCSkin->idealIcon != NULL ) {
+			return *(this->TCSkin->idealIcon);
+	} else if ( this->defaultSkin != NULL
+		&& this->defaultSkin->idealIcon != NULL ) {
+			return *(this->defaultSkin->idealIcon);
+	} else {
+		wxLogFatalError(_T("Cannot retrive an ideal icon. (0x%h, 0x%h, 0x%h)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}

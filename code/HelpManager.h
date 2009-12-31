@@ -11,6 +11,7 @@ namespace HelpManager {
 
 	void OpenHelpById(WindowIDS id);
 	void OpenMainHelpPage();
+	void OpenHelpByString(wxString& str);
 };
 
 #endif

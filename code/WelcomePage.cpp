@@ -7,6 +7,7 @@
 #include "Skin.h"
 #include "StatusBar.h"
 #include "ProfileManager.h"
+#include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -159,7 +160,12 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 void WelcomePage::LinkClicked(wxHtmlLinkEvent &event) {
 	wxHtmlLinkInfo info = event.GetLinkInfo();
-	wxLaunchDefaultBrowser(info.GetHref());
+	wxString rest;
+	if (info.GetHref().StartsWith(_T("help://"), &rest)) {
+		HelpManager::OpenHelpByString(rest);
+	} else {
+		wxLaunchDefaultBrowser(info.GetHref());
+	}
 }
 
 void WelcomePage::LinkHover(wxHtmlCellEvent &event) {
