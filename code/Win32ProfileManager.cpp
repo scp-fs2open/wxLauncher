@@ -346,7 +346,7 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 
 	// Network folder
 	HKEY networkRegHandle = 0;
-	ret = RegCreateKeyEx(
+	ret = RegCreateKeyExW(
 		regHandle,
 		L"Network",
 		0,
