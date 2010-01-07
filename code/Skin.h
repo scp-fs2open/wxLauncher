@@ -20,6 +20,7 @@ public:
 	wxBitmap* idealIcon;
 	wxFont* baseFont;
 	wxString* welcomePageText;
+	wxBitmap* warningIcon;
 };
 
 /** Class used to manage the skinning of the launcher.  The skinable parts of
@@ -40,6 +41,8 @@ public:
 	wxBitmap GetAdvancedIcon();
 	wxBitmap GetInstallIcon();
 	wxBitmap GetIdealIcon();
+	wxBitmap GetWarningIcon();
+	wxBitmap GetBigWarningIcon();
 	wxFont GetFont();
 	const wxFont* GetFontPointer();
 	wxString GetWelcomePageText();
@@ -67,6 +70,8 @@ public:
 	static const unsigned int InfoWindowImageHeight = 112;
 	static const unsigned int ModsListImageWidth = 182;
 	static const unsigned int ModsListImageHeight = 80;
+	static const unsigned int BigWarningIconWidth = 64;
+	static const unsigned int BigWarningIconHeight = 64;
 
 
 private:
