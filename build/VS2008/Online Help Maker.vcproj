@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\..\output\VS2008\$(ConfigurationName)"
-			IntermediateDirectory="$(InputName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
 			ConfigurationType="0"
 			>
 			<Tool
@@ -39,7 +39,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\..\output\VS2008\$(ConfigurationName)"
-			IntermediateDirectory="$(InputName)\$(ConfigurationName)"
+			IntermediateDirectory="$(ProjectName)\$(ConfigurationName)"
 			ConfigurationType="0"
 			>
 			<Tool

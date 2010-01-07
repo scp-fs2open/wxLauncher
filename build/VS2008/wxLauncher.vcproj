@@ -49,6 +49,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(OPENALPATH)\include&quot;;&quot;$(WXPATH)\lib\vc_lib\mswud&quot;;&quot;$(WXPATH)\contrib\include&quot;;&quot;$(WXPATH)\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WXDEBUG=1;USE_SPEECH=1;USE_OPENAL=1;USE_JOYSTICK=1"
+				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -206,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\FlagList.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\HelpManager.cpp"
 				>
 			</File>
@@ -285,6 +290,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\BottomButtons.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\FlagList.h"
 				>
 			</File>
 			<File

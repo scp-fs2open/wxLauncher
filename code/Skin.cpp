@@ -338,7 +338,7 @@ wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
    return NULL;
 }
 
-/** Returns true is function is able to get a valid filename object for the
+/** Returns true if function is able to get a valid filename object for the
 passed paths.  Filename is returned via the param filename. */
 bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
 							wxString shortmodname, wxString filepath) {
