@@ -16,6 +16,7 @@ Skin::Skin() {
 	this->idealIcon = NULL;
 	this->baseFont = NULL;
 	this->welcomePageText = NULL;
+	this->warningIcon = NULL;
 }
 
 Skin::~Skin() {
@@ -30,6 +31,7 @@ Skin::~Skin() {
 	if (this->idealIcon != NULL) delete this->idealIcon;
 	if (this->baseFont != NULL) delete this->baseFont;
 	if (this->welcomePageText != NULL) delete this->welcomePageText;
+	if (this->warningIcon != NULL) delete this->warningIcon;
 }
 
 SkinSystem::SkinSystem(Skin *defaultSkin) {
@@ -109,6 +111,11 @@ If you’re  new to the Freespace 2 universe, you might want to check out these li
 = <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
 Also, don’t  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>\
 </center></p>"));
+	}
+
+	if ( this->defaultSkin->warningIcon == NULL ) {
+		this->defaultSkin->warningIcon = new wxBitmap(_T("error.png"), wxBITMAP_TYPE_ANY);
+		wxASSERT(this->defaultSkin->warningIcon->IsOk());
 	}
 }
 
@@ -292,6 +299,33 @@ wxString SkinSystem::GetWelcomePageText() {
 		return wxEmptyString;
 	}
 }
+
+wxBitmap SkinSystem::GetWarningIcon() {
+	if ( this->modSkin != NULL
+		&& this->modSkin->warningIcon != NULL ) {
+			return *(this->modSkin->warningIcon);
+	} else if ( this->TCSkin != NULL
+		&& this->TCSkin->warningIcon != NULL ) {
+			return *(this->TCSkin->warningIcon);
+	} else if ( this->defaultSkin != NULL
+		&& this->defaultSkin->warningIcon ) {
+			return *(this->defaultSkin->warningIcon);
+	} else {
+		wxLogFatalError(_T("Cannot retrive a warning icon. (0x%h, 0x%h, 0x%h)"),
+			this->modSkin, this->TCSkin, this->defaultSkin);
+		return wxNullBitmap;
+	}
+}
+
+wxBitmap SkinSystem::GetBigWarningIcon() {
+	wxImage image = this->GetWarningIcon().ConvertToImage();
+	image = image.Scale(SkinSystem::BigWarningIconWidth, SkinSystem::BigWarningIconHeight);
+	return wxBitmap(image);
+}
+
+
+
+
 
 
 /** Opens, verifies and resizes (if nessisary) the 255x112 image that is needed
