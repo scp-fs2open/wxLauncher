@@ -61,8 +61,8 @@ public:
 
 	static const unsigned int TabIconWidth = 64;
 	static const unsigned int TabIconHeight = 64;
-	static const unsigned int IdealIconWidth = 16;
-	static const unsigned int IdealIconHeight = 16;
+	static const unsigned int IdealIconWidth = 24;
+	static const unsigned int IdealIconHeight = 24;
 	static const unsigned int InfoWindowImageWidth = 255;
 	static const unsigned int InfoWindowImageHeight = 112;
 	static const unsigned int ModsListImageWidth = 182;
