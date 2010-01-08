@@ -46,6 +46,7 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("Initing Skin System..."));
 	this->skin = new SkinSystem();
 
+	wxLogInfo(_T("Initing HelpManager..."));
 	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	HelpManager::Initialize();
 
