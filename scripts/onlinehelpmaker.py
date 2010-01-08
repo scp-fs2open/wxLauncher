@@ -436,6 +436,8 @@ def process_input_stage3(file, options, files, extrafiles):
         attrs = update_attribute(attrs, 'src', change_filename(dst, os.path.splitext(dst)[1], self.files['stage3'], ".", makedirs=False))
         logging.debug(" Image (%s) should be in %s and copying to %s", attrs[0][1], location, dst)
         try:
+          if not os.path.exists(os.path.dirname(dst)):
+            os.mkdir(os.path.dirname(dst))
           shutil.copy2(location, dst)
         except:
           traceback.print_exc()
