@@ -1,8 +1,17 @@
 #include <wx/wx.h>
 #include <wx/filename.h>
+#include <wx/artprov.h>
 #include "skin.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
+
+class ArtProvider: public wxArtProvider {
+public:
+	ArtProvider(SkinSystem *skinSystem);
+private:
+	SkinSystem *skinSystem;
+	virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client, const wxSize& size);
+};
 
 Skin::Skin() {
 	this->windowTitle = NULL;
@@ -44,6 +53,8 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	}
 	this->TCSkin = NULL;
 	this->modSkin = NULL;
+
+	wxArtProvider::Push(new ArtProvider(this));
 
 	// Verify that the default skin is complete and if not addin anything missing.
 
@@ -538,4 +549,21 @@ wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
 	wxASSERT( outimg.GetWidth() == SkinSystem::ModsListImageWidth);
 	wxASSERT( outimg.GetHeight() == SkinSystem::ModsListImageHeight);
 	return outimg;
+}
+
+ArtProvider::ArtProvider(SkinSystem *skinSystem) {
+	this->skinSystem = skinSystem;
+}
+
+wxBitmap ArtProvider::CreateBitmap(const wxArtID &id, const wxArtClient &client, const wxSize &size) {
+	wxBitmap bitmap;
+	if ( id == wxART_HELP ) {
+		if ( bitmap.LoadFile(_T("helpicon.png"), wxBITMAP_TYPE_PNG) ) {
+			return bitmap;
+		} else {
+			return wxNullBitmap;
+		}
+	} else {
+		return wxNullBitmap;
+	}
 }
