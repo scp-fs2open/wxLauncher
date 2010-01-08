@@ -4,6 +4,13 @@
 
 #include "wxLauncherSetup.h"
 
+struct FlagInfo {
+	wxString flag;
+	wxString category;
+	bool takesArg;
+};
+#include "FlagInfo.cpp"
+
 #define WIDTH_OF_CHECKBOX 16
 
 Flag::Flag() {
