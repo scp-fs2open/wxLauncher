@@ -114,7 +114,7 @@ Also, don’t  forget the help file, there is a nice '<a href='help://Getting star
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
-		this->defaultSkin->warningIcon = new wxBitmap(_T("error.png"), wxBITMAP_TYPE_ANY);
+		this->defaultSkin->warningIcon = new wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->warningIcon->IsOk());
 	}
 }
