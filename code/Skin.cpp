@@ -121,7 +121,7 @@ Also, don’t  forget the help file, there is a nice '<a href='help://Getting star
 	}
 
 	if ( this->defaultSkin->bigWarningIcon == NULL ) {
-		this->defaultSkin->bigWarningIcon = new wxBitmap(_T("big_warning.png"), wxBITMAP_TYPE_ANY);
+		this->defaultSkin->bigWarningIcon = new wxBitmap(_T("warning_big.png"), wxBITMAP_TYPE_ANY);
 		if ( !this->defaultSkin->bigWarningIcon->IsOk() ) {
 			delete this->defaultSkin->bigWarningIcon;
 			this->defaultSkin->bigWarningIcon = NULL;
