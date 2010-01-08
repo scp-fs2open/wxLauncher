@@ -21,6 +21,7 @@ public:
 	wxFont* baseFont;
 	wxString* welcomePageText;
 	wxBitmap* warningIcon;
+	wxBitmap* bigWarningIcon;
 };
 
 /** Class used to manage the skinning of the launcher.  The skinable parts of

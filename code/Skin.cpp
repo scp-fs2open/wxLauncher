@@ -17,6 +17,7 @@ Skin::Skin() {
 	this->baseFont = NULL;
 	this->welcomePageText = NULL;
 	this->warningIcon = NULL;
+	this->bigWarningIcon = NULL;
 }
 
 Skin::~Skin() {
@@ -32,6 +33,7 @@ Skin::~Skin() {
 	if (this->baseFont != NULL) delete this->baseFont;
 	if (this->welcomePageText != NULL) delete this->welcomePageText;
 	if (this->warningIcon != NULL) delete this->warningIcon;
+	if (this->bigWarningIcon != NULL) delete this->bigWarningIcon;
 }
 
 SkinSystem::SkinSystem(Skin *defaultSkin) {
@@ -116,6 +118,14 @@ Also, don’t  forget the help file, there is a nice '<a href='help://Getting star
 	if ( this->defaultSkin->warningIcon == NULL ) {
 		this->defaultSkin->warningIcon = new wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->warningIcon->IsOk());
+	}
+
+	if ( this->defaultSkin->bigWarningIcon == NULL ) {
+		this->defaultSkin->bigWarningIcon = new wxBitmap(_T("big_warning.png"), wxBITMAP_TYPE_ANY);
+		if ( !this->defaultSkin->bigWarningIcon->IsOk() ) {
+			delete this->defaultSkin->bigWarningIcon;
+			this->defaultSkin->bigWarningIcon = NULL;
+		}
 	}
 }
 
@@ -318,9 +328,20 @@ wxBitmap SkinSystem::GetWarningIcon() {
 }
 
 wxBitmap SkinSystem::GetBigWarningIcon() {
-	wxImage image = this->GetWarningIcon().ConvertToImage();
-	image = image.Scale(SkinSystem::BigWarningIconWidth, SkinSystem::BigWarningIconHeight);
-	return wxBitmap(image);
+	if ( this->modSkin != NULL
+		&& this->modSkin->bigWarningIcon != NULL ) {
+			return *(this->modSkin->bigWarningIcon);
+	} else if ( this->TCSkin != NULL
+		&& this->TCSkin->bigWarningIcon != NULL ) {
+			return *(this->TCSkin->bigWarningIcon);
+	} else if ( this->defaultSkin != NULL
+		&& this->defaultSkin->bigWarningIcon ) {
+			return *(this->defaultSkin->bigWarningIcon);
+	} else {
+		wxImage image = this->GetWarningIcon().ConvertToImage();
+		image = image.Scale(SkinSystem::BigWarningIconWidth, SkinSystem::BigWarningIconHeight);
+		return wxBitmap(image);
+	}
 }
 
 
