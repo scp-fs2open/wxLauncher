@@ -8,6 +8,7 @@
 #include <wx/arrstr.h>
 #include <wx/filename.h>
 #include <wx/dir.h>
+#include <wx/html/htmlwin.h>
 
 #include "Skin.h"
 #include "ids.h"
@@ -16,6 +17,29 @@
 #include "TCManager.h"
 
 #include "wxLauncherSetup.h"
+
+class ModInfoDialog: wxDialog {
+public:
+	ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent);
+
+private:
+	class ImageDrawer: public wxPanel {
+	public:
+		ImageDrawer(ModInfoDialog* parent);
+
+		void OnDraw(wxPaintEvent &event);
+
+	private:
+		ModInfoDialog* parent;
+
+		DECLARE_EVENT_TABLE();
+	};
+	friend ImageDrawer;
+
+	SkinSystem* skin;
+	ModItem* item;
+};
+
 
 ConfigPair::ConfigPair(wxString &shortname, wxFileConfig *config)  {
 	this->shortname = shortname;
@@ -525,6 +549,9 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
+	int selected = this->GetSelection();
+	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
+	new ModInfoDialog(this->skinSystem, new ModItem(this->tableData->Item(selected)), this);
 }
 
 BEGIN_EVENT_TABLE(ModList, wxVListBox)
@@ -791,7 +818,7 @@ void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 
 ///////////////////////////////////////////
 /** \class ModItem::ModImage
-Extends wxPanel so that it can draw the Mod's image on the list or degrade smoothly.
+Draws the Mod's image on the list or degrades smoothly.
 */
 /** Constructor. Sets up stuff. */
 ModItem::ModImage::ModImage(ModItem *myData) {
@@ -808,3 +835,127 @@ void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
 		dc.DrawText(noimg, rect.x + rect.width/2 - size.x/2, rect.y + rect.height/2 - size.y/2);
 	}
 }
+
+ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) {
+	wxASSERT(skin != NULL);
+	this->skin = skin;
+
+	wxASSERT(item != NULL);
+	this->item = item;
+
+	wxASSERT(item->name != NULL || item->shortname != NULL);
+	wxString modName = 
+		wxString::Format(_T("%s"),
+			(item->name == NULL)? *(item->shortname): *(item->name));
+	wxDialog::Create(parent, wxID_ANY, modName, wxDefaultPosition, wxDefaultSize, wxBORDER_RAISED | wxBORDER_DOUBLE );
+	this->SetBackgroundColour(wxColour(_T("WHITE")));
+
+	wxStaticText* titleBox = 
+		new wxStaticText(this, wxID_ANY, modName, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxFont titleFont = titleBox->GetFont();
+	titleFont.SetWeight(wxFONTWEIGHT_BOLD);
+	titleFont.SetPointSize(14);
+	titleBox->SetFont(titleFont);
+
+	wxString tcPath;
+	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
+	wxString modFolderString = 
+		wxString::Format(_T("%s%c%s"), tcPath, wxFileName::GetPathSeparator(), *(item->shortname));
+	wxStaticText* modFolderBox = 
+		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+
+	wxPanel* modImage = new ModInfoDialog::ImageDrawer(this);
+	modImage->SetMaxSize(wxSize(SkinSystem::InfoWindowImageWidth, SkinSystem::InfoWindowImageHeight));
+
+	wxHtmlWindow* info = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
+	info->SetMinSize(wxSize(SkinSystem::InfoWindowImageWidth, 250));
+	if ( item->infotext == NULL ) {
+		info->SetPage(_T("<p>No information available.</p>"));
+	} else {
+		wxString infoText(*(item->infotext));
+		infoText.Replace(_T("\n"), _T("<br />"));
+		info->SetPage(infoText);
+	}
+
+	wxHtmlWindow* links = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxHW_SCROLLBAR_NEVER );
+	links->SetSize(SkinSystem::InfoWindowImageWidth, 40);
+	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
+		(item->website != NULL) ? 
+			wxString::Format(_T("<a href='%s'>%s</a> :: "), *(item->website), _("Website")):wxEmptyString,
+		wxString::Format(_T("<a href='%s'>%s</a>"), (item->forum != NULL) ?
+			*(item->forum):_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")),
+		(item->bugs != NULL) ?
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->bugs), _("Bugs")) : wxEmptyString,
+		(item->support != NULL) ?
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->support), _("Support")) : wxEmptyString
+		));
+
+	wxStaticBitmap* warning = NULL;
+	wxHtmlWindow* notesText = NULL;
+
+	if ( item->notes != NULL ) {
+		if ( item->warn ) {
+			warning = new wxStaticBitmap(this, wxID_ANY, skin->GetBigWarningIcon());
+		}
+		notesText = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
+		notesText->SetPage(*(item->notes));
+		notesText->SetMinSize(wxSize(200, 64));
+	}
+
+	wxButton* close = new wxButton(this, wxID_ANY, _("Close"));
+	this->SetEscapeId(close->GetId());
+
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(titleBox, wxSizerFlags().Centre());
+	sizer->Add(modFolderBox, wxSizerFlags().Centre());
+	sizer->Add(modImage, wxSizerFlags().Centre());
+	sizer->Add(info, wxSizerFlags().Centre());
+	sizer->Add(links, wxSizerFlags().Centre());
+	if ( notesText != NULL ) {
+		if ( warning != NULL ) {
+			wxSizer* linkSizer = new wxBoxSizer(wxHORIZONTAL);
+			linkSizer->Add(warning);
+			linkSizer->Add(notesText);
+			sizer->Add(linkSizer, wxSizerFlags().Expand().Centre());
+		} else {
+			sizer->Add(notesText, wxSizerFlags().Expand().Centre());
+		}
+	}
+	sizer->Add(close, wxSizerFlags().Centre());
+	this->SetSizerAndFit(sizer);
+	this->Layout();
+	this->CentreOnParent();
+	this->ShowModal();
+}
+
+ModInfoDialog::ImageDrawer::ImageDrawer(ModInfoDialog* parent):
+wxPanel(parent) {
+	this->parent = parent;
+
+	if (parent->item->image == NULL) {
+		this->SetSize(SkinSystem::InfoWindowImageWidth, SkinSystem::InfoWindowImageHeight);
+	} else {
+		this->SetSize(
+			parent->item->image->GetWidth(),
+			parent->item->image->GetHeight());
+	}
+	this->GetEventHandler()->Connect(wxEVT_PAINT, wxPaintEventHandler(ModInfoDialog::ImageDrawer::OnDraw));
+}
+
+void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &event) {
+	wxPaintDC dc(this);
+	if ( parent->item->image != NULL ) {
+		dc.DrawBitmap(*(parent->item->image), 0, 0);
+	} else {
+		wxCoord textWidth, textHeight;
+		dc.GetTextExtent(_("NO IMAGE"), &textWidth, &textHeight);
+
+		wxCoord drawLocationX = SkinSystem::InfoWindowImageWidth/2 - textWidth/2;
+		wxCoord drawLocationY = SkinSystem::InfoWindowImageHeight/2 - textHeight/2;
+		
+		dc.DrawText(_("NO IMAGE"), drawLocationX, drawLocationY);
+	}
+}
+
+BEGIN_EVENT_TABLE(ModInfoDialog::ImageDrawer, wxPanel)
+END_EVENT_TABLE()
