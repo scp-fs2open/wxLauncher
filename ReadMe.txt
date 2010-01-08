@@ -29,6 +29,17 @@ For more info about the builds on specific system see
 the readme.txt that is in the build systems folder.  All
 building code is in the build directory.
 
+Requirements shortlist:
+All platforms:
+ - wxWidgets
+ - Python
+ - Markdown for Python
+Windows
+ - Platform SDK
+
+Optional components
+All platforms:
+ - OpenAL
 wxLauncher is a wxWidgets based application, thus can 
 only be built with wxWidgets version 2.8.10 or higher 
 installed on your system.
