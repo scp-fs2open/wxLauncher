@@ -2,6 +2,7 @@
 #include <wx/image.h>
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
+#include <wx/splash.h>
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
 #include "Skin.h"
@@ -20,6 +21,16 @@ bool wxLauncher::OnInit() {
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
+
+	wxBitmap splash;
+	wxSplashScreen* splashWindow = NULL;
+	if (splash.LoadFile(_T("SCP_Header.png"), wxBITMAP_TYPE_PNG)) {
+		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
+		wxYield();
+	} else {
+		wxLogFatalError(_T("Unable to load splash image, this normally means that you are running the Launcher from a directory that does not have the images in it."));
+		return false;
+	}
 	
 	wxLog::SetActiveTarget(new Logger());
 	wxLogInfo(_T("wxLauncher Version %d.%d"), MAJOR_VERSION, MINOR_VERSION);
@@ -44,6 +55,8 @@ bool wxLauncher::OnInit() {
 	MainWindow* window = new MainWindow(skin);
 	wxLogStatus(_T("MainWindow is complete"));
 	window->Show(true);
+	splashWindow->Show(false);
+	splashWindow->Destroy();
 
 	wxLogStatus(_T("Ready."));
 	return true;
