@@ -571,6 +571,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		->Write(PRO_CFG_TC_CURRENT_MOD, *shortname);
 
 	TCManager::GenerateTCSelectedModChanged();
+	this->Refresh();
 }
 
 void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
