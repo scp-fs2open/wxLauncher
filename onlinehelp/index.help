@@ -1,14 +1,14 @@
 <title>Welcome to wxLauncher</title>
 
-Welcome to wxLauncher
-=====================
+#Welcome to wxLauncher
 
 ![wxLauncher logo](images/header.png "wxLauncher")
 
-Welcome to wxLauncher, your one-stop-shop for FreeSpace 2 and related content. 
+Welcome to wxLauncher, your one-stop-shop for FreeSpace 2 and related content.
 
-You can find the [FAQ][], the [About the authors][1], and the [Getting Started][2] guide.
+You can find the [FAQ][]![][li],[Authors][1]![][li] and [Getting started tutorial][2]![][li]
 
-[FAQ]:  faq.help
-[1]:    about.help
+[FAQ]:  jfaq.help
+[1]:    kauthors.help
 [2]:    gettingstarted.help
+[li]: images/li.png
