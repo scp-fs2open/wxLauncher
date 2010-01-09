@@ -369,6 +369,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		new wxButton(this, ID_MODLISTBOX_INFO_BUTTON, _("Info"));
 	this->activateButton = 
 		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
+	this->warnBitmap =
+		new wxStaticBitmap(this, wxID_ANY, this->skinSystem->GetWarningIcon());
+	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it, please click Info for more details"));
 
 	wxSizer* verticalSizer = new wxBoxSizer(wxVERTICAL);
 	verticalSizer->AddStretchSpacer(2);
@@ -377,7 +380,14 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	verticalSizer->Add(this->infoButton, wxSizerFlags().Expand());
 	verticalSizer->AddStretchSpacer(2);
 
+	wxSizer* warningSizer = new wxBoxSizer(wxVERTICAL);
+	warningSizer->AddStretchSpacer(1);
+	warningSizer->Add(this->warnBitmap);
+	warningSizer->AddStretchSpacer(1);
+
 	this->buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+	this->buttonSizer->AddStretchSpacer(1);
+	this->buttonSizer->Add(warningSizer, wxSizerFlags().Expand());
 	this->buttonSizer->AddStretchSpacer(1);
 	this->buttonSizer->Add(verticalSizer, wxSizerFlags().Expand());
 	this->buttonSizer->AddStretchSpacer(2);
@@ -463,7 +473,7 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
-	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->buttonSizer);
+	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->buttonSizer, this->warnBitmap);
 }
 
 void ModList::OnDrawSeparator(wxDC &WXUNUSED(dc), wxRect& WXUNUSED(rect), size_t WXUNUSED(n)) const {
@@ -475,8 +485,8 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	dc.DestroyClippingRegion();
 	if ( this->IsSelected(n) ) {
 		wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-		wxBrush b(highlighted);
-		dc.SetPen(wxPen(highlighted));
+		wxBrush b(highlighted, wxTRANSPARENT);
+		dc.SetPen(wxPen(highlighted, 5));
 		dc.SetBackground(b);
 		dc.SetBrush(b);
 		dc.DrawRoundedRectangle(rect, 10.0);
@@ -693,7 +703,7 @@ ModItem::~ModItem() {
 	if (this->modNamePanel != NULL) delete this->modNamePanel;
 }
 
-void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons) {
+void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons, wxStaticBitmap* warn) {
 	wxRect titlerect = rect;
 	titlerect.width = 150;
 
@@ -716,6 +726,11 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons
 	if ( selected ) { /* If I am selected do not have info panel draw because 
 					  I am going to put the buttons over the info text. */
 		buttons->Show(true);
+		if ( this->warn ) {
+			warn->Show(true);
+		} else {
+			warn->Show(false);
+		}
 		buttons->SetDimension(infotextrect.x, infotextrect.y,
 			infotextrect.width, infotextrect.height);
 	} else {
