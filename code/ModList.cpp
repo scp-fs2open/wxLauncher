@@ -976,7 +976,7 @@ wxPanel(parent) {
 	this->GetEventHandler()->Connect(wxEVT_PAINT, wxPaintEventHandler(ModInfoDialog::ImageDrawer::OnDraw));
 }
 
-void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &event) {
+void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &WXUNUSED(event)) {
 	wxPaintDC dc(this);
 	if ( parent->item->image != NULL ) {
 		dc.DrawBitmap(*(parent->item->image), 0, 0);
