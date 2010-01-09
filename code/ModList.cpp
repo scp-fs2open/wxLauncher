@@ -58,7 +58,7 @@ WX_DEFINE_OBJARRAY(ConfigArray);
 ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
-	this->SetMargins(4, 5);
+	this->SetMargins(10, 10);
 
 	this->skinSystem = skin;
 
@@ -483,21 +483,36 @@ void ModList::OnDrawSeparator(wxDC &WXUNUSED(dc), wxRect& WXUNUSED(rect), size_t
 void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxLogDebug(_T(" Background %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
 	dc.DestroyClippingRegion();
+	wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+	wxString activeMod;
+	ProMan::GetProfileManager()->Get()
+		->Read(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod);
+	wxBrush b;
+	wxRect selectedRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
+	wxRect activeRect(selectedRect.x+3, selectedRect.y+3, selectedRect.width-7, selectedRect.height-7);
+
 	if ( this->IsSelected(n) ) {
-		wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-		wxBrush b(highlighted, wxTRANSPARENT);
-		dc.SetPen(wxPen(highlighted, 5));
-		dc.SetBackground(b);
-		dc.SetBrush(b);
-		dc.DrawRoundedRectangle(rect, 10.0);
+		b = wxBrush(highlighted, wxTRANSPARENT);
+		dc.SetPen(wxPen(highlighted, 4));
 	} else {
-		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
-		wxBrush b(background);
-		dc.SetPen(wxPen(background));
-		dc.SetBrush(b);
-		dc.SetBackground(b);
-		dc.DrawRectangle(rect);
+		b = wxBrush(background);
+		dc.SetPen(wxPen(background, 4));
 	}
+	dc.SetBackground(b);
+	dc.SetBrush(b);
+	dc.DrawRoundedRectangle(selectedRect, 10.0);
+
+	if ( activeMod == *(this->tableData->Item(n).shortname) ) {
+		b = wxBrush(highlighted, wxSOLID);
+		dc.SetPen(wxPen(highlighted, 1));
+	} else {
+		b = wxBrush(background, wxSOLID);
+		dc.SetPen(wxPen(background, 1));
+	}
+	dc.SetBackground(b);
+	dc.SetBrush(b);
+	dc.DrawRoundedRectangle(activeRect, 10.0);
 }
 
 wxCoord ModList::OnMeasureItem(size_t WXUNUSED(n)) const {
@@ -845,6 +860,9 @@ void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
 		dc.DrawBitmap(SkinSystem::MakeModsListImage(*this->myData->image), rect.x, rect.y);
 	} else {
 		dc.DrawRectangle(rect);
+		wxPen pen(dc.GetPen());
+		pen.SetWidth(1);
+		dc.SetPen(pen);
 		wxString noimg = _("NO IMAGE");
 		wxSize size = dc.GetTextExtent(noimg);
 		dc.DrawText(noimg, rect.x + rect.width/2 - size.x/2, rect.y + rect.height/2 - size.y/2);
