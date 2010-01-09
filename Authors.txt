@@ -1,5 +1,6 @@
 Iss Mneur <iss.mneur@telus.net>
 kkmic <killermosi@yahoo.com>
+Councilor <johanesbp@yahoo.com>
 
 We would also like to thank:
 wxWidgets Team - wxWidgets <http://www.wxwidgets.org/>
