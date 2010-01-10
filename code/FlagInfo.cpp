@@ -23,7 +23,7 @@ FlagInfo flagInfo[] = {
 	{_T("-clipdist"), _("Graphics"), true},
 	{_T("-res"), _("Graphics"), true},
 	//Gameplay
-	//{_T("-mod"), _("Gameplay"), true}, //The -mod flag is really needed on this list?
+	//{_T("-mod"), _("Gameplay"), true}, // This flag is handled elsewhere, but kept on list for completeness
 	{_T("-fov"), _("Gameplay"), true},
 	//Multiplayer
 	{_T("-gamename"), _("Multiplayer"), true},
@@ -31,7 +31,7 @@ FlagInfo flagInfo[] = {
 	{_T("-allowabove"), _("Multiplayer"), true},
 	{_T("-allowbelow"), _("Multiplayer"), true},
 	{_T("-port"), _("Multiplayer"), true},
-	{_T("-connect"), _("Multiplayer"), true}, //assumed true, the wiki does not specify
-	{_T("-timeout"), _("Multiplayer"), true}, //assumed true, the wiki does not specify
+	{_T("-connect"), _("Multiplayer"), true}, //string, ip to connnect to
+	{_T("-timeout"), _("Multiplayer"), true}, //int, time before timeout
 	{_T("-cap_object_update"), _("Multiplayer"), true},
 };
