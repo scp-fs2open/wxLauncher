@@ -2,9 +2,24 @@
 
 #Authors
 
+This is a list o peoples that contributed directly to the project:
+
 * **Nigel "Iss Mneur" W** - Coding and bugfixing
 * **Silviu "kkmic" G** - Design and testing, miscellaneous graphics
 * **Johanes B "Councilor" Permadi** - Launcher artwork ([http://councilor.deviantart.com/][councilor]![][le])
 
+The wxLauncher development team would also like to thank:
+
+* **wxWidgets Team** - wxWidgets ([http://www.wxwidgets.org/][wx]![][le])
+* **Source Code Project (SCP)** - For the wonderful fs2_open ([http://scp.indiegames.us/][scp]![][le])
+* **Hard-Light Community** - For ideas and support ([http://www.hard-light.net/][hl]![][le])
+* **Volition, Inc.** - Developer of Freespace 2 ([http://www.volition-inc.com/][vl]![][le])
+* **Interplay** - Publisher of Freespace 2 ([http://www.interplay.com/][ip]![][le])
+
 [councilor]: http://councilor.deviantart.com/
 [le]: images/le.png
+[wx]: http://www.wxwidgets.org/
+[scp]: http://scp.indiegames.us/
+[hl]: http://www.hard-light.net/
+[vl]: http://www.volition-inc.com/
+[ip]: http://www.interplay.com/
