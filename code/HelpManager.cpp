@@ -17,6 +17,15 @@ namespace HelpManager {
 	bool initialized = false;
 	wxHtmlHelpController *controller = NULL;
 	size_t numberOfHelpLinks = sizeof(HelpManager::helpLinks)/sizeof(HelpManager::helpLink);
+	class ExternLinkHandler: public wxEvtHandler {
+	public:
+		void LinkClicked(wxHtmlLinkEvent &event);
+	};
+	ExternLinkHandler* externLinkHandler;
+	class HtmlHelpController: public wxHtmlHelpController {
+	public:
+		virtual wxHtmlHelpFrame* CreateHelpFrame(wxHtmlHelpData *data);
+	};
 };
 
 bool HelpManager::Initialize() {
@@ -24,7 +33,8 @@ bool HelpManager::Initialize() {
 		return false;
 	}
 
-	controller = new wxHtmlHelpController();
+	externLinkHandler = new ExternLinkHandler();
+	controller = new HtmlHelpController();
 	wxFileName file(_T("help.htb"));
 	if ( file.FileExists() ) {
 		controller->AddBook(file, false);
@@ -83,4 +93,25 @@ void HelpManager::OpenHelpByString(wxString& str) {
 	wxCHECK_RET( HelpManager::IsInitialized(), _("Help manager is not initialized"));
 
 	HelpManager::controller->Display(str);
+}
+
+
+void HelpManager::ExternLinkHandler::LinkClicked(wxHtmlLinkEvent &event) {
+	wxHtmlLinkInfo info(event.GetLinkInfo());
+	wxString href(info.GetHref());
+	if ( href.StartsWith(_T("http://")) ) {
+		::wxLaunchDefaultBrowser(href);
+	} else {
+		event.Skip(); // not external, so I don't want it.
+	}
+}
+wxHtmlHelpFrame* HelpManager::HtmlHelpController::CreateHelpFrame(wxHtmlHelpData *data) {
+	wxHtmlHelpFrame* frame = new wxHtmlHelpFrame(data);
+	frame->SetController(this);
+	frame->Create(m_parentWindow, -1, wxEmptyString, m_FrameStyle, m_Config, m_ConfigRoot);
+	frame->SetTitleFormat(m_titleFormat);
+	frame->GetEventHandler()	// hook in to allow veto on the links so we can open external browsers
+		->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ExternLinkHandler::LinkClicked), NULL, HelpManager::externLinkHandler);
+	m_helpFrame = frame;
+	return frame;
 }
