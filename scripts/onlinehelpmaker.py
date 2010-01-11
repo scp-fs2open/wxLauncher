@@ -1,4 +1,4 @@
-import sqlite3, os, sys, tempfile, atexit, traceback, shutil, zipfile
+import sqlite3, os, sys, tempfile, atexit, traceback, shutil, zipfile, string
 from optparse import OptionParser
 
 import logging
@@ -408,23 +408,25 @@ def process_input_stage3(file, options, files, extrafiles):
   infile.close()
 
   class Stage3Parser(OutputParser):
-    def __init__(self, options, files, extrafiles, *args, **kwargs):
+    def __init__(self, options, files, extrafiles, subdir, *args, **kwargs):
       OutputParser.__init__(self, *args, **kwargs)
       self.options = options
       self.files = files
       self.extrafiles = extrafiles
+      self.subdir = subdir
 
     def handle_startendtag(self, tag, attrs):
       """Find the image and copy it to the stage3 folder where it should
       be in the file output."""
       if tag == "img":
-        location1 = os.path.join(self.options.indir, attrs[1][1])
+        location1 = os.path.join(self.options.indir, self.subdir, attrs[1][1])
         location = os.path.normpath(location1)
 
         # check to make sure that the image I am including was in the onlinehelp folder,
         # if not change the dst name so that it will be located correctly in the stage3 directory
         if location.startswith(self.options.indir):
-          dst1 = os.path.join(self.files['stage3'], attrs[1][1])
+          dst1 = os.path.join(self.files['stage3'], self.subdir, attrs[1][1])
+          dst = os.path.normpath(dst1)
         else:
           # get extention
           basename = os.path.basename(attrs[1][1])
@@ -432,8 +434,11 @@ def process_input_stage3(file, options, files, extrafiles):
           (file, outname) = tempfile.mkstemp(ext, name, self.files['stage3'])
           dst1 = outname.replace(os.getcwd(), ".") # make into a relative path
 
-        dst = os.path.normpath(dst1)
-        attrs = update_attribute(attrs, 'src', change_filename(dst, os.path.splitext(dst)[1], self.files['stage3'], ".", makedirs=False))
+          # fix up attrs
+          dst = os.path.normpath(dst1)
+          attrs = update_attribute(attrs, 'src', change_filename(dst, os.path.splitext(dst)[1], self.files['stage3'], ".", makedirs=False))
+          
+          
         logging.debug(" Image (%s) should be in %s and copying to %s", attrs[0][1], location, dst)
         try:
           if not os.path.exists(os.path.dirname(dst)):
@@ -448,7 +453,13 @@ def process_input_stage3(file, options, files, extrafiles):
 
   outname = change_filename(file, ".stage3", files['stage2'], files['stage3'])
   outfile = open(outname, mode="w")
-  parser = Stage3Parser(options, files, file=outfile, extrafiles=extrafiles)
+
+  #figure out what subdirectory of the onlinehelp I am in
+  subdir = string.replace(os.path.dirname(outname), files['stage3'], "")
+  if subdir.startswith(os.path.sep):
+    subdir = string.replace(subdir, os.path.sep, "", 1) # I only want to remove the leading sep
+    
+  parser = Stage3Parser(options, files, file=outfile, extrafiles=extrafiles, subdir=subdir)
   parser.feed(input)
   parser.close()
   outfile.close()
