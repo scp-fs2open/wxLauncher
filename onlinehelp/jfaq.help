@@ -12,7 +12,7 @@ There are  several things wxLauncer can do for you:
 
 * Install new mods
 
-(*at the time of this writing,only the first item is targeted for the initial release, the update and install features will be part of the 2.0 release*)
+(*at the time of this writing, only the first item is targeted for the initial release, the update and install features will be part of the 2.0 release*)
 
 ###Is wxLauncher free?
 The launcher is published under the [GNU General Public License v2][gpl]![][le], making it free software, for you to use and modify. The source files are available on the project's [source page][source]![][le].
