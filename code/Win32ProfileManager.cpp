@@ -368,12 +368,6 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 			(BYTE*)networkIP.c_str(),
 			(networkIP.size()+1)*2);
 		ReturnChecker(ret, __LINE__);
-	} else {
-		ret = RegDeleteKeyValueW(
-			networkRegHandle,
-			NULL,
-			L"CustomIP");
-		ReturnChecker(ret, __LINE__);
 	}
 
 	RegCloseKey(regHandle);
