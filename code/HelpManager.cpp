@@ -53,6 +53,7 @@ bool HelpManager::DeInitialize() {
 	if ( HelpManager::IsInitialized()) {
 		HelpManager::initialized = false;
 		delete controller;
+		delete externLinkHandler;
 	}
 	return true;
 }
