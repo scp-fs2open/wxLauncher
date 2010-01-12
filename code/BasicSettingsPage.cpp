@@ -53,7 +53,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
 	
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("Executable Selection"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("TC root folder and Executable"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 Root Folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
