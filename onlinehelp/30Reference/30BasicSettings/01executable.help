@@ -1,4 +1,38 @@
 <meta name="control" content="ID_EXE_ROOT_FOLDER_BOX_TEXT" />
 <meta name="control" content="ID_EXE_ROOT_FOLDER_BOX" />
-<title>Executable</title>
-Contains the full path to the currently selected root Total Conversion folder.
+<title>TC root folder and Executable</title>
+
+#TC root folder and Executable
+
+In order to be able to launch FS2_Open, the launcher needs to know two things:
+
+* In what folder are the executables located
+* What specific executable shoult it use
+
+### TC root folder
+
+Selecting a [TC][tc]![][li] root folder is needed before the executables (and the [MODs][mod]![][li] from the [MODs page][modpage]![][li]) are available for selection.
+
+-- Compound image  of the root folder selection boxa nd button with the"browse for folder" dialog --
+ 
+Simply click **Select** and browse to the correct folder and click **OK** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FS2_Open executables.
+
+### Executable selection
+
+Once a TC folder has been designated, the executable selection box becomes populated with several items, four special entries and then each executable found in the TC root folder branded with the version number, build number (if it's a nightly build) build type and if it's a SSE2 build.
+
+The special entries are:
+
+* Newest Official Release
+* Newest Official Debug
+* Latest Nightly Release
+* Latest Nightly Debug
+
+Each of this entries, if available and selected, will launch the appropiate executable without having to pick an executable by hand.
+
+-- screenshot depicting the exe selection box with the list open and several exe files available for selection --
+
+[li]: ../../images/li.png
+[tc]: ../../50TechnicalStuff/02Terminology.help
+[mod]: ../../50TechnicalStuff/02Terminology.help
+[modpage]: ../20MODs/index.help
