@@ -1,0 +1,15 @@
+<title>Page and Controls Reference</title>
+#Page and Controls Reference
+
+This section explain various the various controls and functions of the launcher, grouped by page:
+
+* [Welcome page][welcome]![][li]
+* [MODs page][mods]![][li]
+* [Basic Settings page][basic]![][li]
+* Advanced Settings page![][li]
+* Install/Update page![][li]
+
+[li]: ../images/li.png
+[welcome]: 10Welcome/index.help
+[mods]: 20MODs/index.help
+[basic]: 30BasicSettings/index.help

@@ -1,6 +1,5 @@
 <meta name="control" content="ID_GRAPHICS_COMBO" />
-
-<title>Graphics</title>
+<title>Video options</title>
 The graphics API to use to show the game.
 
 Currently only OpenGL is supported by the current versions of the Freespace 2 Source Code Project.

@@ -1,0 +1,29 @@
+<title>Terminology</title>
+
+#Terminology
+
+###MOD
+
+A MOD (short from **mod**ification) is, as - it's title suggests - a collection of one or more additions to the original game. While some mods add very little to the game (like a highly detailed skin for a ship, a new beam graphic or an explosion sound) others can almost be considered TCs, adding a new and original story, new ship models, new characters and settings, providing a completly different game experience for the player.
+
+Check the [MOD Database][moddb]![][le] on the [FreeSpace Wiki][fswiki]![][le] for various MODs (campaigns, effects, etc.).
+
+###TC
+
+**TC** stands for **T**otal **C**onversion. This implies that all of the content shipped by the TC is original and does not contain any content from the original FreeSpace 2 game. A TC can stand alone and should stand alone from the normal FreeSpace 2 install location and does not require the player to purchase FreeSpace 2 to play.
+
+Two best-known examples of TCs are
+
+* [The Babylon Project][tbp]![][le] - based on the Babylon 5 universe
+* [Wing Commander Saga][wcs]![][le] - based on the Wing Commander universe
+
+Check the **Hosted** section on [Hard-Light.net][hl]![][le] for a more detailed list.
+
+**Technical note:** The launcher regards FreeSpace 2 as a TC itself.
+
+[le]: ../images/le.png
+[moddb]: http://www.hard-light.net/wiki/index.php/Mod_Database
+[fswiki]: http://www.hard-light.net/wiki/index.php/Main_Page
+[tbp]: http://babylon.hard-light.net/
+[wcs]: http://wcsaga.hard-light.net/
+[hl]: http://hard-light.net/
