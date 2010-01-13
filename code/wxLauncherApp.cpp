@@ -26,7 +26,11 @@ bool wxLauncher::OnInit() {
 	wxBitmap splash;
 	wxSplashScreen* splashWindow = NULL;
 	if (splash.LoadFile(_T("SCP_Header.png"), wxBITMAP_TYPE_PNG)) {
+#if NDEBUG
 		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
+#else
+		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 1000, NULL, wxID_ANY);
+#endif
 		wxYield();
 	} else {
 		wxLogFatalError(_T("Unable to load splash image, this normally means that you are running the Launcher from a directory that does not have the images in it."));
@@ -58,8 +62,10 @@ bool wxLauncher::OnInit() {
 	MainWindow* window = new MainWindow(skin);
 	wxLogStatus(_T("MainWindow is complete"));
 	window->Show(true);
+#if NDEBUG // will autodelete when timout runs out in debug
 	splashWindow->Show(false);
 	splashWindow->Destroy();
+#endif
 
 	wxLogStatus(_T("Ready."));
 	return true;

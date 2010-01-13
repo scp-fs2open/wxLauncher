@@ -345,8 +345,8 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
 }
 
 void WelcomePage::ProfileCountChanged(wxCommandEvent &WXUNUSED(event)) {
-	WXUNUSED(event);
 	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxCHECK_RET(combobox != NULL, _T("can't find the profile combobox"));
 	ProMan *profile = ProMan::GetProfileManager();
 
 	combobox->Clear();
@@ -496,4 +496,3 @@ wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile..."), wxDefaultPosi
 
 	wxLogDebug(_T("Delete Profile Dialog created."));
 }
-	
