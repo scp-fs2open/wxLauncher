@@ -2,6 +2,7 @@
 #include <wx/image.h>
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
+#include <wx/fs_inet.h>
 #include <wx/splash.h>
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
@@ -42,12 +43,13 @@ bool wxLauncher::OnInit() {
 		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
 		return false;
 	}
+	wxFileSystem::AddHandler(new wxArchiveFSHandler);
+	wxFileSystem::AddHandler(new wxInternetFSHandler);
 
 	wxLogInfo(_T("Initing Skin System..."));
 	this->skin = new SkinSystem();
 
 	wxLogInfo(_T("Initing HelpManager..."));
-	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	HelpManager::Initialize();
 
 	wxLogInfo(_T("wxLauncher Starting up."));
