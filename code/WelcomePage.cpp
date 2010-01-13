@@ -2,6 +2,9 @@
 #include <wx/html/htmlwin.h>
 #include <wx/valgen.h>
 #include <wx/valtext.h>
+#include <wx/datetime.h>
+#include <wx/sstream.h>
+#include <wx/tokenzr.h>
 #include "WelcomePage.h"
 #include "ids.h"
 #include "Skin.h"
@@ -10,6 +13,8 @@
 #include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
+
+#define TIME_BETWEEN_NEWS_UPDATES			wxTimeSpan::Day()
 
 class CloneProfileDialog: public wxDialog {
 public:
@@ -67,6 +72,8 @@ EVT_BUTTON(ID_DELETE_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_SAVE_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_CHECKBOX(ID_SAVE_DEFAULT_CHECK, WelcomePage::SaveDefaultChecked)
 EVT_COMBOBOX(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
+
+EVT_IDLE(WelcomePage::UpdateNews)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
@@ -134,13 +141,9 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest headlines from the front"));
 	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
-	headlinesView->SetPage(_("<ul>\
-							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65861.0'>Vidmaster finally released his FortuneHunters 2261 campaign.</a></li>\
-							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65667.0'>Komet has released a Japanese Localization Patch for FreeSpace 2!</a></li>\
-							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
-							 <li><a href='http://www.hard-light.net/forums/index.php?topic=65671.0'>The 158th Banshee Squadron have released Exposition, the first episode of their \"Into the Night\" series.</a></li>\
-							 </ul>"));
+	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
+	this->needToUpdateNews = true;
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->SetMinSize(wxSize(this->stuffWidth, 150));
@@ -349,6 +352,71 @@ void WelcomePage::ProfileCountChanged(wxCommandEvent &WXUNUSED(event)) {
 	combobox->Clear();
 	combobox->Append(profile->GetAllProfileNames());
 	combobox->SetStringSelection(profile->GetCurrentName());
+}
+
+void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
+	if ( !this->needToUpdateNews ) {
+		return;
+	}
+	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
+	wxCHECK_RET(newsWindow != NULL, _T("Update news called, but can't find the news window"));
+
+	ProMan* profile = ProMan::GetProfileManager();
+
+	bool allowedToUpdateNews;
+	if ( !profile->Global()->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &allowedToUpdateNews)) {
+		return;
+	}
+	if (allowedToUpdateNews) {
+		wxString lastTimeString;
+		profile->Global()->Read(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
+		wxDateTime lasttime;
+		if ( (NULL != lasttime.ParseFormat(lastTimeString, NEWS_LAST_TIME_FORMAT) )
+			&& (wxDateTime::Now() - lasttime < TIME_BETWEEN_NEWS_UPDATES) 
+			&& (profile->Global()->Exists(GBL_CFG_NET_THE_NEWS)) ) {
+			// post the news that we have on file for now
+			wxString theNews;
+			if ( profile->Global()->Read(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
+				newsWindow->SetPage(theNews);
+			} else {
+				wxLogFatalError(_T("%s does not exist but the exists function says it does"), GBL_CFG_NET_THE_NEWS);
+			}
+		} else {
+			wxFileSystem filesystem;
+			wxFSFile* news = filesystem.OpenFile(_("http://www.audiozone.ro/hl/"), wxFS_READ);
+			if ( news == NULL ) {
+				wxLogError(_("Error in retriving news"));
+				return;
+			}
+
+			wxInputStream* theNews = news->GetStream();
+			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation(), news->GetMimeType());
+
+			wxString newsData;
+			wxStringOutputStream newsDataStream(&newsData);
+			theNews->Read(newsDataStream);
+			wxString formattedData(_T("<ul>"));
+			wxStringTokenizer tok(newsData, _T("\t"), wxTOKEN_STRTOK);
+			while(tok.HasMoreTokens()) {
+				wxString title(tok.GetNextToken());
+				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
+				wxString link(tok.GetNextToken());
+				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
+				wxString imglink(tok.GetNextToken());
+				
+				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link, title, imglink);
+			}
+			formattedData += _T("\n</ul>");
+			profile->Global()->Write(GBL_CFG_NET_THE_NEWS, formattedData);
+			newsWindow->SetPage(formattedData);
+
+			wxString currentTime(wxDateTime::Now().Format(NEWS_LAST_TIME_FORMAT));
+			profile->Global()->Write(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
+		}
+	} else {
+		newsWindow->SetPage(_("Auto news download disabled.  Visit the Install Tab to change this setting."));
+	}
+	this->needToUpdateNews = false;
 }
 
 

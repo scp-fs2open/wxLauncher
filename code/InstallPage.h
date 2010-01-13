@@ -3,9 +3,13 @@
 
 #include <wx/wx.h>
 
-class InstallPage: public wxWindow {
+class InstallPage: public wxPanel {
 public:
 	InstallPage(wxWindow* parent);
+
+	void OnDownloadNewsCheck(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

@@ -93,6 +93,9 @@ enum WindowIDS {
 	ID_CUSTOM_FLAGS_TEXT,
 	ID_COMMAND_LINE_TEXT,
 	ID_FLAG_SET_NOTES_TEXT,
+
+	ID_NET_DOWNLOAD_NEWS,
+	ID_EVENT_NET_DOWNLOAD_NEWS,
 };
 
 enum MainTabImageIDs {
@@ -134,6 +137,9 @@ enum ProfileDialogReturnValues {
 #define GBL_CFG_PROXY_PORT					_T("/proxy/port")	//!< int
 
 #define GBL_CFG_NET_DOWNLOAD_NEWS			_T("/net/downloadnews")	//!< bool, true means autodownload
+#define NEWS_LAST_TIME_FORMAT				_T("%Y %j %H %M %S")
+#define GBL_CFG_NET_NEWS_LAST_TIME			_T("/net/lastdownloadnews") //!< string, formated time as NEWS_LAST_TIME_FORMAT
+#define GBL_CFG_NET_THE_NEWS				_T("/net/thenews)")		//!< string, the formatted text (workin' for a livin'!)
 /** @}*/
 
 /** \defgroup profilekeys Keys used in profiles */

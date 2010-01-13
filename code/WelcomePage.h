@@ -17,6 +17,7 @@ public:
 	void SaveDefaultChecked(wxCommandEvent& event);
 	void ProfileChanged(wxCommandEvent& event);
 	void ProfileCountChanged(wxCommandEvent& event);
+	void UpdateNews(wxIdleEvent& event);
 	
 private:
 	/** The width of the items on the welcome tab. */
@@ -25,6 +26,8 @@ private:
 
 	void cloneNewProfile(wxChoice* combobox, ProMan* profile);
 	void deleteProfile(wxChoice* combobox, ProMan* profile);
+
+	bool needToUpdateNews;
 
 	DECLARE_EVENT_TABLE();
 };
