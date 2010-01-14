@@ -8,6 +8,11 @@
 
 #include "wxLauncherSetup.h"
 
+enum {
+	SUPPORT_OPENAL			= 1<<0,
+	NOT_SUPPORT_DIRECT3D	= 1<<1,
+} BuildCapabilities;
+
 FSOVersion::FSOVersion() {
 	major = 0;
 	minor = 0;
@@ -16,9 +21,18 @@ FSOVersion::FSOVersion() {
 	sse = 0;
 	debug = false;
 	build = 0;
+	buildCaps = 0;
 }
 
 FSOVersion::~FSOVersion() {
+}
+
+bool FSOVersion::SupportsDirect3D() {
+	return (buildCaps & NOT_SUPPORT_DIRECT3D) == 0;
+}
+
+bool FSOVersion::SupportsOpenAL() {
+	return (buildCaps & SUPPORT_OPENAL) > 0;
 }
 
 /** \class TCManager

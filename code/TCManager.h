@@ -19,6 +19,9 @@ public:
 	wxString string;
 	wxString binaryname; //!< fs2_open or fred
 	wxString executablename; //!< the actual name of the binary
+	wxByte buildCaps;
+	bool SupportsDirect3D();
+	bool SupportsOpenAL();
 };
 
 /** Selected TC has changed. */
