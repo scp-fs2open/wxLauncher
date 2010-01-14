@@ -10,7 +10,7 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	updateNewsCheck->SetToolTip(_("Launcher will update the news on next run"));
 	bool updateNews;
 	if (!ProMan::GetProfileManager()->Global()->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
-		wxDialog* updateNewsQuestion = new wxDialog(NULL, wxID_ANY, _("Network Access Question"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
+		wxDialog* updateNewsQuestion = new wxDialog(NULL, wxID_ANY, _("Network Access Question"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxDIALOG_NO_PARENT);
 		updateNewsQuestion->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 		wxStaticText* updateNewsText = new wxStaticText(updateNewsQuestion, wxID_ANY, _("This launcher can update the news on the front page automaticly.  This update will be done no more than once a day.\n\nThis setting can be changed at anytime on the Install page."));
 		updateNewsText->Wrap(200);
