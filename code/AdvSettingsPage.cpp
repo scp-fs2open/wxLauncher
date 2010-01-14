@@ -29,10 +29,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	FlagListBox* list = new FlagListBox(this, this->skin);
-	list->SetBackgroundColour(wxColour(0, 128, 0));
 	wxHtmlWindow* description = new wxHtmlWindow(this);
 	description->SetPage(_T("<p>Test Page</p>"));
-	description->SetBackgroundColour(wxColour(128, 0, 0));
 	
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
 	topSizer->Add(list, wxSizerFlags().Proportion(2).Expand());
