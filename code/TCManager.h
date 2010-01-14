@@ -5,25 +5,6 @@
 #include <wx/clntdata.h>
 #include <wx/filename.h>
 
-class FSOVersion: public wxClientData {
-public:
-	FSOVersion();
-	virtual ~FSOVersion();
-	int major;
-	int minor;
-	int revision;
-	bool inferno;
-	int sse;
-	bool debug;
-	int build;
-	wxString string;
-	wxString binaryname; //!< fs2_open or fred
-	wxString executablename; //!< the actual name of the binary
-	wxByte buildCaps;
-	bool SupportsDirect3D();
-	bool SupportsOpenAL();
-};
-
 /** Selected TC has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_CHANGED, wxID_ANY);
 /** Selected binary has changed. */
@@ -47,10 +28,6 @@ private:
 
 public:
 	void CurrentProfileChanged(wxCommandEvent &event);
-	static bool CheckRootFolder(wxFileName path);
-	static wxArrayString GetBinariesFromRootFolder(wxFileName path);
-	static FSOVersion GetBinaryVersion(wxString binaryname);
-	static wxString MakeVersionStringFromVersion(FSOVersion version);
 	// Events
 public:
 	static void RegisterTCChanged(wxEvtHandler *handler);
