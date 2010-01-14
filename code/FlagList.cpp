@@ -260,7 +260,8 @@ void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const
 	}
 }
 
-void FlagListBox::OnSize(wxSizeEvent &WXUNUSED(event)) {
+void FlagListBox::OnSize(wxSizeEvent &event) {
+	wxVListBox::OnSize(event); // call parents onSize
 	if ( this->drawStatus != DRAW_OK ) {
 		wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
 
