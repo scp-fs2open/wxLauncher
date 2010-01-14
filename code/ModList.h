@@ -77,7 +77,7 @@ public:
 
 	I18nData* i18n;
 
-	void Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer *buttons, wxStaticBitmap* warn);
+	void Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer *mainSizer, wxSizer *buttons, wxStaticBitmap* warn);
 
 private:
 	SkinSystem* skinSystem;
@@ -146,7 +146,7 @@ private:
 	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;
-	wxBoxSizer *buttonSizer;
+	wxBoxSizer *buttonSizer, *sizer;
 
 	void readIniFileString(wxFileConfig* config,
 		wxString keyvalue, wxString ** location);

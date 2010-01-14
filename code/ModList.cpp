@@ -373,25 +373,26 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		new wxStaticBitmap(this, wxID_ANY, this->skinSystem->GetWarningIcon());
 	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it, please click Info for more details"));
 
-	wxSizer* verticalSizer = new wxBoxSizer(wxVERTICAL);
-	verticalSizer->AddStretchSpacer(2);
-	verticalSizer->Add(this->activateButton, wxSizerFlags().Expand());
-	verticalSizer->AddStretchSpacer(1);
-	verticalSizer->Add(this->infoButton, wxSizerFlags().Expand());
-	verticalSizer->AddStretchSpacer(2);
+	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
+	this->buttonSizer->AddStretchSpacer(2);
+	this->buttonSizer->Add(this->activateButton, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden());
+	this->buttonSizer->AddStretchSpacer(1);
+	this->buttonSizer->Add(this->infoButton, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden());
+	this->buttonSizer->AddStretchSpacer(2);
 
 	wxSizer* warningSizer = new wxBoxSizer(wxVERTICAL);
 	warningSizer->AddStretchSpacer(1);
-	warningSizer->Add(this->warnBitmap);
+	warningSizer->Add(this->warnBitmap, wxSizerFlags().ReserveSpaceEvenIfHidden());
 	warningSizer->AddStretchSpacer(1);
 
-	this->buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	this->buttonSizer->AddStretchSpacer(1);
-	this->buttonSizer->Add(warningSizer, wxSizerFlags().Expand());
-	this->buttonSizer->AddStretchSpacer(1);
-	this->buttonSizer->Add(verticalSizer, wxSizerFlags().Expand());
-	this->buttonSizer->AddStretchSpacer(2);
+	this->sizer = new wxBoxSizer(wxHORIZONTAL);
+	this->sizer->AddStretchSpacer(1);
+	this->sizer->Add(warningSizer, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden());
+	this->sizer->AddStretchSpacer(1);
+	this->sizer->Add(this->buttonSizer, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden());
+	this->sizer->AddStretchSpacer(2);
 	this->buttonSizer->Show(false);
+	this->warnBitmap->Show(false);
 
 
 }
@@ -473,7 +474,7 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
-	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->buttonSizer, this->warnBitmap);
+	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->sizer, this->buttonSizer, this->warnBitmap);
 }
 
 void ModList::OnDrawSeparator(wxDC &WXUNUSED(dc), wxRect& WXUNUSED(rect), size_t WXUNUSED(n)) const {
@@ -719,7 +720,7 @@ ModItem::~ModItem() {
 	if (this->modNamePanel != NULL) delete this->modNamePanel;
 }
 
-void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons, wxStaticBitmap* warn) {
+void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSizer, wxSizer* buttons, wxStaticBitmap* warn) {
 	wxRect titlerect = rect;
 	titlerect.width = 150;
 
@@ -742,12 +743,12 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* buttons
 	if ( selected ) { /* If I am selected do not have info panel draw because 
 					  I am going to put the buttons over the info text. */
 		buttons->Show(true);
-		if ( this->warn ) {
+		if ( this->warn) {
 			warn->Show(true);
-		} else {
+		} else if ( !this->warn) {
 			warn->Show(false);
 		}
-		buttons->SetDimension(infotextrect.x, infotextrect.y,
+		mainSizer->SetDimension(infotextrect.x, infotextrect.y,
 			infotextrect.width, infotextrect.height);
 	} else {
 		this->infoTextPanel->Draw(dc, infotextrect);
