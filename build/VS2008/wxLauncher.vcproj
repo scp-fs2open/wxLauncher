@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\code\FSOExecutable.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\code\HelpManager.cpp"
 				>
 			</File>
@@ -294,6 +298,10 @@
 			</File>
 			<File
 				RelativePath="..\..\code\FlagList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\code\FSOExecutable.h"
 				>
 			</File>
 			<File

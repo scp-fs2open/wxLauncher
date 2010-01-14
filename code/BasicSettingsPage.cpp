@@ -10,6 +10,7 @@
 #include "OpenALManager.h"
 #include "JoystickManager.h"
 #include "HelpManager.h"
+#include "FSOExecutable.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -34,9 +35,9 @@ public:
 	void FindAndSetSelectionWithClientData(wxString item) {
 		size_t number = this->GetStrings().size();
 		for( size_t i = 0; i < number; i++ ) {
-			FSOVersion* data = dynamic_cast<FSOVersion*>(this->GetClientObject(i));
+			FSOExecutable* data = dynamic_cast<FSOExecutable*>(this->GetClientObject(i));
 			wxCHECK2_MSG( data != NULL, continue, _T("Client data is not a FSOVersion pointer"));
-			if ( data->executablename == item ) {
+			if ( data->GetExecutableName() == item ) {
 				this->SetSelection(i);
 				return;
 			}
@@ -554,7 +555,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		if ( !path.IsOk() ) {
 			wxLogWarning(_T("Directory is not valid"));
 			continue;
-		} else if ( TCManager::CheckRootFolder(path) ) {
+		} else if ( FSOExecutable::CheckRootFolder(path) ) {
 			break;
 		} else {
 			wxLogWarning(_T("Directory does not have supported executables in it"));
@@ -606,12 +607,12 @@ into the Executable DropBox.  This function does nothing else to the choice
 control, not even clearing the drop box (call the Clear function if you don't
 want the old items to stay. */
 void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
-	wxArrayString exes = TCManager::GetBinariesFromRootFolder(path);
+	wxArrayString exes = FSOExecutable::GetBinariesFromRootFolder(path);
 	wxArrayString::iterator iter = exes.begin();
 	while ( iter != exes.end() ) {
 		wxFileName path(*iter);
-		FSOVersion ver = TCManager::GetBinaryVersion(path.GetFullName());
-		exeChoice->Insert(TCManager::MakeVersionStringFromVersion(ver), 0, new FSOVersion(ver));
+		FSOExecutable ver = FSOExecutable::GetBinaryVersion(path.GetFullName());
+		exeChoice->Insert(FSOExecutable::MakeVersionStringFromVersion(ver), 0, new FSOExecutable(ver));
 		iter++;
 	}
 }
@@ -622,14 +623,14 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( choice != NULL, 
 		_T("OnSelectExecutable: cannot find choice drop box"));
 
-	FSOVersion* ver = dynamic_cast<FSOVersion*>(
+	FSOExecutable* ver = dynamic_cast<FSOExecutable*>(
 		choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( ver != NULL,
 		_T("OnSelectExecutable: choice does not have FSOVersion data"));
-	wxLogDebug(_T("Have selected ver for %s"), ver->executablename);
+	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName());
 
 	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->executablename);
+		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->GetExecutableName());
 	TCManager::GenerateTCBinaryChanged();
 }
 
