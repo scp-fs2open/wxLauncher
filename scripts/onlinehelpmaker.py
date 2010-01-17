@@ -278,6 +278,8 @@ def should_build(options, files):
     return True
   elif not os.path.exists(options.outfile):
     return True
+  elif options.carrayfilename != None and not os.path.exists(options.carrayfilename):
+    return True
   elif check_source_newer_than_outfile(options, files):
     return True
   return False
@@ -320,20 +322,23 @@ def generate_file_list(directory, extension):
   
 def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
   """Returns the filename after transforming it to be in destdir and making sure the folders required all exist."""
+  filename = os.path.normpath(filename)
+  orginaldir = os.path.normpath(orginaldir)
+  destdir = os.path.normpath(destdir)
   logging.debug("   change_filename('%s', '%s', '%s', '%s', %s)", filename, newext, orginaldir, destdir, makedirs)
   outfile_name1 = filename.replace(orginaldir, ".") # files relative name
-  logging.debug(outfile_name1)
+  logging.debug("%s", outfile_name1)
   if newext == None:
     outfile_name3 = outfile_name1
   else:
     outfile_name2 = os.path.splitext(outfile_name1)[0] #file's name without ext
-    logging.debug(outfile_name2)
+    logging.debug("%s", outfile_name2)
     outfile_name3 = outfile_name2 + newext
-  logging.debug(outfile_name3)
+  logging.debug("%s", outfile_name3)
   outfile_name4 = os.path.join(destdir, outfile_name3)
-  logging.debug(outfile_name4)
+  logging.debug("%s", outfile_name4)
   outfile_name = os.path.normpath(outfile_name4)
-  logging.debug(outfile_name)
+  logging.debug("%s", outfile_name)
   
   # make sure that the folder exists to output, if wanted
   if makedirs:
@@ -414,6 +419,7 @@ def process_input_stage3(file, options, files, extrafiles):
       self.files = files
       self.extrafiles = extrafiles
       self.subdir = subdir
+      logging.debug(" Subdirectory is %s", subdir)
 
     def handle_startendtag(self, tag, attrs):
       """Find the image and copy it to the stage3 folder where it should
@@ -455,7 +461,7 @@ def process_input_stage3(file, options, files, extrafiles):
   outfile = open(outname, mode="w")
 
   #figure out what subdirectory of the onlinehelp I am in
-  subdir = string.replace(os.path.dirname(outname), files['stage3'], "")
+  subdir = string.replace(os.path.dirname(outname), os.path.normpath(files['stage3']), "")
   if subdir.startswith(os.path.sep):
     subdir = string.replace(subdir, os.path.sep, "", 1) # I only want to remove the leading sep
     
