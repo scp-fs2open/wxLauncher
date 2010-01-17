@@ -12,7 +12,7 @@ namespace HelpManager {
 		wxString location;
 	};
 	helpLink helpLinks[] = {
-#include "../generated/helplinks.cpp"
+#include "generated/helplinks.cpp"
 	};
 	bool initialized = false;
 	wxHtmlHelpController *controller = NULL;
