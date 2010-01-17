@@ -19,7 +19,8 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 		updateNewsQuestion->SetAffirmativeId(allowNewsUpdate->GetId());
 		updateNewsQuestion->SetEscapeId(denyNewsUpdate->GetId());
 		wxBoxSizer* updateNewsSizer = new wxBoxSizer(wxVERTICAL);
-		wxBitmap questionMark(_T("questionmark.png"));
+		wxBitmap questionMark(_T("questionmark.png"), wxBITMAP_TYPE_ANY);
+		wxASSERT(questionMark.IsOk());
 		wxStaticBitmap* questionImage = new wxStaticBitmap(updateNewsQuestion, wxID_ANY, questionMark);
 		updateNewsSizer->Add(questionImage);
 		updateNewsSizer->Add(updateNewsText);
