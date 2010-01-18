@@ -1,6 +1,6 @@
 #include <wx/wx.h>
 #include <wx/dynlib.h>
-
+#include "generated/configure_launcher.h"
 #include "OpenALManager.h"
 #include "ids.h"
 

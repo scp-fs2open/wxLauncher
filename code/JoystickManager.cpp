@@ -1,7 +1,7 @@
 #include <wx/wx.h>
 
 #include "JoystickManager.h"
-
+#include "generated/configure_launcher.h"
 #include "wxLauncherSetup.h"
 
 namespace JoyMan {
