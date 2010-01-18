@@ -1,3 +1,4 @@
+#include "generated/configure_launcher.h"
 #include <wx/wx.h>
 #include <wx/image.h>
 #include <wx/filesys.h>
@@ -25,11 +26,12 @@ bool wxLauncher::OnInit() {
 
 	wxBitmap splash;
 	wxSplashScreen* splashWindow = NULL;
-	if (splash.LoadFile(_T("SCP_Header.png"), wxBITMAP_TYPE_PNG)) {
+	wxFileName splashFile(_T(RESOURCES_PATH),_T("SCP_Header.png"));
+	if (splash.LoadFile(splashFile.GetFullPath(), wxBITMAP_TYPE_ANY)) {
 #if NDEBUG
 		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
 #else
-		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 1000, NULL, wxID_ANY);
+		splashWindow = NULL;//new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 1000, NULL, wxID_ANY);
 #endif
 		wxYield();
 	} else {

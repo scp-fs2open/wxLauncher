@@ -1,7 +1,7 @@
-#include <wx/wx.h>
-#include <wx/filename.h>
-#include <wx/artprov.h>
 #include "skin.h"
+#include <wx/artprov.h>
+#include <wx/filename.h>
+#include "generated/configure_launcher.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -64,7 +64,8 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	}
 
 	if ( this->defaultSkin->windowIcon == NULL ) {
-		wxIcon* temp = new wxIcon(_T("wxLauncher.ico"));
+		wxFileName filename(_T(RESOURCES_PATH), _T("wxLauncher.ico"));
+		wxIcon* temp = new wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		if (temp->IsOk())
 			wxLogFatalError( _("Icon not valid") );
 
@@ -72,39 +73,46 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	}
 
 	if ( this->defaultSkin->welcomeHeader == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("SCP_Header.png"));
 		this->defaultSkin->welcomeHeader = 
-			new wxBitmap(_("SCP_Header.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->welcomeHeader->IsOk());
 	}
 
 	if ( this->defaultSkin->welcomeIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("welcome.png"));
 		this->defaultSkin->welcomeIcon =
-			new wxBitmap(_T("welcome.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->welcomeIcon->IsOk());
 	}
 	if ( this->defaultSkin->modsIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("mods.png"));
 		this->defaultSkin->modsIcon =
-			new wxBitmap(_T("mods.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->modsIcon->IsOk());
 	}
 	if ( this->defaultSkin->basicIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("basic.png"));
 		this->defaultSkin->basicIcon =
-			new wxBitmap(_T("basic.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->basicIcon->IsOk());
 	}
 	if ( this->defaultSkin->advancedIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("advanced.png"));
 		this->defaultSkin->advancedIcon = 
-			new wxBitmap(_T("advanced.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->advancedIcon->IsOk());
 	}
 	if ( this->defaultSkin->installIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("install.png"));
 		this->defaultSkin->installIcon =
-			new wxBitmap(_T("install.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->installIcon->IsOk());
 	}
 	if ( this->defaultSkin->idealIcon == NULL ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("recommended.png"));
 		this->defaultSkin->idealIcon = 
-			new wxBitmap(_T("recommended.png"), wxBITMAP_TYPE_PNG);
+			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->idealIcon->IsOk());
 	}
 
@@ -127,12 +135,14 @@ Also, don’t  forget the help file, there is a nice '<a href='help://Getting star
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
-		this->defaultSkin->warningIcon = new wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
+		wxFileName filename(_T(RESOURCES_PATH), _T("warning.png"));
+		this->defaultSkin->warningIcon = new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->warningIcon->IsOk());
 	}
 
 	if ( this->defaultSkin->bigWarningIcon == NULL ) {
-		this->defaultSkin->bigWarningIcon = new wxBitmap(_T("warning_big.png"), wxBITMAP_TYPE_ANY);
+		wxFileName filename(_T(RESOURCES_PATH), _T("warning_big.png"));
+		this->defaultSkin->bigWarningIcon = new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		if ( !this->defaultSkin->bigWarningIcon->IsOk() ) {
 			delete this->defaultSkin->bigWarningIcon;
 			this->defaultSkin->bigWarningIcon = NULL;
@@ -558,7 +568,8 @@ ArtProvider::ArtProvider(SkinSystem *skinSystem) {
 wxBitmap ArtProvider::CreateBitmap(const wxArtID &id, const wxArtClient &client, const wxSize &size) {
 	wxBitmap bitmap;
 	if ( id == wxART_HELP ) {
-		if ( bitmap.LoadFile(_T("helpicon.png"), wxBITMAP_TYPE_PNG) ) {
+		wxFileName filename(_T(RESOURCES_PATH), _T("helpicon.png"));
+		if ( bitmap.LoadFile(filename.GetFullPath(), wxBITMAP_TYPE_ANY) ) {
 			return bitmap;
 		} else {
 			return wxNullBitmap;
