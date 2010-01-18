@@ -23,6 +23,14 @@ else(DEVELOPMENT_MODE)
   set(HELP_HTB_LOCATION ./onlinehelp.htb)
 endif(DEVELOPMENT_MODE)
 
+OPTION(USE_SPEECH "Build launcher with speech support?" OFF)
+OPTION(USE_JOYSTICK "Build launcher with joystick support (currently windows MM only)?" OFF)
+OPTION(USE_OPENAL "Build launcher with OpenAL support?" OFF)
+if(USE_OPENAL)
+  find_package(OpenAL REQUIRED)
+  INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
+endif(USE_OPENAL)
+
 
 INCLUDE(${wxWidgets_USE_FILE})
 add_executable(registry_helper WIN32

@@ -5,4 +5,8 @@
 #cmakedefine RESOURCES_PATH "${RESOURCES_PATH}"
 #cmakedefine HELP_HTB_LOCATION "${HELP_HTB_LOCATION}"
 
+#cmakedefine01 USE_SPEECH
+#cmakedefine01 USE_JOYSTICK
+#cmakedefine01 USE_OPENAL
+
 #endif
