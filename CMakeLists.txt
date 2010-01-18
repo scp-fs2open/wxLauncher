@@ -37,6 +37,9 @@ add_executable(registry_helper WIN32
   code/Win32ProfileManager.cpp platform/win32/registry_helper.cpp)
 SET_TARGET_PROPERTIES(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX)
+if(WIN32)
+  SET_TARGET_PROPERTIES(registry_helper PROPERTIES LINK_FLAGS /MANIFESTUAC:NO)
+endif(WIN32)
 TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
 
 add_custom_command(
