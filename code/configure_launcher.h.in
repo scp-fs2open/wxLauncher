@@ -1,0 +1,7 @@
+#ifndef CONFIGURE_LAUNCHER_H_
+#define CONFIGURE_LAUNCHER_H_
+// File is modified by the build system to tell the launcher where stuff
+// is located
+#cmakedefine RESOURCES_PATH "${RESOURCES_PATH}"
+
+#endif
