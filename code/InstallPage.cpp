@@ -2,6 +2,7 @@
 #include "ids.h"
 #include "ProfileManager.h"
 #include "InstallPage.h"
+#include "HelpManager.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -20,6 +21,8 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 		wxButton* denyNewsUpdate = new wxButton(updateNewsQuestion, wxID_ANY, _("Do not update the highlights on the Welcome page"));
 		updateNewsQuestion->SetAffirmativeId(allowNewsUpdate->GetId());
 		updateNewsQuestion->SetEscapeId(denyNewsUpdate->GetId());
+		wxButton* helpButton = new wxButton(updateNewsQuestion, wxID_ANY, _T("?"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+		helpButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(InstallPage::OnUpdateNewsHelp));
 		
 		wxBoxSizer* updateNewsSizer = new wxBoxSizer(wxHORIZONTAL);
 		wxBoxSizer* bodySizer= new wxBoxSizer(wxVERTICAL);
@@ -33,6 +36,8 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 		choiceSizer->Add(allowNewsUpdate);
 		choiceSizer->AddSpacer(15);
 		choiceSizer->Add(denyNewsUpdate);
+		choiceSizer->AddSpacer(15);
+		choiceSizer->Add(helpButton);
 		choiceSizer->AddStretchSpacer(1);
 		
 		bodySizer->AddSpacer(10);
@@ -78,4 +83,8 @@ void InstallPage::OnDownloadNewsCheck(wxCommandEvent& event) {
 	wxCHECK_RET( checkbox != NULL, _T("OnDownloadNewsCheck called by non checkbox"));
 
 	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_NET_DOWNLOAD_NEWS, checkbox->IsChecked());
+}
+
+void InstallPage::OnUpdateNewsHelp(wxCommandEvent &WXUNUSED(event)) {
+	HelpManager::OpenHelpById(ID_MORE_INFO_PRIVACY);
 }
