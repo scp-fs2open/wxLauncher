@@ -65,7 +65,7 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   code/SpeechManager.cpp code/StatusBar.cpp
   code/TCManager.cpp code/WelcomePage.cpp
   code/WelcomePage.cpp code/Win32ProfileManager.cpp
-  code/wxLauncherApp.cpp )
+  code/wxLauncherApp.cpp platform/win32/wxlauncher.rc)
 SET_TARGET_PROPERTIES(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb ${CMAKE_CURRENT_BINARY_DIR}/generated/confgiure_launcher.h
