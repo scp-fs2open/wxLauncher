@@ -13,6 +13,9 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	if (!ProMan::GetProfileManager()->Global()->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
 		wxDialog* updateNewsQuestion = new wxDialog(NULL, wxID_ANY, _("wxLauncher - Network Access Request"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxDIALOG_NO_PARENT);
 		updateNewsQuestion->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+		wxIcon updateNewsQuestionIcon(_T("helpicon.png"), wxBITMAP_TYPE_ANY);
+		wxASSERT(updateNewsQuestionIcon.IsOk());
+		updateNewsQuestion->SetIcon(updateNewsQuestionIcon);
 		wxStaticText* updateNewsText1 = new wxStaticText(updateNewsQuestion, wxID_ANY, _("wxLauncher has the built-in capability of retrieving and displaying the Hard-Light.net highlights on the Welcome page of the launcher."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxStaticText* updateNewsText2 = new wxStaticText(updateNewsQuestion, wxID_ANY, _("Would you like to allow wxLauncher to go online and retrieve the highlights automatically? "), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxStaticText* updateNewsText3 = new wxStaticText(updateNewsQuestion, wxID_ANY, _("(this setting can can be changed anytime on the Install page, please click \"?\" for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
