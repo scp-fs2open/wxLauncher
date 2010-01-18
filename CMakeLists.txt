@@ -13,11 +13,14 @@ else(onlinehelpmaker_debug)
 SET(HELPMAKER_DEBUG "")
 endif(onlinehelpmaker_debug)
 
+SET(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
 option(DEVELOPMENT_MODE "Doing development" OFF)
 if(DEVELOPMENT_MODE)
+  set(HELP_HTB_LOCATION ${helphtblocation})
   SET(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
 else(DEVELOPMENT_MODE)
   SET(RESOURCES_PATH ./)
+  set(HELP_HTB_LOCATION ./onlinehelp.htb)
 endif(DEVELOPMENT_MODE)
 
 
@@ -33,7 +36,6 @@ add_custom_command(
   COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-set(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp  ${helphtblocation}
   COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
@@ -43,7 +45,7 @@ file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmak
 add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb
+  ${helphtblocation}
   code/AdvSettingsPage.cpp code/BasicSettingsPage.cpp
   code/BottomButtons.cpp 
   code/FlagList.cpp code/FSOExecutable.cpp

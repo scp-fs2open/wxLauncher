@@ -1,5 +1,6 @@
 #include "HelpManager.h"
-
+#include "generated/configure_launcher.h"
+#include <wx/filename.h>
 #include <wx/html/helpctrl.h>
 #include "ids.h"
 #include "wxLauncherSetup.h"
@@ -35,7 +36,7 @@ bool HelpManager::Initialize() {
 
 	externLinkHandler = new ExternLinkHandler();
 	controller = new HtmlHelpController();
-	wxFileName file(_T("help.htb"));
+	wxFileName file(_T(HELP_HTB_LOCATION));
 	if ( file.FileExists() ) {
 		controller->AddBook(file, false);
 	} else {
