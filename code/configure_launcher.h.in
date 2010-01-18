@@ -3,5 +3,6 @@
 // File is modified by the build system to tell the launcher where stuff
 // is located
 #cmakedefine RESOURCES_PATH "${RESOURCES_PATH}"
+#cmakedefine HELP_HTB_LOCATION "${HELP_HTB_LOCATION}"
 
 #endif
