@@ -29,7 +29,7 @@ The wxLauncher requires the CMake build system to for building.
 CMake is a Cross-platform meta-build system (it makes the files
 that allow a platform native build system to build the 
 launcher).  CMake allows us to support your faviourte complier
-from VC6 and newer, XCode, KDevelop, and of course autotools.
+from VS2005 and newer, XCode, KDevelop, and of course autotools.
 
 Requirements shortlist:
 All platforms:
@@ -99,12 +99,24 @@ by runningthe following command (in a folder of your choice):
   
 Building
 ========
-Define USE_SPEECH=1 to have the launcher use the Windows 
-Speech API.
-Define USE_JOYSTICK=1 to have the launcher setup and configure
-Joysticks using (currently) the window MMSystem API.
-Define USE_OPENAL=1 to have the launcher allow setup and
-testing of the OpenAL api and installation.
+Run CMake in your faviourte way (GUI, or on the commandline 
+ccmake (uses curses) or cmake).
+
+Assuming the GUI, select the CMakeLists.txt in the main wxLauncher
+ source directory and set your output directory to where you want the native build tool to be placed, somewhere without spaces.
+ Click configure until the Generate button Enables.  The lines that are highligted red are new variables that CMake has found. 
+- Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
+source directory if it remains NOTFOUND.
+- Set PYTHON_EXECUTABLE to the python that you want to use (it may 
+not show up, if not don't worry about it, it means that it found it)
+- Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher.
+ Make sure that it is unchecked if you plan distrubting the code as with this checked the launcher will only run on the dev 
+machine. This option changes where the launcher looks for files to 
+display as the default interface.
+- Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those 
+options complied in.
+- If USE_OPENAL is check, OPENAL_INCLUDE_DIR will appear, this 
+should be set the include folder in the OpenAL SDK folder.
 
 License
 =======
