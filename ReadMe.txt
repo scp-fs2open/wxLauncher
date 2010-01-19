@@ -62,6 +62,11 @@ in your PATH.  See the compiler specific instructions
 on how to add Python to your PATH.
 Python homepage:
 	http://www.python.org/
+	
+Markdown for Python is required in order to build the 
+integrated help system. 
+Python Markdown homepage:
+	http://www.freewisdom.org/projects/python-markdown/
 
 The OpenAL Software Development Kit is an optional component
 needed to build this program.  OpenAL support is not
@@ -90,7 +95,7 @@ source page:
   
 To get the source, you'll need Mercurial:
 	http://mercurial.selenic.com/
-or TortiseHG:
+or the TortiseHG frontend (which includes Mercurial):
 	http://tortoisehg.bitbucket.org/
 
 Once Mercurial is installed, you can get a copy of the source
