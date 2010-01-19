@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
-project(wxLauncher cxx)
+project(wxlauncher cxx)
 
+SET(CPACK_PACKAGE_NAME wxLauncher for the SCP)
+SET(CPACK_PACKAGE_VENDOR wxLauncher Team)
+SET(CPACK_PACKAGE_VERSION_MAJOR 0)
+SET(CPACK_PACKAGE_VERSION_MINOR 6)
+SET(CPACK_PACKAGE_VERSION_PATCH 0)
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY wxLauncher)
+SET(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
+SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/Readme.txt)
+SET(CPACK_PACKAGE_FILE_NAME wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 include(CPack)
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv media qa richtext)
@@ -14,7 +23,7 @@ SET(HELPMAKER_DEBUG "")
 endif(onlinehelpmaker_debug)
 
 SET(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
-option(DEVELOPMENT_MODE "Doing development" OFF)
+option(DEVELOPMENT_MODE "Doing development (cannot build installer in this mode)" OFF)
 if(DEVELOPMENT_MODE)
   set(HELP_HTB_LOCATION ${helphtblocation})
   SET(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
@@ -71,8 +80,11 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   code/wxLauncherApp.cpp platform/win32/wxlauncher.rc)
 SET_TARGET_PROPERTIES(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb ${CMAKE_CURRENT_BINARY_DIR}/generated/confgiure_launcher.h
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
   PROPERTIES HEADER_FILE_ONLY true)
+if(WIN32)
+ADD_DEPENDENCIES(wxlauncher registry_helper)
+endif(WIN32)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/code/configure_launcher.h.in 
@@ -83,3 +95,7 @@ foreach(temp_file ${helpmaker_temp_files})
 endforeach(temp_file)
 
 TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES})
+install(TARGETS wxlauncher registry_helper
+  RUNTIME DESTINATION .)
+install(DIRECTORY resources/ DESTINATION .)
+install(FILES ${helphtblocation} DESTINATION .)
