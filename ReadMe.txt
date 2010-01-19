@@ -25,12 +25,15 @@ Just find the build for your system and you're set.
 
 Building from source
 ============
-For more info about the builds on specific system see
-the readme.txt that is in the build systems folder.  All
-building code is in the build directory.
+The wxLauncher requires the CMake build system to for building.
+CMake is a Cross-platform meta-build system (it makes the files
+that allow a platform native build system to build the 
+launcher).  CMake allows us to support your faviourte complier
+from VC6 and newer, XCode, KDevelop, and of course autotools.
 
 Requirements shortlist:
 All platforms:
+ - CMake 2.8
  - wxWidgets
  - Python
  - Markdown for Python
@@ -40,6 +43,13 @@ Windows
 Optional components
 All platforms:
  - OpenAL
+
+wxLauncher is built using CMake.  Only version 2.8 has been 
+tested (and the CMake file enforces this).  CMake can be 
+downloaded in binary form, from the [CMake Home Page] or from
+your distro's package repository.
+  [Cmake Home Page]: http://cmake.org
+
 wxLauncher is a wxWidgets based application, thus can 
 only be built with wxWidgets version 2.8.10 or higher 
 installed on your system.
