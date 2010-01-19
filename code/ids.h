@@ -96,6 +96,7 @@ enum WindowIDS {
 
 	ID_NET_DOWNLOAD_NEWS,
 	ID_EVENT_NET_DOWNLOAD_NEWS,
+	ID_MORE_INFO_PRIVACY,
 };
 
 enum MainTabImageIDs {
