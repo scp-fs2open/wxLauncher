@@ -1,16 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(wxlauncher cxx)
+SET(VERSION_MAJOR 0)
+SET(VERSION_MINOR 6)
+SET(VERSION_PATCH 0)
 
-SET(CPACK_PACKAGE_NAME wxLauncher for the SCP)
-SET(CPACK_PACKAGE_VENDOR wxLauncher Team)
-SET(CPACK_PACKAGE_VERSION_MAJOR 0)
-SET(CPACK_PACKAGE_VERSION_MINOR 6)
-SET(CPACK_PACKAGE_VERSION_PATCH 0)
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY wxLauncher)
-SET(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/Readme.txt)
-SET(CPACK_PACKAGE_FILE_NAME wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-include(CPack)
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv media qa richtext)
 include(FindPythonInterp) #PYTHON_EXECUTABLE
@@ -28,7 +21,7 @@ if(DEVELOPMENT_MODE)
   set(HELP_HTB_LOCATION ${helphtblocation})
   SET(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
 else(DEVELOPMENT_MODE)
-  SET(RESOURCES_PATH ./)
+  SET(RESOURCES_PATH ../resources)
   set(HELP_HTB_LOCATION ./onlinehelp.htb)
 endif(DEVELOPMENT_MODE)
 
@@ -52,8 +45,8 @@ endif(WIN32)
 TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp
-  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
+  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_command(
@@ -63,11 +56,11 @@ add_custom_command(
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
 
 add_executable(wxlauncher WIN32 MACOSX_BUNDLE
-  ${CMAKE_CURRENT_BINARY_DIR}/generated/version.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   ${helphtblocation}
   code/AdvSettingsPage.cpp code/BasicSettingsPage.cpp
-  code/BottomButtons.cpp 
+  code/BottomButtons.cpp code/version.cpp
   code/FlagList.cpp code/FSOExecutable.cpp
   code/HelpManager.cpp code/InstallPage.cpp
   code/JoystickManager.cpp code/Logger.cpp
@@ -95,7 +88,36 @@ foreach(temp_file ${helpmaker_temp_files})
 endforeach(temp_file)
 
 TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES})
+
+# find the runtime files
+SET(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT")
+FIND_FILE(VC9_RUNTIME_msvcm90 msvcm90.dll 
+  PATHS ${VC9_RUNTIME_LOCATIONS})
+INSTALL(FILES ${VC9_RUNTIME_msvcm90} DESTINATION .)
+FIND_FILE(VC9_RUNTIME_msvcp90 msvcp90.dll 
+  PATHS ${VC9_RUNTIME_LOCATIONS})
+INSTALL(FILES ${VC9_RUNTIME_msvcp90} DESTINATION .)
+FIND_FILE(VC9_RUNTIME_msvcr90 msvcr90.dll 
+  PATHS ${VC9_RUNTIME_LOCATIONS})
+INSTALL(FILES ${VC9_RUNTIME_msvcr90} DESTINATION .)
+FIND_FILE(VC9_RUNTIME_manifest Microsoft.VC90.CRT.manifest 
+  PATHS ${VC9_RUNTIME_LOCATIONS})
+INSTALL(FILES ${VC9_RUNTIME_manifest} DESTINATION .)
+  
+SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
+SET(CPACK_PACKAGE_NAME wxLauncher for the SCP)
+SET(CPACK_PACKAGE_VENDOR wxLauncher Team)
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY wxLauncher)
+SET(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
+SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/Readme.txt)
+SET(CPACK_PACKAGE_FILE_NAME wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+if( WIN32 AND NOT UNIX )
+    SET(CPACK_PACKAGE_EXECUTABLES "wxLauncher" "wxLauncher for the SCP")
+endif()
+include(CPack)
 install(TARGETS wxlauncher registry_helper
-  RUNTIME DESTINATION .)
-install(DIRECTORY resources/ DESTINATION .)
+  RUNTIME DESTINATION bin)
+install(DIRECTORY resources/ DESTINATION resources)
 install(FILES ${helphtblocation} DESTINATION .)
