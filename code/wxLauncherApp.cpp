@@ -40,7 +40,7 @@ bool wxLauncher::OnInit() {
 	}
 	
 	wxLog::SetActiveTarget(new Logger());
-	wxLogInfo(_T("wxLauncher Version %d.%d"), MAJOR_VERSION, MINOR_VERSION);
+	wxLogInfo(_T("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
 	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
 	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 

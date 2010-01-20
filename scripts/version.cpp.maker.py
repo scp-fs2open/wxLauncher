@@ -58,13 +58,13 @@ def build(file, work):
     print " Writing output file:", file
     make_directory_for_output(file)
     out = open(file, "wb")
-    out.write("wchar_t *HGVersion = L\"")
+    out.write("const wchar_t *HGVersion = L\"")
     out.flush()
     
     out.write(get_hg_id())
     out.flush()
     
-    out.write("\";\nwchar_t *HGDate = L\"")
+    out.write("\";\nconst wchar_t *HGDate = L\"")
     out.flush()
     
     subprocess.Popen('hg parents --template "{date|date}"', stdout=out).wait()

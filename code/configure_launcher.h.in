@@ -9,4 +9,19 @@
 #cmakedefine01 USE_JOYSTICK
 #cmakedefine01 USE_OPENAL
 
+#cmakedefine VERSION_MAJOR ${VERSION_MAJOR}
+#cmakedefine VERSION_MINOR ${VERSION_MINOR}
+#cmakedefine VERSION_PATCH ${VERSION_PATCH}
+
+// If cmake did not define these, it means they are zero
+#ifndef VERSION_MAJOR
+#define VERSION_MAJOR 0
+#endif
+#ifndef VERSION_MINOR
+#define VERSION_MINOR 0
+#endif
+#ifndef VERSION_PATCH
+#define VERSION_PATCH 0
+#endif
+
 #endif
