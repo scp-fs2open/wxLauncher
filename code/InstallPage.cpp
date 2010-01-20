@@ -1,8 +1,10 @@
 #include <wx/wx.h>
+#include <wx/filename.h>
 #include "ids.h"
 #include "ProfileManager.h"
 #include "InstallPage.h"
 #include "HelpManager.h"
+#include "generated/configure_launcher.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -13,7 +15,8 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	if (!ProMan::GetProfileManager()->Global()->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
 		wxDialog* updateNewsQuestion = new wxDialog(NULL, wxID_ANY, _("wxLauncher - Network Access Request"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxDIALOG_NO_PARENT);
 		updateNewsQuestion->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-		wxIcon updateNewsQuestionIcon(_T("helpicon.png"), wxBITMAP_TYPE_ANY);
+		wxFileName updateNewsQuestionIconLocation(_T(RESOURCES_PATH), _T("helpicon.png"));
+		wxIcon updateNewsQuestionIcon(updateNewsQuestionIconLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(updateNewsQuestionIcon.IsOk());
 		updateNewsQuestion->SetIcon(updateNewsQuestionIcon);
 		wxStaticText* updateNewsText1 = new wxStaticText(updateNewsQuestion, wxID_ANY, _("wxLauncher has the built-in capability of retrieving and displaying the Hard-Light.net highlights on the Welcome page of the launcher."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
@@ -31,7 +34,8 @@ InstallPage::InstallPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 		wxBoxSizer* bodySizer= new wxBoxSizer(wxVERTICAL);
 		wxBoxSizer* choiceSizer = new wxBoxSizer(wxHORIZONTAL);
 
-		wxBitmap questionMark(_T("questionmark.png"), wxBITMAP_TYPE_ANY);
+		wxFileName questionMarkLocation(_T(RESOURCES_PATH), _T("questionmark.png"));
+		wxBitmap questionMark(questionMarkLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(questionMark.IsOk());
 		wxStaticBitmap* questionImage = new wxStaticBitmap(updateNewsQuestion, wxID_ANY, questionMark);
 		

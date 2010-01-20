@@ -1,6 +1,8 @@
 #include <wx/wx.h>
 #include <wx/wfstream.h>
 #include <wx/datetime.h>
+#include <wx/filename.h>
+#include <wx/stdpaths.h>
 
 #include <wchar.h>
 
@@ -21,8 +23,12 @@ const wxString levels[] = {
 };
 /** Constructor. */
 Logger::Logger() {
-
-	this->out = new wxFFileOutputStream(_T("wxLauncher.log"), _T("wb"));
+	wxFileName outfile(wxStandardPaths::Get().GetUserDataDir(), _T("wxLauncher.log"));
+	if (!outfile.DirExists() && 
+		!wxFileName::Mkdir(outfile.GetPath(), wxPATH_MKDIR_FULL) ) {
+			wxLogFatalError(_T("Unable to create folder to place log in. (%s)"), outfile.GetPath());
+	}
+	this->out = new wxFFileOutputStream(outfile.GetFullPath(), _T("wb"));
 	wxASSERT_MSG(out->IsOk(), _T("Log output file is not valid!"));
 	this->out->Write("\357\273\277", 3);
 
