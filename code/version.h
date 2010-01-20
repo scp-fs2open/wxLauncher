@@ -1,12 +1,13 @@
 #ifndef VERSION_H
 #define VERSION_H
+#include <wx/wx.h>
 
-#define MAJOR_VERSION 0
-#define MINOR_VERSION 6
+extern const wxUint8 MAJOR_VERSION;
+extern const wxUint8 MINOR_VERSION;
+extern const wxUint8 PATCH_VERSION;
+extern const wxUint64 FULL_VERSION;
 
-#define FULL_VERSION (MAJOR_VERSION*1000000 + MINOR_VERSION*1000)
-
-extern wchar_t *HGVersion;
-extern wchar_t *HGDate;
+extern const wchar_t *HGVersion;
+extern const wchar_t *HGDate;
 
 #endif
