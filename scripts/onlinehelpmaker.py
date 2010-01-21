@@ -44,8 +44,8 @@ def main(argv):
     parser.error("Incorrect number of arguments")
 
   options.type = args[1]
-  options.outfile = args[2]
-  options.indir = args[3]
+  options.outfile = os.path.normpath(args[2])
+  options.indir = os.path.normpath(args[3])
   
   loglevel=logging.INFO
   logging.addLevelName(NOTICE, "NOTICE")
