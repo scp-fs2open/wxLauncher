@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(wxlauncher cxx)
+project(wxlauncher CXX)
 SET(VERSION_MAJOR 0)
 SET(VERSION_MINOR 6)
 SET(VERSION_PATCH 0)
