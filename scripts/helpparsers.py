@@ -114,6 +114,24 @@ class Stage3Parser(OutputParser):
     """Find the image and copy it to the stage3 folder where it should
     be in the file output."""
     if tag == "img":
+      if attrs[1][1].startswith("/"): 
+        # manual wants an absolute path, the help manual does not support
+        # absolute path, so make sure that the image exists where the
+        # absolute path indicates, then make the path into a relative path
+        # with the approriate number of updirs
+        test = os.path.join(self.options.indir, attrs[1][1][1:])
+        if not os.path.exists(test):
+          raise IOError("Cannot find %s in base path"%(attrs[1][1]))
+        
+        # try find a valid relative path
+        subdirdepth = len(self.subdir.split(os.path.sep))
+        prefix = "../"*subdirdepth
+        relpath = os.path.join(prefix, attrs[1][1][1:])
+        if not os.path.exists(os.path.join(self.options.indir, self.subdir,relpath)):
+          raise Exception("Cannot relativize path: %s"%(attrs[1][1]))
+        else:
+          attrs = update_attribute(attrs, 'src', relpath)
+      
       location1 = os.path.join(self.options.indir, self.subdir, attrs[1][1])
       location = os.path.normpath(location1)
 
@@ -145,17 +163,39 @@ class Stage3Parser(OutputParser):
         traceback.print_exc()
         logging.error(" '%s' does not exist", location )
         sys.exit(3)
+        
       self.extrafiles.append(dst)
     OutputParser.handle_startendtag(self, tag, attrs)
 
 class Stage4Parser(OutputParser):
-  def __init__(self, files, *args, **kwargs):
+  def __init__(self, files, options, subdir, *args, **kwargs):
     OutputParser.__init__(self, *args, **kwargs)
     self.files = files
+    self.options = options
+    self.subdir = subdir
     
   def handle_starttag(self, tag, attrs):
     if tag == "a":
       for name,value in attrs:
+        if name == "href" and value.startswith("/"):
+          if value.startswith("/"): 
+            # manual wants an absolute path, the help manual does not support
+            # absolute path, so make sure that the image exists where the
+            # absolute path indicates, then make the path into a relative path
+            # with the approriate number of updirs
+            test = os.path.join(self.options.indir, value[1:])
+            if not os.path.exists(test):
+              raise IOError("Cannot find %s in base path" % (value))
+            
+            # try find a valid relative path
+            subdirdepth = len(self.subdir.split(os.path.sep))
+            prefix = "../"*subdirdepth
+            relpath = os.path.join(prefix, value[1:])
+            if not os.path.exists(os.path.join(self.options.indir, self.subdir,relpath)):
+              raise Exception("Cannot relativize path: %s" % (value))
+            else:
+              attrs = update_attribute(attrs, 'src', relpath)
+              value = relpath
         if name == "href" and not value.startswith("http://"):
           # make sure the file being refered to exists in stage3
           check_ref = change_filename(value, ".stage3", ".", self.files['stage3'], makedirs=False)
