@@ -128,12 +128,12 @@ Building - Linux (Ubuntu)
 Commandline
 -----------
 - Download the source
-- sudo apt-get install build-essentials libwxgtk2.8-dev libwxgtk2.8-dbg
+- sudo apt-get install build-essentials libwxgtk2.8-dev libwxgtk2.8-dbg python-markdown
 - Download and install the cmake 2.8 .debs for your platform from: https://launchpad.net/ubuntu/+source/cmake
 - cd <source directory>
 - mkdir build
 - cd build
-- cmake ../
+- cmake -DUSE_OPENAL=1 ../
 
 
 License

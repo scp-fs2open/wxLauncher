@@ -35,14 +35,14 @@ endif(USE_OPENAL)
 
 
 INCLUDE(${wxWidgets_USE_FILE})
+if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
   code/Win32ProfileManager.cpp platform/win32/registry_helper.cpp)
 SET_TARGET_PROPERTIES(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX)
-if(WIN32)
   SET_TARGET_PROPERTIES(registry_helper PROPERTIES LINK_FLAGS /MANIFESTUAC:NO)
-endif(WIN32)
 TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
+endif()
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
@@ -54,6 +54,11 @@ add_custom_command(
   COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
+if(WIN32)
+SET(PLATFORM_PROFILE_MANAGER code/Win32ProfileManager.cpp)
+else()
+SET(PLATFORM_PROFILE_MANAGER code/UnixProfileManager.cpp)
+endif()
 
 add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
@@ -69,7 +74,7 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   code/ProfileManager.cpp code/Skin.cpp
   code/SpeechManager.cpp code/StatusBar.cpp
   code/TCManager.cpp code/WelcomePage.cpp
-  code/WelcomePage.cpp code/Win32ProfileManager.cpp
+  code/WelcomePage.cpp ${PLATFORM_PROFILE_MANAGER}
   code/wxLauncherApp.cpp platform/win32/wxlauncher.rc)
 SET_TARGET_PROPERTIES(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
@@ -111,7 +116,7 @@ SET(CPACK_PACKAGE_NAME wxLauncher for the SCP)
 SET(CPACK_PACKAGE_VENDOR wxLauncher Team)
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY wxLauncher)
 SET(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/Readme.txt)
+SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/ReadMe.txt)
 if(DEVELOPMENT_MODE)
   SET(CPACK_PACKAGE_FILE_NAME wxlaucher-development-mode)
 else()
@@ -125,7 +130,9 @@ include(CPack)
 if(DEVELOPMENT_MODE)
   MESSAGE( "Development mode is set. Do not distribute installer.")
 endif()
-install(TARGETS wxlauncher registry_helper
-  RUNTIME DESTINATION bin)
+install(TARGETS wxlauncher RUNTIME DESTINATION bin)
+if(WIN32)
+install(TARGETS registry_helper RUNTIME DESTINATION bin)
+endif()
 install(DIRECTORY resources/ DESTINATION resources)
 install(FILES ${helphtblocation} DESTINATION .)
