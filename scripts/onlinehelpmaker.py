@@ -320,8 +320,14 @@ def process_input_stage4(file, options, files):
   
   outname = change_filename(file, ".stage4", files['stage3'], files['stage4'])
   outfile = open(outname, mode="w")
+  
+  #figure out what subdirectory of the onlinehelp I am in
+  subdir = string.replace(os.path.dirname(outname), os.path.normpath(files['stage4']), "")
+  if subdir.startswith(os.path.sep):
+    subdir = string.replace(subdir, os.path.sep, "", 1) # I only want to remove the leading sep
 
-  parser = Stage4Parser(files=files, file=outfile)
+  parser = Stage4Parser(files=files, file=outfile, options=options,
+                        subdir=subdir)
   parser.feed(input)
   parser.close()
   outfile.close()  
