@@ -24,7 +24,7 @@ If checked, the Default profile (that is "the profile named Default") will alway
 
 **Note** If you don't want to use profiles or if you don't know what they are, check this box, select the Default profile and the launcher will act like the old launcher, remembering your changes without asking.
 
-[li]: ../../images/li.png
+[li]: /images/li.png
 [le]: ../../images/le.png
 [profiles]: ../../10Introduction/02Profiles.help
 [derelict]: http://freespace.volitionwatch.com/derelict/index.shtml
