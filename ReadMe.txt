@@ -102,9 +102,9 @@ Once Mercurial is installed, you can get a copy of the source
 by runningthe following command (in a folder of your choice):
 	hg clone https://wxlauncher.googlecode.com/hg/ wxlauncher  
   
-Building
-========
-Run CMake in your faviourte way (GUI, or on the commandline 
+Building - Windows
+==================
+Run CMake in your favourite way (GUI, or on the commandline 
 ccmake (uses curses) or cmake).
 
 Assuming the GUI, select the CMakeLists.txt in the main wxLauncher
@@ -122,6 +122,19 @@ display as the default interface.
 options complied in.
 - If USE_OPENAL is check, OPENAL_INCLUDE_DIR will appear, this 
 should be set the include folder in the OpenAL SDK folder.
+
+Building - Linux (Ubuntu)
+=========================
+Commandline
+-----------
+- Download the source
+- sudo apt-get install build-essentials libwxgtk2.8-dev libwxgtk2.8-dbg
+- Download and install the cmake 2.8 .debs for your platform from: https://launchpad.net/ubuntu/+source/cmake
+- cd <source directory>
+- mkdir build
+- cd build
+- cmake ../
+
 
 License
 =======
