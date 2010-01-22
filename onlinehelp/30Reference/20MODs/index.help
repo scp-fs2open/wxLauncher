@@ -9,9 +9,9 @@ This page allows you to manage the [MODs][mod]![][li] installed for the current 
 
 Installing new MODs can be done from the [Install/Update][iu]![][li] page.
 
-[li]: ../../images/li.png
-[mod]: ../../50TechnicalStuff/02Terminology.help
-[tc]: ../../50TechnicalStuff/02Terminology.help
+[li]: /images/li.png
+[mod]: /50TechnicalStuff/02Terminology.help
+[tc]: /50TechnicalStuff/02Terminology.help
 [am]: activate.help
 [rm]: remove.help
 [iu]: ../50InstallUpdate/index.help

@@ -14,7 +14,7 @@ A nice side-effect of language change is that if your [MODs][mod]![][li] have th
 * New translations can be downloaded from the project's [download page][downloads]![][le]. Installing instructions are found on the [language][lng]![][li] section. 
 * If you're interested in creating a new translation, please check the [Translating the interface][translating]![][li] section.
 
-[li]: ../../images/li.png
+[li]: /images/li.png
 [le]: ../../images/le.png
 [mod]: ../../50TechnicalStuff/02Terminology.help
 [translating]: ../../50TechnicalStuff/01translating.help

@@ -8,7 +8,7 @@ Because of that, the welcome page contains the [language selector][language]![][
 * [Profile management controls][profiles]![][li]
 * [Hard-Light.net highlights][hlnews]![][li]
 
-[li]: ../../images/li.png
+[li]: /images/li.png
 [language]: 01language.help
 [profiles]: 02profiles.help
 [hlnews]: 03news.help
