@@ -67,7 +67,7 @@ def build(file, work):
     out.write("\";\nconst wchar_t *HGDate = L\"")
     out.flush()
     
-    subprocess.Popen('hg parents --template "{date|date}"', stdout=out).wait()
+    subprocess.Popen('hg parents --template {date|date}'.split(), stdout=out).wait()
     out.flush()
     
     out.write('";\n')
@@ -78,7 +78,7 @@ def build(file, work):
     
 def get_hg_id():
   id = tempfile.TemporaryFile()
-  subprocess.Popen("hg id -i -b -t", stdout=id).wait()
+  subprocess.Popen("hg id -i -b -t".split(), stdout=id).wait()
   id.seek(0)
   return string.split(id.readline(), "\n")[0]
   
