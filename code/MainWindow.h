@@ -18,7 +18,7 @@ public:
 	void OnStartFred(wxCommandEvent& event);
 	void OnUpdate(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
-	void OnHelp(wxHelpEvent& event);
+	void OnContextHelp(wxHelpEvent& event);
 	void OnFS2Exited(wxProcessEvent& event);
 
 private:

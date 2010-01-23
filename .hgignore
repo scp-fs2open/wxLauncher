@@ -4,3 +4,4 @@ glob:code/version.cpp
 glob:generated
 glob:output
 glob:*.pyc
+glob:*~
