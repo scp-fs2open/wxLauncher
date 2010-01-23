@@ -168,9 +168,11 @@ bool JoyMan::HasCalibrateTool(unsigned int) {
 
 /** Launch the windows joystick calibration tool. */
 void JoyMan::LaunchCalibrateTool(unsigned int WXUNUSED(i)) {
+#ifdef WINDOWS
 	// the same call that the current window launcher uses to open the 
-	// calibration tool.
+	// calibration tool. Obviously it only works on windows :)
 	WinExec("rundll32.exe shell32.dll,Control_RunDLL joy.cpl", SW_SHOWNORMAL);
+#endif
 }
 
 /** Returns the name of the joystick for display. */
