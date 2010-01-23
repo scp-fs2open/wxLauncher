@@ -195,9 +195,9 @@ wxString FSOExecutable::MakeVersionStringFromVersion(FSOExecutable ver) {
 	bool hasfullversion = (ver.major != 0 && ver.minor != 0 && ver.revision != 0);
 	return wxString::Format(_T("%s %s%s%s %s%s%s"),
 		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname, // Freespace 2 Open
-		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision) : wxEmptyString,
-		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build),
-		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string),
+		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision).c_str() : wxEmptyString,
+		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build).c_str(),
+		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string).c_str(),
 		(ver.debug) ? _T("Debug") : _T("Release"),
 		(ver.inferno) ? _T(" Inferno") : wxEmptyString,
 		(ver.sse == 0) ? wxEmptyString : (ver.sse == 1) ? _T(" SSE") : _T(" SSE2")
