@@ -6,7 +6,6 @@
 #include "ids.h"
 
 #include <wx/html/htmlwin.h>
-#include <windows.h>
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
