@@ -39,7 +39,7 @@ Sets the graphic options to some predetermined values. They can be tweaked in-ga
 
 ### Fix font distortion problem
 
-**The surrent launcher warns the user with the info belowwhen checking this box. is it needed anymore? as the FSO supposedly supportos only OpenGL***
+**The current launcher warns the user with the info below when checking this box. is it needed anymore? as the FSO supposedly supportos only OpenGL***
 
 Only use this if you actually have the font distortion problem that happens to some cards in in D3D modes
 
