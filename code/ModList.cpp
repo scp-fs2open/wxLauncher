@@ -34,7 +34,7 @@ private:
 
 		DECLARE_EVENT_TABLE();
 	};
-	friend ImageDrawer;
+	friend class ImageDrawer;
 
 	SkinSystem* skin;
 	ModItem* item;
@@ -916,13 +916,13 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	links->SetSize(SkinSystem::InfoWindowImageWidth, 40);
 	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
 		(item->website != NULL) ? 
-			wxString::Format(_T("<a href='%s'>%s</a> :: "), *(item->website), _("Website")):wxEmptyString,
+			wxString::Format(_T("<a href='%s'>%s</a> :: "), *(item->website), _("Website")).c_str():wxEmptyString,
 		wxString::Format(_T("<a href='%s'>%s</a>"), (item->forum != NULL) ?
-			*(item->forum):_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")),
+			item->forum->c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
 		(item->bugs != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->bugs), _("Bugs")) : wxEmptyString,
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->bugs), _("Bugs")).c_str() : wxEmptyString,
 		(item->support != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->support), _("Support")) : wxEmptyString
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->support), _("Support")).c_str() : wxEmptyString
 		));
 
 	wxStaticBitmap* warning = NULL;
