@@ -15,7 +15,7 @@ Selecting a [TC][tc]![][li] root folder is needed before the executables (and th
 
 -- Compound image  of the root folder selection boxa nd button with the"browse for folder" dialog --
  
-Simply click **Select** and browse to the correct folder and click **OK** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
+Simply click **Select** and browse to the correct folder (the one containing the FSO executables) and click **OK** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
 
 ### Executable selection
 
