@@ -1,5 +1,50 @@
 <meta name="control" content="ID_GRAPHICS_COMBO" />
 <title>Video options</title>
-The graphics API to use to show the game.
+#Video options
 
-Currently only OpenGL is supported by the current versions of the Freespace 2 Source Code Project.
+This is where you configure the basic settings of the graphics engine to best suit your needs (and to best fit your computer's graphic and processing power)
+
+-- screenshot with the "video" section highlighted --
+
+### Graphics
+The graphics system to be used by the game. Currently only OpenGL is supported by the current versions of the [FSO][]![][li].
+
+**Note**: The original engine reliably supported only Microsoft's DirectX technology, but the [SCP][]![][li] upgraded the engine to work well in OpenGL mode and removed DirectX support to make the game multiplatform.
+
+### Resolution
+The number of pixels you see on the screen when playing the game. Chosing a bigger resolution increases the quality of the graphics output of the  engine but requires more processing power. If the game runs sluggish, try lowering the resolution.
+
+### Depth
+Bit depth (AKA *color depth* and *screen depth*) describes the number of bits used to represent the color of a single pixel. In game terms, this means that a 32bit depth creates a more vivid image than a 16bit depth mode. However, 32bit requires a bit more processing power than 16bit, causing a slight performance loss.
+
+### Texture Filter
+The texture filter determines is the method used to blend the pixels you see on a textured object/model in game with that of neighbouring pixels to create the illusion of a continuous surface. The more advanced the method, the better the result. The cost is a slight performance loss.
+
+### Anisotropic
+Anisotropic is a second filter applied to the textures you see in-game to correct blurriness when the textured surface is at an oblique angle. Since most of the textures in-game are viewed at oblique angles, it is a good idea to turn this on. Like most other options, chosing a bigger correction factor resutls in a slight performace loss.
+
+### Anti-Alias
+
+** is this feature implemented? does it work? **
+
+Anti-aliasing is a technique that minimizes the "jagged edges" of any object you seein-game. Check this [Wikipedia article on Anti-aliasing][aa]![][le] for a more detailed explanation. 
+
+In a furious dogfight you won't notice any difference if this is turned on or off, but if you want to admire the beautiful world of FreeSpace it's worth turning it on. Careful when chosing a big Anti-Alias factor, as this might cause a huge performance loss, depending on your system configuration.
+
+### General settings
+Sets the graphic options to some predetermined values. They can be tweaked in-game.
+
+### Use large textures
+  -- **unknown, need documentation** --
+
+### Fix font distortion problem
+
+**The surrent launcher warns the user with the info belowwhen checking this box. is it needed anymore? as the FSO supposedly supportos only OpenGL***
+
+Only use this if you actually have the font distortion problem that happens to some cards in in D3D modes
+
+[li]: /images/li.png
+[le]: /images/le.png
+[fso]: /50TechnicalStuff/02Terminology.help
+[scp]: /50TechnicalStuff/02Terminology.help
+[aa]: http://en.wikipedia.org/wiki/Anti-alias

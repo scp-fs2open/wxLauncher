@@ -6,10 +6,8 @@ wxLauncher is a multilanguage multiplatform multipurpose launcher/updater applic
 ### What can wxLauncer do?
 There are  several things wxLauncer can do for you:
 
-* Allow you to launch FS2_open with your favorite mod and settings easily
-
+* Allow you to launch [FSO][]![][li] with your favorite mod and settings easily
 * Keep your FreeSpace files (mods included) up-to-date
-
 * Install new mods
 
 (*at the time of this writing, only the first item is targeted for the initial release, the update and install features will be part of the 2.0 release*)
@@ -17,29 +15,28 @@ There are  several things wxLauncer can do for you:
 ###Is wxLauncher free?
 The launcher is published under the [GNU General Public License v2][gpl]![][le], making it free software, for you to use and modify. The source files are available on the project's [source page][source]![][le].
 
-
 ### Why wxLauncher?
 The name was chosen because the launcher it is build with [wxWidgets][]![][le] in order to make it run on multiple platforms.
 [wxWidgets]: http://www.wxwidgets.org/
 
 ###On what platforms does the launcher run?
-The launcher runs on the same platformsas FS2_Open, namely **Microsoft Windows**, **Linux** and **Mac OS**.
+The launcher runs on the same platforms as FSO, namely **Microsoft Windows**, **Linux** and **Mac OS**.
 
 ### Who made wxLauncher?
 Check the [authors][]![][li] section for details.
 
+### What about my privacy?
+The launcher does not send any data over the internet so your privacy is safe. You don't have to take our word for it, and if you have the necessary knowledge you can examine the [source code][source]![][le] and see for yourself. If you dont, but are curious to know what technical stuff happens when the launcher goes online, you can check the [privacy][privacy]![][li] page in the [Technical stuff][technical]![][li] section.
 
 ### Are there any translations available?
 Yes, there are. Check the project's [downloads page][downloads]![][le] for a list of available translations. To install them, simply unzip the downloaded files in the launcher folder (or in it's "Data" folder if you don't have administrator acces).
-
 
 ### I've found a bug, what should I do?
 While wo do our best to create a bug-free experience, some pesky bugs may have slipped through. If you've encountered one, do the following:
 
 * First, check the project's [issues page][issues]![][le] to see if someone else already reported a problem similar with what you are experiencing. If so, please read carefully the issue in questionto determine if you have some pertienent info to add. Contact the owner of the issue with the details.
 
-* If the issue you are experiencing is not reported in the [issues page][issues]![][le], please contact one of the [project owners][people]![][le] or any [developer][people]![][le] with all the relevant details (what were you doing when the issue happened, logs, screenshots, launcher version, FS2_Open version, etc.). We'll analyze the details an may ask you for some more information in order to track down the problem and fix it.
-
+* If the issue you are experiencing is not reported in the [issues page][issues]![][le], please contact one of the [project owners][people]![][le] or any [developer][people]![][le] with all the relevant details (what were you doing when the issue happened, logs, screenshots, launcher version, FSO version, etc.). We'll analyze the details an may ask you for some more information in order to track down the problem and fix it.
 
 ###I have a suggestion, what should I do?
 Suggestions are always welcome. Contact one of the [project owners or developers][people]![][le] with it. If it's worth implementing it, we'll do so.
@@ -53,9 +50,12 @@ While this is not a question, we will accept your criticism if you can tell us i
 
 [li]: images/li.png
 [le]: images/le.png
+[fso]: 50TechnicalStuff/02Terminology.help
 [gpl]: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-[source]: http://code.google.com/p/wxlauncher/source/checkout
 [authors]: kauthors.help
+[source]: http://code.google.com/p/wxlauncher/source/browse/
+[privacy]: 50TechnicalStuff/03privacy.help
+[technical]: 50TechnicalStuff/index.help
 [downloads]: http://code.google.com/p/wxlauncher/downloads/list
 [issues]: http://code.google.com/p/wxlauncher/issues/list
 [people]: http://code.google.com/p/wxlauncher/people/list
