@@ -1,1 +1,27 @@
 <title>Audio device</title>
+#Audio device
+Here you set the device that [FSO][]![][li] will use to output the sound effects.
+
+-- screenshot with the "adio" section highlighted --
+
+###Sound device
+Lists the compatible sound devices that are installed on your system. "Generic software" works on any machine, choose that if you don't have a high-end dedicated sound card.
+
+**Note**: If you don't have any device listed in the droplist, click the button below to download the latest version of OpenAL. You might want to check this [Wikipedia page][openalw]![][le] to learn more about OpenAL.
+
+###Download OpenAL
+
+** this button should always be enabled -- how do we know the user has the latest version? or the latest version is not needed, what is needed is a version that works? **
+
+Click this button to open the [OpenAL download section][openald]![][le] in your default browser. There, locate, download and install the appropiate package for your system
+
+###Detect
+Click this to redetect the audio devices installed  on your system. Useful if you made changes to your system - like installing a
+new version of OpenAL for example.
+
+
+[li]: /images/li.png
+[le]: /images/le.png
+[openalw]: http://en.wikipedia.org/wiki/OpenAL
+[openald]: http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx
+[fso]: /50TechnicalStuff/02Terminology.help

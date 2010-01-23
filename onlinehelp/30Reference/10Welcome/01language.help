@@ -10,13 +10,14 @@ A nice side-effect of language change is that if your [MODs][mod]![][li] have th
 
 **Notes**: 
 
-* The language selection has no effect on the language used by the FS2_Open or MODs when playing the game.
+* The language selection has no effect on the language used by the [FSO][]![][li] or MODs when playing the game.
 * New translations can be downloaded from the project's [download page][downloads]![][le]. Installing instructions are found on the [language][lng]![][li] section. 
 * If you're interested in creating a new translation, please check the [Translating the interface][translating]![][li] section.
 
 [li]: /images/li.png
-[le]: ../../images/le.png
-[mod]: ../../50TechnicalStuff/02Terminology.help
-[translating]: ../../50TechnicalStuff/01translating.help
+[le]: /images/le.png
+[fso]: /50TechnicalStuff/02Terminology.help
+[mod]: /50TechnicalStuff/02Terminology.help
+[translating]: /50TechnicalStuff/01translating.help
 [downloads]: http://code.google.com/p/wxlauncher/downloads/list
-[lng]: ../../10Introduction/03Languages.help "Languages"
+[lng]: /10Introduction/03Languages.help
