@@ -645,7 +645,7 @@ void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &WXUNUSED(event)) {
 	
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_API, api->GetStringSelection());
-	box->SetLabel(wxString::Format(_("Video (%s)"), api->GetStringSelection()));
+	box->SetLabel(wxString::Format(_("Video (%s)"), api->GetStringSelection().c_str()));
 }
 
 class Resolution: public wxClientData {
@@ -663,6 +663,7 @@ private:
 };
 
 void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
+#ifdef WIN32
 	DEVMODE deviceMode;
 	DWORD modeCounter = 0;
 	BOOL result;
@@ -703,6 +704,9 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 		}
 		modeCounter++;
 	} while ( result == TRUE );
+#else
+#pragma warning("BasicSettingsPage::FillResolutionDropBox not implemented")
+#endif
 }
 
 void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event)) {
