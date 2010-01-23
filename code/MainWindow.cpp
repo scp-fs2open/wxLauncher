@@ -2,6 +2,7 @@
 #include <wx/gdicmn.h>
 #include <wx/toolbook.h>
 #include <wx/imagpng.h>
+#include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
 #include "ids.h"
 #include "MainWindow.h"
@@ -36,7 +37,8 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	// setup tabs
 
 	// Images used by wxImageList must be all the same dimentions
-	wxImageList* images = new wxImageList(64,64);
+	wxImageList* images = new wxImageList;
+  images->Create(64,64);
 	images->Add(skin->GetWelcomeIcon());
 	images->Add(skin->GetModsIcon());
 	images->Add(skin->GetBasicIcon());
@@ -78,7 +80,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_UPDATE_BUTTON, MainWindow::OnUpdate)
 	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnStartFS)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
-	EVT_HELP(wxID_ANY, MainWindow::OnHelp)
+	EVT_HELP(wxID_ANY, MainWindow::OnContextHelp)
 	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
 END_EVENT_TABLE()
 
@@ -148,7 +150,7 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("About"));
 }
 
-void MainWindow::OnHelp(wxHelpEvent& event) {
+void MainWindow::OnContextHelp(wxHelpEvent& event) {
 	HelpManager::OpenHelpById((WindowIDS)event.GetId());
 }
 
