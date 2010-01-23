@@ -1,3 +1,7 @@
 * Statusbar icons by FamFamFam <http://www.famfamfam.com/lab/icons/silk/>. License: the Creative Commons 2.5 Attribution license
+
 * Warning icon (warning_big.png) from <http://ftp.gnome.org/pub/gnome/sources/gnome-themes-extras/0.9/gnome-themes-extras-0.9.0.tar.bz2> by David Vignoni, modified by Bastique <http://commons.wikimedia.org/wiki/User:Bastique>. Recolored by flamurai <http://commons.wikimedia.org/wiki/User:Flamurai>. License: LGPL
+
 * Help icon by Thoosje <http://thoosje.deviantart.com/>. License: Freeware, author credit required.
+
+* Info icon (info_big.png) by Amanda44 <http://commons.wikimedia.org/wiki/User:Amada44>. License: Public domain

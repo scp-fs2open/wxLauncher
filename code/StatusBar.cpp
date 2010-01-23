@@ -1,7 +1,9 @@
 #include <wx/wx.h>
+#include <wx/filename.h>
 #include "StatusBar.h"
 #include "ids.h"
 #include "logger.h"
+#include "generated/configure_launcher.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -22,10 +24,17 @@ StatusBar::StatusBar(wxWindow *parent)
 	this->parent = parent;
 	this->showingToolTip = false;
 
-	this->icons[ID_SB_OK] = wxBitmap(_T("ok.png"), wxBITMAP_TYPE_ANY);
-	this->icons[ID_SB_WARNING] = wxBitmap(_T("warning.png"), wxBITMAP_TYPE_ANY);
-	this->icons[ID_SB_ERROR] = wxBitmap(_T("error.png"), wxBITMAP_TYPE_ANY);
-	this->icons[ID_SB_INFO] = wxBitmap(_T("information.png"), wxBITMAP_TYPE_ANY);
+	wxFileName iconLocationOk(_T(RESOURCES_PATH), _T("icon_ok.png"));
+	this->icons[ID_SB_OK] = wxBitmap(iconLocationOk.GetFullPath(), wxBITMAP_TYPE_ANY);
+	
+	wxFileName iconLocationWarning(_T(RESOURCES_PATH), _T("icon_warning.png"));
+	this->icons[ID_SB_WARNING] = wxBitmap(iconLocationWarning.GetFullPath(), wxBITMAP_TYPE_ANY);
+	
+	wxFileName iconLocationError(_T(RESOURCES_PATH), _T("icon_error.png"));
+	this->icons[ID_SB_ERROR] = wxBitmap(iconLocationError.GetFullPath(), wxBITMAP_TYPE_ANY);
+
+	wxFileName iconLocationInformation(_T(RESOURCES_PATH), _T("icon_information.png"));
+	this->icons[ID_SB_INFO] = wxBitmap(iconLocationInformation.GetFullPath(), wxBITMAP_TYPE_ANY);
 
 	for( int i = 0; i < ID_SB_MAX_ID; i++) { // Check that all icons are okay.
 		if ( !this->icons[i].IsOk() ) {
