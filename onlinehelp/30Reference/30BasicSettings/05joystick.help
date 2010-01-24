@@ -1,1 +1,22 @@
 <title>Joystick selection</title>
+#Joystick selection
+This is where you select and configure your joystick.
+
+-- screenshot of with the joystick area highlighted --
+
+###Select joystick
+This is a list if joysticks connected to your computer and recognized by the operating system. Choose the one you want to use.
+
+###Force feedback
+Force feedback, or *haptics* (from *Haptic Technology*) is a tactile feedback technology which takes advantage of a user's sense of touch by applying forces, vibrations, and/or motions upon the user. An example of this feature is the simulated automobile steering wheels that are programmed to provide a "feel" of the road. As the user makes a turn or accelerates, the steering wheel responds by resisting turns or slipping out of control.
+
+So, if you want to "feel" your fighter more closely, enable this option (your joystick must support force feedback for this to have any effect).
+
+###Directional hit
+When *Directional hit* is enabled the joystick will bump in the opposite direction of where you were hit (by lasers, missiles, etc) - that is if your joystick supports force feedback.
+
+###Calibrate
+Clicking this opens the joystick calibration page in the Control Panel.
+
+###Detect
+Makes the launcher look for joysticks again. Useful if you plugged your joystick in after the launcher was started.

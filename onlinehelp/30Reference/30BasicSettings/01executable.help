@@ -4,7 +4,7 @@
 
 #TC root folder and Executable
 
-In order to be able to launch FS2_Open, the launcher needs to know two things:
+In order to be able to launch [FSO][]![][li], the launcher needs to know two things:
 
 * In what folder are the executables located
 * What specific executable shoult it use
@@ -15,7 +15,7 @@ Selecting a [TC][tc]![][li] root folder is needed before the executables (and th
 
 -- Compound image  of the root folder selection boxa nd button with the"browse for folder" dialog --
  
-Simply click **Select** and browse to the correct folder and click **OK** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FS2_Open executables.
+Simply click **Select** and browse to the correct folder (the one containing the FSO executables) and click **OK** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
 
 ### Executable selection
 
@@ -33,6 +33,7 @@ Each of this entries, if available and selected, will launch the appropiate exec
 -- screenshot depicting the exe selection box with the list open and several exe files available for selection --
 
 [li]: /images/li.png
+[fso]: ../../50TechnicalStuff/02Terminology.help
 [tc]: /50TechnicalStuff/02Terminology.help
 [mod]: /50TechnicalStuff/02Terminology.help
 [modpage]: ../20MODs/index.help

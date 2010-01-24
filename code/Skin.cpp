@@ -135,7 +135,7 @@ Also, don’t  forget the help file, there is a nice '<a href='help://Getting star
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("warning.png"));
+		wxFileName filename(_T(RESOURCES_PATH), _T("icon_warning.png"));
 		this->defaultSkin->warningIcon = new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->warningIcon->IsOk());
 	}

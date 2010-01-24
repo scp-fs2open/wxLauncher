@@ -22,7 +22,7 @@ Manually saves the current profile. If a profile contains unsaved changes, the l
 ### Always save default profile
 If checked, the Default profile (that is "the profile named Default") will always be saved on launcher exit and/or profile switch. 
 
-**Note** If you don't want to use profiles or if you don't know what they are, check this box, select the Default profile and the launcher will act like the old launcher, remembering your changes without asking.
+**Note**: If you don't want to use profiles or if you don't know what they are, check this box, select the Default profile and the launcher will act like the old launcher, remembering your changes without asking.
 
 [li]: /images/li.png
 [le]: ../../images/le.png
