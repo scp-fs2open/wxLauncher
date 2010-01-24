@@ -1,4 +1,4 @@
-#include "skin.h"
+#include "Skin.h"
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include "generated/configure_launcher.h"
@@ -124,14 +124,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( this->defaultSkin->welcomePageText == NULL ) {
 		this->defaultSkin->welcomePageText =
 			new wxString(
-_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>\
-If you’re  new to the Freespace 2 universe, you might want to check out these links first:<br>\
-= <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a>  \
-= <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> \
-= <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> \
-= <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
-Also, don’t  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>\
-</center></p>"));
+_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>If you're  new to the Freespace 2 universe, you might want to check out these links first:<br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a> = <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> = <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> = <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> = <br><br>Also, don't  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br></center></p>"));
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
