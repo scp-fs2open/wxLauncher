@@ -358,6 +358,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	if ( !this->needToUpdateNews ) {
 		return;
 	}
+	this->needToUpdateNews = false;
 	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
 	wxCHECK_RET(newsWindow != NULL, _T("Update news called, but can't find the news window"));
 
@@ -416,7 +417,6 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	} else {
 		newsWindow->SetPage(_("Auto news download disabled.  Visit the Install Tab to change this setting."));
 	}
-	this->needToUpdateNews = false;
 }
 
 
