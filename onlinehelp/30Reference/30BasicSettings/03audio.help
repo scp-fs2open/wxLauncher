@@ -2,7 +2,7 @@
 #Audio device
 Here you set the device that [FSO][]![][li] will use to output the sound effects.
 
--- screenshot with the "adio" section highlighted --
+-- screenshot with the "audio" section highlighted --
 
 ###Sound device
 Lists the compatible sound devices that are installed on your system. "Generic software" works on any machine, choose that if you don't have a high-end dedicated sound card.
@@ -13,11 +13,10 @@ Lists the compatible sound devices that are installed on your system. "Generic s
 
 ** this button should always be enabled -- how do we know the user has the latest version? or the latest version is not needed, what is needed is a version that works? **
 
-Click this button to open the [OpenAL download section][openald]![][le] in your default browser. There, locate, download and install the appropiate package for your system
+Click this button to open the [OpenAL download section][openald]![][le] in your default browser. In your default browser, locate, download and install the appropiate package for your system.
 
 ###Detect
-Click this to redetect the audio devices installed  on your system. Useful if you made changes to your system - like installing a
-new version of OpenAL for example.
+Click this to redetect the audio devices installed  on your system. Useful if you made changes to your system - like installing a new version of OpenAL for example, without restarting wxLauncher.
 
 
 [li]: /images/li.png

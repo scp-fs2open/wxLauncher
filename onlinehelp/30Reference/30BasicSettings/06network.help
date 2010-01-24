@@ -11,10 +11,10 @@ In order to play on online, [FSO][]![][li] needs to know what kind of network co
 For a smooth experience, select the apropiate connection speed here.
 
 ###Port
-If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here.
+If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here. Used for getting around problems with older Network Address Translation (NAT) Firewalls.
 
 ###IP
-Same as above, but for the [IP][]![][le] address. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.
+Same as above, but for the [IP][]![][le] address. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.  As with port, normaly not required, but is used to get around older NAT Firewalls.
 
 [li]: /images/li.png
 [le]: /images/le.png
