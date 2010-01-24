@@ -210,6 +210,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	bool fixFont;
 	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &fixFont, false);
 	fontDistortion->SetValue(fixFont);
+	fontDistortion->Disable(); // DirectX only
 	
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); 
