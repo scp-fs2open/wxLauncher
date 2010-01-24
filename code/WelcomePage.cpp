@@ -262,7 +262,7 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 			int response = wxMessageBox(
 				wxString::Format(
 					_("There are unsaved changes to your profile '%s'.\n\nWould you like to save your changes?"),
-					proman->GetCurrentName()),
+					proman->GetCurrentName().c_str()),
 				_("Save profile changes?"), wxYES_NO, this);
 
 			if ( response == wxYES ) {
@@ -270,9 +270,9 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 			}
 		}
 		if ( proman->SwitchTo(newProfile) ) {
-			wxLogMessage(_T("Profile %s is now the active profile."), proman->GetCurrentName());
+			wxLogMessage(_T("Profile %s is now the active profile."), proman->GetCurrentName().c_str());
 		} else {
-			wxLogWarning(_T("Unable to switch to %s, staying on %s."), newProfile, proman->GetCurrentName());
+			wxLogWarning(_T("Unable to switch to %s, staying on %s."), newProfile.c_str(), proman->GetCurrentName().c_str());
 		}
 	} else {
 		wxLogWarning(_T("Profile does not exist. Use Clone to create profile first"));
@@ -291,7 +291,7 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	If the current value of the combobox is a valid profile name then we will
 	use that as the profile to clone from, leaving the newname blank.
 	*/
-	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection());
+	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection().c_str());
 	if ( profile->DoesProfileExist(combobox->GetStringSelection()) ) {
 		// is a vaild profile
 		originalName = combobox->GetStringSelection();
@@ -310,13 +310,13 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 			cloneDialog.GetOriginalName(),
 			cloneDialog.GetTargetName()) ) {
 				wxLogStatus(_("Cloned profile '%s' from '%s'"),
-					cloneDialog.GetOriginalName(),
-					cloneDialog.GetTargetName());
+					cloneDialog.GetOriginalName().c_str(),
+					cloneDialog.GetTargetName().c_str());
 				profile->SwitchTo(cloneDialog.GetTargetName());
 		} else {
 				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
-					cloneDialog.GetOriginalName(),
-					cloneDialog.GetTargetName());							
+					cloneDialog.GetOriginalName().c_str(),
+					cloneDialog.GetTargetName().c_str());							
 		}
 	} else {
 		wxLogStatus(_("Profile clone aborted"));
@@ -332,15 +332,15 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
 		
 		if ( deleteDialog.ShowModal() == deleteDialog.GetAffirmativeId()) {
 			if ( profile->DeleteProfile(nametodelete) ) {
-				wxLogStatus(_("Deleted profile named '%s'."), nametodelete);
+				wxLogStatus(_("Deleted profile named '%s'."), nametodelete.c_str());
 			} else {
-				wxLogWarning(_("Unable to delete profile '%s', see log for more details."), nametodelete);
+				wxLogWarning(_("Unable to delete profile '%s', see log for more details."), nametodelete.c_str());
 			}
 		} else {
-			wxLogStatus(_("Deletion of profile '%s' cancelled"), nametodelete);
+			wxLogStatus(_("Deletion of profile '%s' cancelled"), nametodelete.c_str());
 		}
 	} else {
-		wxLogWarning(_T("Unable to delete non existant profile '%s'"), nametodelete);
+		wxLogWarning(_T("Unable to delete non existant profile '%s'"), nametodelete.c_str());
 	}
 }
 
@@ -358,6 +358,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	if ( !this->needToUpdateNews ) {
 		return;
 	}
+	this->needToUpdateNews = false;
 	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
 	wxCHECK_RET(newsWindow != NULL, _T("Update news called, but can't find the news window"));
 
@@ -390,7 +391,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			}
 
 			wxInputStream* theNews = news->GetStream();
-			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation(), news->GetMimeType());
+			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
 
 			wxString newsData;
 			wxStringOutputStream newsDataStream(&newsData);
@@ -404,7 +405,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
 				wxString imglink(tok.GetNextToken());
 				
-				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link, title, imglink);
+				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
 			}
 			formattedData += _T("\n</ul>");
 			profile->Global()->Write(GBL_CFG_NET_THE_NEWS, formattedData);
@@ -416,7 +417,6 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	} else {
 		newsWindow->SetPage(_("Auto news download disabled.  Visit the Install Tab to change this setting."));
 	}
-	this->needToUpdateNews = false;
 }
 
 
@@ -475,7 +475,7 @@ wxString CloneProfileDialog::GetOriginalName() {
 DeleteProfileDialog::DeleteProfileDialog(wxWindow* parent, wxString name):
 wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile..."), wxDefaultPosition, wxDefaultSize) {
 	wxStaticText* text = new wxStaticText(this, wxID_ANY,
-		wxString::Format(_("Are you sure you would like to delete profile %s"), name));
+		wxString::Format(_("Are you sure you would like to delete profile %s"), name.c_str()));
 
 	wxButton *deleteButton = new wxButton(this, wxID_ANY, _("Delete"));
 	wxButton *cancelButton = new wxButton(this, wxID_ANY, _("Cancel"));

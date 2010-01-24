@@ -562,7 +562,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 			wxLogWarning(_T("Directory does not have supported executables in it"));
 		}
 	}
-	wxLogDebug(_T("User choose '%s' as the TC directory"), path.GetPath());
+	wxLogDebug(_T("User choose '%s' as the TC directory"), path.GetPath().c_str());
 	proman->Get()->Write(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
 	TCManager::GenerateTCChanged();
 }
@@ -628,7 +628,7 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 		choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( ver != NULL,
 		_T("OnSelectExecutable: choice does not have FSOVersion data"));
-	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName());
+	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName().c_str());
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->GetExecutableName());

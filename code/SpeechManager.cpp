@@ -1,6 +1,8 @@
 #include <wx/wx.h>
 #include "generated/configure_launcher.h"
+#if USE_SPEECH
 #include <sapi.h>
+#endif
 
 #include "SpeechManager.h"
 #include "wxLauncherSetup.h"
