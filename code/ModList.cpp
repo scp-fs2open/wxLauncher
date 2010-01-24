@@ -207,7 +207,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
 		if ( config->Exists(_T("/multimod/secondrylist")) ) {
 			wxLogInfo(_T("  DEPCRECIATION WARNING: Mod '%s' uses depreciated mod.ini parameter 'secondrylist'"),
-				shortname);
+				shortname.c_str());
 		}
 		readIniFileString(config, _T("/multimod/secondrylist"), &(item->secondarylist));
 		readIniFileString(config, _T("/multimod/secondarylist"), &(item->secondarylist));
@@ -322,7 +322,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 		// langauges
 		for ( size_t i = 0;	i < SupportedLanguages.Count(); i++ ) {
-			wxString section = wxString::Format(_T("/%s"), SupportedLanguages[i]);
+			wxString section = wxString::Format(_T("/%s"), SupportedLanguages[i].c_str());
 			if ( config->Exists(section) ) {
 				if ( item->i18n == NULL ) {
 					item->i18n = new I18nData();
@@ -451,19 +451,27 @@ wxString ModList::excapeSpecials(wxString toexcape) {
 /** */
 void ModList::readFlagSet(wxFileConfig* config,
 							   wxString keyprefix, FlagSetItem *set) {
-	readIniFileString(config, wxString::Format(_T("%s/name"), keyprefix), &(set->name));
-	readIniFileString(config, wxString::Format(_T("%s/flagset"), keyprefix), &(set->flagset));
-	readIniFileString(config, wxString::Format(_T("%s/notes"), keyprefix), &(set->notes));
+	readIniFileString(config,
+    wxString::Format(_T("%s/name"), keyprefix.c_str()),
+    &(set->name));
+	readIniFileString(config, 
+    wxString::Format(_T("%s/flagset"), keyprefix.c_str()), 
+    &(set->flagset));
+	readIniFileString(config, 
+    wxString::Format(_T("%s/notes"), keyprefix.c_str()), 
+    &(set->notes));
 }
 
 void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nItem **trans) {
-	wxString section = wxString::Format(_T("/%s"), langaugename);
+	wxString section = wxString::Format(_T("/%s"), langaugename.c_str());
 	if ( config->Exists(section) ) {
 		*trans = new I18nItem();
 
-		readIniFileString(config, wxString::Format(_T("%s/modname"), section),
+		readIniFileString(config, 
+      wxString::Format(_T("%s/modname"), section.c_str()),
 			&((*trans)->modname));
-		readIniFileString(config, wxString::Format(_T("%s/infotext"), section),
+		readIniFileString(config, 
+      wxString::Format(_T("%s/infotext"), section.c_str()),
 			&((*trans)->infotext));
 
 	} else {
@@ -881,7 +889,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	wxASSERT(item->name != NULL || item->shortname != NULL);
 	wxString modName = 
 		wxString::Format(_T("%s"),
-			(item->name == NULL)? *(item->shortname): *(item->name));
+			(item->name == NULL)? item->shortname->c_str(): item->name->c_str());
 	wxDialog::Create(parent, wxID_ANY, modName, wxDefaultPosition, wxDefaultSize, wxBORDER_RAISED | wxBORDER_DOUBLE );
 	this->SetBackgroundColour(wxColour(_T("WHITE")));
 
@@ -895,7 +903,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	wxString tcPath;
 	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
 	wxString modFolderString = 
-		wxString::Format(_T("%s%c%s"), tcPath, wxFileName::GetPathSeparator(), *(item->shortname));
+		wxString::Format(_T("%s%c%s"), tcPath.c_str(), wxFileName::GetPathSeparator(), item->shortname->c_str());
 	wxStaticText* modFolderBox = 
 		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
@@ -916,13 +924,13 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	links->SetSize(SkinSystem::InfoWindowImageWidth, 40);
 	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
 		(item->website != NULL) ? 
-			wxString::Format(_T("<a href='%s'>%s</a> :: "), *(item->website), _("Website")).c_str():wxEmptyString,
+			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website->c_str(), _("Website")).c_str():wxEmptyString,
 		wxString::Format(_T("<a href='%s'>%s</a>"), (item->forum != NULL) ?
 			item->forum->c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
 		(item->bugs != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->bugs), _("Bugs")).c_str() : wxEmptyString,
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs->c_str(), _("Bugs")).c_str() : wxEmptyString,
 		(item->support != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), *(item->support), _("Support")).c_str() : wxEmptyString
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support->c_str(), _("Support")).c_str() : wxEmptyString
 		));
 
 	wxStaticBitmap* warning = NULL;

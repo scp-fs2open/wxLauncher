@@ -40,7 +40,7 @@ bool HelpManager::Initialize() {
 	if ( file.FileExists() ) {
 		controller->AddBook(file, false);
 	} else {
-		::wxLogWarning(_T("Unable to find help file %s"), file.GetFullName());
+		::wxLogWarning(_T("Unable to find help file %s"), file.GetFullName().c_str());
 		delete controller;
 		controller = NULL;
 		return false;

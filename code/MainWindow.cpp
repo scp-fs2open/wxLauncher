@@ -117,7 +117,7 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 
 	wxFileName path(folder, binary, wxPATH_NATIVE);
 	if ( !path.FileExists() ) {
-		wxLogError(_T("Binary %s does not exist"), path.GetFullName());
+		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
 		return;
 	}
 
@@ -135,7 +135,7 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
-	wxString command(wxString::Format(_T("%s"), path.GetFullPath()));
+	wxString command(wxString::Format(_T("%s"), path.GetFullPath().c_str()));
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
 	if ( pid == 0 ) {
 		return;

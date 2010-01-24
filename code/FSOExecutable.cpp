@@ -2,7 +2,7 @@
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 
-enum {
+enum BuildCapabilities_enum {
 	SUPPORT_OPENAL			= 1<<0,
 	NOT_SUPPORT_DIRECT3D	= 1<<1,
 } BuildCapabilities;
@@ -50,7 +50,7 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
 	wxArrayString files;
 	wxDir::GetAllFiles(path.GetPath(), &files, _T("fs2_open_*.exe"), wxDIR_FILES);
-	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath());
+	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
 	return files;
 }
 
@@ -75,7 +75,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				ver.binaryname = _T("Fred 2 Open");
 			}
 		} else {
-			wxLogWarning(_T("was expecting open; got %s"), first1);
+			wxLogWarning(_T("was expecting open; got %s"), first1.c_str());
 			return ver;
 		}
 	} else {
@@ -129,7 +129,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					wxLogWarning(_T("Revisiond version out of range (%d)"), version);
 				}
 			} else {
-				wxLogWarning(_T("Token ending in 'd' is not a number (%s)"), token);
+				wxLogWarning(_T("Token ending in 'd' is not a number (%s)"), token.c_str());
 			}
 		} else if ( token.EndsWith(_T("r"), &temp) ) {
 			if ( temp.IsNumber() ) {
@@ -143,7 +143,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					wxLogWarning(_T("Revisionr version out of range (%d)"), version);
 				}
 			} else {
-				wxLogWarning(_T("Token ending in 'r' is not a number (%s)"), token);
+				wxLogWarning(_T("Token ending in 'r' is not a number (%s)"), token.c_str());
 			}
 		} else if ( token.IsNumber() && token.size() == 8 ) {
 			// must be a date from SirKnightly's builds
@@ -170,13 +170,13 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		} else if ( token.EndsWith(_T("t"), &temp) && temp.size() == 8 ) {
 			ver.string += token;
 		} else {
-			wxLogWarning(_T(" Got token I don't understand (%s)"), token);
+			wxLogWarning(_T(" Got token I don't understand (%s)"), token.c_str());
 		}
 	}
 	if ( ver.string.StartsWith(_T("ant")) ) {
 		// is an antipodes builds
 		ver.string = wxString::Format(_T("Antipodes%s"),
-			(ver.revision == 0) ? _T("") : wxString::Format(_T(" #%d"), ver.revision));
+			(ver.revision == 0) ? _T("") : wxString::Format(_T(" #%d"), ver.revision).c_str());
 	}
 	return ver;
 }
@@ -194,10 +194,10 @@ Fred 2 Open 3.6.11 Debug
 wxString FSOExecutable::MakeVersionStringFromVersion(FSOExecutable ver) {
 	bool hasfullversion = (ver.major != 0 && ver.minor != 0 && ver.revision != 0);
 	return wxString::Format(_T("%s %s%s%s %s%s%s"),
-		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname, // Freespace 2 Open
+		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname.c_str(), // Freespace 2 Open
 		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision).c_str() : wxEmptyString,
 		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build).c_str(),
-		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string).c_str(),
+		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string.c_str()).c_str(),
 		(ver.debug) ? _T("Debug") : _T("Release"),
 		(ver.inferno) ? _T(" Inferno") : wxEmptyString,
 		(ver.sse == 0) ? wxEmptyString : (ver.sse == 1) ? _T(" SSE") : _T(" SSE2")

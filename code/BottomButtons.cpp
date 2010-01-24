@@ -46,7 +46,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	} else if ( wxFileName(tc, binary).FileExists() ) {
 		this->play->Enable();
 	} else {
-		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName());
+		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName().c_str());
 		this->play->Disable();
 	}
 }
