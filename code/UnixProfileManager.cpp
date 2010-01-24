@@ -4,9 +4,9 @@
 #include "ids.h"
 
 ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
-	return ProMan::UnkownError;
+	return ProMan::InvalidParameters;
 }
 
 ProMan::RegistryCodes PlatformPullProfile(wxFileConfig *cfg) {
-	return ProMan::UnkownError;
+	return ProMan::InvalidParameters;
 }
