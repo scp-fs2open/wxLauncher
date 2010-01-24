@@ -2,7 +2,7 @@
 #include <wx/filename.h>
 #include "StatusBar.h"
 #include "ids.h"
-#include "logger.h"
+#include "Logger.h"
 #include "generated/configure_launcher.h"
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
@@ -66,17 +66,15 @@ StatusBar::~StatusBar() {
 }
 
 void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
-	wxWindow* icon = this->GetWindowChild(ID_STATUSBAR_STATUS_ICON);
-
-	wxASSERT( icon != NULL );
+	wxWindow* icon = dynamic_cast<wxWindow*>(wxWindow::FindWindowById(ID_STATUSBAR_STATUS_ICON, this));
+	wxCHECK_RET( icon != NULL, _T("Cannot find status bar icon control"));
 	
 	wxRect iconrect;
 	this->GetFieldRect(SB_FIELD_ICON, iconrect);
 	icon->SetSize(iconrect);
 
-	wxWindow* bar = this->GetWindowChild(ID_STATUSBAR_PROGRESS_BAR);
-
-	wxASSERT( bar != NULL );
+	wxWindow* bar = dynamic_cast<wxWindow*>(wxWindow::FindWindowById(ID_STATUSBAR_PROGRESS_BAR, this));
+	wxCHECK_RET( bar != NULL, _T("Cannot find status bar progress bar"));
 
 	wxRect barrect;
 	this->GetFieldRect(SB_FIELD_PROGRESS_BAR, barrect);
@@ -87,7 +85,8 @@ void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
 void StatusBar::SetMainStatusText(wxString msg, int icon) {
 	this->SetStatusText(msg, SB_FIELD_MAINTEXT);
 	if ( icon > ID_SB_NO_CHANGE && icon < ID_SB_MAX_ID ) {
-		wxStaticBitmap* iconImage = dynamic_cast<wxStaticBitmap*>(this->GetWindowChild(ID_STATUSBAR_STATUS_ICON));
+		wxStaticBitmap* iconImage = dynamic_cast<wxStaticBitmap*>(wxWindow::FindWindowById(ID_STATUSBAR_STATUS_ICON, this));
+  wxCHECK_RET( iconImage != NULL, _T("Cannot find status bar icon image"));
 
 		iconImage->SetBitmap(this->icons[icon]);
 		iconImage->Refresh();
