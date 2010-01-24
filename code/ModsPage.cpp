@@ -1,4 +1,5 @@
 #include <wx/wx.h>
+#include <wx/settings.h>
 #include "ModsPage.h"
 #include "ids.h"
 #include "ModList.h"
@@ -36,7 +37,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available MODs, you must first specify a Total Conversion root folder.\n You can do that on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
-		noTC->SetForegroundColour(wxTheColourDatabase->Find(_T("BLACK")));
+		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		noTC->Wrap(TAB_AREA_WIDTH-50);
 
 		wxFileName infoLocation(_T(RESOURCES_PATH), _T("info_big.png"));
