@@ -19,11 +19,11 @@
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
-#define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxBORDER_SIMPLE | wxSYSTEM_MENU\
-	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN | wxMINIMIZE_BOX)
+#define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
+	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
 
 MainWindow::MainWindow(SkinSystem* skin) {
-	this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
+	//this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
 		wxDefaultPosition, wxSize(800, 600), MAINWINDOW_STYLE);
 
