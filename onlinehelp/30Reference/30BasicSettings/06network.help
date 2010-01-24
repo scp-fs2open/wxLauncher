@@ -1,1 +1,23 @@
 <title>Network configuration</title>
+#Network configuration
+Here you can set several options regarding your network.
+
+--screenshot with the network area highlighted
+
+###Connection type
+In order to play on online, [FSO][]![][li] needs to know what kind of network configuration you have. Choose the apropiate value.
+
+###Connection speed
+For a smooth experience, select the apropiate connection speed here.
+
+###Port
+If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here.
+
+###IP
+Same as above, but for the [IP][]![][le] address. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.
+
+[li]: /images/li.png
+[le]: /images/le.png
+[fso]: /50TechnicalStuff/02Terminology.help
+[port]: http://en.wikipedia.org/wiki/Computer_port_%28software%29
+[ip]: http://en.wikipedia.org/wiki/IP_address

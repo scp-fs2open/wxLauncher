@@ -1,10 +1,52 @@
 <meta name="control" content="ID_SPEECH_MORE_VOICES_BUTTON" />
 <title>Speech settings</title>
 
-#More Speech Voices
+#Speech settings
 
-If you are on Windows Vista or 7, there are no other voices available from Microsoft.  The voices linked below will install but Windows will not allow them to be used.
+Here you can set various aspects related to the speech engine. This is intended to be used by the numerous user-made campaigns that lack voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes is better than nothing.
 
-If you are on Windows XP or older you can download Mike and Mary from [Microsoft's Download Center][1].  
+###Test string
+Input a test string totest the selected voice. A "Press play to test this string" is provided by default.
+ 
+**Note**: When testing the voice, the launcher will be unrensponsive until the simulated speech stops, so try to limit your string to a few words only.
 
-[1]:  http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en
+###Voice selection
+Lists the available voices installed on your system. Choose one that you like.
+
+###Volume slider
+Well, what about the volume slider?
+
+**Note**: Remember that when you play the game there will be countless other sounds beside the simulated voices, and if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when setting the volume, if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background.
+
+###"Play string" button
+It plays the string that was typed above. 
+
+###Where to use
+Defines the areas of the game where the simulates speech should be used. Check as needed.
+
+* Techroom
+* Briefings
+* In-game
+* Multiplayer
+
+###Get more voices
+Several options are available, depending on your operating platform:
+
+#####Windows
+If you are on Windows XP or older you can download Mike and Mary from [Microsoft's Download Center][mdc]![][le].
+
+If you are using Windows Vista or 7, there are no other free voices available from Microsoft. (the voices available for Windows XP or older  will install but Windows will not allow them to be used)
+
+#####Linux
+ -- more details here --
+
+#####Mac OS
+
+-- more details here --
+
+#####All platforms
+There might be other commercial-available voices on the net. Use the [Google search engine][google]![][le] to try to locate them.
+
+[le]:/images/le.png
+[mdc]:  http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en
+[google]: http://www.google.com

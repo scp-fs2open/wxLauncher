@@ -5,6 +5,8 @@
 #include "Skin.h"
 #include "ProfileManager.h"
 #include "TCManager.h"
+#include "generated/configure_launcher.h"
+
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -31,36 +33,49 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->DeleteWindows();
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY,
-			_("There is no path currently specified for the location of a Total Conversion.  Select a path on the Basic Settings tab."));
-		wxFont messageFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available MODs, you must first specify a Total Conversion root folder.\n You can do that on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
+		noTC->SetForegroundColour(wxTheColourDatabase->Find(_T("BLACK")));
+		noTC->Wrap(TAB_AREA_WIDTH-50);
 
-		noTC->SetForegroundColour(wxTheColourDatabase->Find(_T("RED")));
+		wxFileName infoLocation(_T(RESOURCES_PATH), _T("info_big.png"));
+		wxBitmap infoIcon(infoLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
+		wxASSERT(infoIcon.IsOk());
+		wxStaticBitmap* infoImage = new wxStaticBitmap(this, wxID_ANY, infoIcon);
 
-		noTC->Wrap(TAB_AREA_WIDTH);
-		
 		wxBoxSizer* noTCSizer = new wxBoxSizer(wxVERTICAL);
-		noTCSizer->Add(noTC, wxSizerFlags().Expand());
+		noTCSizer->AddStretchSpacer(1);
+		noTCSizer->Add(infoImage,0, wxALL | wxCENTER);
+		noTCSizer->AddSpacer(10);
+		noTCSizer->Add(noTC, 0, wxEXPAND| wxALL | wxCENTER);
+		noTCSizer->AddStretchSpacer(1);
 
 		this->SetSizer(noTCSizer);
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently specified Total Conversion is not a valid Total Conversion.  Select a valid Total Conversion on the Basic Settings tab."));
-		wxFont messageFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
+			_("The currently specified Total Conversion root folder does not contain a valid Total Conversion.\nSelect a valid Total Conversion root folder on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
+		invalidTC->SetForegroundColour(wxTheColourDatabase->Find(_T("BLACK")));
+		invalidTC->Wrap(TAB_AREA_WIDTH-50);
 
-		invalidTC->SetForegroundColour(wxTheColourDatabase->Find(_T("RED")));
+		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
+		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
+		wxASSERT(warningIcon.IsOk());
+		wxStaticBitmap* warningImage = new wxStaticBitmap(this, wxID_ANY, warningIcon);
 
-		invalidTC->Wrap(TAB_AREA_WIDTH);
-		
 		wxBoxSizer* invalidTCSizer = new wxBoxSizer(wxVERTICAL);
-		invalidTCSizer->Add(invalidTC, wxSizerFlags().Expand());
+		invalidTCSizer->AddStretchSpacer(1);
+		invalidTCSizer->Add(warningImage,0, wxALL | wxCENTER);
+		invalidTCSizer->AddSpacer(10);
+		invalidTCSizer->Add(invalidTC, 0, wxEXPAND| wxALL | wxCENTER);
+		invalidTCSizer->AddStretchSpacer(1);
 
 		this->SetSizer(invalidTCSizer);
 	} else {
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
-			_("Installed MODs.  Click on Install/Update in the left panel to search, download, and install additional MODs and updates."));
+			_("Installed MODs.  Click on Install/Update in the left to search, download, and install additional MODs and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		header->Wrap(TAB_AREA_WIDTH);
 
 		wxSize modGridSize(TAB_AREA_WIDTH, 500);
