@@ -3,10 +3,10 @@
 
 #Speech settings
 
-Here you can set various aspects related to the speech engine. This is intended to be used by the numerous user-made campaigns that lack voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes is better than nothing.
+Here you can set various aspects related to the speech engine. This is intended to be used by the numerous user-made campaigns that lack voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes it is better than nothing.
 
 ###Test string
-Input a test string totest the selected voice. A "Press play to test this string" is provided by default.
+Input a test string to test the selected voice. A "Press play to test this string" is provided by default.
  
 **Note**: When testing the voice, the launcher will be unrensponsive until the simulated speech stops, so try to limit your string to a few words only.
 
@@ -16,13 +16,15 @@ Lists the available voices installed on your system. Choose one that you like.
 ###Volume slider
 Well, what about the volume slider?
 
+Volume of speech in game.
+
 **Note**: Remember that when you play the game there will be countless other sounds beside the simulated voices, and if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when setting the volume, if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background.
 
 ###"Play string" button
 It plays the string that was typed above. 
 
 ###Where to use
-Defines the areas of the game where the simulates speech should be used. Check as needed.
+Defines the areas of the game where the simulated speech should be used. Check as needed.
 
 * Techroom
 * Briefings
