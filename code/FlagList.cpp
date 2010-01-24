@@ -40,7 +40,7 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 			this->drawStatus = INVALID_BINARY;
 		} else {
 			wxArrayString output;
-			wxString commandline = wxString::Format(_T("%s -get_flags"), exename.GetFullPath());
+			wxString commandline = wxString::Format(_T("%s -get_flags"), exename.GetFullPath().c_str());
 			long ret = ::wxExecute(commandline, output, 0);
 			wxLogDebug(_T(" FSO returned %d when polled for the flags"), ret);
 

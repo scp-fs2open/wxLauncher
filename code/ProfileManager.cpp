@@ -74,11 +74,11 @@ bool ProMan::Initialize() {
 	file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
-		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath());
+		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath().c_str());
 		return false;
 	}
 
-	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullPath());
+	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullPath().c_str());
 	if ( !wxFileName::DirExists(file.GetPath())
 		&& !wxFileName::Mkdir(file.GetPath(), wxPATH_MKDIR_FULL ) ) {
 		wxLogError(_T(" Unable to make profile directory."));
@@ -130,9 +130,9 @@ bool ProMan::Initialize() {
 		currentProfile = _T("Default");
 	}
 
-	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile);
+	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile.c_str());
 	if ( !ProMan::proman->SwitchTo(currentProfile) ) {
-		wxLogError(_T("Unable to set current profile to '%s'"), currentProfile);
+		wxLogError(_T("Unable to set current profile to '%s'"), currentProfile.c_str());
 		return false;
 	}
 
@@ -208,7 +208,7 @@ bool ProMan::CreateNewProfile(wxString newName) {
 
 	if ( !wxFileName::DirExists(profile.GetPath())
 		&& !wxFileName::Mkdir( profile.GetPath(), wxPATH_MKDIR_FULL) ) {
-		wxLogWarning(_T("  Unable to create profile directory: %s"), profile.GetPath());
+		wxLogWarning(_T("  Unable to create profile directory: %s"), profile.GetPath().c_str());
 		return false;
 	}
 
@@ -308,11 +308,11 @@ bool ProMan::SwitchTo(wxString name) {
 bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName, copyName);
 	if ( !this->DoesProfileExist(originalName) ) {
-		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName);
+		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName.c_str());
 		return false;
 	}
 	if ( this->DoesProfileExist(copyName) ) {
-		wxLogWarning(_("Target profile '%s' already exists!"), copyName);
+		wxLogWarning(_("Target profile '%s' already exists!"), copyName.c_str());
 		return false;
 	}
 	if ( !this->CreateNewProfile(copyName) ) {
@@ -350,7 +350,7 @@ bool ProMan::DeleteProfile(wxString name) {
 
 		wxString filename;
 		if ( !config->Read(PRO_CFG_MAIN_FILENAME, &filename) ) {
-			wxLogWarning(_T("Unable to get filename to delete %s"), name);
+			wxLogWarning(_T("Unable to get filename to delete %s"), name.c_str());
 			return false;
 		}
 
@@ -363,17 +363,17 @@ bool ProMan::DeleteProfile(wxString name) {
 				this->profiles.erase(this->profiles.find(name));
 				delete config;
 				
-				wxLogMessage(_("Profile '%s' deleted."), name);
+				wxLogMessage(_("Profile '%s' deleted."), name.c_str());
 				this->GenerateChangeEvent();
 				return true;
 			} else {
-				wxLogWarning(_("Unable to delete file for profile '%s'"), name);
+				wxLogWarning(_("Unable to delete file for profile '%s'"), name.c_str());
 			}
 		} else {
-			wxLogWarning(_("Backing file (%s) for profile '%s' does not exist"), file.GetFullPath(), name);
+			wxLogWarning(_("Backing file (%s) for profile '%s' does not exist"), file.GetFullPath().c_str(), name.c_str());
 		}
 	} else {
-		wxLogWarning(_("Profile %s does not exist. Cannot delete."), name);
+		wxLogWarning(_("Profile %s does not exist. Cannot delete."), name.c_str());
 	}
 	return false;
 }
