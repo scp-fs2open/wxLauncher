@@ -291,7 +291,7 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	If the current value of the combobox is a valid profile name then we will
 	use that as the profile to clone from, leaving the newname blank.
 	*/
-	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection());
+	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection().c_str());
 	if ( profile->DoesProfileExist(combobox->GetStringSelection()) ) {
 		// is a vaild profile
 		originalName = combobox->GetStringSelection();
@@ -390,7 +390,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			}
 
 			wxInputStream* theNews = news->GetStream();
-			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation(), news->GetMimeType());
+			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
 
 			wxString newsData;
 			wxStringOutputStream newsDataStream(&newsData);

@@ -370,7 +370,7 @@ wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 									   wxString filepath) {
 	wxFileName filename;
 	if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 		wxImage image(filename.GetFullPath());
 		if ( image.IsOk() ) {
 			if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
@@ -391,7 +391,7 @@ wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 									   wxString filepath) {
    wxFileName filename;
    if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
-	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 	   wxImage image(filename.GetFullPath());
 	   if ( image.IsOk() ) {
@@ -419,14 +419,14 @@ bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
 				return true;
 			} else {
 				wxLogDebug(_T("   File '%s' does not exist"),
-					filename->GetFullPath());
+					filename->GetFullPath().c_str());
 			}
 		} else {
-			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath());
+			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath().c_str());
 		}
 	} else {
-		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC,
-			shortmodname, filepath);
+		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC.c_str(),
+			shortmodname.c_str(), filepath.c_str());
 	}
 	return false;
 }
@@ -437,7 +437,7 @@ wxBitmap* SkinSystem::VerifyTabIcon(wxString currentTC, wxString shortmodname,
 									wxString filepath) {
 	wxFileName filename;
 	if ( SkinSystem::SearchFile(&filename, currentTC, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 		wxImage image(filename.GetFullPath());
 		
@@ -466,7 +466,7 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 									  wxString filepath) {
 	  wxFileName filename;
 	  if ( SkinSystem::SearchFile(&filename, currentTC, shortname, filepath) ) {
-		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 		  wxImage image(filename.GetFullPath());
 

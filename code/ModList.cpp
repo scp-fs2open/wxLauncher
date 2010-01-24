@@ -85,7 +85,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
 		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig(tcmodinistream)));
-		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath());
+		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath().c_str());
 
 		// make sure that a mod.ini in the root TC folder is not apart of this set
 		// because it will be addressed shortly and specificly
@@ -101,7 +101,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	wxLogDebug(_T("Starting to parse mod.ini's..."));
 	for (size_t i = 0; i < foundInis.Count(); i++) {
-		wxLogDebug(_T("  Opening %s"), foundInis.Item(i));
+		wxLogDebug(_T("  Opening %s"), foundInis.Item(i).c_str());
 		wxFFileInputStream stream(foundInis.Item(i));
 		if ( stream.IsOk() ) {
 			wxLogDebug(_T("   Opened ok"));
@@ -146,7 +146,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			delete[] characterBuffer;
 		}
 
-		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")));
+		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
 
 		// get the mod.ini's base directory
 		// <something>/modfolder/mod.ini
@@ -158,11 +158,11 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		wxASSERT_MSG( tokens.GetCount() >= 2,
 			wxString::Format(
 			_T("Path '%s' does not seems to have enough directory markers."),
-			foundInis.Item(i))
+			foundInis.Item(i).c_str())
 		);
 		wxString shortname = tokens[tokens.GetCount() - 2];
 
-		wxLogDebug(_T("   Mod short name is: %s"), shortname);
+		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
 
 		this->configFiles->Add(new ConfigPair(shortname, config));
 	}
@@ -174,7 +174,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		wxString shortname = this->configFiles->Item(i).shortname;
 		wxFileConfig* config = this->configFiles->Item(i).config;
 		ModItem* item = new ModItem(this->skinSystem);
-		wxLogDebug(_T(" %s"), shortname);
+		wxLogDebug(_T(" %s"), shortname.c_str());
 
 		item->shortname = new wxString(shortname);
 
@@ -420,11 +420,11 @@ void ModList::readIniFileString(wxFileConfig* config,
 				(*location)->RemoveLast();
 			}
 	}
-	wxLogDebug(_T("  %s:'%s'"), keyvalue,
-		((*location) == NULL) ? _T("Not Specified") : excapeSpecials(**location));
+	wxLogDebug(_T("  %s:'%s'"), keyvalue.c_str(),
+		((*location) == NULL) ? _T("Not Specified") : excapeSpecials(**location).c_str());
 
 	if ( (*location) != NULL && (*location)->empty() ) {
-		wxLogDebug(_T("  Nulled %s"), keyvalue);
+		wxLogDebug(_T("  Nulled %s"), keyvalue.c_str());
 		delete *location;
 		*location = NULL;
 	}
@@ -476,7 +476,7 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 
 	} else {
 		wxLogDebug( 
-			wxString::Format(_T("  Section '%s' does not exist."), langaugename));
+			wxString::Format(_T("  Section '%s' does not exist."), langaugename.c_str()));
 	}
 }
 
@@ -531,7 +531,7 @@ wxCoord ModList::OnMeasureItem(size_t WXUNUSED(n)) const {
 void ModList::OnSelectionChange(wxCommandEvent &event) {
 	wxLogDebug(_T("Selection changed to %d (%s)."),
 		event.GetInt(),
-		*(this->tableData->Item(event.GetInt()).shortname));
+		this->tableData->Item(event.GetInt()).shortname->c_str());
 }
 
 void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
@@ -572,7 +572,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		}
 	}
 
-	wxLogDebug(_T("New modline is %s"), modline);
+	wxLogDebug(_T("New modline is %s"), modline.c_str());
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_TC_CURRENT_MODLINE, modline);
