@@ -95,7 +95,7 @@ bool ProMan::Initialize() {
 
 	wxLogInfo(_T(" Found %d profile(s)."), foundProfiles.Count());
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
-		wxLogDebug(_T("  Opening %s"), foundProfiles[i]);
+		wxLogDebug(_T("  Opening %s"), foundProfiles[i].c_str());
 		wxFFileInputStream instream(foundProfiles[i]);
 		wxFileConfig *config = new wxFileConfig(instream);
 		
@@ -103,18 +103,18 @@ bool ProMan::Initialize() {
 		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(_T("Profile %05d"), i));
 
 		ProMan::proman->profiles[name] = config;
-		wxLogDebug(_T("  Opened profile named: %s"), name);
+		wxLogDebug(_T("  Opened profile named: %s"), name.c_str());
 	}
 
 	wxString currentProfile;
 	ProMan::proman->profileList->Read(
 		GBL_CFG_MAIN_LASTPROFILE, &currentProfile, _T("Default"));
 	
-	wxLogDebug(_T(" Searching for profile: %s"), currentProfile);
+	wxLogDebug(_T(" Searching for profile: %s"), currentProfile.c_str());
 	if ( ProMan::proman->profiles.find(currentProfile)
 	== ProMan::proman->profiles.end() ) {
 		// lastprofile does not exist
-		wxLogDebug(_T(" lastprofile '%s' does not exist!"), currentProfile);
+		wxLogDebug(_T(" lastprofile '%s' does not exist!"), currentProfile.c_str());
 		if ( ProMan::proman->profiles.find(_T("Default"))
 		== ProMan::proman->profiles.end() ) {
 			// default profile also does not exist.
@@ -278,7 +278,7 @@ void ProMan::SaveCurrentProfile() {
 				wxASSERT( file.IsOk() );
 				wxFFileOutputStream configOutput(file.GetFullPath());
 				config->Save(configOutput);
-				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath());
+				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
 			}
 		} else {
 			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
@@ -306,7 +306,7 @@ bool ProMan::SwitchTo(wxString name) {
 }
 
 bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
-	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName, copyName);
+	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName.c_str(), copyName.c_str());
 	if ( !this->DoesProfileExist(originalName) ) {
 		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName.c_str());
 		return false;
@@ -326,7 +326,7 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 	long cookie;
 	bool cont = config->GetFirstEntry(str, cookie);
 	while ( cont ) {
-		wxLogDebug(_T("  Got: %s"), str);
+		wxLogDebug(_T("  Got: %s"), str.c_str());
 
 		cont = config->GetNextEntry(str, cookie);
 	}
@@ -335,7 +335,7 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 }
 
 bool ProMan::DeleteProfile(wxString name) {
-	wxLogDebug(_T("Deleting profile: %s"), name);
+	wxLogDebug(_T("Deleting profile: %s"), name.c_str());
 	if ( name == _T("Default") ) {
 		wxLogWarning(_("Cannot delete Default profile."));
 		return false;

@@ -55,7 +55,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
 }
 
 FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
-	wxLogDebug(_T("Making version struct for '%s'"), binaryname);
+	wxLogDebug(_T("Making version struct for '%s'"), binaryname.c_str());
 	FSOExecutable ver;
 	wxStringTokenizer tok(binaryname, _T("_.-"));
 	wxString first;
