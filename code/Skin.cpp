@@ -1,4 +1,4 @@
-#include "skin.h"
+#include "Skin.h"
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include "generated/configure_launcher.h"
@@ -124,14 +124,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( this->defaultSkin->welcomePageText == NULL ) {
 		this->defaultSkin->welcomePageText =
 			new wxString(
-_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>\
-If you’re  new to the Freespace 2 universe, you might want to check out these links first:<br>\
-= <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a>  \
-= <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> \
-= <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> \
-= <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> =<br><br>\
-Also, don’t  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>\
-</center></p>"));
+_("<p><center><b><font size='3'>Welcome to  wxLauncher, your one-stop-shop for Freespace 2 and related content</font></b><br><br>If you're  new to the Freespace 2 universe, you might want to check out these links first:<br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FS2 Wiki</a> = <a href='http://www.hard-light.net/forums/'>FS2 Forum</a> = <a href='http://en.wikipedia.org/wiki/FreeSpace_2'>Wikipedia FS2 page</a> = <a href='http://scp.indiegames.us/mantis/main_page.php'> Reporting bugs</a> = <br><br>Also, don't  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br></center></p>"));
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
@@ -377,7 +370,7 @@ wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 									   wxString filepath) {
 	wxFileName filename;
 	if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 		wxImage image(filename.GetFullPath());
 		if ( image.IsOk() ) {
 			if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
@@ -398,7 +391,7 @@ wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 									   wxString filepath) {
    wxFileName filename;
    if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
-	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 	   wxImage image(filename.GetFullPath());
 	   if ( image.IsOk() ) {
@@ -419,21 +412,21 @@ passed paths.  Filename is returned via the param filename. */
 bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
 							wxString shortmodname, wxString filepath) {
 	filename->Assign(
-		wxString::Format(_T("%s/%s"), shortmodname, filepath));
+		wxString::Format(_T("%s/%s"), shortmodname.c_str(), filepath.c_str()));
 	if ( filename->Normalize(wxPATH_NORM_ALL, currentTC, wxPATH_UNIX) ) {
 		if ( filename->IsOk() ) {
 			if ( filename->FileExists() ) {
 				return true;
 			} else {
 				wxLogDebug(_T("   File '%s' does not exist"),
-					filename->GetFullPath());
+					filename->GetFullPath().c_str());
 			}
 		} else {
-			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath());
+			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath().c_str());
 		}
 	} else {
-		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC,
-			shortmodname, filepath);
+		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC.c_str(),
+			shortmodname.c_str(), filepath.c_str());
 	}
 	return false;
 }
@@ -444,7 +437,7 @@ wxBitmap* SkinSystem::VerifyTabIcon(wxString currentTC, wxString shortmodname,
 									wxString filepath) {
 	wxFileName filename;
 	if ( SkinSystem::SearchFile(&filename, currentTC, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 		wxImage image(filename.GetFullPath());
 		
@@ -473,7 +466,7 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 									  wxString filepath) {
 	  wxFileName filename;
 	  if ( SkinSystem::SearchFile(&filename, currentTC, shortname, filepath) ) {
-		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath());
+		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 		  wxImage image(filename.GetFullPath());
 
