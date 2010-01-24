@@ -61,7 +61,7 @@ bool OpenALMan::WasCompliedIn() {
 typedef const ALCchar* (ALC_APIENTRY *alcGetStringType)(ALCdevice*, ALenum);
 typedef ALCboolean (ALC_APIENTRY *alcIsExtensionPresentType)(ALCdevice*, const ALchar*);
 typedef const ALchar* (AL_APIENTRY *alGetStringType)(ALenum);
-typedef ALenum (AL_APIENTRY *alGetErrorType)(ALvoid);
+typedef ALenum (AL_APIENTRY *alGetErrorType)(void);
 namespace OpenALMan {
 	alcGetStringType GetalcGetStringPointer();
 	alcIsExtensionPresentType  GetalcIsExtensionPresentPointer();
@@ -77,7 +77,7 @@ alcGetStringType OpenALMan::GetalcGetStringPointer() {
 	}
 
 	alcGetStringType GetString = NULL;
-	GetString = static_cast<alcGetStringType>(
+	GetString = reinterpret_cast<alcGetStringType>(
 		OpenALLib.GetSymbol(_T("alcGetString")));
 
 	if ( GetString == NULL ) {
@@ -95,7 +95,7 @@ alGetStringType OpenALMan::GetalGetStringPointer() {
 	}
 
 	alGetStringType GetString = NULL;
-	GetString = static_cast<alGetStringType>(
+	GetString = reinterpret_cast<alGetStringType>(
 		OpenALLib.GetSymbol(_T("alGetString")));
 
 	if ( GetString == NULL ) {
@@ -113,7 +113,7 @@ alcIsExtensionPresentType OpenALMan::GetalcIsExtensionPresentPointer() {
 		return NULL;
 	}
 	alcIsExtensionPresentType isExtentsionPresent = NULL;
-	isExtentsionPresent = static_cast<ALCboolean (*)(ALCdevice*, const ALchar*)>(
+	isExtentsionPresent = reinterpret_cast<ALCboolean (*)(ALCdevice*, const ALchar*)>(
 		OpenALLib.GetSymbol(_T("alcIsExtensionPresent")));
 
 	if ( isExtentsionPresent == NULL ) {
@@ -130,7 +130,7 @@ alGetErrorType OpenALMan::GetalGetErrorPointer() {
 	}
 
 	alGetErrorType getError = NULL;
-	getError = static_cast<alGetErrorType>(
+	getError = reinterpret_cast<alGetErrorType>(
 		OpenALLib.GetSymbol(_T("alGetError")));
 
 	if ( getError == NULL ) {
