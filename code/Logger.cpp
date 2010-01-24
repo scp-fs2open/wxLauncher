@@ -25,7 +25,7 @@ const wxString levels[] = {
 Logger::Logger() {
 	wxFileName outfile(wxStandardPaths::Get().GetUserDataDir(), _T("wxLauncher.log"));
 	if (!outfile.DirExists() && 
-		!wxFileName::Mkdir(outfile.GetPath(), wxPATH_MKDIR_FULL) ) {
+		!wxFileName::Mkdir(outfile.GetPath(), 0700, wxPATH_MKDIR_FULL) ) {
 			wxLogFatalError(_T("Unable to create folder to place log in. (%s)"), outfile.GetPath().c_str());
 	}
 	this->out = new wxFFileOutputStream(outfile.GetFullPath(), _T("wb"));
