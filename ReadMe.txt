@@ -128,8 +128,8 @@ Building - Linux (Ubuntu)
 Commandline
 -----------
 - Download the source
-- sudo apt-get install build-essentials libwxgtk2.8-dev libwxgtk2.8-dbg python-markdown
-- Download and install the cmake 2.8 .debs for your platform from: https://launchpad.net/ubuntu/+source/cmake
+- sudo apt-get install build-essential libopenal-dev libwxgtk2.8-dev libwxgtk2.8-dbg python-markdown
+- Download and install the cmake 2.8 .debs for your platform from: <https://launchpad.net/ubuntu/+source/cmake>.  You will need cmake-data, and cmake-2.8.0* for your platform, plus cmake-curses-gui or cmake-qt-gui
 - cd <source directory>
 - mkdir build
 - cd build
