@@ -33,7 +33,6 @@ if(USE_OPENAL)
   INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
 endif(USE_OPENAL)
 
-
 INCLUDE(${wxWidgets_USE_FILE})
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
@@ -94,45 +93,6 @@ endforeach(temp_file)
 
 TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES})
 
-# find the runtime files
-SET(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT")
-FIND_FILE(VC9_RUNTIME_msvcm90 msvcm90.dll 
-  PATHS ${VC9_RUNTIME_LOCATIONS})
-INSTALL(FILES ${VC9_RUNTIME_msvcm90} DESTINATION bin)
-FIND_FILE(VC9_RUNTIME_msvcp90 msvcp90.dll 
-  PATHS ${VC9_RUNTIME_LOCATIONS})
-INSTALL(FILES ${VC9_RUNTIME_msvcp90} DESTINATION bin)
-FIND_FILE(VC9_RUNTIME_msvcr90 msvcr90.dll 
-  PATHS ${VC9_RUNTIME_LOCATIONS})
-INSTALL(FILES ${VC9_RUNTIME_msvcr90} DESTINATION bin)
-FIND_FILE(VC9_RUNTIME_manifest Microsoft.VC90.CRT.manifest 
-  PATHS ${VC9_RUNTIME_LOCATIONS})
-INSTALL(FILES ${VC9_RUNTIME_manifest} DESTINATION bin)
-  
-SET(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
-SET(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
-SET(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
-SET(CPACK_PACKAGE_NAME wxLauncher for the SCP)
-SET(CPACK_PACKAGE_VENDOR wxLauncher Team)
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY wxLauncher)
-SET(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-SET(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/ReadMe.txt)
-if(DEVELOPMENT_MODE)
-  SET(CPACK_PACKAGE_FILE_NAME wxlaucher-development-mode)
-else()
-SET(CPACK_PACKAGE_FILE_NAME wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-endif()
-
-if( WIN32 AND NOT UNIX )
-    SET(CPACK_PACKAGE_EXECUTABLES "wxLauncher" "wxLauncher for the SCP")
-endif()
-include(CPack)
-if(DEVELOPMENT_MODE)
-  MESSAGE( "Development mode is set. Do not distribute installer.")
-endif()
-install(TARGETS wxlauncher RUNTIME DESTINATION bin)
-if(WIN32)
-install(TARGETS registry_helper RUNTIME DESTINATION bin)
-endif()
-install(DIRECTORY resources/ DESTINATION resources)
-install(FILES ${helphtblocation} DESTINATION .)
+# packaging
+SET(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
+INCLUDE(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
