@@ -24,6 +24,9 @@ bool OpenALMan::Initialize() {
 	if ( OpenALLib.Load(_T("OpenAL32")) ) {
 		isInitialized = true;
 		return true;
+	} else if ( OpenALLib.Load(_T("libopenal")) ) {
+		isInitialized = true;
+		return true;
 	} else {
 		return false;
 	}
@@ -235,8 +238,7 @@ wxString OpenALMan::GetCurrentVersion() {
 		return _("Unknown version");
 	} else {
 		const ALCchar* version = (*GetString)(AL_VERSION);
-		wxCHECK( checkForALError(), _("Error"));
-		if ( version == NULL ) {
+		if ( !checkForALError() || version == NULL ) {
 			wxLogError(_T("OpenAL: Unable to retrive Version String"));
 			return _("Unknown version");
 		} else {
