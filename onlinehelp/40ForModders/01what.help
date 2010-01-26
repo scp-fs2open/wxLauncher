@@ -1,0 +1,25 @@
+<title>What's new for MOD/TC authors</title>
+#What's new for MOD/TC authors
+A list of what the new *mod.ini* format can offer to MOD and TC authors:
+
+###1. Cosmetic
+* Change the main launcher banner (the one found on the welcome page)
+* Change the five main icons (the left vertical toolbar that's always visible)
+* Change the welcome text to better suit your MOD
+* Change the titlebar text
+* Change the launcher icon
+* Change the notifications icons used in the statusbar
+* Change the font and color
+* Change the default "Mod with no image" image (available to TCs only)
+
+###2. Internationalization
+* Ability to translate the welcome text from the welcome page and your MOD's description (and name) to multiple languages.
+
+###3. MOD fine tune
+* Attach a note to your MOD and optionally mark it as high importance to the user
+* Add "Bugs" and "Support" links to your mod
+* Force some flags on or off for your MOD (use with care)
+* Define an ideal flagset that the user should use to play your mod for best experience
+* Define several more flagsets as fallback for various computer configurations
+
+**Note**: While the new *mod.ini* format introduces a lot of new options, the format is backward-compatible with the "old" *mod.ini* file, meaning that you can use the new format with the old launcher without any issues.
