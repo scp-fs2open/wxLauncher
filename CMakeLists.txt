@@ -10,9 +10,16 @@ include(FindPythonInterp) #PYTHON_EXECUTABLE
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
-SET(HELPMAKER_DEBUG "-d")
+  SET(HELPMAKER_DEBUG "-d")
+  SET(HELPMAKER_QUIET "")
 else(onlinehelpmaker_debug)
-SET(HELPMAKER_DEBUG "")
+  SET(HELPMAKER_DEBUG "")
+  option(onlinehelpmaker_quiet "Have onlinehelpmaker.py produce even less output than normal" ON)
+  if(onlinehelpmaker_quiet)
+    SET(HELPMAKER_QUIET "-q")
+  else()
+    SET(HELPMAKER_QUIET "")
+  endif()
 endif(onlinehelpmaker_debug)
 
 SET(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
@@ -50,7 +57,7 @@ add_custom_command(
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp  ${helphtblocation}
-  COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
+  COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_QUIET} ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
 if(WIN32)
