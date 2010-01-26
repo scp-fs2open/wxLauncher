@@ -14,14 +14,12 @@ Input a test string to test the selected voice. A "Press play to test this strin
 Lists the available voices installed on your system. Choose one that you like.
 
 ###Volume slider
-Well, what about the volume slider?
+This slider sets the volume of simulated speech in game. Drag it all the way to the right to set the volume to maximum.
 
-Volume of speech in game.
-
-**Note**: Remember that when you play the game there will be countless other sounds beside the simulated voices, and if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when setting the volume, if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background.
+**Note**: Remember that when you play the game there will be countless other sounds beside the simulated voices, and if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when testing your settings from the launcher, especially if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background when playing.
 
 ###"Play string" button
-It plays the string that was typed above. 
+Starts the simulated-voice playback of the string that was typed above. 
 
 ###Where to use
 Defines the areas of the game where the simulated speech should be used. Check as needed.
@@ -35,9 +33,9 @@ Defines the areas of the game where the simulated speech should be used. Check a
 Several options are available, depending on your operating platform:
 
 #####Windows
-If you are on Windows XP or older you can download Mike and Mary from [Microsoft's Download Center][mdc]![][le].
 
-If you are using Windows Vista or 7, there are no other free voices available from Microsoft. (the voices available for Windows XP or older  will install but Windows will not allow them to be used)
+* **Windows XP or older**: You can download Mike and Mary from [Microsoft's Download Center][mdc]![][le].
+* **Vista or 7**: There are no other free voices available from Microsoft (the voices available for Windows XP or older will install but Windows will not allow them to be used)
 
 #####Linux
  -- more details here --
@@ -47,7 +45,8 @@ If you are using Windows Vista or 7, there are no other free voices available fr
 -- more details here --
 
 #####All platforms
-There might be other commercial-available voices on the net. Use the [Google search engine][google]![][le] to try to locate them.
+-- if anyone knows any quality free or commercial voices that work with FS2 please add them here --
+There might be other free or commercial voices available on the Internet. You can use the [Google search engine][google]![][le] to try to locate them.
 
 [le]:/images/le.png
 [mdc]:  http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en

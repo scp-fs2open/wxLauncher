@@ -1,5 +1,17 @@
 <title>For Modders</title>
 
 #For modders
+wxLauncher introduces new posibilities for [MOD][]![][li] and [TC][]![][li] authors, allowing greater and more detailed control over your MOD/TC. While most of the aforementioned "control" translates into changing the launcher's "skin", there are some options that allows you to fine-tune the user's experience when playing your MOD.
 
-**Should contain a sample mod.ini described in detail - probably the same as the one currently on the wiki. Will be done once the modini format is finalized.**
+
+* [What's new for MOD/TC authors][what]![][li]
+* [Section reference guide][reference]![][li] for all the sections/options available in the *mod.ini*
+* [Sample *mod.ini*][sample]![][li] file with all the options used
+
+
+[li]: /images/li.png
+[mod]: /50TechnicalStuff/02Terminology.help
+[tc]: /50TechnicalStuff/02Terminology.help
+[what]: 01what.help
+[reference]: 02reference.help
+[sample]: 03sample.help

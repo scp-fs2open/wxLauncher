@@ -13,7 +13,7 @@ Lists the compatible sound devices that are installed on your system. "Generic s
 
 ** this button should always be enabled -- how do we know the user has the latest version? or the latest version is not needed, what is needed is a version that works? **
 
-Click this button to open the [OpenAL download section][openald]![][le] in your default browser. In your default browser, locate, download and install the appropiate package for your system.
+Click this button to open the [OpenAL download section][openald]![][le] in your browser. Then, locate, download and install the appropiate package for your system.
 
 ###Detect
 Click this to redetect the audio devices installed  on your system. Useful if you made changes to your system - like installing a new version of OpenAL for example, without restarting wxLauncher.
