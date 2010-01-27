@@ -83,7 +83,10 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
-	wxComboBox* launcherLanguageCombo = new wxComboBox(this, wxID_ANY, _("English (US)"));
+	wxChoice* launcherLanguageCombo = new wxChoice(this, wxID_ANY);
+	launcherLanguageCombo->Insert(_("English (US)"), 0);
+	launcherLanguageCombo->SetSelection(0);
+	launcherLanguageCombo->Disable();
 
 	wxBoxSizer* languageSizer = new wxBoxSizer(wxHORIZONTAL);
 	languageSizer->AddStretchSpacer(2);

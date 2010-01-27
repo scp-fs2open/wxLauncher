@@ -95,6 +95,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	wxString graphicsAPI;
 	proman->Get()->Read(PRO_CFG_VIDEO_API, &graphicsAPI, _T("OpenGL"));
 	graphicsCombo->SetStringSelection(graphicsAPI);
+	graphicsCombo->Disable();
 
 	wxStaticText* resolutionText = 
 		new wxStaticText(this, wxID_ANY, _("Resolution:"));
