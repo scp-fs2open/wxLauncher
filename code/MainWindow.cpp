@@ -85,7 +85,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("Quit"));
+	this->Destroy();
 }
 void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
 	if (HelpManager::IsInitialized()) {
