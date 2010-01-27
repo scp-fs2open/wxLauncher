@@ -55,15 +55,16 @@ SET_TARGET_PROPERTIES(registry_helper
 TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
+add_custom_target(version.cpp.maker ALL
   COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
 
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp  ${helphtblocation}
+add_custom_target(helpmaker ALL
   COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_QUIET} ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp)
+SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocation})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
 if(WIN32)
 SET(PLATFORM_PROFILE_MANAGER code/Win32ProfileManager.cpp)
@@ -91,6 +92,7 @@ SET_TARGET_PROPERTIES(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
   PROPERTIES HEADER_FILE_ONLY true)
+ADD_DEPENDENCIES(wxlauncher helpmaker version.cpp.maker)
 if(WIN32)
 ADD_DEPENDENCIES(wxlauncher registry_helper)
 endif(WIN32)
