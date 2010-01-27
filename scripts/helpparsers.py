@@ -52,7 +52,7 @@ class OutputParser(HTMLParser.HTMLParser):
     """Recursive function to match the tag"""
     tag = self.tagstack.pop()
     if not tag.name == tagtofind:
-      logging.warning(" %smismatched tag found (expected %d, found %s)", " "*indent, tagtofind, tag.name)
+      logging.warning(" %smismatched tag found (expected %s, found %s)", " "*indent, tagtofind, tag.name)
       self.write_tag(tag)
       tag = self.find_match(tagtofind)
       
