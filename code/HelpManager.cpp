@@ -80,8 +80,10 @@ void HelpManager::OpenHelpById(WindowIDS id) {
 void HelpManager::OpenMainHelpPage() {
 	wxCHECK_RET( HelpManager::IsInitialized(), _T("Help is not initialized"));
 	// Hacky way to get the help tree to expand
-	HelpManager::OpenHelpByString(wxString(_T("jfaq.htm")));
-	HelpManager::OpenHelpByString(wxString(_T("index.htm")));
+	wxString faq(_T("jfaq.htm"));
+	wxString index(_T("index.htm"));
+	HelpManager::OpenHelpByString(faq);
+	HelpManager::OpenHelpByString(index);
 }
 
 /** Opens the help file passing str to the help controller.
