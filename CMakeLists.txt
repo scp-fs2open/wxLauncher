@@ -5,7 +5,7 @@ SET(VERSION_MINOR 6)
 SET(VERSION_PATCH 0)
 
 find_package(wxWidgets 2.8.10
-  REQUIRED base core net xml html adv media qa richtext)
+  REQUIRED base core net xml html adv qa richtext)
 include(FindPythonInterp) #PYTHON_EXECUTABLE
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
