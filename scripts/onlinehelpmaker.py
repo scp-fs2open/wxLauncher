@@ -262,7 +262,10 @@ def process_input_stage1(file, options, files):
   input = infile.read()
   infile.close()
 
-  output = markdown.markdown(input)
+  md = markdown.Markdown(
+    extensions=['toc']
+  )
+  output = md.convert(input)
 
   outfile_name = change_filename(file, ".stage1", options.indir, files['stage1'])
   

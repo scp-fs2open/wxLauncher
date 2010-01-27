@@ -1,24 +1,11 @@
 <title>wxLauncher FAQ</title>
-#wxLauncher FAQ
 
-* <a href="jfaq.help#faq1">What is wxLauncher?</a>
-* <a href="jfaq.help#faq2">What can wxLauncer do?</a>
-* <a href="jfaq.help#faq3">Is wxLauncher free?</a>
-* <a href="jfaq.help#faq4">Why wxLauncher?</a>
-* <a href="jfaq.help#faq5">On what platforms does the launcher run?</a>
-* <a href="jfaq.help#faq6">Who made wxLauncher?</a>
-* <a href="jfaq.help#faq7">What about my privacy?</a>
-* <a href="jfaq.help#faq8">Are there any translations available?</a>
-* <a href="jfaq.help#faq9">I've found a bug, what should I do?</a>
-* <a href="jfaq.help#faq10">I have a suggestion, what should I do?</a>
-* <a href="jfaq.help#faq11">I want to join the project, what should I do?</a>
-* <a href="jfaq.help#faq12">This launcher sucks!</a><
+[TOC]
 
-
-### What is wxLauncher? <a name="faq1">
+# What is wxLauncher?
 wxLauncher is a multilanguage multiplatform multipurpose launcher/updater application intended to make life easier for the FreeSpace 2 fans.
 
-### What can wxLauncer do?<a name="faq2">
+# What can wxLauncher do?
 There are  several things wxLauncer can do for you:
 
 * Allow you to launch [FSO][]![][li] with your favorite mod and settings easily
@@ -27,39 +14,39 @@ There are  several things wxLauncer can do for you:
 
 (*at the time of this writing, only the first item is targeted for the initial release, the update and install features will be part of the 2.0 release*)
 
-###Is wxLauncher free?<a name="faq3">
+# Is wxLauncher free?
 The launcher is published under the [GNU General Public License v2][gpl]![][le], making it free software, for you to use and modify. The source files are available on the project's [source page][source]![][le].
 
-### Why wxLauncher?<a name="faq4">
+# Why wxLauncher?
 The name was chosen because the launcher it is build with [wxWidgets][]![][le] in order to make it run on multiple platforms.
 [wxWidgets]: http://www.wxwidgets.org/
 
-###On what platforms does the launcher run?<a name="faq5">
+# On what platforms does the launcher run?
 The launcher runs on the same platforms as FSO, namely **Microsoft Windows**, **Linux** and **Mac OS**.
 
-### Who made wxLauncher?<a name="faq6">
+# Who made wxLauncher?
 Check the [authors][]![][li] section for details.
 
-### What about my privacy?<a name="faq7">
+# What about my privacy?
 The launcher does not send any data over the internet so your privacy is safe. You don't have to take our word for it, if you have the necessary knowledge you can examine the [source code][source]![][le] and see for yourself. If you dont, but are curious to know what technical stuff happens when the launcher goes online, you can check the [privacy][privacy]![][li] page in the [Technical stuff][technical]![][li] section.
 
-### Are there any translations available?<a name="faq8">
+# Are there any translations available?
 Yes, there are. Check the project's [downloads page][downloads]![][le] for a list of available translations. To install them, simply unzip the downloaded files in the launcher folder (or in it's "Data" folder if you don't have administrator acces).
 
-### I've found a bug, what should I do?<a name="faq9">
+# I've found a bug, what should I do?
 While wo do our best to create a bug-free experience, some pesky bugs may have slipped through. If you've encountered one, do the following:
 
 * First, check the project's [issues page][issues]![][le] to see if someone else already reported a problem similar with what you are experiencing. If so, please read carefully the issue in question to determine if you have some pertienent info to add. Contact the owner of the issue with the details.
 
 * If the issue you are experiencing is not reported in the [issues page][issues]![][le], please contact one of the [project owners][people]![][le] or any [developer][people]![][le] with all the relevant details (what were you doing when the issue happened, logs, screenshots, launcher version, FSO version, etc.). We'll analyze the details and may ask you for some more information in order to track down the problem and fix it.
 
-###I have a suggestion, what should I do?<a name="faq10">
+# I have a suggestion, what should I do?
 Suggestions are always welcome. Contact one of the [project owners or developers][people]![][le] with it. If it's worth implementing it, we'll do so.
 
-###I want to join the project, what should I do?<a name="faq11">
+# I want to join the project, what should I do?
 Simply contact one of the [project owners][people]![][le]. We're not looking for any particular skills at the moment, but that doesn't mean that we're not accepting people into the team.
 
-###This launcher sucks!<a name="faq12">
+# This launcher sucks!
 While this is not a question, we will accept your criticism if you can tell us in detail why you think the application is not worth using. Please contact one of the [project owners][people]![][le] with the information.
 
 
