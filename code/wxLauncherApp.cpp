@@ -5,6 +5,9 @@
 #include <wx/fs_arc.h>
 #include <wx/fs_inet.h>
 #include <wx/splash.h>
+
+#include "SDL.h"
+
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
 #include "Skin.h"
@@ -22,6 +25,11 @@ bool wxLauncher::OnInit() {
 
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
+#if HAS_SDL == 1
+	if ( 0 != SDL_InitSubSystem(SDL_INIT_VIDEO) ) {
+	  wxLogFatalError(_T("SDL_InitSubSystem failed"));
+	}
 #endif
 
 	wxBitmap splash;
@@ -80,6 +88,10 @@ int wxLauncher::OnExit() {
 
 	ProMan::DeInitialize();
 	HelpManager::DeInitialize();
+	
+#if HAS_SDL == 1
+	SDL_Quit();
+#endif
 
 	wxLogInfo(_T("wxLogger shutdown complete."));
 

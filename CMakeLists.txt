@@ -112,7 +112,7 @@ foreach(temp_file ${helpmaker_temp_files})
   SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${temp_file})
 endforeach(temp_file)
 
-TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES})
+TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
 
 # packaging
 SET(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)

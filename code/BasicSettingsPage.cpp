@@ -2,6 +2,12 @@
 #include <wx/filename.h>
 #include <wx/choicebk.h>
 
+#include "generated/configure_launcher.h"
+
+#if HAS_SDL == 1
+#include "SDL.h"
+#endif
+
 #include "BasicSettingsPage.h"
 #include "ids.h"
 #include "ProfileManager.h"
@@ -706,8 +712,40 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 		}
 		modeCounter++;
 	} while ( result == TRUE );
+#elif HAS_SDL == 1
+	wxLogDebug(_T("Enumerating graphics modes with SDL"));
+	SDL_Rect** modes;
+	modes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+	
+	if ( modes == (SDL_Rect**)NULL ) {
+	  wxLogWarning(_T("Unable retreive any video modes"));
+	} else if ( modes == (SDL_Rect**)(-1) ) {
+	  wxLogWarning(_T("All resolutions are available.  If you get this message please report it to the developers as they do not think this response is actually possible"));
+	} else {
+	  wxLogDebug(_T("Found the following video modes:"));
+	  
+	  for(int i = 0; modes[i]; i++) {
+	    wxLogDebug(_T(" %d x %d"), modes[i]->w, modes[i]->h);
+	    
+	    wxString resolution = wxString::Format(CFG_RES_FORMAT_STRING, modes[i]->w, modes[i]->h);
+	    
+	    /*while ( iter != strings.end() ) {
+		    if ( *iter == resolution ) {
+			    exists = true;
+		    }
+		    iter++;
+	    }
+	    if ( !exists ) {*/
+	    {
+		    exeChoice->Insert(
+			    resolution,
+			    0,
+			    new Resolution(modes[i]->w, modes[i]->h));
+	    }
+	  }
+	}
 #else
-#pragma warning("BasicSettingsPage::FillResolutionDropBox not implemented")
+#error "BasicSettingsPage::FillResolutionDropBox not implemented because not on windows and SDL is not implemented"
 #endif
 }
 
