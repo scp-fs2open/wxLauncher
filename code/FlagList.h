@@ -20,6 +20,15 @@ public:
 
 WX_DECLARE_LIST(Flag, FlagList);
 
+/** Contains all of the flags in a category. */
+class FlagCategory {
+public:
+	wxString categoryName;
+	FlagList flags;
+};
+
+WX_DECLARE_LIST(FlagCategory, FlagCategoryList);
+
 class FlagListBox: public wxVListBox {
 public:
 	FlagListBox(wxWindow* parent, SkinSystem* skin);
@@ -48,9 +57,11 @@ private:
 
 	wxArrayString easyflags;
 
-	FlagList allSupportedFlags;
+	FlagCategoryList allSupportedFlagsByCategory;
 
 	wxStaticText* errorText;
+
+	void FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const;
 
 	DECLARE_EVENT_TABLE();
 
