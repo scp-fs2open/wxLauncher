@@ -45,6 +45,12 @@ if(USE_OPENAL)
   INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
 endif(USE_OPENAL)
 
+if(UNIX)
+  find_package(SDL REQUIRED)
+  INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
+  SET(HAS_SDL true)
+endif()
+
 INCLUDE(${wxWidgets_USE_FILE})
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
