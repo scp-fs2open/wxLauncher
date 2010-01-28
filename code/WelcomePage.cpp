@@ -124,7 +124,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
-	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automaticly save profile"));
+	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profile"));
 	bool autosave;
 	profile->Global()->Read(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
