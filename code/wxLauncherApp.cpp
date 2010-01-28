@@ -6,7 +6,9 @@
 #include <wx/fs_inet.h>
 #include <wx/splash.h>
 
+#if HAS_SDL == 1
 #include "SDL.h"
+#endif
 
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
