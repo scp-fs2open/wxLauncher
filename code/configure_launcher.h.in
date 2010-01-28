@@ -9,6 +9,8 @@
 #cmakedefine01 USE_JOYSTICK
 #cmakedefine01 USE_OPENAL
 
+#cmakedefine01 HAS_SDL
+
 #cmakedefine VERSION_MAJOR ${VERSION_MAJOR}
 #cmakedefine VERSION_MINOR ${VERSION_MINOR}
 #cmakedefine VERSION_PATCH ${VERSION_PATCH}
