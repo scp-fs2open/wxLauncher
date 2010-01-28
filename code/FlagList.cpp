@@ -20,6 +20,9 @@ Flag::Flag() {
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagList);
 
+#include <wx/listimpl.cpp> // Magic Incantation
+WX_DEFINE_LIST(FlagCategoryList);
+
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
 	wxASSERT(skin != NULL);
@@ -51,7 +54,15 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 				this->drawStatus = this->ParseFlagFile(flagfile);
 				if ( this->drawStatus == DRAW_OK ) {
 					::wxRemoveFile(flagfile.GetFullPath());
-					this->SetItemCount(this->allSupportedFlags.GetCount());
+					
+					size_t itemCount = 0;
+					FlagCategoryList::iterator iter =
+						this->allSupportedFlagsByCategory.begin();
+					while ( iter != this->allSupportedFlagsByCategory.end() ) {
+						itemCount += (*iter)->flags.GetCount();
+						iter++;
+					}
+					this->SetItemCount(itemCount);
 				}
 			}
 		}
@@ -176,7 +187,32 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		flag->webURL = wxString(web_url, wxConvUTF8, sizeof(web_url));
 		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, sizeof(easy_catagory));
 
-		this->allSupportedFlags.Append(flag);
+		FlagCategoryList::iterator iter = this->allSupportedFlagsByCategory.begin();
+		while ( iter != this->allSupportedFlagsByCategory.end() ) {
+			if ( flag->fsoCatagory == (*iter)->categoryName ) {
+				break;
+			}
+			iter++;
+		}
+		if ( iter == this->allSupportedFlagsByCategory.end() ) {
+			// did not find the category add it
+			FlagCategory* flagCat = new FlagCategory();
+			flagCat->categoryName = flag->fsoCatagory;
+
+			Flag* headFlag = new Flag();
+			headFlag->fsoCatagory = flag->fsoCatagory;
+			headFlag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
+			headFlag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
+			headFlag->checkboxSizer->AddStretchSpacer(1);
+			headFlag->checkboxSizer->Add(headFlag->checkbox);
+			headFlag->checkboxSizer->AddStretchSpacer(1);
+
+			flagCat->flags.Append(headFlag);
+			flagCat->flags.Append(flag);
+			this->allSupportedFlagsByCategory.Append(flagCat);
+		} else {
+			(*iter)->flags.Append(flag);
+		}
 	}		
 
 	wxLogDebug(_T(" easy_flag_size: %d, %d; flag_size: %d, %d; num_easy_flags: %d, %d; num_flags: %d, %d"),
@@ -196,19 +232,48 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 }
 
 FlagListBox::~FlagListBox() {
-	FlagList::iterator iter = this->allSupportedFlags.begin();
-	while ( iter != this->allSupportedFlags.end() ) {
-		Flag *flag = *iter;
-		delete flag;
+	FlagCategoryList::iterator catIter = this->allSupportedFlagsByCategory.begin();
+	while ( catIter != this->allSupportedFlagsByCategory.end() ) {
+		FlagCategory* category = *catIter;
+		FlagList::iterator iter = category->flags.begin();
+		while ( iter != category->flags.end() ) {
+			Flag *flag = *iter;
+			delete flag;
+			iter++;
+		}
+		category->flags.Clear();
+
+		delete category;
+		catIter++;
+	}
+	this->allSupportedFlagsByCategory.Clear();
+}
+
+void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
+	size_t index = n;
+	FlagCategoryList::const_iterator iter =
+		this->allSupportedFlagsByCategory.begin();
+	while ( iter != this->allSupportedFlagsByCategory.end() ) {
+		FlagCategory* cat = *iter;
+		if ( cat->flags.GetCount() > index ) {
+			(*flag) = cat->flags.Item(index)->GetData();
+			if ( catFlag != NULL ) {
+				// cat flag is first in the list
+				(*catFlag) = cat->flags.Item(0)->GetData(); 
+			}
+			break;
+		} else {
+			index -= cat->flags.GetCount();
+		}
 		iter++;
 	}
-	this->allSupportedFlags.Clear();
 }
 
 void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	if ( this->drawStatus == DRAW_OK ) {
 		this->errorText->Hide();
-		Flag* item = this->allSupportedFlags.Item(n)->GetData();
+		Flag* item = NULL;
+		this->FindFlagAt(n, &item, NULL);		
 		wxCHECK_RET(item != NULL, _T("Flag pointer is null"));
 	
 		if ( item->isRecomendedFlag ) {
@@ -221,8 +286,10 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 			rect.y,
 			SkinSystem::IdealIconWidth,
 			rect.height);
-
-		if ( item->shortDescription.IsEmpty() ) {
+		if ( item->flagString.IsEmpty() ) {
+			// draw a category
+			dc.DrawText(item->fsoCatagory, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
+		} else if ( item->shortDescription.IsEmpty() ) {
 			dc.DrawText(item->flagString, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
 		} else {
 			dc.DrawText(item->shortDescription, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
@@ -232,23 +299,35 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	}
 }
 
-wxCoord FlagListBox::OnMeasureItem(size_t WXUNUSED(n)) const {
+wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 	if ( this->drawStatus == DRAW_OK ) {
-		return SkinSystem::IdealIconHeight;
+		Flag* flag = NULL;
+		Flag* catFlag = NULL;
+		this->FindFlagAt(n, &flag, &catFlag);
+
+		if ( flag->flagString.IsEmpty() ) {
+			// is a catagory header
+			return SkinSystem::IdealIconHeight;
+		} else {
+			return 0;
+		}
 	} else {
 		return this->GetSize().y;
 	}
 }
 
 void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const {
-	dc.DestroyClippingRegion();
-	if ( this->drawStatus == DRAW_OK && this->IsSelected(n) ) {
-		wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-		wxBrush b(highlighted);
-		dc.SetPen(wxPen(highlighted));
-		dc.SetBackground(b);
+	Flag* item = NULL;
+	this->FindFlagAt(n, &item, NULL);
+	wxCHECK_RET(item != NULL, _T("Flag pointer is null"));
+	if ( item->flagString.IsEmpty() ) {
+		dc.DestroyClippingRegion();
+		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+		wxBrush b(background);
+		dc.SetPen(wxPen(background));
 		dc.SetBrush(b);
-		dc.DrawRoundedRectangle(rect, 10.0);
+		dc.SetBackground(b);
+		dc.DrawRectangle(rect);
 	} else {
 		dc.DestroyClippingRegion();
 		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
