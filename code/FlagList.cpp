@@ -202,6 +202,10 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 			Flag* headFlag = new Flag();
 			headFlag->fsoCatagory = flag->fsoCatagory;
 			headFlag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
+			this->GetEventHandler()->Connect(
+				headFlag->checkbox->GetId(),
+				wxEVT_COMMAND_CHECKBOX_CLICKED,
+				wxCommandEventHandler(FlagListBox::OnCheckCategoryBox));
 			headFlag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
 			headFlag->checkboxSizer->AddStretchSpacer(1);
 			headFlag->checkboxSizer->Add(headFlag->checkbox);
@@ -306,10 +310,14 @@ wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 		this->FindFlagAt(n, &flag, &catFlag);
 
 		if ( flag->flagString.IsEmpty() ) {
-			// is a catagory header
+			// is a category header
 			return SkinSystem::IdealIconHeight;
 		} else {
-			return 0;
+			if (catFlag->checkbox->IsChecked()) {
+				return SkinSystem::IdealIconHeight;
+			} else {
+				return 0;
+			}
 		}
 	} else {
 		return this->GetSize().y;
@@ -379,6 +387,10 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 		this->errorText->SetSize(rect, wxSIZE_FORCE);
 		this->errorText->Wrap(rect.width);
 	}
+}
+
+void FlagListBox::OnCheckCategoryBox(wxCommandEvent &WXUNUSED(event)) {
+	this->RefreshRect(this->GetRect(), true);
 }
 
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)

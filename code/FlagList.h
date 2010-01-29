@@ -39,6 +39,8 @@ public:
 	virtual wxCoord OnMeasureItem(size_t n) const;
 	virtual void OnSize(wxSizeEvent &event);
 
+	void OnCheckCategoryBox(wxCommandEvent &event);
+
 private:
 	SkinSystem* skin;
 	enum DrawStatus {
