@@ -1,4 +1,5 @@
 #include "FlagList.h"
+#include "AdvSettingsPage.h"
 #include "ProfileManager.h"
 #include "ids.h"
 
@@ -176,13 +177,16 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		Flag* flag = new Flag();
 		flag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
 		flag->checkbox->Hide();
+		this->m_parent->Connect(flag->checkbox->GetId(),
+			wxEVT_COMMAND_CHECKBOX_CLICKED,
+			wxCommandEventHandler(AdvSettingsPage::OnCheckFlag));
 		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
 		flag->checkboxSizer->AddStretchSpacer(1);
 		flag->checkboxSizer->Add(flag->checkbox);
 		flag->checkboxSizer->AddStretchSpacer(1);
 
 		flag->isRecomendedFlag = true; //!< \todo implement logic to do the recomnmended flag
-		flag->flagString = wxString(flag_string, wxConvUTF8, sizeof(flag_string));
+		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
 		flag->shortDescription = wxString(description, wxConvUTF8, sizeof(description));
 		flag->webURL = wxString(web_url, wxConvUTF8, sizeof(web_url));
 		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, sizeof(easy_catagory));
@@ -391,6 +395,28 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 
 void FlagListBox::OnCheckCategoryBox(wxCommandEvent &WXUNUSED(event)) {
 	this->RefreshRect(this->GetRect(), true);
+}
+
+wxString FlagListBox::GenerateStringList() {
+	wxString flagList;
+	FlagCategoryList::const_iterator cat =
+		this->allSupportedFlagsByCategory.begin();
+	while ( cat != this->allSupportedFlagsByCategory.end() ) {
+		FlagList::const_iterator flags =
+			(*cat)->flags.begin();
+		while ( flags != (*cat)->flags.end() ) {
+			if ( (*flags)->checkbox->IsChecked() 
+				&& !(*flags)->flagString.IsEmpty() ) {
+					if ( !flagList.IsEmpty() ) {
+						flagList += _T(" ");
+					}
+					flagList += (*flags)->flagString;
+			}
+			flags++;
+		}
+		cat++;
+	}
+	return flagList;
 }
 
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)
