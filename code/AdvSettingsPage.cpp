@@ -2,7 +2,6 @@
 
 #include "TCManager.h"
 #include "ProfileManager.h"
-#include "FlagList.h"
 #include "ids.h"
 
 #include <wx/html/htmlwin.h>
@@ -27,12 +26,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& WXUNUSED(event)) {
 		this->GetSizer()->DeleteWindows();
 	}
 
-	FlagListBox* list = new FlagListBox(this, this->skin);
+	this->flagListBox = new FlagListBox(this, this->skin);
 	wxHtmlWindow* description = new wxHtmlWindow(this);
 	description->SetPage(_T("<p>Test Page</p>"));
 	
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
-	topSizer->Add(list, wxSizerFlags().Proportion(2).Expand());
+	topSizer->Add(this->flagListBox, wxSizerFlags().Proportion(2).Expand());
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 	topSizer->SetMinSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT/2);
 
@@ -72,5 +71,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& WXUNUSED(event)) {
 	this->Layout();
 }
 
+void AdvSettingsPage::OnCheckFlag(wxCommandEvent &event) {
+	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
+	wxCHECK_RET( commandLine != NULL, _T("Unable to find the text control") );
+
+	commandLine->SetLabel(this->flagListBox->GenerateStringList());
+}
 	
 	

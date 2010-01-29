@@ -40,6 +40,7 @@ public:
 	virtual void OnSize(wxSizeEvent &event);
 
 	void OnCheckCategoryBox(wxCommandEvent &event);
+	wxString GenerateStringList();
 
 private:
 	SkinSystem* skin;
