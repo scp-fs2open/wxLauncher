@@ -1,1 +1,15 @@
 <title>Getting started tutorial</title>
+
+#Getting started tutorial
+
+The "Getting started tutorial" is split into two sections:
+
+* [The Basics][basic]![][li] - For people who are new to the FreeSpace universe
+* [Advanced][]![][li] - For people who played [Descent FreeSpace][fs1]![][le] or [FreeSpace 2][fs2]![][le] before and just want to get started.
+
+[li]: /images/li.png
+[le]: /images/le.png
+[basic]: 01basics.help
+[advanced]: 02advanced.help
+[fs1]: http://en.wikipedia.org/wiki/Descent:_FreeSpace_%E2%80%93_The_Great_War
+[fs2]: http://en.wikipedia.org/wiki/FreeSpace_2
