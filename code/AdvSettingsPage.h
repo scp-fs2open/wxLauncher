@@ -9,7 +9,7 @@ class AdvSettingsPage: public wxPanel {
 public:
 	AdvSettingsPage(wxWindow* parent, SkinSystem* skin);
 
-	void OnCheckFlag(wxCommandEvent &event);
+	void OnNeedUpdateCommandLine(wxCommandEvent &event);
 
 private:
 	SkinSystem *skin;

@@ -41,6 +41,9 @@ public:
 
 	void OnCheckCategoryBox(wxCommandEvent &event);
 	wxString GenerateStringList();
+	/** Tries to find flagString in the list of flags and set it to state,
+	returns true on successful set, returns false if cannot find flag. */
+	bool SetFlag(wxString flagString, bool state);
 
 private:
 	SkinSystem* skin;

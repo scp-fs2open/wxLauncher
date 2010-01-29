@@ -5,6 +5,7 @@
 #include "ids.h"
 
 #include <wx/html/htmlwin.h>
+#include <wx/tokenzr.h>
 
 #include "wxLauncherSetup.h" // Last include for memory debugging
 
@@ -19,9 +20,10 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
+EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 END_EVENT_TABLE()
 
-void AdvSettingsPage::OnExeChanged(wxCommandEvent& WXUNUSED(event)) {
+void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	if (this->GetSizer() != NULL) {
 		this->GetSizer()->DeleteWindows();
 	}
@@ -42,41 +44,78 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& WXUNUSED(event)) {
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	idealFlagsRowSizer->Add(idealIcon);
-	idealFlagsRowSizer->Add(idealLabel);
+	wxBoxSizer* idealLabelSizer = new wxBoxSizer(wxVERTICAL);
+	idealLabelSizer->AddStretchSpacer(1);
+	idealLabelSizer->Add(idealLabel);
+	idealLabelSizer->AddStretchSpacer(1);
+	idealFlagsRowSizer->Add(idealLabelSizer);
 	idealFlagsRowSizer->AddStretchSpacer(1);
 	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Left());
 
-	wxTextCtrl* flagsetNotes = new wxTextCtrl(this, ID_FLAG_SET_NOTES_TEXT);
-	flagsetNotes->Disable();
+	wxStaticBox* flagsetNotesBox = new wxStaticBox(this, wxID_ANY, _("Flag set notes"));
+	wxTextCtrl* flagsetNotes = new wxTextCtrl(this, ID_FLAG_SET_NOTES_TEXT,
+		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/8),
+		wxTE_MULTILINE|wxTE_READONLY);
+	wxStaticBoxSizer* flagsetNotesSizer = new wxStaticBoxSizer(flagsetNotesBox, wxVERTICAL);
+	flagsetNotesSizer->Add(flagsetNotes, wxSizerFlags().Expand());
 
-	wxStaticText* customFlagsLabel = new wxStaticText(this, wxID_ANY, _("Custom flags:"));
+	wxStaticBox* customFlagsBox = new wxStaticBox(this, wxID_ANY, _("Custom flags"));
 	wxTextCtrl* customFlagsText = new wxTextCtrl(this, ID_CUSTOM_FLAGS_TEXT);
-	wxBoxSizer* customFlagsSizer = new wxBoxSizer(wxHORIZONTAL);
-	customFlagsSizer->Add(customFlagsLabel);
-	customFlagsSizer->Add(customFlagsText);
+	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
+	customFlagsSizer->Add(customFlagsText, wxSizerFlags().Expand());
 	
-	wxStaticText* commandLineLabel = new wxStaticText(this, wxID_ANY, _("Current commandline"));
-	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT);
+	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current commandline"));
+	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
+		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/8),
+		wxTE_MULTILINE|wxTE_READONLY);
+	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
+	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(topSizer);
-	sizer->Add(idealFlagsRowSizer);//, wxSizerFlags().Expand());
-	sizer->Add(flagsetNotes);//, wxSizerFlags().Expand());
-	sizer->Add(customFlagsSizer);//, wxSizerFlags().Expand());
-	sizer->Add(commandLineLabel);
-	sizer->Add(commandLineText);//, wxSizerFlags().Expand());
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand());
+	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand());
+	sizer->Add(customFlagsSizer, wxSizerFlags().Expand());
+	sizer->Add(commandLineSizer, wxSizerFlags().Expand());
 
 	this->SetSizer(sizer);
 	this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 	this->Layout();
+
+	wxString cmdline, customFlags;
+	ProMan::GetProfileManager()->Get()->
+		Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &cmdline);
+	wxStringTokenizer tokenizer(cmdline, _T(" "));
+	while(tokenizer.HasMoreTokens()) {
+		wxString tok = tokenizer.GetNextToken();
+		if ( this->flagListBox->SetFlag(tok, true) ) {
+			continue;
+		} else {
+			if (!customFlags.IsEmpty()) {
+				customFlags += _T(" ");
+			}
+			customFlags += tok;
+		}
+	}
+	customFlagsText->SetLabel(customFlags);
+	this->OnNeedUpdateCommandLine(event);
 }
 
-void AdvSettingsPage::OnCheckFlag(wxCommandEvent &event) {
+void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
 	wxCHECK_RET( commandLine != NULL, _T("Unable to find the text control") );
+	wxTextCtrl* customFlags = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
+	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flag box"));
 
-	commandLine->SetLabel(this->flagListBox->GenerateStringList());
+	wxString cmdLine = wxString::Format(_T("%s %s"),
+		this->flagListBox->GenerateStringList().c_str(),
+		customFlags->GetLabel().c_str());
+	
+	commandLine->SetLabel(cmdLine);
+	ProMan::GetProfileManager()->Get()->
+		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, cmdLine);
 }
 	
 	
