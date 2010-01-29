@@ -385,10 +385,15 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 			wxFileName::GetPathSeparator(),
 			_T("cmdline_fso.cfg")));
 	wxFFileOutputStream outStream(cmdLineFileName.GetFullPath(), _T("w+b"));
+	if ( !outStream.IsOk() ) {
+		return ProMan::UnknownError;
+	}
 	outStream.Write(modLine.char_str(), modLine.size());
 	outStream.Write(" ", 1);
 	outStream.Write(flagLine.char_str(), flagLine.size());
-	outStream.Close();
+	if ( !outStream.Close() ) {
+		return ProMan::UnknownError;
+	}
 
 	return ProMan::NoError;
 }
