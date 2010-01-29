@@ -174,12 +174,17 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 			return FLAG_FILE_NOT_VALID;
 		}
 
+		flag_string[sizeof(flag_string)-1] = _T('\0');
+		description[sizeof(description)-1] = _T('\0');
+		easy_catagory[sizeof(easy_catagory)-1] = _T('\0');
+		web_url[sizeof(web_url)-1] = _T('\0');
+
 		Flag* flag = new Flag();
 		flag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
 		flag->checkbox->Hide();
 		this->m_parent->Connect(flag->checkbox->GetId(),
 			wxEVT_COMMAND_CHECKBOX_CLICKED,
-			wxCommandEventHandler(AdvSettingsPage::OnCheckFlag));
+			wxCommandEventHandler(AdvSettingsPage::OnNeedUpdateCommandLine));
 		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
 		flag->checkboxSizer->AddStretchSpacer(1);
 		flag->checkboxSizer->Add(flag->checkbox);
@@ -187,9 +192,9 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 		flag->isRecomendedFlag = true; //!< \todo implement logic to do the recomnmended flag
 		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
-		flag->shortDescription = wxString(description, wxConvUTF8, sizeof(description));
-		flag->webURL = wxString(web_url, wxConvUTF8, sizeof(web_url));
-		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, sizeof(easy_catagory));
+		flag->shortDescription = wxString(description, wxConvUTF8, strlen(description));
+		flag->webURL = wxString(web_url, wxConvUTF8, strlen(web_url));
+		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, strlen(easy_catagory));
 
 		FlagCategoryList::iterator iter = this->allSupportedFlagsByCategory.begin();
 		while ( iter != this->allSupportedFlagsByCategory.end() ) {
@@ -417,6 +422,24 @@ wxString FlagListBox::GenerateStringList() {
 		cat++;
 	}
 	return flagList;
+}
+
+bool FlagListBox::SetFlag(wxString flagString, bool state) {
+	FlagCategoryList::const_iterator category =
+		this->allSupportedFlagsByCategory.begin();
+	while (category != this->allSupportedFlagsByCategory.end()) {
+		FlagList::const_iterator flag = (*category)->flags.begin();
+		while( flag != (*category)->flags.end() ) {
+			if ( !(*flag)->flagString.IsEmpty()
+				&& (*flag)->flagString == flagString ) {
+					(*flag)->checkbox->SetValue(state);
+					return true;
+			}
+			flag++;
+		}
+		category++;
+	}
+	return false;
 }
 
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)
