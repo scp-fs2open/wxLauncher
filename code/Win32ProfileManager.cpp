@@ -372,6 +372,24 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 
 	RegCloseKey(regHandle);
 	RegCloseKey(networkRegHandle);
+
+	wxString modLine, flagLine, tcPath;
+	cfg->Read(PRO_CFG_TC_CURRENT_MODLINE, &modLine);
+	cfg->Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
+	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+	wxFileName cmdLineFileName(
+		wxString::Format(_T("%s%s%s%s%s"),
+			tcPath,
+			wxFileName::GetPathSeparator(),
+			_T("data"),
+			wxFileName::GetPathSeparator(),
+			_T("cmdline_fso.cfg")));
+	wxFFileOutputStream outStream(cmdLineFileName.GetFullPath(), _T("w+b"));
+	outStream.Write(modLine.char_str(), modLine.size());
+	outStream.Write(" ", 1);
+	outStream.Write(flagLine.char_str(), flagLine.size());
+	outStream.Close();
+
 	return ProMan::NoError;
 }
 
