@@ -336,8 +336,7 @@ wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const {
 	Flag* item = NULL;
 	this->FindFlagAt(n, &item, NULL);
-	wxCHECK_RET(item != NULL, _T("Flag pointer is null"));
-	if ( item->flagString.IsEmpty() ) {
+	if ( item != NULL && item->flagString.IsEmpty() ) {
 		dc.DestroyClippingRegion();
 		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 		wxBrush b(background);

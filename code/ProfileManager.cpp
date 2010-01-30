@@ -122,6 +122,8 @@ bool ProMan::Initialize() {
 			// Create a default profile
 			wxLogInfo(_T(" Default profile does not exist! Creating..."));
 			ProMan::proman->CreateNewProfile(_T("Default"));
+			wxLogInfo(_T(" Priming profile..."));
+			PullProfile(ProMan::proman->profiles[_T("Default")]);
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
 		ProMan::proman->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, _T("Default"));
