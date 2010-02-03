@@ -146,11 +146,11 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	profileVerticalSizer->SetMinSize(wxSize(this->stuffWidth, -1));
 
 	// Latest headlines
-	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest headlines from the front"));
+	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from the front"));
 	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
-	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Auto download news for Welcome Page"));
+	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Auto update highlights"));
 	updateNewsCheck->SetToolTip(_("Launcher will update the news on next run"));
 	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
 	this->needToUpdateNews = true;
