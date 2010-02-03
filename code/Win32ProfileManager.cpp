@@ -83,10 +83,13 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 		wxLogDebug(_T("Launching helper on %s"), tempfile);
 		wxFileOutputStream out(tempfile);
 		cfg->Save(out);
-		wxArrayString processOutput;
-		long ret = wxExecute(wxString::Format(_T("registry_helper.exe push \"%s\""), tempfile), processOutput);
-		wxLogDebug(_T(" Registry helper returned %d"), ret);
+		wxArrayString processOutput, processError;
+		long ret = wxExecute(wxString::Format(_T("registry_helper.exe push \"%s\""), tempfile), processOutput, processError);
+		wxLogDebug(_T(" Registry helper returned 0x%08X"), ret);
 
+		for(size_t i = 0; i < processError.size(); i++) {
+			wxLogInfo(_T("EREG:%s"), processError[i]);
+		}
 		for(size_t i = 0; i < processOutput.size(); i++) {
 			wxLogInfo(_T(" REG:%s"), processOutput[i]);
 		}
@@ -95,7 +98,7 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
 		} else {
-			wxLogError(_T("Unable to write FS2Open settings to the registry (%d)"), ret);
+			wxLogError(_T("Unable to write FS2Open settings to the registry (0x%08X)"), ret);
 			return static_cast<ProMan::RegistryCodes>(ret);
 		}
 #endif	
