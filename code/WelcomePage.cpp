@@ -151,7 +151,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Auto update highlights"));
-	updateNewsCheck->SetToolTip(_("Launcher will update the news on next run"));
+	updateNewsCheck->SetToolTip(_("Check this to have the Launcher update the highlights on next run"));
 	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
 	this->needToUpdateNews = true;
 
