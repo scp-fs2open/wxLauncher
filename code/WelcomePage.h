@@ -18,6 +18,8 @@ public:
 	void ProfileChanged(wxCommandEvent& event);
 	void ProfileCountChanged(wxCommandEvent& event);
 	void UpdateNews(wxIdleEvent& event);
+	void OnDownloadNewsCheck(wxCommandEvent& event);
+	void OnUpdateNewsHelp(wxCommandEvent& event);
 	
 private:
 	/** The width of the items on the welcome tab. */
@@ -28,6 +30,7 @@ private:
 	void deleteProfile(wxChoice* combobox, ProMan* profile);
 
 	bool needToUpdateNews;
+	bool getOrPromptUpdateNews();
 
 	DECLARE_EVENT_TABLE();
 };
