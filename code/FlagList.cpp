@@ -210,16 +210,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 			Flag* headFlag = new Flag();
 			headFlag->fsoCatagory = flag->fsoCatagory;
-			headFlag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
-			this->GetEventHandler()->Connect(
-				headFlag->checkbox->GetId(),
-				wxEVT_COMMAND_CHECKBOX_CLICKED,
-				wxCommandEventHandler(FlagListBox::OnCheckCategoryBox));
-			headFlag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
-			headFlag->checkboxSizer->AddStretchSpacer(1);
-			headFlag->checkboxSizer->Add(headFlag->checkbox);
-			headFlag->checkboxSizer->AddStretchSpacer(1);
-
+			headFlag->checkbox = NULL;
 			flagCat->flags.Append(headFlag);
 			flagCat->flags.Append(flag);
 			this->allSupportedFlagsByCategory.Append(flagCat);
@@ -293,12 +284,14 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 			dc.DrawBitmap(this->skin->GetIdealIcon(), rect.x, rect.y);
 		}
 
-		item->checkbox->Show();
-		item->checkboxSizer->SetDimension(
-			rect.x + SkinSystem::IdealIconWidth,
-			rect.y,
-			SkinSystem::IdealIconWidth,
-			rect.height);
+		if (item->checkbox != NULL) {
+			item->checkbox->Show();
+			item->checkboxSizer->SetDimension(
+				rect.x + SkinSystem::IdealIconWidth,
+				rect.y,
+				SkinSystem::IdealIconWidth,
+				rect.height);
+		}
 		if ( item->flagString.IsEmpty() ) {
 			// draw a category
 			dc.DrawText(item->fsoCatagory, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
@@ -314,20 +307,7 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 
 wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 	if ( this->drawStatus == DRAW_OK ) {
-		Flag* flag = NULL;
-		Flag* catFlag = NULL;
-		this->FindFlagAt(n, &flag, &catFlag);
-
-		if ( flag->flagString.IsEmpty() ) {
-			// is a category header
-			return SkinSystem::IdealIconHeight;
-		} else {
-			if (catFlag->checkbox->IsChecked()) {
-				return SkinSystem::IdealIconHeight;
-			} else {
-				return 0;
-			}
-		}
+		return SkinSystem::IdealIconHeight;
 	} else {
 		return this->GetSize().y;
 	}
@@ -409,7 +389,8 @@ wxString FlagListBox::GenerateStringList() {
 		FlagList::const_iterator flags =
 			(*cat)->flags.begin();
 		while ( flags != (*cat)->flags.end() ) {
-			if ( (*flags)->checkbox->IsChecked() 
+			if ( (*flags)->checkbox != NULL
+				&& (*flags)->checkbox->IsChecked() 
 				&& !(*flags)->flagString.IsEmpty() ) {
 					if ( !flagList.IsEmpty() ) {
 						flagList += _T(" ");
