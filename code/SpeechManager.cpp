@@ -80,7 +80,12 @@ bool EnumerateVoices() {
 		comVoices->Next(1, &comAVoice, NULL); // retrive just one
 		LPWSTR id = NULL;
 		comAVoice->GetStringValue(NULL, &id);
-		voiceNames[wxString(id, wxMBConvUTF16())] = comAVoice;
+		size_t idlength = wcslen(id);
+		wxLogDebug(_T("  Got string of length %d:"), idlength);
+		for(size_t i = 0; i < idlength; i++) {
+			wxLogDebug(_T("   %04X"), id[i]);
+		}
+		voiceNames[wxString(id, wxMBConvUTF16(), wcslen(id))] = comAVoice;
 
 #ifdef __WXDEBUG__
 		enumerateObjectToken(comAVoice);
