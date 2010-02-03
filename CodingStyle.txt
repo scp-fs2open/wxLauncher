@@ -18,7 +18,11 @@ all linux and OSX coders should have:
     [encode]
     ** = cleverencode:
     [decode]
-    ** = cleverdecode:
+    ** = !
+    [hooks]
+    pretxncommit.crlf = python:hgext.win32text.forbidcr
+    [patch]
+    eol = crlf
 as in their .hgrc files. The setting 
 can be set in either the ~/.hgrc or
 in the <wxlauncher dir>/.hg/.hgrc.
