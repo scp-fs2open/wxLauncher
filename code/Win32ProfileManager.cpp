@@ -83,6 +83,8 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 		wxLogDebug(_T("Launching helper on %s"), tempfile);
 		wxFileOutputStream out(tempfile);
 		cfg->Save(out);
+		out.Close();
+
 		wxArrayString processOutput, processError;
 		long ret = wxExecute(wxString::Format(_T("registry_helper.exe push \"%s\""), tempfile), processOutput, processError);
 		wxLogDebug(_T(" Registry helper returned 0x%08X"), ret);
@@ -94,6 +96,7 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 			wxLogInfo(_T(" REG:%s"), processOutput[i]);
 		}
 
+		::wxRemoveFile(tempfile);
 		if ( ret == ProMan::NoError ) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
@@ -383,13 +386,13 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_TC_CURRENT_MODLINE, &modLine);
 	cfg->Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
-	wxFileName cmdLineFileName(
-		wxString::Format(_T("%s%s%s%s%s"),
-			tcPath,
-			wxFileName::GetPathSeparator(),
-			_T("data"),
-			wxFileName::GetPathSeparator(),
-			_T("cmdline_fso.cfg")));
+	wxString cmdLineString;
+	cmdLineString += tcPath.c_str();
+	cmdLineString += wxFileName::GetPathSeparator();
+	cmdLineString += _T("data");
+	cmdLineString += wxFileName::GetPathSeparator();
+	cmdLineString += _T("cmdline_fso.cfg");
+	wxFileName cmdLineFileName(cmdLineString);
 	wxFFileOutputStream outStream(cmdLineFileName.GetFullPath(), _T("w+b"));
 	if ( !outStream.IsOk() ) {
 		return ProMan::UnknownError;
