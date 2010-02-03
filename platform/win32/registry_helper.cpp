@@ -10,8 +10,8 @@
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
 	{wxCMD_LINE_PARAM, NULL, NULL, _T("<operation>"), wxCMD_LINE_VAL_STRING, 0},
 	{wxCMD_LINE_PARAM, NULL, NULL, _T("<file>"), wxCMD_LINE_VAL_STRING, 0},
-	{wxCMD_LINE_OPTION, _T("h"), _T("help"), _T("Show Help"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP},
-	{wxCMD_LINE_NONE, NULL, NULL, NULL, wxCMD_LINE_VAL_NONE, 0}};
+	{wxCMD_LINE_NONE},
+};
 
 /** RegistryHelper is a executable helper for wxLauncher that will allow it to 
 set the required registry keys on Windows Vista and Windows 7 because they both by
