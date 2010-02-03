@@ -7,9 +7,6 @@ class InstallPage: public wxPanel {
 public:
 	InstallPage(wxWindow* parent);
 
-	void OnDownloadNewsCheck(wxCommandEvent& event);
-	void OnUpdateNewsHelp(wxCommandEvent& event);
-
 	DECLARE_EVENT_TABLE()
 };
 
