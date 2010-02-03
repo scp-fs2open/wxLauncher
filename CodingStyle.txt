@@ -29,6 +29,8 @@ endings.
 All windows users should set:
     [extensions]
     hgext.win32text =
+    [encode]
+    ** = cleverencode:
     [decode]
     ** = cleverdecode:
 in their Mercurial.ini file (located
