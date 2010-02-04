@@ -101,27 +101,35 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	wxButton* play = dynamic_cast<wxButton*>(
 		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
 	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
-	play->SetLabel(_T("Running"));
+	play->SetLabel(_("Running"));
 	play->Disable();
 	
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
 	if ( !p->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
 		wxLogError(_T("TC folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
+		play->SetLabel(_("Play"));
+		play->Enable();
 		return;
 	}
 	if ( !p->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary) ) {
 		wxLogError(_T("Binary to execute is not set (%s)"), PRO_CFG_TC_CURRENT_BINARY);
+		play->SetLabel(_("Play"));
+		play->Enable();
 		return;
 	}
 
 	wxFileName path(folder, binary, wxPATH_NATIVE);
 	if ( !path.FileExists() ) {
 		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
+		play->SetLabel(_("Play"));
+		play->Enable();
 		return;
 	}
 
 	if ( ProMan::NoError != ProMan::PushProfile(p->Get()) ) {
+		play->SetLabel(_("Play"));
+		play->Enable();
 		return;
 	}
 
@@ -138,6 +146,8 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	wxString command(wxString::Format(_T("%s"), path.GetFullPath().c_str()));
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
 	if ( pid == 0 ) {
+		play->SetLabel(_("Play"));
+		play->Enable();
 		return;
 	}
 	this->FS2_pid = pid;
