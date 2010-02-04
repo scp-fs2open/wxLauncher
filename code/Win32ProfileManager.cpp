@@ -397,9 +397,14 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 	if ( !outStream.IsOk() ) {
 		return ProMan::UnknownError;
 	}
-	outStream.Write(modLine.char_str(), modLine.size());
-	outStream.Write(" ", 1);
-	outStream.Write(flagLine.char_str(), flagLine.size());
+	if ( !modLine.IsEmpty()) {
+		outStream.Write("-mod ", 5);
+		outStream.Write(modLine.char_str(), modLine.size());
+	}
+	if ( !modLine.IsEmpty() ) {
+		outStream.Write(" ", 1);
+		outStream.Write(flagLine.char_str(), flagLine.size());
+	}
 	if ( !outStream.Close() ) {
 		return ProMan::UnknownError;
 	}
