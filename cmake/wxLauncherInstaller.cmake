@@ -3,7 +3,7 @@
 IF(WIN32) # and WIN64
   # find the runtime files
   IF(CMAKE_BUILD_TYPE MATCHES Debug)
-    SET(VC9_RUNTIME_LOCATIONS "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT" "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT")
+    SET(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT")
     FIND_FILE(VC9_RUNTIME_msvcm90 msvcm90d.dll 
       PATHS ${VC9_RUNTIME_LOCATIONS})
     INSTALL(FILES ${VC9_RUNTIME_msvcm90} DESTINATION bin)
