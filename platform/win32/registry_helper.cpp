@@ -19,11 +19,12 @@ default virtualize the registry so that the use of HKLM it redirected to HKCU.
 
 Registry Virtualization in Windows Vista <http://msdn.microsoft.com/en-us/library/bb530198.aspx>
 
-The executable that this app is compiled into *must* *not* a UAC manifest so that
-Win7 and WinVista will Virtualize its access to HKLM. Allowing us to write,
-where FSO is looking because it does not have a UAC manifest.  This
-virtualiszation also allows us to write the cmdline_fso.cfg file if FSO has
-been installed into Program Files. */
+The executable that this app is compiled into *must* *not* have a UAC manifest
+so that Win7 and WinVista will Virtualize its access to HKLM. Not having the 
+UAC manifest allows us to write into the per user virtual location where FSO
+is looking because it also does not have a UAC manifest.  This
+virtualiszation also allows us to write the cmdline_fso.cfg file to the 
+correct location (data/cmdline_fso.cfg) if FSO has been installed into Program Files. */
 class RegistryHelper : public wxApp {
 public:
 	virtual int OnRun();
