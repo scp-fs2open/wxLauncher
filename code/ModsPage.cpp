@@ -27,7 +27,8 @@ END_EVENT_TABLE()
 void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString tcPath;
 
-	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
+	ProMan::GetProfileManager()->Get()
+		->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
 
 	wxSizer* currentSizer = this->GetSizer();
 	if ( currentSizer != NULL ) {
@@ -58,7 +59,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 			_("The currently specified Total Conversion root folder does not contain a valid Total Conversion.\nSelect a valid Total Conversion root folder on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
-		invalidTC->SetForegroundColour(wxTheColourDatabase->Find(_T("BLACK")));
+		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		invalidTC->Wrap(TAB_AREA_WIDTH-50);
 
 		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
