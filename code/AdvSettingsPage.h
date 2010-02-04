@@ -17,6 +17,7 @@ private:
 	
 public:
 	void OnExeChanged(wxCommandEvent& event);
+	void OnSelectFlagSet(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };
