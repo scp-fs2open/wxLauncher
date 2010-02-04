@@ -6,17 +6,16 @@ manual(Markdown) portion of code.
 
 All code
 ========
-All code for wxLauncher should have a
-carriage return (CR) (ASCII 0x0D)
-followed by a line feed (LF) (ASCII 0x0A)
+All code for wxLauncher should have 
+a line feed (LF) (ASCII 0x0A)
 as the line endings in all files. This
 line ending style is also known as the
-Windows/DOS line ending.  This means
+Unix style line ending.  This means
 all linux and OSX coders should have:
     [extensions]
-    hgext.win32text =
+    hgext.win32text = !
     [encode]
-    ** = cleverencode:
+    ** = !
     [decode]
     ** = !
     [hooks]
@@ -36,7 +35,12 @@ All windows users should set:
     [encode]
     ** = cleverencode:
     [decode]
-    ** = cleverdecode:
+    ** = cleverencode:
+    [hooks]
+    # make sure that crlf's do not get committed.
+    pretxncommit.crlf = python:hgext.win32text.forbidcrlf
+    [patch]
+    eol = crlf
 in their Mercurial.ini file (located
 in the user profile) or in the 
 <wxlauncher dir>/.hg/.hgrc file.
