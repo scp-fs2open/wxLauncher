@@ -19,7 +19,7 @@ all linux and OSX coders should have:
     [decode]
     ** = !
     [hooks]
-    pretxncommit.crlf = python:hgext.win32text.forbidcr
+    pretxncommit.crlf = python:hgext.win32text.forbidcrlf
     [patch]
     eol = crlf
 as in their .hgrc files. The setting 
