@@ -21,6 +21,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
+EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
@@ -41,6 +42,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
+	wxArrayString flagSetsArray;
+	flagSetChoice->Append(this->flagListBox->GetFlagSets(flagSetsArray));
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
 	idealFlagsRowSizer->Add(idealIcon);
@@ -72,11 +75,11 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer);
-	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand());
-	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand());
-	sizer->Add(customFlagsSizer, wxSizerFlags().Expand());
-	sizer->Add(commandLineSizer, wxSizerFlags().Expand());
+	sizer->Add(topSizer, wxSizerFlags().Border(wxRIGHT, 25));
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
 
 	this->SetSizer(sizer);
 	this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
@@ -117,5 +120,18 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, cmdLine);
 }
-	
+
+void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
+	wxChoice* choice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
+	wxCHECK_RET( choice != NULL, _T("Unable to get flagSetChoice box"));
+
+	wxString selectedSet = choice->GetString(choice->GetSelection());
+	bool ret = this->flagListBox->SetFlagSet(selectedSet);
+	if ( ret == false ) {
+		wxLogError(_T("Unable to set FlagSet (%s). Set does not exist"), selectedSet);
+	}
+	wxCommandEvent event;
+	this->OnNeedUpdateCommandLine(event);
+}
 	

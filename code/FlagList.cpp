@@ -24,6 +24,13 @@ WX_DEFINE_LIST(FlagList);
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagCategoryList);
 
+FlagSet::FlagSet(wxString Name) {
+	this->Name = Name;
+}
+
+#include <wx/listimpl.cpp> // Magic Incantation
+WX_DEFINE_LIST(FlagSetsList);
+
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
 	wxASSERT(skin != NULL);
@@ -195,6 +202,9 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		flag->shortDescription = wxString(description, wxConvUTF8, strlen(description));
 		flag->webURL = wxString(web_url, wxConvUTF8, strlen(web_url));
 		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, strlen(easy_catagory));
+
+		flag->easyDisable = easy_off_flags;
+		flag->easyEnable = easy_on_flags;
 
 		FlagCategoryList::iterator iter = this->allSupportedFlagsByCategory.begin();
 		while ( iter != this->allSupportedFlagsByCategory.end() ) {
@@ -425,3 +435,109 @@ bool FlagListBox::SetFlag(wxString flagString, bool state) {
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)
 EVT_SIZE(FlagListBox::OnSize)
 END_EVENT_TABLE()
+
+bool FlagListBox::SetFlagSet(wxString setToFind) {
+	if ( this->flagSets.GetCount() == 0 ) {
+		this->generateFlagSets();
+	}
+	FlagSetsList::const_iterator flagSetsIter =
+		this->flagSets.begin();
+	FlagSet* sets = NULL; 
+	while(flagSetsIter != this->flagSets.end()) {
+		if ( (*flagSetsIter)->Name.StartsWith(setToFind) ) {
+			sets = *flagSetsIter;
+		}
+		flagSetsIter++;
+	}
+	if ( sets == NULL ) {
+		// never found the set
+		return false;
+	}
+
+	wxArrayString::const_iterator disableIter =
+		sets->FlagsToDisable.begin();
+	while ( disableIter != sets->FlagsToDisable.end() ) {
+		this->SetFlag(*disableIter, false);
+		disableIter++;
+	}
+	wxArrayString::const_iterator enableIter =
+		sets->FlagsToEnable.begin();
+	while ( enableIter != sets->FlagsToEnable.end() ) {
+		this->SetFlag(*enableIter, true);
+		enableIter++;
+	}
+	return true;
+}
+
+void FlagListBox::generateFlagSets() {
+	this->flagSets.clear();
+	// \todo include the flag sets of the mod.inis as well
+
+	// custom
+	{
+		FlagSet* flagSetCustom = new FlagSet(_("Custom"));
+		this->flagSets.Append(flagSetCustom);
+	}
+	// the easy flags.
+	wxUint32 counter = 0;
+	wxArrayString::const_iterator easyIter =
+		this->easyflags.begin();
+	while ( easyIter != this->easyflags.end() ) {
+		wxString easyFlag = *easyIter;
+
+		if ( easyFlag.StartsWith(_T("Custom")) ) {
+			// do nothing, we already have a custom
+		} else {
+			FlagSet* flagSet = new FlagSet(easyFlag);
+			FlagCategoryList::const_iterator catIter =
+				this->allSupportedFlagsByCategory.begin();
+
+			while ( catIter != this->allSupportedFlagsByCategory.end() ) {
+				FlagList::const_iterator flagIter =
+					(*catIter)->flags.begin();
+
+				while ( flagIter != (*catIter)->flags.end() ) {
+					Flag* flag = *flagIter;
+
+					if ( !flag->flagString.IsEmpty()
+						&& (flag->easyEnable & counter) > 0 ) {
+						flagSet->FlagsToEnable.Add(flag->flagString);
+					}
+					if ( !flag->flagString.IsEmpty()
+						&& (flag->easyDisable & counter) > 0 ) {
+						flagSet->FlagsToDisable.Add(flag->flagString);
+					}
+					flagIter++;
+				}
+				catIter++;
+			}
+			this->flagSets.Append(flagSet);
+		}
+
+		if (counter < 1) {
+			counter = 2; // prime the counter so we can bitshift for the rest
+		} else {
+			counter = counter << 1;
+		}
+		if ( counter > (1 << 31) ) {
+			// we have checked 31 bits of counter, this is too many easy flag sets
+			easyIter = this->easyflags.end();
+			wxLogError(_T("FSO executable has more than 31 easy flag categories"));
+		} else {
+			easyIter++;
+		}
+	}
+}
+
+wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
+	if ( this->flagSets.size() == 0 ) {
+		this->generateFlagSets();
+	}
+	FlagSetsList::const_iterator flagSetsIter =
+		this->flagSets.begin();
+	while ( flagSetsIter != this->flagSets.end() ) {
+		arr.Add((*flagSetsIter)->Name);
+		flagSetsIter++;
+	}
+	return arr;
+}

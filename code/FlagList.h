@@ -16,6 +16,8 @@ public:
 	wxCheckBox *checkbox;
 	wxSizer* checkboxSizer;
 	bool isRecomendedFlag;
+	wxUint32 easyEnable;
+	wxUint32 easyDisable;
 };
 
 WX_DECLARE_LIST(Flag, FlagList);
@@ -28,6 +30,16 @@ public:
 };
 
 WX_DECLARE_LIST(FlagCategory, FlagCategoryList);
+
+class FlagSet {
+public:
+	FlagSet(wxString Name);
+	wxString Name;
+	wxArrayString FlagsToEnable;
+	wxArrayString FlagsToDisable;
+};
+
+WX_DECLARE_LIST(FlagSet, FlagSetsList);
 
 class FlagListBox: public wxVListBox {
 public:
@@ -44,6 +56,12 @@ public:
 	/** Tries to find flagString in the list of flags and set it to state,
 	returns true on successful set, returns false if cannot find flag. */
 	bool SetFlag(wxString flagString, bool state);
+	/** Tries to find the flagSet specified and then set or unset all flags
+	contained in the flag set, returns true on success, returns false
+	iff it cannot find the flagset.  That is, will return true if none of
+	the flags in the flag set are real flags. */
+	bool SetFlagSet(wxString flagSet);
+	wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr);
 
 private:
 	SkinSystem* skin;
@@ -62,6 +80,8 @@ private:
 	DrawStatus ParseFlagFile(wxFileName &flagfile);
 
 	wxArrayString easyflags;
+	FlagSetsList flagSets;
+	void generateFlagSets();
 
 	FlagCategoryList allSupportedFlagsByCategory;
 
