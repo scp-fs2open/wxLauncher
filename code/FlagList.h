@@ -61,7 +61,7 @@ public:
 	iff it cannot find the flagset.  That is, will return true if none of
 	the flags in the flag set are real flags. */
 	bool SetFlagSet(wxString flagSet);
-	wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr);
+	wxArrayString& GetFlagSets(wxArrayString &arr);
 
 private:
 	SkinSystem* skin;
