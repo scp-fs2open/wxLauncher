@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(wxlauncher CXX)
 SET(VERSION_MAJOR 0)
-SET(VERSION_MINOR 6)
+SET(VERSION_MINOR 7)
 SET(VERSION_PATCH 0)
 
 find_package(wxWidgets 2.8.10
