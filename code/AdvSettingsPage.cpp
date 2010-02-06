@@ -14,12 +14,14 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	this->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
 	TCManager::RegisterTCBinaryChanged(this);
+	TCManager::RegisterTCSelectedModChanged(this);
 	wxCommandEvent nullEvent;
 	this->OnExeChanged(nullEvent);	
 }
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
@@ -112,13 +114,25 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flag box"));
 
-	wxString cmdLine = wxString::Format(_T("%s %s"),
+	wxString tcPath, exeName, modline;
+	ProMan::GetProfileManager()->Get()->
+		Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+	ProMan::GetProfileManager()->Get()->
+		Read(PRO_CFG_TC_CURRENT_BINARY, &exeName);
+	ProMan::GetProfileManager()->Get()->
+		Read(PRO_CFG_TC_CURRENT_MODLINE, &modline);
+
+	wxString flagLine = wxString::Format(_T("%s %s"),
 		this->flagListBox->GenerateStringList().c_str(),
 		customFlags->GetLabel().c_str());
+
+	wxString cmdLine = wxString::Format(_T("%s%c%s -mod %s %s"),
+		tcPath.c_str(), wxFileName::GetPathSeparator(), exeName.c_str(),
+		modline.c_str(), flagLine.c_str());
 	
 	commandLine->SetLabel(cmdLine);
 	ProMan::GetProfileManager()->Get()->
-		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, cmdLine);
+		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
 
 void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
