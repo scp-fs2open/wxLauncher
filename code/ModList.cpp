@@ -154,13 +154,17 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		wxArrayString tokens = wxStringTokenize(foundInis.Item(i), _T("\\/"),
 			wxTOKEN_STRTOK); /* breakup on folder markers and never return an
 							 empty string. */
+		wxArrayString tcTokens = wxStringTokenize(tcPath, _T("\\/"), wxTOKEN_STRTOK);
 
-		wxASSERT_MSG( tokens.GetCount() >= 2,
-			wxString::Format(
-			_T("Path '%s' does not seems to have enough directory markers."),
-			foundInis.Item(i).c_str())
-		);
-		wxString shortname = tokens[tokens.GetCount() - 2];
+		size_t j = tcTokens.GetCount();
+		wxString shortname;
+		while ( j < (tokens.GetCount() - 1) ) { // -1 to skip mod.ini
+			if ( !shortname.IsEmpty() ) {
+				shortname += _T("/");
+			}
+			shortname += tokens[j];
+			j++;
+		}
 
 		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
 
