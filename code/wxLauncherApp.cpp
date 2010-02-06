@@ -33,6 +33,14 @@ bool wxLauncher::OnInit() {
 	  wxLogFatalError(_T("SDL_InitSubSystem failed"));
 	}
 #endif
+	// Little hack to deal with people starting the launcher from the bin folder
+	wxFileName resourceDir(_T(RESOURCES_PATH));
+	if ( !resourceDir.DirExists() ) {
+		resourceDir.PrependDir(_T(".."));
+		if ( resourceDir.DirExists() ) {
+			::wxSetWorkingDirectory(_T(".."));
+		}
+	}
 
 	wxBitmap splash;
 	wxSplashScreen* splashWindow = NULL;
