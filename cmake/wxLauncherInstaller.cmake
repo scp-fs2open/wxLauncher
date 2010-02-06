@@ -16,6 +16,11 @@ IF(WIN32) # and WIN64
     FIND_FILE(VC9_RUNTIME_manifest Microsoft.VC90.DebugCRT.manifest 
       PATHS ${VC9_RUNTIME_LOCATIONS})
     INSTALL(FILES ${VC9_RUNTIME_manifest} DESTINATION bin)
+    FIND_FILE(wxLauncher_pdb wxlauncher.pdb PATHS ${CMAKE_CURRENT_BINARY_DIR})
+    INSTALL(FILES ${wxLauncher_pdb} DESTINATION bin)
+    FIND_FILE(registry_helper_pdb registry_helper.pdb PATHS ${CMAKE_CURRENT_BINARY_DIR})
+    INSTALL(FILES ${registry_helper_pdb} DESTINATION bin)
+    
   ELSE()
     SET(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT")
     FIND_FILE(VC9_RUNTIME_msvcm90 msvcm90.dll 
