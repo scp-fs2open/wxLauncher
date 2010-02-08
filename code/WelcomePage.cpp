@@ -73,7 +73,7 @@ EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_DELETE_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_SAVE_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_CHECKBOX(ID_SAVE_DEFAULT_CHECK, WelcomePage::SaveDefaultChecked)
-EVT_COMBOBOX(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
+EVT_CHOICE(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
 
 EVT_CHECKBOX(ID_NET_DOWNLOAD_NEWS, WelcomePage::OnDownloadNewsCheck)
 
