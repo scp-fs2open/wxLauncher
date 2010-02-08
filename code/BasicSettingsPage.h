@@ -46,6 +46,8 @@ public:
 	void OnCalibrateJoystick(wxCommandEvent& event);
 	void OnDetectJoystick(wxCommandEvent& event);
 
+	void ProfileChanged(wxCommandEvent& event);
+
 private:
 	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	void FillResolutionDropBox(wxChoice* exeChoice);
