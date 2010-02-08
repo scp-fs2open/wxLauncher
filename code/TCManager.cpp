@@ -48,7 +48,7 @@ TCManager* TCManager::Get() {
 ///////////////////////////////////////////////////////////////////////////////
 ///// Events
 BEGIN_EVENT_TABLE(TCManager, wxEvtHandler)
-EVT_COMMAND(wxID_ANY, EVT_PROFILE_CHANGE, TCManager::CurrentProfileChanged)
+EVT_COMMAND(wxID_ANY, EVT_CURRENT_PROFILE_CHANGED, TCManager::CurrentProfileChanged)
 END_EVENT_TABLE()
 
 DEFINE_EVENT_TYPE(EVT_TC_CHANGED);
