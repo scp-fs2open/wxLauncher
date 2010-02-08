@@ -31,7 +31,7 @@ public:
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
-	bool NeedToPromptToSave() { return this->isAutoSaving; };
+	inline bool NeedToPromptToSave() { return !this->isAutoSaving; };
 	void SetAutoSave(bool value) { this->isAutoSaving = value; };
 
 	void AddEventHandler(wxEvtHandler *handler);
