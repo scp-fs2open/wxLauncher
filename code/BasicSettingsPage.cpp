@@ -53,8 +53,18 @@ public:
 		
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
-	ProMan* proman = ProMan::GetProfileManager();
 	TCManager::Initialize();
+	ProMan::GetProfileManager()->AddEventHandler(this);
+	wxCommandEvent event(this->GetId());
+	this->ProfileChanged(event);
+}
+
+void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
+	if (this->GetSizer() != NULL) {
+		this->GetSizer()->DeleteWindows();
+	}
+
+	ProMan* proman = ProMan::GetProfileManager();
 	// exe Selection
 	wxString tcfolder, binary;
 	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
@@ -538,6 +548,9 @@ EVT_CHECKBOX(ID_JOY_FORCE_FEEDBACK, BasicSettingsPage::OnCheckForceFeedback)
 EVT_CHECKBOX(ID_JOY_DIRECTIONAL_HIT, BasicSettingsPage::OnCheckDirectionalHit)
 EVT_BUTTON(ID_JOY_CALIBRATE_BUTTON, BasicSettingsPage::OnCalibrateJoystick)
 EVT_BUTTON(ID_JOY_DETECT_BUTTON, BasicSettingsPage::OnDetectJoystick)
+
+// Profile
+EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, BasicSettingsPage::ProfileChanged)
 
 END_EVENT_TABLE()
 
