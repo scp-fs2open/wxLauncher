@@ -63,6 +63,8 @@ public:
 	bool SetFlagSet(wxString flagSet);
 	wxArrayString& GetFlagSets(wxArrayString &arr);
 
+	bool IsDrawOK();
+
 private:
 	SkinSystem* skin;
 	enum DrawStatus {
