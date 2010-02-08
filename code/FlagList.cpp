@@ -541,3 +541,9 @@ wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
 	}
 	return arr;
 }
+
+/** returns true when the FlagList will draw the the actual list,
+false when the FlagList is showing an error message. */
+bool FlagListBox::IsDrawOK() {
+	return (this->drawStatus == DRAW_OK);
+}
