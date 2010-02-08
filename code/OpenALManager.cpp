@@ -21,7 +21,9 @@ using namespace OpenALMan;
 
 bool OpenALMan::Initialize() {
 #if USE_OPENAL
-	if ( OpenALLib.Load(_T("OpenAL32")) ) {
+	if ( isInitialized ) {
+		return true;
+	} else if ( OpenALLib.Load(_T("OpenAL32")) ) {
 		isInitialized = true;
 		return true;
 	} else if ( OpenALLib.Load(_T("libopenal")) ) {
