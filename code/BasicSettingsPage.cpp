@@ -38,16 +38,17 @@ private:
 class ExeChoice: public wxChoice {
 public:
 	ExeChoice(wxWindow * parent, wxWindowID id) : wxChoice(parent, id) {}
-	void FindAndSetSelectionWithClientData(wxString item) {
+	bool FindAndSetSelectionWithClientData(wxString item) {
 		size_t number = this->GetStrings().size();
 		for( size_t i = 0; i < number; i++ ) {
 			FSOExecutable* data = dynamic_cast<FSOExecutable*>(this->GetClientObject(i));
 			wxCHECK2_MSG( data != NULL, continue, _T("Client data is not a FSOVersion pointer"));
 			if ( data->GetExecutableName() == item ) {
 				this->SetSelection(i);
-				return;
+				return true;
 			}
 		}
+		return false;
 	}
 };
 		
@@ -591,12 +592,14 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 
 Currently function only changes the executable dropbox control (clearing, and 
 filling in the executables that are in the new TC folder) and removes the
-currently select executable from the active profile (thus disabling the play
-button).
+currently select executable from the active profile only if the executable
+specified in the profile does not exist in the TC.
+
+\note clearing the selected executable disables the play button.
 \note Emits a EVT_TC_BINARY_CHANGED in any case.*/
 void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
-	wxChoice *exeChoice = dynamic_cast<wxChoice*>(
+	ExeChoice *exeChoice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
 	wxCHECK_RET( exeChoice != NULL, 
 		_T("Cannot find executable choice control"));
@@ -606,11 +609,8 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( tcFolder != NULL, 
 		_T("Cannot find Text Control to show folder in."));
 
-	wxString tcPath;
+	wxString tcPath, binaryName;
 	exeChoice->Clear();
-	ProMan::GetProfileManager()
-		->Get()
-			->DeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
 
 	if ( ProMan::GetProfileManager()->Get()
 			->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
@@ -618,6 +618,15 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
 		exeChoice->Enable();
+
+		/* check to see if the exe listed in the profile actually does exist in
+		the list */
+		ProMan::GetProfileManager()->Get()
+			->Read(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
+		if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
+			ProMan::GetProfileManager()->Get()
+				->DeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+		}
 	}
 	this->GetSizer()->Layout();
 	TCManager::GenerateTCBinaryChanged();
