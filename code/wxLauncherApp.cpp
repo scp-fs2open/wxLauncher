@@ -34,11 +34,14 @@ bool wxLauncher::OnInit() {
 	}
 #endif
 	// Little hack to deal with people starting the launcher from the bin folder
-	wxFileName resourceDir(_T(RESOURCES_PATH));
-	if ( !resourceDir.DirExists() ) {
-		resourceDir.PrependDir(_T(".."));
+	if ( !wxFileName::DirExists(_T(RESOURCES_PATH)) ) {
+		wxFileName resourceDir;
+		resourceDir.AssignDir(::wxGetCwd());
+		resourceDir.AppendDir(_T(".."));
+		resourceDir.AppendDir(_T(RESOURCES_PATH));
 		if ( resourceDir.DirExists() ) {
-			::wxSetWorkingDirectory(_T(".."));
+			wxFileName newWorkingDir(::wxGetCwd(), _T(".."));
+			::wxSetWorkingDirectory(newWorkingDir.GetFullPath());
 		}
 	}
 
@@ -53,7 +56,13 @@ bool wxLauncher::OnInit() {
 #endif
 		wxYield();
 	} else {
-		wxLogFatalError(_T("Unable to load splash image, this normally means that you are running the Launcher from a directory that does not have the images in it."));
+		wxFileName expectedDir(::wxGetCwd(), _T(RESOURCES_PATH));
+		wxLogFatalError(wxString::Format(
+			_T("Unable to load splash image, ")
+			_T("this normally means that you are running the Launcher from a directory")
+			_T(" that the launcher does not know how to find the resource directory from.")
+			_T("\n\nThe Launcher is expecting (%s) to contain the resource images."),
+			expectedDir.GetFullPath().c_str()).c_str());
 		return false;
 	}
 	
