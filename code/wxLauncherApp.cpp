@@ -12,13 +12,13 @@
 
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
-#include "Skin.h"
-#include "Logger.h"
-#include "version.h"
-#include "ProfileManager.h"
-#include "HelpManager.h"
+#include "apis/SkinManager.h"
+#include "controls/Logger.h"
+#include "global/version.h"
+#include "apis/ProfileManager.h"
+#include "apis/HelpManager.h"
 
-#include "wxLauncherSetup.h" // Last include for memory debugging
+#include "global/MemoryDebugging.h" // Last include for memory debugging
 
 IMPLEMENT_APP(wxLauncher);
 
