@@ -52,9 +52,10 @@ if(UNIX)
 endif()
 
 INCLUDE(${wxWidgets_USE_FILE})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
-  code/Win32ProfileManager.cpp platform/win32/registry_helper.cpp)
+  code/apis/Win32ProfileManager.cpp platform/win32/registry_helper.cpp)
 SET_TARGET_PROPERTIES(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX)
   SET_TARGET_PROPERTIES(registry_helper PROPERTIES LINK_FLAGS /MANIFESTUAC:NO)
@@ -73,39 +74,113 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocation})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
 SET_SOURCE_FILES_PROPERTIES(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
-if(WIN32)
-SET(PLATFORM_PROFILE_MANAGER code/Win32ProfileManager.cpp)
-else()
-SET(PLATFORM_PROFILE_MANAGER code/UnixProfileManager.cpp)
-endif()
 
-add_executable(wxlauncher WIN32 MACOSX_BUNDLE
+if(WIN32)
+SET(WIN32_PROFILE_MANAGER code/apis/Win32ProfileManager.cpp)
+else()
+SET(WIN32_PROFILE_MANAGER code/apis/UnixProfileManager.cpp)
+endif()
+SET(TAB_CODE_FILES
+  code/tabs/AdvSettingsPage.h
+  code/tabs/AdvSettingsPage.cpp
+  code/tabs/BasicSettingsPage.h
+  code/tabs/BasicSettingsPage.cpp
+  code/tabs/InstallPage.h
+  code/tabs/InstallPage.cpp
+  code/tabs/ModsPage.h
+  code/tabs/ModsPage.cpp
+  code/tabs/WelcomePage.h
+  code/tabs/WelcomePage.cpp
+  )
+SOURCE_GROUP(Tabs FILES ${TAB_CODE_FILES})
+SET(GUI_CONTROL_CODE_FILES
+  code/controls/BottomButtons.h
+  code/controls/BottomButtons.cpp
+  code/controls/FlagList.h
+  code/controls/FlagList.cpp
+  code/controls/Logger.h
+  code/controls/Logger.cpp
+  code/controls/ModList.h
+  code/controls/ModList.cpp
+  code/controls/StatusBar.h
+  code/controls/StatusBar.cpp
+  )
+SOURCE_GROUP("GUI Controls" FILES ${GUI_CONTROL_CODE_FILES})
+SET(GLOBAL_CODE_FILES
+  code/global/configure_launcher.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
+  code/global/ids.h
+  code/global/MemoryDebugging.h
+  code/global/targetver.h
+  code/global/version.h
+  code/global/version.cpp
+)
+SOURCE_GROUP(Global FILES ${GLOBAL_CODE_FILES})
+SET(DATASTRUCTURE_CODE_FILES
+  code/datastructures/FlagInfo.cpp
+  code/datastructures/FSOExecutable.h
+  code/datastructures/FSOExecutable.cpp
+  )
+SOURCE_GROUP("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
+SET(API_CODE_FILES
+  code/apis/HelpManager.h
+  code/apis/HelpManager.cpp
+  code/apis/JoystickManager.h
+  code/apis/JoystickManager.cpp
+  code/apis/OpenALManager.h
+  code/apis/OpenALManager.cpp
+  code/apis/ProfileManager.h
+  code/apis/ProfileManager.cpp
+  code/apis/SkinManager.h
+  code/apis/SkinManager.cpp
+  code/apis/SpeechManager.h
+  code/apis/SpeechManager.cpp
+  code/apis/TCManager.h
+  code/apis/TCManager.cpp
+  code/apis/PlatformProfileManager.h
+  ${WIN32_PROFILE_MANAGER}
+  )
+SOURCE_GROUP(Apis FILES ${API_CODE_FILES})
+SET(RESOURCE_FILES
+  platform/win32/wxlauncher.rc
   ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   ${helphtblocation}
-  code/AdvSettingsPage.cpp code/BasicSettingsPage.cpp
-  code/BottomButtons.cpp code/version.cpp
-  code/FlagList.cpp code/FSOExecutable.cpp
-  code/HelpManager.cpp code/InstallPage.cpp
-  code/JoystickManager.cpp code/Logger.cpp
-  code/MainWindow.cpp code/ModList.cpp
-  code/ModsPage.cpp code/OpenALManager.cpp
-  code/ProfileManager.cpp code/Skin.cpp
-  code/SpeechManager.cpp code/StatusBar.cpp
-  code/TCManager.cpp code/WelcomePage.cpp
-  code/WelcomePage.cpp ${PLATFORM_PROFILE_MANAGER}
-  code/wxLauncherApp.cpp platform/win32/wxlauncher.rc)
+  )
+SOURCE_GROUP(Resources FILES ${RESOURCE_FILES})
+SET(CODE_FILES
+  code/MainWindow.h
+  code/MainWindow.cpp
+  code/wxLauncherApp.h
+  code/wxLauncherApp.cpp
+  )
+SOURCE_GROUP("Main Code Files" FILES ${CODE_FILES})
+
+add_executable(wxlauncher WIN32 MACOSX_BUNDLE
+  ${TAB_CODE_FILES}
+  ${GUI_CONTROL_CODE_FILES}
+  ${GLOBAL_CODE_FILES}
+  ${DATASTRUCTURE_CODE_FILES}
+  ${API_CODE_FILES}
+  ${RESOURCE_FILES}
+  ${CODE_FILES}
+  )
 SET_TARGET_PROPERTIES(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
+# Files that are not to be complied directly
+SET_SOURCE_FILES_PROPERTIES(
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp   
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb 
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h 
+  code/datastructures/FlagInfo.cpp
+  code/global/configure_launcher.h.in
   PROPERTIES HEADER_FILE_ONLY true)
 ADD_DEPENDENCIES(wxlauncher helpmaker version.cpp.maker)
 if(WIN32)
 ADD_DEPENDENCIES(wxlauncher registry_helper)
 endif(WIN32)
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/code/configure_launcher.h.in 
+CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h)
 
 foreach(temp_file ${helpmaker_temp_files})

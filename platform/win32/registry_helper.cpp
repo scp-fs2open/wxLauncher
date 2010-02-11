@@ -1,5 +1,5 @@
-#include "../../code/ProfileManager.h"
-#include "../../code/PlatformProfileManager.h"
+#include "apis/ProfileManager.h"
+#include "apis/PlatformProfileManager.h"
 
 #include <wx/cmdline.h>
 #include <wx/filename.h>

@@ -5,7 +5,7 @@
 #include <wx/notebook.h>
 #include <wx/toolbook.h>
 #include <wx/process.h>
-#include "Skin.h"
+#include "apis/SkinManager.h"
 
 class MainWindow: public wxFrame {
 public:

@@ -1,7 +1,7 @@
 #ifndef WXLAUNCHERAPP_H
 #define WXLAUNCHERAPP_H
 #include <wx/wx.h>
-#include "Skin.h"
+#include "apis/SkinManager.h"
 
 class wxLauncher: public wxApp {
 public:

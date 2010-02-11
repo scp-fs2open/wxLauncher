@@ -4,20 +4,20 @@
 #include <wx/imagpng.h>
 #include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
-#include "ids.h"
+#include "global/ids.h"
 #include "MainWindow.h"
-#include "WelcomePage.h"
-#include "ModsPage.h"
-#include "BasicSettingsPage.h"
-#include "AdvSettingsPage.h"
-#include "InstallPage.h"
-#include "BottomButtons.h"
-#include "Skin.h"
-#include "Logger.h"
-#include "StatusBar.h"
-#include "HelpManager.h"
+#include "tabs/WelcomePage.h"
+#include "tabs/ModsPage.h"
+#include "tabs/BasicSettingsPage.h"
+#include "tabs/AdvSettingsPage.h"
+#include "tabs/InstallPage.h"
+#include "controls/BottomButtons.h"
+#include "apis/SkinManager.h"
+#include "controls/Logger.h"
+#include "controls/StatusBar.h"
+#include "apis/HelpManager.h"
 
-#include "wxLauncherSetup.h" // Last include for memory debugging
+#include "global/MemoryDebugging.h" // Last include for memory debugging
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
 	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
