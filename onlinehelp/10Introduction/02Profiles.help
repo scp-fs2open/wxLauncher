@@ -1,7 +1,7 @@
 <title>Profiles</title>
 #Profiles
 
-Profiles are one of the bigget feature introduced by wxLauncher. It allows you to save various "snapshots" of the launcher settings, for ease of access. Think of them like the "save" feature in the modern games. You can save your current settings and restore them later.
+Profiles are one of the biggest features introduced by wxLauncher. It allows you to save various "snapshots" of the launcher settings, for ease of access. Think of them like the "save" feature in the modern games. You can save your current settings and restore them later.
 
 ###Why use profiles
 Since most of the available [MODs][mod]![][li]/[TCs][tc]![][li] use different settings to achieve the best experience for the player, the profiles feature was created in order to allow the player to quicly switch between settings for his/her MODs instead of manually having to set the various options that [FSO][]![][li] supports when switching to another MOD.
@@ -21,10 +21,7 @@ Basicly, a profile contains the following data:
 **What is not saved**: The Highlights autoupdate option and the proxy configuration
 
 ###Using the launcher without this feature
-While you cannot disable the profiles, you can make them function transparent to the user:
-
-* Select the profile "Default" in the profiles panel
-* Check the "Always save default profile" checkbox.
+While you cannot disable the profiles, you can make there function transparent to the user by just checking the "Automatically save profile" and never change the selected profile.
 
 Now, every change you make is automatically saved to the default profile. wxLauncher will behave from now on just like the old launcher did.
 
