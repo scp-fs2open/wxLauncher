@@ -21,6 +21,7 @@
 class ModInfoDialog: wxDialog {
 public:
 	ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent);
+	void OnLinkClicked(wxHtmlLinkEvent &event);
 
 private:
 	class ImageDrawer: public wxPanel {
@@ -945,6 +946,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 		(item->support != NULL) ?
 			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support->c_str(), _("Support")).c_str() : wxEmptyString
 		));
+	links->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ModInfoDialog::OnLinkClicked));
 
 	wxStaticBitmap* warning = NULL;
 	wxHtmlWindow* notesText = NULL;
@@ -982,6 +984,12 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	this->Layout();
 	this->CentreOnParent();
 	this->ShowModal();
+}
+
+void ModInfoDialog::OnLinkClicked(wxHtmlLinkEvent &event) {
+	wxHtmlLinkInfo info = event.GetLinkInfo();
+	wxString rest;
+	wxLaunchDefaultBrowser(info.GetHref());
 }
 
 ModInfoDialog::ImageDrawer::ImageDrawer(ModInfoDialog* parent):
