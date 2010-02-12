@@ -116,35 +116,44 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		char header[3];
 		stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
 		stream.SeekI(0);
+		bool isUTF8 = false;
 		if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
 			// is a UTF-8 file
-			config = new wxFileConfig(stream);
-		} else {
-			// Convert any input stream into UTF8 so that the wxFileConfig will not
-			// choke on the high ASCII characters.
-			wxMemoryOutputStream tempStream;
-			tempStream.Write(stream);
-
-			wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
-			size_t size = buf->GetBufferSize();
-
-			char* characterBuffer = new char[size+1];
-			characterBuffer[size] = '\0';
-
-			buf->Seek(0, wxFromStart);
-			size_t read = buf->Read(reinterpret_cast<void*>(characterBuffer), size);
-			if ( read != size ) {
-				wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
-				delete[] characterBuffer;
-				continue;
-			}
-
-			wxString stringBuffer(characterBuffer, wxConvLocal);
-			wxStringInputStream finalBuffer(stringBuffer);
-
-			config = new wxFileConfig(finalBuffer);
-			delete[] characterBuffer;
+			isUTF8 = true;
 		}
+		wxMemoryOutputStream tempStream;
+		tempStream.Write(stream);
+
+		wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
+		size_t size = buf->GetBufferSize();
+
+		char* characterBuffer = new char[size+1];
+		characterBuffer[size] = '\0';
+
+		buf->Seek(0, wxFromStart);
+		size_t read = buf->Read(reinterpret_cast<void*>(characterBuffer), size);
+		if ( read != size ) {
+			wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+			delete[] characterBuffer;
+			continue;
+		}
+
+		wxMBConv* conv;
+		if ( isUTF8 ) {
+			conv = new wxMBConvUTF8();
+		} else {
+			conv = new wxCSConv(wxFONTENCODING_ISO8859_1);
+		}
+		wxString stringBuffer(characterBuffer, *conv);
+		delete conv;
+		// A hack to insert a backslash into the stream so that when
+		// wxFileConfig excapes the backslashes the one that is in 
+		// the file is returned
+		stringBuffer.Replace(_T("\\"), _T("\\\\"));
+		wxStringInputStream finalBuffer(stringBuffer);
+
+		config = new wxFileConfig(finalBuffer);
+		delete[] characterBuffer;
 
 		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
 
