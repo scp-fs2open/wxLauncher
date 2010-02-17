@@ -8,7 +8,10 @@ SET(CMAKE_OSX_ARCHITECTURES i386)
 
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv qa richtext)
-include(FindPythonInterp) #PYTHON_EXECUTABLE
+if(NOT PYTHON_EXECTUABLE)
+  # Only try to find python iff not already given
+  include(FindPythonInterp) #PYTHON_EXECUTABLE
+endif()
 find_program(hg_binary hg)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
