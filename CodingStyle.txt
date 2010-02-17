@@ -12,16 +12,10 @@ as the line endings in all files. This
 line ending style is also known as the
 Unix style line ending.  This means
 all linux and OSX coders should have:
-    [extensions]
-    hgext.win32text = !
-    [encode]
-    ** = !
-    [decode]
-    ** = !
     [hooks]
     pretxncommit.crlf = python:hgext.win32text.forbidcrlf
     [patch]
-    eol = crlf
+    eol = lf
 as in their .hgrc files. The setting 
 can be set in either the ~/.hgrc or
 in the <wxlauncher dir>/.hg/.hgrc.
@@ -30,17 +24,11 @@ mercurial to automaticilly convert line
 endings.
 
 All windows users should set:
-    [extensions]
-    hgext.win32text =
-    [encode]
-    ** = cleverencode:
-    [decode]
-    ** = cleverencode:
     [hooks]
     # make sure that crlf's do not get committed.
     pretxncommit.crlf = python:hgext.win32text.forbidcrlf
     [patch]
-    eol = crlf
+    eol = lf
 in their Mercurial.ini file (located
 in the user profile) or in the 
 <wxlauncher dir>/.hg/.hgrc file.
