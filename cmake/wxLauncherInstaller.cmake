@@ -106,7 +106,9 @@ if(WIN32)
   install(TARGETS registry_helper RUNTIME DESTINATION bin)
   install(TARGETS wxlauncher RUNTIME DESTINATION bin)
 else()  
-  install(TARGETS wxlauncher RUNTIME DESTINATION local/bin)
+  install(TARGETS wxlauncher 
+	RUNTIME DESTINATION local/bin
+	BUNDLE DESTINATION bin)
 endif()
 if(WIN32)
 install(DIRECTORY resources/ DESTINATION resources)
