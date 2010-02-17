@@ -1,5 +1,6 @@
-import os.path
 import logging
+import os
+import os.path
 
 def update_attribute(attributes, name, value):
   """Finds the attribute name and sets it to value in the attributes tuple of tuples, returns the attributes tuple of tuples with the changed attribute."""
@@ -63,3 +64,28 @@ def change_filename(filename, newext, orginaldir, destdir, makedirs=True):
     return outfile_name
   else:
     return "#".join([outfile_name, anchor])
+    
+def make_directory_for_filename(filename):
+  """Returns False if direcotry for filename already exists, True if
+  function was successfully able to create the directory, or raises
+  and exception for the error."""
+  path = os.path.dirname(filename)
+  if os.path.exists(path):
+    if os.path.isdir(path):
+      return False
+    else:
+      raise ExistsButNotDirectoryError(path)
+  else:
+    # only remaing exception to throw is if the user does not have permission
+    try:
+      os.makedirs(path)
+      return True
+    except:
+      raise
+
+class ExistsButNotDirectoryError(IOError):
+  def __init__(self, path="Not Specified"):
+    self.path = path
+    
+  def __str__():
+    return "Path (%s) exists but is not a directory!"
