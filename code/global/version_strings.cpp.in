@@ -1,0 +1,2 @@
+const wchar_t *HGVersion = L"123456789abc+ unknown custom tip";
+const wchar_t *HGDate = L"Thu Jan 01 00:00:00 1970 -0000";
