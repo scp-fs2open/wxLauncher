@@ -13,7 +13,8 @@ if(NOT PYTHON_EXECUTABLE)
   # Only try to find python iff not already given
   include(FindPythonInterp) #PYTHON_EXECUTABLE
 endif()
-find_program(hg_binary hg)
+
+find_program(HG_EXECUTABLE hg)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
@@ -70,7 +71,7 @@ TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
 add_custom_target(version.cpp.maker ALL
-  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp ${hg_binary}
+  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp --hgpath=${HG_EXECUTABLE}
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
 
