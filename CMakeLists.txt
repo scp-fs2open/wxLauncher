@@ -4,6 +4,8 @@ SET(VERSION_MAJOR 0)
 SET(VERSION_MINOR 7)
 SET(VERSION_PATCH 3)
 
+SET(CMAKE_OSX_ARCHITECTURES i386)
+
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv qa richtext)
 include(FindPythonInterp) #PYTHON_EXECUTABLE
