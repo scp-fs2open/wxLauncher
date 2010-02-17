@@ -7,6 +7,7 @@ SET(VERSION_PATCH 3)
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv qa richtext)
 include(FindPythonInterp) #PYTHON_EXECUTABLE
+find_program(hg_binary hg)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
@@ -63,7 +64,7 @@ TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
 add_custom_target(version.cpp.maker ALL
-  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp
+  COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp ${hg_binary}
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
 

@@ -91,7 +91,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	size_t bytesRead;
 
 	bytesRead = flagfile.Read(&easy_flag_size, sizeof(easy_flag_size));
-	if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag_size) ) {
+	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag_size) ) {
 		wxLogError(_T(" Flag file is too short (failed to read easy_flag_size)"));
 		return FLAG_FILE_NOT_VALID;
 	}
@@ -101,7 +101,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	}
 
 	bytesRead = flagfile.Read(&flag_size, sizeof(flag_size));
-	if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_size) ) {
+	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_size) ) {
 		wxLogError(_T(" Flag file is too short (failed to read flag_size)"));
 		return FLAG_FILE_NOT_VALID;
 	}
@@ -111,7 +111,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	}
 
 	bytesRead = flagfile.Read(&num_easy_flags, sizeof(num_easy_flags));
-	if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(num_easy_flags) ) {
+	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(num_easy_flags) ) {
 		wxLogError(_T(" Flag file is too short (failed to read num_easy_flags)"));
 		return FLAG_FILE_NOT_VALID;
 	}
@@ -119,7 +119,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	for ( int i = 0; i < num_easy_flags; i++ ) {
 		char easy_flag[32];
 		bytesRead = flagfile.Read(&easy_flag, sizeof(easy_flag));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_flag)"), sizeof(easy_flag), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
@@ -128,7 +128,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	}
 
 	bytesRead = flagfile.Read(&num_flags, sizeof(num_flags));
-	if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(num_flags) ) {
+	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(num_flags) ) {
 		wxLogError(_T(" Flag file is too short (failed to read num_flags)"));
 		return FLAG_FILE_NOT_VALID;
 	}
@@ -140,43 +140,43 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		char easy_catagory[16], web_url[256];
 
 		bytesRead = flagfile.Read(&flag_string, sizeof(flag_string));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_string) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_string) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (flag_string)"), sizeof(flag_string), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&description, sizeof(description));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(description) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(description) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (description)"), sizeof(description), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&fso_only, sizeof(fso_only));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(fso_only) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(fso_only) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (fso_only)"), sizeof(fso_only), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&easy_on_flags, sizeof(easy_on_flags));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_on_flags) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_on_flags) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_on_flags)"), sizeof(easy_on_flags), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&easy_off_flags, sizeof(easy_off_flags));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_off_flags) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_off_flags) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_off_flags)"), sizeof(easy_off_flags), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&easy_catagory, sizeof(easy_catagory));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_catagory) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_catagory) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_catagory)"), sizeof(easy_catagory), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 
 		bytesRead = flagfile.Read(&web_url, sizeof(web_url));
-		if ( wxInvalidOffset == bytesRead || bytesRead != sizeof(web_url) ) {
+		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(web_url) ) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (web_url)"), sizeof(web_url), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
@@ -237,7 +237,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 	wxByte buildCaps;
 	bytesRead = flagfile.Read(&buildCaps, sizeof(buildCaps));
-	if ( wxInvalidOffset == bytesRead ) {
+	if ( (size_t)wxInvalidOffset == bytesRead ) {
 		wxLogInfo(_T(" Old build that does not output its capabilities, must not support openAL"));
 		buildCaps = 0;
 	}
@@ -519,7 +519,7 @@ void FlagListBox::generateFlagSets() {
 		} else {
 			counter = counter << 1;
 		}
-		if ( counter > (1 << 31) ) {
+		if ( counter > (wxUint32)(1 << 31) ) {
 			// we have checked 31 bits of counter, this is too many easy flag sets
 			easyIter = this->easyflags.end();
 			wxLogError(_T("FSO executable has more than 31 easy flag categories"));
