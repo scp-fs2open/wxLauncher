@@ -1,21 +1,23 @@
 import subprocess, sys, os, tempfile, string, os.path
 
+HGLOC=4
 WORKFILE=3
 OUTFILE=2
 JOB=1
 
 def main():
-  if (len(sys.argv) < 4):
+  if (len(sys.argv) < 5):
     print "Output file not specifed!"
     sys.exit(1)
     
   work = os.path.normcase(os.path.normpath(sys.argv[WORKFILE]))
   file = os.path.normcase(os.path.normpath(sys.argv[OUTFILE]))
-    
+  hgloc = os.path.normcase(os.path.normpath(sys.argv[HGLOC]))
+  
   if ( sys.argv[JOB] == "build" ):
-    build(file, work)
+    build(file, work, hgloc)
   elif ( sys.argv[JOB] == "rebuild" ):
-    rebuild(file, work)
+    rebuild(file, work, hgloc)
   elif ( sys.argv[JOB] == "clean" ):
     clean(file, work)
   else:
@@ -24,10 +26,10 @@ def main():
   
   sys.exit(0)
 
-def rebuild(file, work):
+def rebuild(file, work, hgloc):
   print "Rebuild...."
   clean(file, work)
-  build(file, work)
+  build(file, work, hgloc)
   
 def clean(file, work):
   print "Clean..."
@@ -45,13 +47,13 @@ def clean(file, work):
   except:
     print "Failed"
   
-def build(file, work):
+def build(file, work, hgloc):
   print "Building..."
-  if ( need_to_update(file, work) ):
+  if ( need_to_update(file, work, hgloc) ):
     print " Writing tempfile:", work
     make_directory_for_output(work)
     temp = open(work, "wb")
-    temp.write(get_hg_id())
+    temp.write(get_hg_id(hgloc))
     temp.flush()
     temp.close()
     
@@ -61,13 +63,16 @@ def build(file, work):
     out.write("const wchar_t *HGVersion = L\"")
     out.flush()
     
-    out.write(get_hg_id())
+    out.write(get_hg_id(hgloc))
     out.flush()
     
     out.write("\";\nconst wchar_t *HGDate = L\"")
     out.flush()
     
-    subprocess.Popen('hg parents --template {date|date}'.split(), stdout=out).wait()
+    cmd = '%s parents --template {date|date}' % (hgloc)
+    cmd = cmd.split()
+    print cmd
+    subprocess.Popen(cmd, stdout=out).wait()
     out.flush()
     
     out.write('";\n')
@@ -76,17 +81,20 @@ def build(file, work):
   else:
     print " Up to date"
     
-def get_hg_id():
+def get_hg_id(hgloc):
   id = tempfile.TemporaryFile()
-  subprocess.Popen("hg id -i -b -t".split(), stdout=id).wait()
+  s = "%s id -i -b -t" % (hgloc)
+  s = s.split()
+  print s
+  subprocess.Popen(s, stdout=id).wait()
   id.seek(0)
   return string.split(id.readline(), "\n")[0]
   
-def need_to_update(file, work):
+def need_to_update(file, work, hgloc):
   if ( os.path.exists(work) == True ):
     if ( os.path.exists(file) == True ):
       workfile = open(work, 'rb')
-      if ( workfile.readline() == get_hg_id() ):
+      if ( workfile.readline() == get_hg_id(hgloc) ):
         return False
       else:
         print "hg id changed"
