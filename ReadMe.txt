@@ -28,7 +28,7 @@ Building from source
 The wxLauncher requires the CMake build system to for building.
 CMake is a Cross-platform meta-build system (it makes the files
 that allow a platform native build system to build the 
-launcher).  CMake allows us to support your faviourte complier
+launcher).  CMake allows us to support your favourite complier
 from VS2005 and newer, XCode, KDevelop, and of course autotools.
 
 Requirements shortlist:
@@ -39,6 +39,10 @@ All platforms:
  - Markdown for Python
 Windows
  - Platform SDK
+Linux
+ - SDL 1.2
+OS X
+ - SDL 1.2
 
 Optional components
 All platforms:
@@ -69,9 +73,10 @@ Python Markdown homepage:
 	http://www.freewisdom.org/projects/python-markdown/
 
 The OpenAL Software Development Kit is an optional component
-needed to build this program.  OpenAL support is not
-compiled in by default and requires the preprocessor
-symbol USE_OPENAL=1.  See the compiler specific
+needed to build this program.  OpenAL support requires the 
+preprocessor symbol USE_OPENAL=1.  This symbol is set to 1 by
+default by CMake.  You can pass -DUSE_OPENAL=0 to CMake to
+disable building of OpenAL support.  See the compiler specific
 instructions for getting your compiler ready to build
 with OpenAL.
 OpenAL homepage:
@@ -79,7 +84,7 @@ OpenAL homepage:
 
 The Microsoft Windows SDK (formorly the Platform SDK) is
 required to build both this application and wxWidgets when
- on windows.  Note that only the Windows SDK for Windows
+ on Windows.  Note that only the Windows SDK for Windows
 Vista and Windows 7 have been tested with this application.
 
 wxLauncher has only been built with Microsoft's Visual Studio
@@ -135,6 +140,23 @@ Commandline
 - cd build
 - cmake -DUSE_OPENAL=1 ../
 
+Building - OS X 10.5 (Leopard)
+==============================
+Commandline
+-----------
+- Download the source
+- Download and install XCode 3.1 if not already installed, you will need a
+ Free Apple Developers Center login to download if Xcode in not on your
+ Install Disk.
+- Download and install Python 2.6
+- Download and install CMake 2.8
+- Download and install SDL 1.2 (follow instructions in the SDL ReadMe.txt)
+- (Optional) Download and install Mercurial (make sure you have the
+ correct download for your version of OS X, if you get an error about
+ python not being installed but you already have, you downloaded the 
+ version of Mercurial for your version of OS X)
+- Run CMake ( either using cmake or ccmake in the source directory or use Spotlight to find the CMake GUI)
+- Choose XCode as your generator.
 
 License
 =======
