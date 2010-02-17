@@ -42,6 +42,11 @@ bool JoyMan::IsInitialized() {
 */
 bool JoyMan::Initialize() {
 #if USE_JOYSTICK
+	if ( JoyMan::IsInitialized() ) {
+		wxLogDebug(_T("JoyMan already initialized with %d joysticks"),
+			joysticks.Count());
+		return true;
+	}
 	UINT num = joyGetNumDevs(); // get the number of joys supported by windows.
 	if ( num > 16 ) {
 		/* greater than 16 is cause for a warning because according to MSDN,
