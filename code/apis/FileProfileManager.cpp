@@ -3,10 +3,10 @@
 #include "apis/JoystickManager.h"
 #include "global/ids.h"
 
-ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
+ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	return ProMan::InvalidParameters;
 }
 
-ProMan::RegistryCodes PlatformPullProfile(wxFileConfig *cfg) {
+ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	return ProMan::InvalidParameters;
 }
