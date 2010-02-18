@@ -63,7 +63,7 @@ INCLUDE(${wxWidgets_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
-  code/apis/Win32ProfileManager.cpp platform/win32/registry_helper.cpp)
+  code/apis/RegistryProfileManager.cpp platform/win32/registry_helper.cpp)
 SET_TARGET_PROPERTIES(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX)
   SET_TARGET_PROPERTIES(registry_helper PROPERTIES LINK_FLAGS /MANIFESTUAC:NO)
@@ -94,9 +94,9 @@ file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmak
 SET_SOURCE_FILES_PROPERTIES(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
 
 if(WIN32)
-SET(WIN32_PROFILE_MANAGER code/apis/Win32ProfileManager.cpp)
+SET(WIN32_PROFILE_MANAGER code/apis/RegistryProfileManager.cpp)
 else()
-SET(WIN32_PROFILE_MANAGER code/apis/UnixProfileManager.cpp)
+SET(WIN32_PROFILE_MANAGER code/apis/FileProfileManager.cpp)
 endif()
 SET(TAB_CODE_FILES
   code/tabs/AdvSettingsPage.h
