@@ -209,4 +209,11 @@ TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
 
 # packaging
 SET(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
-INCLUDE(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
+
+if(DEVELOPMENT_MODE)
+  MESSAGE( "Development mode is set. Building of installers is not allowed.  Set DEVELOPMENT_MODE=OFF to build installers.")
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake COPYONLY)
+  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake COPYONLY)
+else()
+  INCLUDE(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
+endif()
