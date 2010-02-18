@@ -1,0 +1,1 @@
+MESSAGE(FATAL_ERROR "This build environment was configured using DEVELOPMENT_MODE=ON.  To build a package for wxLauncher regenerated environment using DEVELOPMENT_MODE=OFF")
