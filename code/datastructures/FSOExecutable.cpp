@@ -169,10 +169,11 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			ver.inferno = true;
 		} else if ( token.StartsWith(_T("debug")) ){
 			ver.debug = true;
-		} else if ( token.EndsWith(_T("t"), &temp) && temp.size() == 8 ) {
-			ver.string += token;
 		} else {
-			wxLogWarning(_T(" Got token I don't understand (%s)"), token.c_str());
+			if (!ver.string.IsEmpty()) {
+				ver.string += _T(" ");
+			}
+			ver.string += token;
 		}
 	}
 	if ( ver.string.StartsWith(_T("ant")) ) {
