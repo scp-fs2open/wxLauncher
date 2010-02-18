@@ -382,10 +382,10 @@ bool ProMan::DeleteProfile(wxString name) {
 /** Applies the passed wxFileConfig profile to the registry where 
 Freespace 2 can read it. */
 ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
-	return PlatformPushProfile(cfg);
+	return RegistryPushProfile(cfg);
 }
 
 /** Takes the settings in the registry and puts them into the wxFileConfig */
 ProMan::RegistryCodes ProMan::PullProfile(wxFileConfig *cfg) {
-	return PlatformPullProfile(cfg);
+	return RegistryPullProfile(cfg);
 }

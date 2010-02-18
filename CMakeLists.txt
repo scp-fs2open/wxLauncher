@@ -59,6 +59,13 @@ if(UNIX)
   SET(HAS_SDL true)
 endif()
 
+# Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
+# will not try to compile the registry code on non Win32 systems.
+# Allow the user to define this as false even on windows if they want
+if((WIN32) AND (NOT DEFINED PLATFORM_USES_REGISTRY))
+  SET(PLATFORM_USES_REGISTRY TRUE)
+endif()
+
 INCLUDE(${wxWidgets_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 if(WIN32) # helper is only needed on windows
@@ -93,11 +100,6 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocatio
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
 SET_SOURCE_FILES_PROPERTIES(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
 
-if(WIN32)
-SET(WIN32_PROFILE_MANAGER code/apis/RegistryProfileManager.cpp)
-else()
-SET(WIN32_PROFILE_MANAGER code/apis/FileProfileManager.cpp)
-endif()
 SET(TAB_CODE_FILES
   code/tabs/AdvSettingsPage.h
   code/tabs/AdvSettingsPage.cpp
@@ -156,7 +158,8 @@ SET(API_CODE_FILES
   code/apis/TCManager.h
   code/apis/TCManager.cpp
   code/apis/PlatformProfileManager.h
-  ${WIN32_PROFILE_MANAGER}
+  code/apis/RegistryProfileManager.cpp
+  code/apis/FileProfileManager.cpp
   )
 SOURCE_GROUP(Apis FILES ${API_CODE_FILES})
 SET(RESOURCE_FILES

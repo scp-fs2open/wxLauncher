@@ -2,6 +2,7 @@
 #include "apis/PlatformProfileManager.h"
 #include "apis/JoystickManager.h"
 #include "global/ids.h"
+#include "generated/configure_launcher.h"
 
 #include <wx/process.h>
 #include <wx/filename.h>
@@ -11,6 +12,7 @@
 
 #include "global/MemoryDebugging.h"
 
+#if PLATFORM_USES_REGISTRY == 1
 #define ReturnChecker(retvalue, location) \
 	if ( retvalue != ERROR_SUCCESS ) {\
 		LPWSTR message = NULL;\
@@ -34,11 +36,13 @@
 #define UNKOWN_ERROR_MSG _T("Unhandled error number %d from query above line %d")
 #define REG_DATA_NOT_DWORD _T("Registry key lookup above line %d is not a DWORD")
 #define REG_DATA_NOT_STRING _T("Registry key lookup above line %d is not a DWORD")
+#endif
 
 /* File contains the Win32 incatations for Pushing and Pulling the passed
 profile to/from the registry. */
 
-ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
+ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
+#if PLATFORM_USES_REGISTRY == 1
 	LONG ret = ERROR_SUCCESS;
 	HKEY regHandle = 0;
 
@@ -410,9 +414,13 @@ ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg) {
 	}
 
 	return ProMan::NoError;
+#else // PLATFORM_USES_REGISTRY
+	return ProMan::SupportNotCompiledIn;
+#endif // PLATFORM_USES_REGISTRY
 }
 
-ProMan::RegistryCodes PlatformPullProfile(wxFileConfig *cfg) {
+ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
+#if PLATFORM_USES_REGISTRY == 1
 	LONG ret = ERROR_SUCCESS;
 	HKEY regHandle = 0;
 
@@ -966,4 +974,7 @@ ProMan::RegistryCodes PlatformPullProfile(wxFileConfig *cfg) {
 	}
 
 	return ProMan::NoError;
+#else // PLATFORM_USES_REGISTRY
+	return ProMan::SupportNotCompiledIn;
+#endif // PLATFORM_USES_REGISTRY
 }

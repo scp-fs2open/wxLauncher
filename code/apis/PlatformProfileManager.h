@@ -3,7 +3,10 @@
 #include <wx/fileconf.h>
 #include "apis/ProfileManager.h"
 
-ProMan::RegistryCodes PlatformPushProfile(wxFileConfig *cfg);
-ProMan::RegistryCodes PlatformPullProfile(wxFileConfig *cfg);
+ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg);
+ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg);
+
+ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg);
+ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg);
 
 #endif

@@ -60,10 +60,10 @@ int RegistryHelper::OnRun() {
 	}
 
 	if (this->op == Push) {
-		return PlatformPushProfile(config);
+		return RegistryPushProfile(config);
 	} else if (this->op == Pull) {
 		ProMan::RegistryCodes ret;
-		ret = PlatformPullProfile(config);
+		ret = RegistryPullProfile(config);
 		if ( ret == ProMan::NoError ) {
 			wxFFileOutputStream f(file.GetFullPath());
 			if (config->Save(f)) {

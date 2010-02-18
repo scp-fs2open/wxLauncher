@@ -44,6 +44,7 @@ public:
 
 		FileIsNotOK,
 		InputFileDoesNotExist,
+		SupportNotCompiledIn,
 		UnknownError,
 	};
 
