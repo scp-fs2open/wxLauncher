@@ -8,7 +8,9 @@
 #include <wx/filename.h>
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
+#if PLATFORM_USES_REGISTRY == 1
 #include <windows.h>
+#endif
 
 #include "global/MemoryDebugging.h"
 
