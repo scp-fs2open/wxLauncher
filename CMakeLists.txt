@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
-project(wxlauncher CXX)
+
+# We don't use C but CMake on linux complains if we don't have it enabled
+project(wxlauncher CXX C) 
+
 SET(VERSION_MAJOR 0)
 SET(VERSION_MINOR 7)
 SET(VERSION_PATCH 4)
