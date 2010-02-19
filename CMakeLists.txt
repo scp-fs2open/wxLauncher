@@ -30,6 +30,10 @@ else(onlinehelpmaker_debug)
   endif()
 endif(onlinehelpmaker_debug)
 
+# This needs to be set so that VS2008 will link against the most recent
+# version of the CRT, the one that is being distrubuted in the installer
+add_definitions("/D_BIND_TO_CURRENT_CRT_VERSION=1")
+
 SET(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
 option(DEVELOPMENT_MODE "Doing development (cannot build installer in this mode)" OFF)
 if(DEVELOPMENT_MODE)
