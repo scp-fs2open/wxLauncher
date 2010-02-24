@@ -70,10 +70,11 @@ typedef ALenum (AL_APIENTRY *alGetErrorType)(void);
 namespace OpenALMan {
 	template< typename funcPtrType> 
 	funcPtrType GetOpenALFunctionPointer(const wxString& name, size_t line);
-	bool checkForALError();
+	bool checkForALError_(size_t line);
 };
 #define ___GetOALFuncPtr(type, name, line) GetOpenALFunctionPointer<type>(_T(name), line)
 #define GetOALFuncPtr(type, name) ___GetOALFuncPtr(type, #name, __LINE__)
+#define checkForALError() OpenALMan::checkForALError_(__LINE__)
 
 template< typename funcPtrType> 
 funcPtrType 
@@ -98,7 +99,7 @@ OpenALMan::GetOpenALFunctionPointer(const wxString& name, size_t line) {
 	return pointer;
 }
 
-bool OpenALMan::checkForALError() {
+bool OpenALMan::checkForALError_(size_t line) {
 	alGetErrorType getError = GetOALFuncPtr(alGetErrorType, alGetError);
 	if ( getError == NULL ) {
 		return false;
@@ -107,11 +108,11 @@ bool OpenALMan::checkForALError() {
 	if ( errorcode == AL_NO_ERROR ) {
 		return true;
 	} else if ( errorcode == AL_INVALID_NAME ) {
-		wxLogError(_T("OpenAL: a bad name (ID) was passed to an OpenAL function"));
+		wxLogError(_T("OpenAL:%d: a bad name (ID) was passed to an OpenAL function"), line);
 	} else if ( errorcode == AL_INVALID_ENUM ) {
-		wxLogError(_T("OpenAL: an invalid enum value was passed to an OpenAL function"));
+		wxLogError(_T("OpenAL:%d: an invalid enum value was passed to an OpenAL function"), line);
 	} else {
-		wxLogError(_T("OpenAL: Unknown error number 0x%08x"), errorcode);
+		wxLogError(_T("OpenAL:%d: Unknown error number 0x%08x"), line, errorcode);
 	}
 	return false;
 }
