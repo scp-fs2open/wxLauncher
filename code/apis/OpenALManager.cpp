@@ -68,85 +68,38 @@ typedef ALCboolean (ALC_APIENTRY *alcIsExtensionPresentType)(ALCdevice*, const A
 typedef const ALchar* (AL_APIENTRY *alGetStringType)(ALenum);
 typedef ALenum (AL_APIENTRY *alGetErrorType)(void);
 namespace OpenALMan {
-	alcGetStringType GetalcGetStringPointer();
-	alcIsExtensionPresentType  GetalcIsExtensionPresentPointer();
-	alGetStringType GetalGetStringPointer();
-	alGetErrorType GetalGetErrorPointer();
+	template< typename funcPtrType> 
+	funcPtrType GetOpenALFunctionPointer(const wxString& name, size_t line);
 	bool checkForALError();
 };
+#define ___GetOALFuncPtr(type, name, line) GetOpenALFunctionPointer<type>(_T(name), line)
+#define GetOALFuncPtr(type, name) ___GetOALFuncPtr(type, #name, __LINE__)
 
-alcGetStringType OpenALMan::GetalcGetStringPointer() {
-	if ( !OpenALLib.HasSymbol(_T("alcGetString")) ) {
-		wxLogError(_T("OpenAL does not have alcGetString()"));
+template< typename funcPtrType> 
+funcPtrType 
+OpenALMan::GetOpenALFunctionPointer(const wxString& name, size_t line) {
+	if ( !OpenALLib.HasSymbol(name) ) {
+		wxLogError(
+			_T("OpenAL does not have %s() for function containing line %d"),
+			name.c_str(), line);
 		return NULL;
 	}
 
-	alcGetStringType GetString = NULL;
-	GetString = reinterpret_cast<alcGetStringType>(
-		OpenALLib.GetSymbol(_T("alcGetString")));
+	funcPtrType pointer = NULL;
 
-	if ( GetString == NULL ) {
-		wxLogError(_T("Unable to get alcGetString() function from OpenAL"));
+	pointer = reinterpret_cast<funcPtrType>(
+		OpenALLib.GetSymbol(name));
+
+	if ( pointer == NULL ) {
+		wxLogError(_T("Unable to get %s() function from OpenAL, even though it apparently exists for function containing line %d"), name.c_str(), line);
 		return NULL;
 	}
 
-	return GetString;
-}
-
-alGetStringType OpenALMan::GetalGetStringPointer() {
-	if ( !OpenALLib.HasSymbol(_T("alGetString")) ) {
-		wxLogError(_T("OpenAL does not have alGetString()"));
-		return NULL;
-	}
-
-	alGetStringType GetString = NULL;
-	GetString = reinterpret_cast<alGetStringType>(
-		OpenALLib.GetSymbol(_T("alGetString")));
-
-	if ( GetString == NULL ) {
-		wxLogError(_T("Unable to get alGetString() function from OpenAL"));
-		return NULL;
-	}
-
-	return GetString;
-}
-
-alcIsExtensionPresentType OpenALMan::GetalcIsExtensionPresentPointer() {
-
-	if ( !OpenALLib.HasSymbol(_T("alcIsExtensionPresent")) ) {
-		wxLogError(_T("The OpenAL library does not have alcIsExtensionPresent"));
-		return NULL;
-	}
-	alcIsExtensionPresentType isExtentsionPresent = NULL;
-	isExtentsionPresent = reinterpret_cast<ALCboolean (*)(ALCdevice*, const ALchar*)>(
-		OpenALLib.GetSymbol(_T("alcIsExtensionPresent")));
-
-	if ( isExtentsionPresent == NULL ) {
-		wxLogError(_T("Unable to retrive the pointer to the alcIsExtensionPresent() function"));
-		return NULL;
-	}
-	return isExtentsionPresent;
-}
-
-alGetErrorType OpenALMan::GetalGetErrorPointer() {
-	if ( !OpenALLib.HasSymbol(_T("alGetError")) ) {
-		wxLogError(_T("OpenAL does not have alGetError()"));
-		return NULL;
-	}
-
-	alGetErrorType getError = NULL;
-	getError = reinterpret_cast<alGetErrorType>(
-		OpenALLib.GetSymbol(_T("alGetError")));
-
-	if ( getError == NULL ) {
-		wxLogError(_T("Unable to get alGetError() function from OpenAL"));
-		return NULL;
-	}
-	return getError;
+	return pointer;
 }
 
 bool OpenALMan::checkForALError() {
-	alGetErrorType getError = GetalGetErrorPointer();
+	alGetErrorType getError = GetOALFuncPtr(alGetErrorType, alGetError);
 	if ( getError == NULL ) {
 		return false;
 	}
@@ -169,13 +122,9 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 #if USE_OPENAL
 	wxCHECK_MSG( OpenALMan::IsInitialized(), arr,
 		_T("GetAvailiableDevices called but OpenALMan not initialized"));
-	if ( !OpenALLib.HasSymbol(_T("alcIsExtensionPresent")) ) {
-		wxLogError(_T("The OpenAL library does not have alcIsExtensionPresent"));
-		return arr;
-	}
 
 	alcIsExtensionPresentType isExtentsionPresent = 
-		OpenALMan::GetalcIsExtensionPresentPointer();
+		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 
 	if ( isExtentsionPresent != NULL ) {
 		if ( (*isExtentsionPresent)(NULL, "ALC_ENUMERATION_EXT") != AL_TRUE ) {
@@ -186,7 +135,7 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 		return arr;
 	}
 
-	alcGetStringType GetString = GetalcGetStringPointer();
+	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType, alcGetString);
 
 	if ( GetString != NULL ) {
 		const ALCchar* devices = (*GetString)(NULL, ALC_DEVICE_SPECIFIER);
@@ -214,7 +163,7 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 
 wxString OpenALMan::SystemDefaultDevice() {
 #if USE_OPENAL
-	alcGetStringType GetString = GetalcGetStringPointer();
+	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType,alcGetStringType);
 
 	if ( GetString == NULL ) {
 		return wxEmptyString;
@@ -234,7 +183,7 @@ wxString OpenALMan::SystemDefaultDevice() {
 
 wxString OpenALMan::GetCurrentVersion() {
 #if USE_OPENAL
-	alGetStringType GetString = GetalGetStringPointer();
+	alGetStringType GetString = GetOALFuncPtr(alGetStringType,alGetString);
 
 	if ( GetString == NULL ) {
 		return _("Unknown version");
