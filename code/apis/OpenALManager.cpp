@@ -29,6 +29,9 @@ bool OpenALMan::Initialize() {
 	} else if ( OpenALLib.Load(_T("libopenal")) ) {
 		isInitialized = true;
 		return true;
+	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
+		isInitialized = true;
+		return true;
 	} else {
 		return false;
 	}
