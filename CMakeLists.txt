@@ -65,6 +65,9 @@ if(UNIX)
   INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
   SET(HAS_SDL true)
 endif()
+if(UNIX AND NOT DEFINED PLATFORM_HAS_BROKEN_OPENAL)
+  SET(PLATFORM_HAS_BROKEN_OPENAL True)
+endif()
 
 # Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
 # will not try to compile the registry code on non Win32 systems.

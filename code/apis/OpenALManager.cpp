@@ -124,7 +124,13 @@ bool OpenALMan::checkForALError_(size_t line) {
 	} else {
 		wxLogError(_T("OpenAL:%d: Unknown error number 0x%08x"), line, errorcode);
 	}
+#if PLATFORM_HAS_BROKEN_OPENAL == 1
+	/** \todo a hack to fix certain OpenAL implementations that are not
+	clearing the errors correctly. */
 	return true;
+#else
+	return false;
+#endif
 }
 #endif
 
