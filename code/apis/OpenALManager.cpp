@@ -2,6 +2,7 @@
 #include <wx/dynlib.h>
 #include "generated/configure_launcher.h"
 #include "apis/OpenALManager.h"
+#include "apis/ProfileManager.h"
 #include "global/ids.h"
 
 #if USE_OPENAL
@@ -70,6 +71,12 @@ typedef const ALCchar* (ALC_APIENTRY *alcGetStringType)(ALCdevice*, ALenum);
 typedef ALCboolean (ALC_APIENTRY *alcIsExtensionPresentType)(ALCdevice*, const ALchar*);
 typedef const ALchar* (AL_APIENTRY *alGetStringType)(ALenum);
 typedef ALenum (AL_APIENTRY *alGetErrorType)(void);
+typedef ALCdevice* (ALC_APIENTRY *alcOpenDeviceType)(const ALCchar *);
+typedef ALCboolean (ALC_APIENTRY *alcCloseDeviceType)(ALCdevice *);
+typedef ALCcontext* (ALC_APIENTRY *alcCreateContextType)(const ALCdevice*, const ALCint*);
+typedef ALCboolean (ALC_APIENTRY *alcMakeContextCurrentType)(ALCcontext*);
+typedef void (ALC_APIENTRY *alcDestroyContextType)(ALCcontext*);
+
 namespace OpenALMan {
 	template< typename funcPtrType> 
 	funcPtrType GetOpenALFunctionPointer(const wxString& name, size_t line);
@@ -117,7 +124,7 @@ bool OpenALMan::checkForALError_(size_t line) {
 	} else {
 		wxLogError(_T("OpenAL:%d: Unknown error number 0x%08x"), line, errorcode);
 	}
-	return false;
+	return true;
 }
 #endif
 
@@ -174,6 +181,7 @@ wxString OpenALMan::SystemDefaultDevice() {
 	} else {
 		const ALCchar* device = (*GetString)(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
 		if ( device == NULL ) {
+			wxLogError(_("Unable to get system default OpenAL device"));
 			return wxEmptyString;
 		} else {
 			wxString DefaultDevice(device, wxConvUTF8);
@@ -191,16 +199,85 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	if ( GetString == NULL ) {
 		return _("Unknown version");
-	} else {
-		const ALCchar* version = (*GetString)(AL_VERSION);
-		if ( !checkForALError() || version == NULL ) {
-			wxLogError(_T("OpenAL: Unable to retrive Version String"));
-			return _("Unknown version");
-		} else {
-			wxString Version(version, wxConvUTF8);
-			return Version;
-		}
 	}
+	
+	wxString selectedDevice;
+	ProMan::GetProfileManager()->Get()
+		->Read(PRO_CFG_OPENAL_DEVICE, &selectedDevice);
+
+	// clear errors, I have not done any openAL stuff, so make sure that any
+	// errors that are active are because of me.
+	checkForALError();
+
+	alcOpenDeviceType OpenDevice = 
+		GetOALFuncPtr(alcOpenDeviceType,alcOpenDevice);
+	if ( OpenDevice == NULL || checkForALError() == false) {
+		return _("Unable to open device");
+	}
+
+	ALCdevice* device = (*OpenDevice)(selectedDevice.char_str());
+	if ( device == NULL || checkForALError() == false ) {
+		wxLogError(_T("alcOpenDevice returned NULL for selected device '%s'"),
+			selectedDevice.c_str());
+		return _("Error opening device");
+	}
+
+	alcCreateContextType CreateContext =
+		GetOALFuncPtr(alcCreateContextType,alcCreateContext);
+	if ( OpenDevice == NULL || checkForALError() == false ) {
+		return _("Unable to open context on device");
+	}
+
+	ALCint attributes = 0;
+	ALCcontext* context = (*CreateContext)(device,NULL);
+	if ( context == NULL || checkForALError() == false) {
+		return _("Error in opening context");
+	}
+
+	alcMakeContextCurrentType MakeContextCurrent =
+		GetOALFuncPtr(alcMakeContextCurrentType,alcMakeContextCurrent);
+	if ( MakeContextCurrent == NULL || checkForALError() == false) {
+		return _("Unable to set context as current");
+	}
+
+	if ( (*MakeContextCurrent)(context) != ALC_TRUE || checkForALError() == false ) {
+		return _("Error in setting context as current");
+	}
+	
+	const ALCchar* version = (*GetString)(AL_VERSION);
+	if ( !checkForALError() || version == NULL ) {
+		wxLogError(_T("OpenAL: Unable to retrive Version String"));
+		return _("Unknown version");
+	}
+	wxString Version(version, wxConvUTF8);
+
+	// unset the current context
+	(*MakeContextCurrent)(NULL);
+
+	alcDestroyContextType DestroyContext =
+		GetOALFuncPtr(alcDestroyContextType,alcDestroyContext);
+	if ( DestroyContext == NULL ) {
+		return _("Unable to destroy context");
+	}
+
+	(*DestroyContext)(context);
+	context = NULL;
+	if ( checkForALError() == false ) {
+		return _("Error in destroying context");
+	}
+
+	alcCloseDeviceType CloseDevice =
+		GetOALFuncPtr(alcCloseDeviceType,alcCloseDevice);
+	if ( CloseDevice == NULL ) {
+		return _("Unable to close device");
+	}
+
+	(*CloseDevice)(device);
+	if ( checkForALError() == false ) {
+		return _("Error in closing device");
+	}
+
+	return wxString::Format(_("Detected OpenAL Version: %s"), Version.c_str());
 #else
 	return wxEmptyString;
 #endif
