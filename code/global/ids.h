@@ -1,6 +1,8 @@
 #ifndef IDS_HPP
 #define IDS_HPP
 
+#include <wx/stdpaths.h>
+
 /* File contains all IDs and other application constants that are to be used
 in the application. */
 
