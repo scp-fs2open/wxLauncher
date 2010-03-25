@@ -375,7 +375,9 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 				msg = _("Generated flag file is not supported.\nUpdate the launcher or talk to a maintainer of this launcher if you have the most recent version of the launcher.");
 				break;
 			default:
-				msg = _("Unkown error occured while obtaing the flags from the FreeSpace Open excutable");
+				msg = wxString::Format(
+					_("Unkown error occured while obtaing the flags from the FreeSpace Open excutable (%d)"),
+					this->drawStatus);
 				break;
 		}
 		this->errorText->Show();
