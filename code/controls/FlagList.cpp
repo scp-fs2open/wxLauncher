@@ -35,49 +35,108 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
+	this->drawStatus = DRAW_OK;
+	this->errorText = new wxStaticText(this, wxID_ANY, wxEmptyString);
+
+	this->Initialize();
+
+	if ( this->drawStatus != DRAW_OK ) {
+		this->SetItemCount(1);
+	}
+}
+
+void FlagListBox::Initialize() {
 	wxString tcPath, exeName;
 	wxFileName exename;
-	this->drawStatus = DRAW_OK;
+
 	wxLogDebug(_T("Initializing FlagList"));
+
 	if ( !ProMan::GetProfileManager()->Get()
 		->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 			this->drawStatus = MISSING_TC;
-	} else if ( !ProMan::GetProfileManager()->Get()
+			return;
+	}
+	
+	if ( !ProMan::GetProfileManager()->Get()
 		->Read(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
 			this->drawStatus = MISSING_EXE;
-	} else {
-		exename.Assign(tcPath, exeName);
-		if (!exename.FileExists()) {
-			this->drawStatus = INVALID_BINARY;
-		} else {
-			wxArrayString output;
-			wxString commandline = wxString::Format(_T("%s -get_flags"), exename.GetFullPath().c_str());
-			long ret = ::wxExecute(commandline, output, 0);
-			wxLogDebug(_T(" FSO returned %d when polled for the flags"), ret);
-
-			wxFileName flagfile(tcPath, _T("flags.lch"));
-			if ( !flagfile.FileExists() ) {
-				this->drawStatus = FLAG_FILE_NOT_GENERATED;
-			} else {
-				this->drawStatus = this->ParseFlagFile(flagfile);
-				if ( this->drawStatus == DRAW_OK ) {
-					::wxRemoveFile(flagfile.GetFullPath());
-					
-					size_t itemCount = 0;
-					FlagCategoryList::iterator iter =
-						this->allSupportedFlagsByCategory.begin();
-					while ( iter != this->allSupportedFlagsByCategory.end() ) {
-						itemCount += (*iter)->flags.GetCount();
-						iter++;
-					}
-					this->SetItemCount(itemCount);
-				}
-			}
-		}
+			return;
 	}
-	this->errorText = new wxStaticText(this, wxID_ANY, wxEmptyString);
-	if ( this->drawStatus != DRAW_OK ) {
-		this->SetItemCount(1);
+
+	exename.Assign(tcPath, exeName);
+
+	if (!exename.FileExists()) {
+		this->drawStatus = INVALID_BINARY;
+		return;
+	}
+	// Make sure that the directory that I am going to change to exists
+	wxFileName profileStorageFlagFile;
+	profileStorageFlagFile.AssignDir(GET_PROFILE_STORAGEFOLDER());
+	profileStorageFlagFile.AppendDir(_T("temp_flag_folder"));
+	if ( !profileStorageFlagFile.DirExists() 
+		&& !profileStorageFlagFile.Mkdir() ) {
+
+		wxLogError(_T("Unable to create flag folder at %s"),
+			profileStorageFlagFile.GetFullPath().c_str());
+		this->drawStatus = CANNOT_CREATE_FLAGFILE_FOLDER;
+		return;
+	}
+
+	wxString previousWorkingDir(::wxGetCwd());
+	// hopefully this doesn't goof anything up
+	if ( !::wxSetWorkingDirectory(profileStorageFlagFile.GetFullPath()) ) {
+		wxLogError(_T("Unable to change working directory to %s"),
+			profileStorageFlagFile.GetFullPath().c_str());
+		this->drawStatus = CANNOT_CHANGE_WORKING_FOLDER;
+		return;
+	}
+
+	wxArrayString output;
+	wxString commandline = wxString::Format(_T("%s -get_flags"), exename.GetFullPath().c_str());
+	wxLogDebug(_T(" Called FSO with commandline '%s'."), commandline.c_str());
+	long ret = ::wxExecute(commandline, output, 0);
+	wxLogDebug(_T(" FSO returned %d when polled for the flags"), ret);
+
+	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
+		wxLogError(_T("Unable to change back to working directory %s"),
+			previousWorkingDir.c_str());
+		this->drawStatus = CANNOT_CHANGE_WORKING_FOLDER;
+		return;
+	}
+
+	wxFileName flagfile;
+	wxFileName tcPathFlagFile(tcPath, _T("flags.lch"));
+	wxLogDebug(_T(" Trying flag file at %s...%s"),
+		tcPathFlagFile.GetFullPath().c_str(),
+		tcPathFlagFile.FileExists()?_T("yes"):_T("no"));
+	if ( tcPathFlagFile.FileExists() ) {
+		flagfile = tcPathFlagFile;
+	} else {
+		profileStorageFlagFile.SetFullName(_T("flags.lch"));
+		wxLogDebug(_T(" Trying flag file at %s...%s"),
+			profileStorageFlagFile.GetFullPath().c_str(),
+			profileStorageFlagFile.FileExists()?_T("yes"):_T("no"));
+		flagfile = profileStorageFlagFile;
+	}
+
+	if ( !flagfile.FileExists() ) {
+		this->drawStatus = FLAG_FILE_NOT_GENERATED;
+		wxLogError(_T(" FSO did not generate flag file."));
+		return;
+	}
+
+	this->drawStatus = this->ParseFlagFile(flagfile);
+	if ( this->drawStatus == DRAW_OK ) {
+		::wxRemoveFile(flagfile.GetFullPath());
+		
+		size_t itemCount = 0;
+		FlagCategoryList::iterator iter =
+			this->allSupportedFlagsByCategory.begin();
+		while ( iter != this->allSupportedFlagsByCategory.end() ) {
+			itemCount += (*iter)->flags.GetCount();
+			iter++;
+		}
+		this->SetItemCount(itemCount);
 	}
 }
 

@@ -45,6 +45,7 @@ class FlagListBox: public wxVListBox {
 public:
 	FlagListBox(wxWindow* parent, SkinSystem* skin);
 	~FlagListBox();
+	void Initialize();
 
 	virtual void OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual void OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
@@ -76,6 +77,8 @@ private:
 		FLAG_FILE_NOT_GENERATED,
 		FLAG_FILE_NOT_VALID,
 		FLAG_FILE_NOT_SUPPORTED,
+		CANNOT_CREATE_FLAGFILE_FOLDER,
+		CANNOT_CHANGE_WORKING_FOLDER,
 		MAX_DRAWSTATUS
 	};
 	DrawStatus drawStatus; //!< are the draw methods allowed to draw.
