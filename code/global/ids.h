@@ -125,7 +125,7 @@ enum ProfileDialogReturnValues {
 	RETURN_CONFRIM_DELETE,
 };
 
-/** \defgroup Storeage Storage locations */
+/** \defgroup Storage Storage locations */
 /** @{*/
 #define GET_PROFILE_STORAGEFOLDER()			wxStandardPaths::Get().GetUserDataDir()
 /** @}*/
