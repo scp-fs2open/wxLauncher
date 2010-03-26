@@ -28,4 +28,15 @@
 #define VERSION_PATCH 0
 #endif
 
+// What platform am I on
+#cmakedefine01 IS_WIN32
+#cmakedefine01 IS_LINUX
+#cmakedefine01 IS_APPLE
+
+#if (IS_WIN32 + IS_LINUX + IS_APPLE) > 1
+#error "Only one of IS_WIN32, IS_LINUX, and IS_APPLE may evaluate to true"
+#elif (IS_WIN32 + IS_LINUX + IS_APPLE) < 1
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+
 #endif

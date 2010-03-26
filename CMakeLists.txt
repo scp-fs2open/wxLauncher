@@ -9,6 +9,16 @@ SET(VERSION_PATCH 4)
 
 SET(CMAKE_OSX_ARCHITECTURES i386)
 
+if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
+  if(WIN32)
+    set(IS_WIN32 TRUE)
+  elseif(__APPLE__)
+    set(IS_APPLE TRUE)
+  else()
+    set(IS_LINUX TRUE)
+  endif()
+endif()
+
 find_package(wxWidgets 2.8.10
   REQUIRED base core net xml html adv qa richtext)
   
