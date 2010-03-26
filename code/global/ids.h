@@ -130,6 +130,11 @@ enum ProfileDialogReturnValues {
 #define GET_PROFILE_STORAGEFOLDER()			wxStandardPaths::Get().GetUserDataDir()
 /** @}*/
 
+/** \defgroup Internal Store location */
+/** @{ */
+#define INT_CONFIG_FILE_LOCATION			_T("/wxlauncher/configlocation")	//!< string
+/** @} */
+
 /** \defgroup globalkeys Keys used in global config file */
 /** @{*/
 #define GBL_CFG_MAIN_AUTOSAVEPROFILES		_T("/main/autosaveprofiles") //!< bool

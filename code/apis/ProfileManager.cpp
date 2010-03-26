@@ -5,6 +5,7 @@
 #include <wx/wfstream.h>
 #include <wx/dir.h>
 
+#include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
 #include "wxLauncherApp.h"
@@ -382,10 +383,24 @@ bool ProMan::DeleteProfile(wxString name) {
 /** Applies the passed wxFileConfig profile to the registry where 
 Freespace 2 can read it. */
 ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
+#if IS_WIN32
+	// check if binary supports configfile
 	return RegistryPushProfile(cfg);
+#elif IS_LINUX || IS_APPLE
+	return FilePushProfile(cfg);
+#else
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
 }
 
 /** Takes the settings in the registry and puts them into the wxFileConfig */
 ProMan::RegistryCodes ProMan::PullProfile(wxFileConfig *cfg) {
+#if IS_WIN32
+	// check if binary supports configfile
 	return RegistryPullProfile(cfg);
+#elif IS_LINUX || IS_APPLE
+	return FilePullProfile(cfg);
+#else
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
 }
