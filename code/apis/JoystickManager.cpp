@@ -60,6 +60,8 @@ bool JoyMan::Initialize() {
 	MMRESULT result = JOYERR_NOERROR;
 	JOYINFO joyinfo;
 	JOYCAPS joycaps;
+	JoyMan::numOfJoysticks = 0;
+	JoyMan::joysticks.clear();
 	int totalNumberOfJoysticks = 0;
 	
 	for (UINT counter = 0; counter < num; counter++) {
@@ -77,6 +79,7 @@ bool JoyMan::Initialize() {
 			if ( result == JOYERR_NOERROR ) {
 				numOfJoysticks++;
 				joystickName = wxString(joycaps.szPname, wxMBConvUTF16());
+				joysticks.Add(joystickName);
 			} else {
 				wxLogError(_T("Error in retrieving joystick caps"));
 				continue;
@@ -87,7 +90,6 @@ bool JoyMan::Initialize() {
 		} else {
 			// Joystick doesn't exist, do nothing
 		}
-		joysticks.Add(joystickName);
 	}
 	wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
 			totalNumberOfJoysticks, numOfJoysticks );
