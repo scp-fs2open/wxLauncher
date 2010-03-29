@@ -1,4 +1,6 @@
+#include "generated/configure_launcher.h"
 #include "datastructures/FSOExecutable.h"
+#include "global/ids.h"
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 
@@ -49,9 +51,19 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 	}
 }
 
+#if IS_WIN32
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*.exe")
+#elif IS_LINUX
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*")
+#elif IS_APPLE
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*.app")
+#else
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+
 wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
 	wxArrayString files;
-	wxDir::GetAllFiles(path.GetPath(), &files, _T("fs2_open_*.exe"), wxDIR_FILES);
+	wxDir::GetAllFiles(path.GetPath(), &files, EXECUTABLE_GLOB_PATTERN, wxDIR_FILES);
 	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
 	return files;
 }
