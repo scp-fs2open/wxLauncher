@@ -133,15 +133,6 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 
-	wxArrayString commandline;
-
-	wxString currentModLine;
-	p->Get()->Read(PRO_CFG_TC_CURRENT_MODLINE, &currentModLine);
-	if ( !currentModLine.IsEmpty() ) {
-		commandline.Add(_T("-mod"));
-		commandline.Add(currentModLine);
-	}
-
 	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
 	wxString command(wxString::Format(_T("%s"), path.GetFullPath().c_str()));
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
