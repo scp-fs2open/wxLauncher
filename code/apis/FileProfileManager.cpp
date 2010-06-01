@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include <wx/ffile.h>
 #include <wx/wfstream.h>
+#include <wx/sstream.h>
 #include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
@@ -74,7 +75,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 		outFileName.SetFullName(FSO_CONFIG_FILENAME);
 	}
 
-	wxFFileInputStream inConfigStream(outFileName.GetFullPath(), _T("rb"));
+	wxStringInputStream inConfigStream(_T(""));
 	wxFileConfig outConfig(inConfigStream, wxMBConvUTF8());
 	bool ret;
 
