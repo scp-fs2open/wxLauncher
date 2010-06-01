@@ -1076,6 +1076,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 		} else {
 			int profileJoystick;
 			unsigned int i;
+			this->joystickSelected->Enable();
 			this->joystickDetectButton->Enable();
 			ProMan::GetProfileManager()->Get()
 				->Read(PRO_CFG_JOYSTICK_ID,
