@@ -172,7 +172,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					ver.revision = (int)version;
 					ver.debug = false;
 				} else {
-					wxLogWarning(_T("Revisionr version out of range (%d)"), version);
+					wxLogWarning(_T("Revision version out of range (%d)"), version);
 				}
 			} else {
 				wxLogWarning(_T("Token ending in 'r' is not a number (%s)"), token.c_str());
