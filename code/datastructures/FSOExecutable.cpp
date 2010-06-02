@@ -149,6 +149,8 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Revision version out of range (%d)"), version);
 			}
+		} else if ( token.StartsWith(_T("d")) && token.size() == 1 ) {
+			ver.debug = true;
 		} else if ( token.EndsWith(_T("d"), &temp) ) {
 			if ( temp.IsNumber() ) {
 				// is the revision version number
