@@ -81,7 +81,21 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 
 wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
 	wxArrayString files;
-	wxDir::GetAllFiles(path.GetPath(), &files, EXECUTABLE_GLOB_PATTERN, wxDIR_FILES);
+	wxDir folder(path.GetPath());
+	wxString filename;
+
+	bool cont = folder.GetFirst(&filename, EXECUTABLE_GLOB_PATTERN, wxDIR_FILES);
+	while (cont == true) {
+#if IS_LINUX
+		if ( !filename.EndsWith(_T(".exe"))
+			&& !filename.EndsWith(_T(".app")) ) {
+#endif
+		files.Add(filename);
+#if IS_LINUX
+		}
+#endif
+		cont = folder.GetNext(&filename);
+	}
 	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
 	return files;
 }
