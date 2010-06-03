@@ -48,7 +48,7 @@ inline wxFileName GetPlatformDefaultConfigFilePath() {
 #define FSO_CONFIG_FILENAME _T("fs2_open.ini")
 
 #define ReturnChecker(retvalue, location) \
-	if ( retvalue ) {\
+	if ( retvalue != true ) {\
 		wxLogError(_T("Unhandled error in writing to the configation file above line %d"), location);\
 		return ProMan::UnknownError;\
 	}
