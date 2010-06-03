@@ -68,7 +68,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	}
 	wxASSERT_MSG( outFileName.Normalize(),
 		wxString::Format(_T("Unable to normalize PlatformDefaultConfigFilePath (%s)"),
-		outFileName.GetFullPath()));
+		outFileName.GetFullPath().c_str()));
 
 	if ( !outFileName.FileExists() && outFileName.DirExists() ) {
 		// was given a directory name
