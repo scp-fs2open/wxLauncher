@@ -131,11 +131,11 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 #endif	
 	}
 	int width, height, bitdepth;
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &width, 1024);
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &height, 768);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 768);
 	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, 16);
 
-	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), height, width, bitdepth);
+	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
 	ret = RegSetValueExW(
 		regHandle,
 		L"VideocardFs2open",
