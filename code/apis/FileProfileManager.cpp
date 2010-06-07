@@ -229,6 +229,8 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	outConfig.SetPath( L"/");
 
+	wxLogDebug(_T(" Writing FSO config to '%s'."),
+		outFileName.GetFullPath().c_str());
 	wxFFileOutputStream outConfigStream(outFileName.GetFullPath(), L"wb");
 	ret = outConfig.Save( outConfigStream, wxMBConvUTF8());
 	ReturnChecker(ret, __LINE__);
