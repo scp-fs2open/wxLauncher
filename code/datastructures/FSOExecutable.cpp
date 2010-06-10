@@ -70,11 +70,11 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 }
 
 #if IS_WIN32
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*.exe")
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_*.exe")
 #elif IS_LINUX
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*")
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_*")
 #elif IS_APPLE
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_open_*.app")
+#define EXECUTABLE_GLOB_PATTERN _T("fs2_*.app")
 #else
 #error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
 #endif
