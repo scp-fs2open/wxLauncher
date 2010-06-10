@@ -16,6 +16,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "generated/configure_launcher.h"
 #include "controls/FlagList.h"
 #include "tabs/AdvSettingsPage.h"
 #include "apis/ProfileManager.h"
@@ -110,7 +111,12 @@ void FlagListBox::Initialize() {
 	}
 
 	wxArrayString output;
-	wxString commandline = wxString::Format(_T("%s -get_flags"), exename.GetFullPath().c_str());
+	wxString formatString;
+#if IS_APPLE
+	formatString += _T("open ");
+#endif
+	formatString += _T("%s -get_flags");
+	wxString commandline = wxString::Format(formatString, exename.GetFullPath().c_str());
 	wxLogDebug(_T(" Called FSO with commandline '%s'."), commandline.c_str());
 	long ret = ::wxExecute(commandline, output, 0);
 	wxLogDebug(_T(" FSO returned %d when polled for the flags"), ret);
