@@ -152,6 +152,16 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 
+		wxString previousWorkingDir(::wxGetCwd());
+	// hopefully this doesn't goof anything up
+	if ( !::wxSetWorkingDirectory(folder) ) {
+		wxLogError(_T("Unable to change working directory to %s"),
+			folder.c_str());
+		play->SetLabel(_T("Play"));
+		play->Enable();
+		return;
+	}
+
 	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
 	wxString formatString;
 #if IS_APPLE
@@ -167,6 +177,11 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	}
 	this->FS2_pid = pid;
 	wxLogInfo(_T("FreeSpace 2 Open is now running..."));
+
+	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
+		wxLogError(_T("Unable to change back to working directory %s"),
+			previousWorkingDir.c_str());
+	}
 }
 void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Update"));
