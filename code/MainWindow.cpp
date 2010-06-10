@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
 #include "global/ids.h"
+#include "generated/configure_launcher.h"
 #include "MainWindow.h"
 #include "tabs/WelcomePage.h"
 #include "tabs/ModsPage.h"
@@ -152,7 +153,12 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
-	wxString command(wxString::Format(_T("%s"), path.GetFullPath().c_str()));
+	wxString formatString;
+#if IS_APPLE
+	formatString += _T("open ");
+#endif
+	formatString = _T("%s");
+	wxString command(wxString::Format(formatString, path.GetFullPath().c_str()));
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
 	if ( pid == 0 ) {
 		play->SetLabel(_("Play"));
