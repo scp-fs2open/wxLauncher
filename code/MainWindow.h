@@ -32,7 +32,9 @@ public:
 
 	void OnQuit(wxCommandEvent& event);
 	void OnHelp(wxCommandEvent& event);
-	void OnStartFS(wxCommandEvent& event);
+	void OnFSButton(wxCommandEvent& event);
+	void OnStartFS(wxButton* play);
+	void OnKillFS(wxButton* play);
 	void OnStartFred(wxCommandEvent& event);
 	void OnUpdate(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
