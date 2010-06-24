@@ -42,6 +42,7 @@ public:
 	void OnFS2Exited(wxProcessEvent& event);
 
 private:
+	wxProcess* process;
 	wxToolbook* mainTab;
 	long FS2_pid;
 
