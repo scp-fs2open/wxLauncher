@@ -97,7 +97,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_HELP_BUTTON, MainWindow::OnHelp)
 	EVT_BUTTON(ID_FRED_BUTTON, MainWindow::OnStartFred)
 	EVT_BUTTON(ID_UPDATE_BUTTON, MainWindow::OnUpdate)
-	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnStartFS)
+	EVT_BUTTON(ID_PLAY_BUTTON, MainWindow::OnFSButton)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
 	EVT_HELP(wxID_ANY, MainWindow::OnContextHelp)
 	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
@@ -116,11 +116,20 @@ void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
 void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Start Fred"));
 }
-void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
+void MainWindow::OnFSButton(wxCommandEvent& WXUNUSED(event)) {
 	wxButton* play = dynamic_cast<wxButton*>(
 		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
 	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
-	play->SetLabel(_("Running"));
+
+	if (this->FS2_pid == 0) {
+		this->OnStartFS(play);
+	} else {
+		this->OnKillFS(play);
+	}
+}
+
+void MainWindow::OnStartFS(wxButton* play) {
+	play->SetLabel(_("Starting"));
 	play->Disable();
 	
 	ProMan* p = ProMan::GetProfileManager();
@@ -186,7 +195,22 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 		wxLogError(_T("Unable to change back to working directory %s"),
 			previousWorkingDir.c_str());
 	}
+
+	play->SetLabel(_T("Kill"));
+	play->Enable();
 }
+
+void MainWindow::OnKillFS(wxButton* play) {
+	play->SetLabel(_T("Stopping"));
+	play->Disable();
+
+	int ret = ::wxKill(this->FS2_pid, wxSIGKILL);
+	if ( ret != wxKILL_OK ) {
+		wxLogError(_T("Got KillError %d"), ret);
+		wxLogError(_T("Failed to kill FS2 process!"));
+	}
+}
+
 void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_("Update"));
 }
