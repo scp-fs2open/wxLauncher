@@ -429,7 +429,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 }
 
-/** the distructor.  Cleans up stuff. */
+/** the dtor.  Cleans up stuff. */
 ModList::~ModList() {
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
@@ -437,8 +437,8 @@ ModList::~ModList() {
 	if ( this->tableData != NULL ) {
 		delete this->tableData;
 	}
-	if ( this->buttonSizer != NULL ) {
-		delete this->buttonSizer;
+	if ( this->sizer != NULL ) {
+		delete this->sizer;
 	}
 }
 /** Function takes the keyvalue string to search for, and returns via location
