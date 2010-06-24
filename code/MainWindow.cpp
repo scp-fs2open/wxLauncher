@@ -175,14 +175,14 @@ void MainWindow::OnStartFS(wxButton* play) {
 		return;
 	}
 
-	wxProcess* process = new wxProcess(this, ID_FS2_PROCESS);
+	this->process = new wxProcess(this, ID_FS2_PROCESS);
 	wxString formatString;
 #if IS_APPLE
 	formatString += _T("open ");
 #endif
 	formatString = _T("%s");
 	wxString command(wxString::Format(formatString, path.GetFullPath().c_str()));
-	long pid = ::wxExecute(command, wxEXEC_ASYNC, process);
+	long pid = ::wxExecute(command, wxEXEC_ASYNC, this->process);
 	if ( pid == 0 ) {
 		play->SetLabel(_("Play"));
 		play->Enable();
@@ -231,6 +231,9 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 	int exitCode = event.GetExitCode();
 
 	wxLogInfo(_T("FS2 Open exited with a status of %d"), exitCode);
+
+	delete this->process;
+	this->process = NULL;
 	
 	wxButton* play = dynamic_cast<wxButton*>(
 		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
