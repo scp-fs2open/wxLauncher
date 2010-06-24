@@ -139,7 +139,11 @@ void MainWindow::OnStartFS(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	wxFileName path(folder, binary, wxPATH_NATIVE);
+#if IS_APPLE // Binaries are directories on OSX.
+	if ( !path.DirExists() ) {
+#else
 	if ( !path.FileExists() ) {
+#endif
 		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
 		play->SetLabel(_("Play"));
 		play->Enable();

@@ -84,7 +84,12 @@ void FlagListBox::Initialize() {
 
 	exename.Assign(tcPath, exeName);
 
+	// The binaries are actually directories on OSX.
+#if IS_APPLE
+	if (!exename.DirExists()) {
+#else
 	if (!exename.FileExists()) {
+#endif
 		this->drawStatus = INVALID_BINARY;
 		return;
 	}
