@@ -33,8 +33,8 @@ struct FlagInfo {
 
 #define WIDTH_OF_CHECKBOX 16
 
-Flag::Flag() {
-	this->checkbox = NULL;
+Flag::Flag()
+: checkbox(NULL), checkboxSizer(NULL) {
 }
 
 #include <wx/listimpl.cpp> // Magic Incantation
@@ -341,6 +341,10 @@ FlagListBox::~FlagListBox() {
 		FlagList::iterator iter = category->flags.begin();
 		while ( iter != category->flags.end() ) {
 			Flag *flag = *iter;
+			if ( flag->checkboxSizer != NULL ) {
+				delete flag->checkboxSizer;
+				flag->checkboxSizer = NULL;
+			}
 			delete flag;
 			iter++;
 		}
@@ -350,6 +354,13 @@ FlagListBox::~FlagListBox() {
 		catIter++;
 	}
 	this->allSupportedFlagsByCategory.Clear();
+
+	FlagSetsList::iterator flagSetIter = this->flagSets.begin();
+	while ( flagSetIter != this->flagSets.end() ) {
+		delete *flagSetIter;
+		flagSetIter++;
+	}
+	this->flagSets.clear();
 }
 
 void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
