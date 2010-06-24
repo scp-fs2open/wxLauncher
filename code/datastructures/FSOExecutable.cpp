@@ -103,7 +103,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
 FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	wxLogDebug(_T("Making version struct for '%s'"), binaryname.c_str());
 	FSOExecutable ver;
-	wxStringTokenizer tok(binaryname, _T("_.-"));
+	wxStringTokenizer tok(binaryname, _T("_.- ()[]"));
 	wxString first;
 	ver.executablename = binaryname;
 
@@ -215,6 +215,8 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			ver.inferno = true;
 		} else if ( token.StartsWith(_T("debug")) ){
 			ver.debug = true;
+		} else if ( token.StartsWith(_T("inferno")) ) {
+			ver.inferno = true;
 		} else {
 			if (!ver.string.IsEmpty()) {
 				ver.string += _T(" ");
