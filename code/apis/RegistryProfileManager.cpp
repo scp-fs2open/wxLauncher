@@ -406,34 +406,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	RegCloseKey(regHandle);
 	RegCloseKey(networkRegHandle);
 
-	wxString modLine, flagLine, tcPath;
-	cfg->Read(PRO_CFG_TC_CURRENT_MODLINE, &modLine);
-	cfg->Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
-	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
-	wxString cmdLineString;
-	cmdLineString += tcPath.c_str();
-	cmdLineString += wxFileName::GetPathSeparator();
-	cmdLineString += _T("data");
-	cmdLineString += wxFileName::GetPathSeparator();
-	cmdLineString += _T("cmdline_fso.cfg");
-	wxFileName cmdLineFileName(cmdLineString);
-	wxFFileOutputStream outStream(cmdLineFileName.GetFullPath(), _T("w+b"));
-	if ( !outStream.IsOk() ) {
-		return ProMan::UnknownError;
-	}
-	if ( !modLine.IsEmpty()) {
-		outStream.Write("-mod ", 5);
-		outStream.Write(modLine.char_str(), modLine.size());
-	}
-	if ( !modLine.IsEmpty() ) {
-		outStream.Write(" ", 1);
-		outStream.Write(flagLine.char_str(), flagLine.size());
-	}
-	if ( !outStream.Close() ) {
-		return ProMan::UnknownError;
-	}
-
-	return ProMan::NoError;
+	return PushCmdlineFSO(cfg);
 #else // PLATFORM_USES_REGISTRY
 	return ProMan::SupportNotCompiledIn;
 #endif // PLATFORM_USES_REGISTRY

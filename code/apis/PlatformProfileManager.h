@@ -27,4 +27,6 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg);
 ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg);
 ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg);
 
+ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg);
+
 #endif

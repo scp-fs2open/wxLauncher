@@ -90,7 +90,9 @@ INCLUDE(${wxWidgets_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
-  code/apis/RegistryProfileManager.cpp platform/win32/registry_helper.cpp)
+  code/apis/RegistryProfileManager.cpp
+  platform/win32/registry_helper.cpp
+  code/apis/PlatformProfileManagerShared.cpp)
 SET_TARGET_PROPERTIES(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX)
   SET_TARGET_PROPERTIES(registry_helper PROPERTIES LINK_FLAGS /MANIFESTUAC:NO)
@@ -181,6 +183,7 @@ SET(API_CODE_FILES
   code/apis/PlatformProfileManager.h
   code/apis/RegistryProfileManager.cpp
   code/apis/FileProfileManager.cpp
+  code/apis/PlatformProfileManagerShared.cpp
   )
 SOURCE_GROUP(Apis FILES ${API_CODE_FILES})
 SET(RESOURCE_FILES
