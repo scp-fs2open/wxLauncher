@@ -150,7 +150,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		characterBuffer[size] = '\0';
 
 		buf->Seek(0, wxFromStart);
-		size_t read = buf->Read(reinterpret_cast<void*>(characterBuffer), size);
+		// don't try to read in buffer because there is nothing to read.
+		size_t read = (size == 0)? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
 		if ( read != size ) {
 			wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
 			delete[] characterBuffer;
