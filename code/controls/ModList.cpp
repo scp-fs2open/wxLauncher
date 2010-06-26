@@ -891,7 +891,8 @@ void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 
 ///////////////////////////////////////////
 /** \class ModItem::ModImage
-Draws the Mod's image on the list or degrades smoothly.
+Draws the Mod's image on the list or degrades smoothly to drawing the text
+"NO IMAGE".
 */
 /** Constructor. Sets up stuff. */
 ModItem::ModImage::ModImage(ModItem *myData) {
