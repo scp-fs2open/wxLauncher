@@ -86,6 +86,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->stringNoMod = _("(No MOD)");
 
+	this->appendmods = NULL;
+	this->prependmods = NULL;
+
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
@@ -395,6 +398,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		} else {
 			this->SetSelection(0);
 		}
+		this->OnActivateMod(wxCommandEvent());
 	}
 
 
@@ -537,6 +541,12 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	if ( this->IsSelected(n) ) {
 		b = wxBrush(highlighted, wxTRANSPARENT);
 		dc.SetPen(wxPen(highlighted, 4));
+	} else if ( this->isCurrentSelectionAnAppendMod(*(this->tableData->Item(n).shortname)) ) {
+		b = wxBrush(highlighted, wxBDIAGONAL_HATCH);
+		dc.SetPen(wxPen(highlighted, 1));
+	} else if ( this->isCurrentSelectionAPrependMod(*(this->tableData->Item(n).shortname)) ) {
+		b = wxBrush(highlighted, wxFDIAGONAL_HATCH);
+		dc.SetPen(wxPen(highlighted, 1));
 	} else {
 		b = wxBrush(background);
 		dc.SetPen(wxPen(background, 4));
@@ -547,6 +557,12 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 
 	if ( activeMod == *(this->tableData->Item(n).shortname) ) {
 		b = wxBrush(highlighted, wxSOLID);
+		dc.SetPen(wxPen(highlighted, 1));
+	} else if ( this->isAnAppendMod(*(this->tableData->Item(n).shortname)) ) {
+		b = wxBrush(highlighted, wxBDIAGONAL_HATCH);
+		dc.SetPen(wxPen(highlighted, 1));
+	} else if ( this->isAPrependMod(*(this->tableData->Item(n).shortname)) ) {
+		b = wxBrush(highlighted, wxFDIAGONAL_HATCH);
 		dc.SetPen(wxPen(highlighted, 1));
 	} else {
 		b = wxBrush(background, wxSOLID);
@@ -565,6 +581,7 @@ void ModList::OnSelectionChange(wxCommandEvent &event) {
 	wxLogDebug(_T("Selection changed to %d (%s)."),
 		event.GetInt(),
 		this->tableData->Item(event.GetInt()).shortname->c_str());
+	this->Refresh();
 }
 
 void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
@@ -573,11 +590,11 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 
 	wxString modline;
 	wxString* shortname = this->tableData->Item(selected).shortname;
-	wxString* prependmods = this->tableData->Item(selected).primarylist;
-	wxString* appendmods = this->tableData->Item(selected).secondarylist;
+	this->prependmods = this->tableData->Item(selected).primarylist;
+	this->appendmods = this->tableData->Item(selected).secondarylist;
 
-	if ( prependmods != NULL ) {
-		wxStringTokenizer prependtokens(*prependmods, _T(", "), wxTOKEN_STRTOK); // no empty tokens
+	if ( this->prependmods != NULL ) {
+		wxStringTokenizer prependtokens(*(this->prependmods), _T(", "), wxTOKEN_STRTOK); // no empty tokens
 		while ( prependtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -595,8 +612,8 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		modline += *shortname;
 	}
 
-	if ( appendmods != NULL ) {
-		wxStringTokenizer appendtokens(*appendmods, _T(", "), wxTOKEN_STRTOK);
+	if ( this->appendmods != NULL ) {
+		wxStringTokenizer appendtokens(*(this->appendmods), _T(", "), wxTOKEN_STRTOK);
 		while ( appendtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -621,6 +638,46 @@ void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
 	new ModInfoDialog(this->skinSystem, new ModItem(this->tableData->Item(selected)), this);
 }
+
+bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
+	wxStringTokenizer tokens(modlist, _T(", "), wxTOKEN_STRTOK);
+	while ( tokens.HasMoreTokens() ) {
+		if ( tokens.GetNextToken() == mod ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool ModList::isAnAppendMod(const wxString &mod) const {
+	if ( this->appendmods == NULL ) return false; // no append mods, mod cannot be one
+	return ModList::isADependency(mod, *(this->appendmods));
+}
+
+bool ModList::isAPrependMod(const wxString &mod) const {
+	if ( this->prependmods == NULL ) return false;	// no prepend mods, mod cannot be one
+	return ModList::isADependency(mod, *(this->prependmods));
+}
+
+bool ModList::isCurrentSelectionAnAppendMod(const wxString &mod) const {
+	int selection = this->GetSelection();
+	if ( selection == wxNOT_FOUND
+		|| this->tableData->Item(selection).secondarylist == NULL) {
+			return false;
+	}
+	return ModList::isADependency(mod, *(this->tableData->Item(selection).secondarylist));
+}
+
+bool ModList::isCurrentSelectionAPrependMod(const wxString &mod) const {
+	int selection = this->GetSelection();
+	if ( selection == wxNOT_FOUND
+		|| this->tableData->Item(selection).primarylist == NULL) {
+		return false;
+	}
+	return ModList::isADependency(mod, *(this->tableData->Item(selection).primarylist));
+}
+
 
 BEGIN_EVENT_TABLE(ModList, wxVListBox)
 EVT_LISTBOX(ID_MODLISTBOX, ModList::OnSelectionChange)
