@@ -177,6 +177,14 @@ private:
 	ModItemArray* tableData;
 	wxButton * testbutton;
 
+	wxString* prependmods, *appendmods;
+	bool isAPrependMod(const wxString& mod) const;
+	bool isAnAppendMod(const wxString& mod) const;
+
+	static bool isADependency(const wxString& mod, const wxString& modlist);
+	bool isCurrentSelectionAPrependMod(const wxString &mod) const;
+	bool isCurrentSelectionAnAppendMod(const wxString &mod) const;
+
 	DECLARE_EVENT_TABLE();
 };
 
