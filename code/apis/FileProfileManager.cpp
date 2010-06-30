@@ -229,6 +229,8 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	outConfig.SetPath( L"/");
 
+	outConfig.Save(wxFFileOutputStream(outFileName.GetFullPath()));
+
 	return PushCmdlineFSO(cfg);
 }
 
