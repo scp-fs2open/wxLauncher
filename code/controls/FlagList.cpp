@@ -50,6 +50,10 @@ FlagSet::FlagSet(wxString Name) {
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagSetsList);
 
+WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
+#include <wx/arrimpl.cpp> // Magic Incantation
+WX_DEFINE_OBJARRAY(FlagFileArray);
+
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
 	wxASSERT(skin != NULL);
@@ -94,23 +98,38 @@ void FlagListBox::Initialize() {
 		return;
 	}
 	// Make sure that the directory that I am going to change to exists
-	wxFileName profileStorageFlagFile;
-	profileStorageFlagFile.AssignDir(GET_PROFILE_STORAGEFOLDER());
-	profileStorageFlagFile.AppendDir(_T("temp_flag_folder"));
-	if ( !profileStorageFlagFile.DirExists() 
-		&& !profileStorageFlagFile.Mkdir() ) {
+	wxFileName tempExecutionLocation;
+	tempExecutionLocation.AssignDir(GET_PROFILE_STORAGEFOLDER());
+	tempExecutionLocation.AppendDir(_T("temp_flag_folder"));
+	if ( !tempExecutionLocation.DirExists() 
+		&& !tempExecutionLocation.Mkdir() ) {
 
 		wxLogError(_T("Unable to create flag folder at %s"),
-			profileStorageFlagFile.GetFullPath().c_str());
+			tempExecutionLocation.GetFullPath().c_str());
 		this->drawStatus = CANNOT_CREATE_FLAGFILE_FOLDER;
 		return;
 	}
 
+	FlagFileArray flagFileLocations;
+	flagFileLocations.Add(wxFileName(tcPath, _T("flags.lch")));
+	flagFileLocations.Add(wxFileName(tempExecutionLocation.GetFullPath(), _T("flags.lch")));
+
+	// remove potential flag files to eliminate any confusion.
+	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
+		bool exists = flagFileLocations[i].FileExists();
+		if (exists) {
+			::wxRemoveFile(flagFileLocations[i].GetFullPath());
+			wxLogDebug(_T(" Cleaned up %s ... %s"),
+				flagFileLocations[i].GetFullPath().c_str(),
+				(flagFileLocations[i].FileExists())? _T("Failed") : _T("Removed"));
+		}
+	}
+
 	wxString previousWorkingDir(::wxGetCwd());
 	// hopefully this doesn't goof anything up
-	if ( !::wxSetWorkingDirectory(profileStorageFlagFile.GetFullPath()) ) {
+	if ( !::wxSetWorkingDirectory(tempExecutionLocation.GetFullPath()) ) {
 		wxLogError(_T("Unable to change working directory to %s"),
-			profileStorageFlagFile.GetFullPath().c_str());
+			tempExecutionLocation.GetFullPath().c_str());
 		this->drawStatus = CANNOT_CHANGE_WORKING_FOLDER;
 		return;
 	}
@@ -133,20 +152,18 @@ void FlagListBox::Initialize() {
 		return;
 	}
 
+	// Find the flag file
 	wxFileName flagfile;
-	wxFileName tcPathFlagFile(tcPath, _T("flags.lch"));
-	wxLogDebug(_T(" Trying flag file at %s...%s"),
-		tcPathFlagFile.GetFullPath().c_str(),
-		tcPathFlagFile.FileExists()?_T("yes"):_T("no"));
-	if ( tcPathFlagFile.FileExists() ) {
-		flagfile = tcPathFlagFile;
-	} else {
-		profileStorageFlagFile.SetFullName(_T("flags.lch"));
-		wxLogDebug(_T(" Trying flag file at %s...%s"),
-			profileStorageFlagFile.GetFullPath().c_str(),
-			profileStorageFlagFile.FileExists()?_T("yes"):_T("no"));
-		flagfile = profileStorageFlagFile;
+	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
+		bool exists = flagFileLocations[i].FileExists();
+		if (exists) {
+			flagfile = flagFileLocations[i];
+			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
+				flagFileLocations[i].GetFullPath().c_str(),
+				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+		}
 	}
+
 
 	if ( !flagfile.FileExists() ) {
 		this->drawStatus = FLAG_FILE_NOT_GENERATED;
