@@ -775,6 +775,7 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSiz
 	infotextrect.width = rect.width - infotextrect.x;
 
 	wxFont titlefont = this->skinSystem->GetFont();
+	titlefont.SetPointSize(titlefont.GetPointSize() + 2);
 	titlefont.SetWeight(wxFONTWEIGHT_BOLD);
 	dc.SetFont(titlefont);
 	this->modNamePanel->Draw(dc, titlerect);
@@ -802,6 +803,26 @@ WX_DEFINE_OBJARRAY(ModItemArray);
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ArrayOfWords);
 
+/** Helper function for ModItem::InfoText and ModItem::ModName. */
+void FillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
+								wxDC &dc,
+								wxFont *testFont,
+								ArrayOfWords *words)
+{
+	while ( tokens.HasMoreTokens() ) {
+		wxString tok = tokens.GetNextToken();
+		int x, y;
+		dc.GetTextExtent(tok, &x, &y, NULL, NULL, testFont);
+
+		Words* temp = new Words();
+		temp->size.SetWidth(x);
+		temp->size.SetHeight(y);
+		temp->word = tok;
+
+		words->Add(temp);
+	}
+}
+
 ///////////////////////////////////////////
 /** \class ModItem::InfoText
 Extends wxPanel so that it can draw the info text to the correct size in the list
@@ -817,17 +838,7 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
 
-		do {
-			wxString tok = tokens.GetNextToken();
-			int x, y;
-			dc.GetTextExtent(tok, &x, &y);
-
-			Words* temp = new Words();
-			temp->size = dc.GetTextExtent(tok);
-			temp->word = tok;
-
-			words.Add(temp);
-		} while ( tokens.HasMoreTokens() );
+		FillArrayOfWordsFromTokens(tokens, dc, NULL, &words);
 
 		const int maxwidth = rect.width;
 		int currentx = rect.x, currenty = rect.y;
@@ -877,15 +888,82 @@ void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 		name = *this->myData->shortname;
 	}
 
-	wxSize line = dc.GetTextExtent(name);
+	wxCoord width, height;
+	wxFont testFont(dc.GetFont());	/* font to use to compensate for
+									GetTextExtent's inabliity to handle
+									bold font.*/
+	testFont.SetPointSize(testFont.GetPointSize() + 2);
+	dc.GetMultiLineTextExtent(name, &width, &height, NULL, &testFont);
 
-	if ( line.x > rect.width ) {
+	if ( width > rect.width ) {
 		// too wide need to wrap if possible.
-		wxLogDebug(_T("Name is to long"));
+		ArrayOfWords titleWords;
+		wxStringTokenizer tokens(name);
+		ArrayOfWords words;
+		words.Alloc(tokens.CountTokens());
+
+		FillArrayOfWordsFromTokens(tokens, dc, &testFont, &words);
+
+		const int maxwidth = rect.width;
+		int currentx = rect.x, currenty = rect.y;
+
+		wxCoord spaceX, spaceY;
+		dc.GetTextExtent(_T(" "), &spaceX, &spaceY, NULL, NULL, &testFont);
+		int currentwidth  = 0;
+		wxString string;
+		for( size_t i = 0; i < words.Count(); i++) {
+			if ( currentwidth + words[i].size.x + spaceX > maxwidth ) {
+				wxCoord tempX, tempY;
+				dc.GetTextExtent(string, &tempX, &tempY, NULL, NULL, &testFont);
+
+				Words* temp = new Words();
+				temp->size.SetWidth(tempX);
+				temp->size.SetHeight(tempY);
+				temp->word = string;
+				titleWords.Add(temp);
+
+				string.Empty();
+				currentwidth = 0;
+
+				currenty += words[i].size.y;
+				if (currenty + words[i].size.y > rect.y + rect.height) {
+					break;
+				}
+			} else if ( string.size() > 0 ) {
+				string.append(_T(" "));
+			}
+			string.append(words[i].word);
+			currentwidth += words[i].size.x + spaceX;
+		}
+		wxCoord tempX, tempY;
+		dc.GetTextExtent(string, &tempX, &tempY, NULL, NULL, &testFont);
+
+		Words* temp = new Words();
+		temp->size.SetWidth(tempX);
+		temp->size.SetHeight(tempY);
+		temp->word = string;
+		titleWords.Add(temp);
+
+		// draw the words properly centered
+
+		// Find the hight of all of the lines of text
+		int totalHeight = 0;
+		for( size_t i = 0; i < titleWords.Count(); i++ ) {
+			totalHeight += titleWords[i].size.y;
+		}
+
+		int currentHeightOffset = 0;
+		for( size_t i = 0; i < titleWords.Count(); i++ ) {
+			dc.DrawText(titleWords[i].word,
+				rect.x + rect.width/2 - titleWords[i].size.x/2,
+				rect.y + rect.height/2 - titleWords[i].size.y/2 + currentHeightOffset - totalHeight/2);
+			currentHeightOffset += titleWords[i].size.y;
+		}
+
 	} else {
 		dc.DrawText(name,
-			rect.x + rect.width/2 - line.x/2,
-			rect.y + rect.height/2 - line.y/2);
+			rect.x + rect.width/2 - width/2,
+			rect.y + rect.height/2 - height/2);
 	}
 }
 
