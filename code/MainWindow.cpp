@@ -234,6 +234,7 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 
 	delete this->process;
 	this->process = NULL;
+	this->FS2_pid = 0;
 	
 	wxButton* play = dynamic_cast<wxButton*>(
 		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
