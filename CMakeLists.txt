@@ -63,7 +63,7 @@ else(DEVELOPMENT_MODE)
 endif(DEVELOPMENT_MODE)
 
 OPTION(USE_SPEECH "Build launcher with speech support?" OFF)
-OPTION(USE_JOYSTICK "Build launcher with joystick support (currently windows MM only)?" OFF)
+OPTION(USE_JOYSTICK "Build launcher with joystick support?" ON)
 OPTION(USE_OPENAL "Build launcher with OpenAL support?" ON)
 if(USE_OPENAL)
   find_package(OpenAL REQUIRED)
