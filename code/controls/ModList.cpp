@@ -398,7 +398,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		} else {
 			this->SetSelection(0);
 		}
-		this->OnActivateMod(wxCommandEvent());
+		wxCommandEvent activateModEvent;
+		this->OnActivateMod(activateModEvent);
 	}
 
 
