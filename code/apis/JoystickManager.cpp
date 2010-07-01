@@ -21,6 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/JoystickManager.h"
 #include "generated/configure_launcher.h"
 
+#if USE_JOYSTICK && HAS_SDL
+#include "SDL.h"
+#endif
+
 #include "global/MemoryDebugging.h"
 
 namespace JoyMan {
@@ -59,7 +63,7 @@ bool JoyMan::IsInitialized() {
 \sa JoyMan::WasCompiledIn()
 */
 bool JoyMan::Initialize() {
-#if USE_JOYSTICK
+#if USE_JOYSTICK && IS_WIN32
 	if ( JoyMan::IsInitialized() ) {
 		wxLogDebug(_T("JoyMan already initialized with %d joysticks"),
 			joysticks.Count());
@@ -111,6 +115,23 @@ bool JoyMan::Initialize() {
 	}
 	wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
 			totalNumberOfJoysticks, numOfJoysticks );
+	return true;
+#elif USE_JOYSTICK && HAS_SDL
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	
+	JoyMan::numOfJoysticks = 0;
+	JoyMan::joysticks.clear();
+
+	SDL_Joystick *joy = NULL;
+	for (size_t i = 0; i < SDL_NumJoysticks(); i++) {
+		joy = SDL_JoystickOpen(i);
+		if ( joy != NULL ) {
+			wxString joystickName(SDL_JoystickName(i), wxConvLocal);
+			joysticks.Add(joystickName);
+		}
+		SDL_JoystickClose(joy);
+	}
+
 	return true;
 #else
 	return false;
