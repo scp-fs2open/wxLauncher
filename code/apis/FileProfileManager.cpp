@@ -230,7 +230,8 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	outConfig.SetPath( L"/");
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
-	outConfig.Save(wxFFileOutputStream(outFileName.GetFullPath()));
+	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
+	outConfig.Save(outFileStream);
 
 	return PushCmdlineFSO(cfg);
 }
