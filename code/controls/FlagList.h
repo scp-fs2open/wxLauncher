@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include <wx/vlbox.h>
+#include <wx/process.h>
 
 #include "apis/SkinManager.h"
 
@@ -58,6 +59,10 @@ public:
 };
 
 WX_DECLARE_LIST(FlagSet, FlagSetsList);
+
+WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
+
+DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, wxID_ANY);
 
 class FlagListBox: public wxVListBox {
 public:
@@ -111,6 +116,15 @@ private:
 	wxStaticText* errorText;
 
 	void FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const;
+
+	class FlagProcess: public wxProcess {
+	public:
+		FlagProcess(FlagListBox* target, FlagFileArray flagFileLocations);
+		virtual void OnTerminate(int pid, int status);
+	private:
+		FlagListBox *target;
+		FlagFileArray flagFileLocations;
+	};
 
 	DECLARE_EVENT_TABLE();
 

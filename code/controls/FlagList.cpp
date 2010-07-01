@@ -50,7 +50,6 @@ FlagSet::FlagSet(wxString Name) {
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagSetsList);
 
-WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 #include <wx/arrimpl.cpp> // Magic Incantation
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
@@ -142,8 +141,8 @@ void FlagListBox::Initialize() {
 	formatString += _T("%s -get_flags");
 	wxString commandline = wxString::Format(formatString, exename.GetFullPath().c_str());
 	wxLogDebug(_T(" Called FSO with commandline '%s'."), commandline.c_str());
-	long ret = ::wxExecute(commandline, output, 0);
-	wxLogDebug(_T(" FSO returned %d when polled for the flags"), ret);
+	FlagProcess *process = new FlagProcess(this, flagFileLocations);
+	::wxExecute(commandline, wxEXEC_ASYNC, process);
 
 	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
 		wxLogError(_T("Unable to change back to working directory %s"),
@@ -152,38 +151,7 @@ void FlagListBox::Initialize() {
 		return;
 	}
 
-	// Find the flag file
-	wxFileName flagfile;
-	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
-		bool exists = flagFileLocations[i].FileExists();
-		if (exists) {
-			flagfile = flagFileLocations[i];
-			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
-				flagFileLocations[i].GetFullPath().c_str(),
-				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
-		}
-	}
-
-
-	if ( !flagfile.FileExists() ) {
-		this->drawStatus = FLAG_FILE_NOT_GENERATED;
-		wxLogError(_T(" FSO did not generate flag file."));
-		return;
-	}
-
-	this->drawStatus = this->ParseFlagFile(flagfile);
-	if ( this->drawStatus == DRAW_OK ) {
-		::wxRemoveFile(flagfile.GetFullPath());
-		
-		size_t itemCount = 0;
-		FlagCategoryList::iterator iter =
-			this->allSupportedFlagsByCategory.begin();
-		while ( iter != this->allSupportedFlagsByCategory.end() ) {
-			itemCount += (*iter)->flags.GetCount();
-			iter++;
-		}
-		this->SetItemCount(itemCount);
-	}
+	this->drawStatus = WAITING_FOR_FLAGFILE;
 }
 
 FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
@@ -665,4 +633,56 @@ wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
 false when the FlagList is showing an error message. */
 bool FlagListBox::IsDrawOK() {
 	return (this->drawStatus == DRAW_OK);
+}
+
+
+FlagListBox::FlagProcess::FlagProcess(
+							FlagListBox *target,
+							FlagFileArray flagFileLocations)
+							:
+target(target), flagFileLocations(flagFileLocations) {
+}
+
+DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE);
+
+void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
+	wxLogDebug(_T(" FSO returned %d when polled for the flags"), status);
+
+	// Find the flag file
+	wxFileName flagfile;
+	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
+		bool exists = flagFileLocations[i].FileExists();
+		if (exists) {
+			flagfile = flagFileLocations[i];
+			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
+				flagFileLocations[i].GetFullPath().c_str(),
+				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+		}
+	}
+
+
+	if ( !flagfile.FileExists() ) {
+		target->drawStatus = FLAG_FILE_NOT_GENERATED;
+		wxLogError(_T(" FSO did not generate flag file."));
+		return;
+	}
+
+	target->drawStatus = target->ParseFlagFile(flagfile);
+	if ( target->drawStatus == DRAW_OK ) {
+		::wxRemoveFile(flagfile.GetFullPath());
+		
+		size_t itemCount = 0;
+		FlagCategoryList::iterator iter =
+			target->allSupportedFlagsByCategory.begin();
+		while ( iter != target->allSupportedFlagsByCategory.end() ) {
+			itemCount += (*iter)->flags.GetCount();
+			iter++;
+		}
+		target->SetItemCount(itemCount);
+	}
+
+	wxCommandEvent evt(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, wxID_NONE);
+	this->target->AddPendingEvent(evt);
+
+	delete this;
 }
