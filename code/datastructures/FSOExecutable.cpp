@@ -115,7 +115,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	if ( tok.HasMoreTokens() && (first == _T("fred2") || first == _T("fs2")) ) {
 		wxString first1 = tok.GetNextToken();
 		if ( first1 == _T("open") ) {
-			if ( first = _T("fs2") ) {
+			if ( first == _T("fs2") ) {
 				ver.binaryname = _T("FreeSpace 2 Open");
 			} else {
 				ver.binaryname = _T("Fred 2 Open");
