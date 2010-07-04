@@ -33,18 +33,19 @@ public:
 	void OnQuit(wxCommandEvent& event);
 	void OnHelp(wxCommandEvent& event);
 	void OnFSButton(wxCommandEvent& event);
-	void OnStartFS(wxButton* play);
-	void OnKillFS(wxButton* play);
+	void OnStart(wxButton* button, bool startFred=false);
+	void OnKill(wxButton* button, bool killFred=false);
 	void OnStartFred(wxCommandEvent& event);
 	void OnUpdate(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnContextHelp(wxHelpEvent& event);
 	void OnFS2Exited(wxProcessEvent& event);
+	void OnFRED2Exited(wxProcessEvent& event);
 
 private:
 	wxProcess* process;
 	wxToolbook* mainTab;
-	long FS2_pid;
+	long FS2_pid, FRED2_pid;
 
 	DECLARE_EVENT_TABLE();
 };

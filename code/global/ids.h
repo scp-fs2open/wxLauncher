@@ -43,6 +43,7 @@ enum WindowIDS {
 	ID_PLAY_BUTTON,
 	ID_ABOUT_BUTTON,
 	ID_FS2_PROCESS,
+	ID_FRED2_PROCESS,
 
 	ID_PROFILE_COMBO,
 	ID_NEW_PROFILE,
@@ -104,6 +105,7 @@ enum WindowIDS {
 	ID_EXE_ROOT_FOLDER_BOX,
 	ID_EXE_SELECT_ROOT_BUTTON,
 	ID_EXE_CHOICE_BOX,
+	ID_EXE_FRED_CHOICE_BOX,
 
 	ID_CLONE_PROFILE_DIALOG,
 	ID_DELETE_PROFILE_DIALOG,
@@ -166,6 +168,8 @@ enum ProfileDialogReturnValues {
 #define NEWS_LAST_TIME_FORMAT				_T("%Y %j %H %M %S")
 #define GBL_CFG_NET_NEWS_LAST_TIME			_T("/net/lastdownloadnews") //!< string, formated time as NEWS_LAST_TIME_FORMAT
 #define GBL_CFG_NET_THE_NEWS				_T("/net/thenews)")		//!< string, the formatted text (workin' for a livin'!)
+
+#define GBL_CFG_OPT_CONFIG_FRED				_T("/opt/configfred")	//!< bool, true means show the user the Fred button and allow user to select fred executable
 /** @}*/
 
 /** \defgroup profilekeys Keys used in profiles */
@@ -178,6 +182,7 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_TC_CURRENT_MODLINE			_T("/tc/currentmodline")	//!< string, the entire line that should follow -mod
 #define PRO_CFG_TC_CURRENT_MOD				_T("/tc/currentmod")	//!< string, the mod shortname (for modlist)
 #define PRO_CFG_TC_CURRENT_FLAG_LINE		_T("/tc/flags")			//!< string, the flags that we as the modline to to make the cmdline
+#define PRO_CFG_TC_CURRENT_FRED				_T("/tc/currentfred")	//!< string, fred binary's name
 
 #define PRO_CFG_VIDEO_API					_T("/video/api")		//!< string
 #define PRO_CFG_VIDEO_RESOLUTION_WIDTH		_T("/video/width")		//!< int

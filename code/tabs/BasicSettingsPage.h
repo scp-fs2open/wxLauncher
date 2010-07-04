@@ -30,6 +30,7 @@ public:
 	void OnTCChanged(wxCommandEvent &event);
 
 	void OnSelectExecutable(wxCommandEvent &event);
+	void OnSelectFredExecutable(wxCommandEvent &event);
 	void OnSelectVideoResolution(wxCommandEvent &event);
 	void OnSelectGraphicsAPI(wxCommandEvent &event);
 	void OnSelectVideoDepth(wxCommandEvent &event);
@@ -67,8 +68,10 @@ public:
 	void ProfileChanged(wxCommandEvent& event);
 
 private:
-	void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
-	void FillResolutionDropBox(wxChoice* exeChoice);
+	static void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
+	static void FillFredExecutableDropBox(wxChoice* exeChoice, wxFileName path);
+	static void FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes);
+	static void FillResolutionDropBox(wxChoice* exeChoice);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();

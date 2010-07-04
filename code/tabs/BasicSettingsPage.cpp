@@ -88,6 +88,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString tcfolder, binary;
 	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
+	wxString fredBinary;
+	bool fredEnabled;
+	proman->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("TC root folder and Executable"));
 
@@ -97,15 +101,29 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	rootFolderBox->SetEditable(false);
 
-	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("Use this FS2_Open binary: "));
+	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("Use this FS2 Open binary: "));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	if ( hastcfolder ) {
-		this->FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
+		BasicSettingsPage::FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
 		useExeChoice->FindAndSetSelectionWithClientData(binary);
 	} else {
 		useExeChoice->Disable();
 	}
 	TCManager::RegisterTCChanged(this);
+
+	wxStaticText* useFredText = NULL;
+	ExeChoice* useFredChoice = NULL;
+	if ( fredEnabled ) {
+		useFredText = new wxStaticText(this, wxID_ANY, _("Use this FRED2 Open binary: "));
+		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
+
+		if ( hastcfolder ) {
+			BasicSettingsPage::FillFredExecutableDropBox(useFredChoice, wxFileName(tcfolder, wxEmptyString));
+			useFredChoice->FindAndSetSelectionWithClientData(fredBinary);
+		} else {
+			useExeChoice->Disable();
+		}
+	}
 
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
 	rootFolderSizer->Add(rootFolderText);
@@ -116,9 +134,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	selectExeSizer->Add(useExeText);
 	selectExeSizer->Add(useExeChoice, wxSizerFlags().Proportion(1));
 
+	wxBoxSizer* selectFredExeSizer = NULL;
+	if ( useFredText != NULL && useFredChoice != NULL ) {
+		selectFredExeSizer = new wxBoxSizer(wxHORIZONTAL);
+		selectFredExeSizer->Add(useFredText);
+		selectFredExeSizer->Add(useFredChoice, wxSizerFlags().Proportion(1));
+	}
+
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxVERTICAL);
 	exeSizer->Add(rootFolderSizer, wxSizerFlags().Expand());
 	exeSizer->Add(selectExeSizer,  wxSizerFlags().Expand());
+	if ( selectFredExeSizer != NULL ) {
+		exeSizer->Add(selectFredExeSizer, wxSizerFlags().Expand());
+	}
 
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, ID_VIDEO_STATIC_BOX, _("Video"));
@@ -528,6 +556,7 @@ BasicSettingsPage::~BasicSettingsPage() {
 BEGIN_EVENT_TABLE(BasicSettingsPage, wxPanel)
 EVT_BUTTON(ID_EXE_SELECT_ROOT_BUTTON, BasicSettingsPage::OnSelectTC)
 EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
+EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 
 // Video controls
@@ -655,7 +684,14 @@ into the Executable DropBox.  This function does nothing else to the choice
 control, not even clearing the drop box (call the Clear function if you don't
 want the old items to stay. */
 void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
-	wxArrayString exes = FSOExecutable::GetBinariesFromRootFolder(path);
+	BasicSettingsPage::FillExecutableDropBox(exeChoice, FSOExecutable::GetBinariesFromRootFolder(path));
+}
+
+void BasicSettingsPage::FillFredExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
+	BasicSettingsPage::FillExecutableDropBox(exeChoice, FSOExecutable::GetFredBinariesFromRootFolder(path));
+}
+
+void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes) {
 	wxArrayString::iterator iter = exes.begin();
 	while ( iter != exes.end() ) {
 		wxFileName path(*iter);
@@ -680,6 +716,23 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->GetExecutableName());
 	TCManager::GenerateTCBinaryChanged();
+}
+
+void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) {
+	ExeChoice* choice = dynamic_cast<ExeChoice*>(
+		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
+	wxCHECK_RET( choice != NULL, 
+		_T("OnSelectExecutable: cannot find fred choice drop box"));
+
+	FSOExecutable* ver = dynamic_cast<FSOExecutable*>(
+		choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( ver != NULL,
+		_T("OnSelectExecutable: choice does not have FSOVersion data"));
+	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName().c_str());
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_TC_CURRENT_FRED, ver->GetExecutableName());
+	TCManager::GenerateTCFredBinaryChanged();
 }
 
 void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &WXUNUSED(event)) {
