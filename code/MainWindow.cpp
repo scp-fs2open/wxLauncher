@@ -47,6 +47,7 @@ MainWindow::MainWindow(SkinSystem* skin) {
 		wxDefaultPosition, wxSize(745, 550), MAINWINDOW_STYLE);
 
 	this->FS2_pid = 0;
+	this->FRED2_pid = 0;
 
 	this->SetFont(skin->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
@@ -101,6 +102,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_BUTTON(ID_ABOUT_BUTTON, MainWindow::OnAbout)
 	EVT_HELP(wxID_ANY, MainWindow::OnContextHelp)
 	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
+	EVT_END_PROCESS(ID_FRED2_PROCESS, MainWindow::OnFRED2Exited)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -114,7 +116,22 @@ void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
 	}
 }
 void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("Start Fred"));
+	bool fredEnabled;
+	ProMan::GetProfileManager()->Global()->Read(
+		GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	if ( fredEnabled ) {
+		wxButton* fred = dynamic_cast<wxButton*>(
+			wxWindow::FindWindowById(ID_FRED_BUTTON, this));
+		wxCHECK_RET(fred != NULL, _T("Unable to find fred button"));
+
+		if (this->FRED2_pid == 0) {
+			this->OnStart(fred, true);
+		} else {
+			this->OnKill(fred, true);
+		}
+	} else {
+		wxLogError(_T("OnStartFred called while fredSupport is disabled!"));
+	}
 }
 void MainWindow::OnFSButton(wxCommandEvent& WXUNUSED(event)) {
 	wxButton* play = dynamic_cast<wxButton*>(
@@ -122,28 +139,31 @@ void MainWindow::OnFSButton(wxCommandEvent& WXUNUSED(event)) {
 	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
 
 	if (this->FS2_pid == 0) {
-		this->OnStartFS(play);
+		this->OnStart(play);
 	} else {
-		this->OnKillFS(play);
+		this->OnKill(play);
 	}
 }
 
-void MainWindow::OnStartFS(wxButton* play) {
-	play->SetLabel(_("Starting"));
-	play->Disable();
+void MainWindow::OnStart(wxButton* button, bool startFred) {
+	button->SetLabel(_("Starting"));
+	button->Disable();
+
+	const wxString defaultButtonValue((startFred)?_("Fred"):_("Play"));
+	const wxString cfgBinaryPath((startFred)? PRO_CFG_TC_CURRENT_FRED : PRO_CFG_TC_CURRENT_BINARY);
 	
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
 	if ( !p->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
 		wxLogError(_T("TC folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
-		play->SetLabel(_("Play"));
-		play->Enable();
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
-	if ( !p->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary) ) {
-		wxLogError(_T("Binary to execute is not set (%s)"), PRO_CFG_TC_CURRENT_BINARY);
-		play->SetLabel(_("Play"));
-		play->Enable();
+	if ( !p->Get()->Read(cfgBinaryPath, &binary) ) {
+		wxLogError(_T("Binary to execute is not set (%s)"), cfgBinaryPath);
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
 
@@ -154,14 +174,14 @@ void MainWindow::OnStartFS(wxButton* play) {
 	if ( !path.FileExists() ) {
 #endif
 		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
-		play->SetLabel(_("Play"));
-		play->Enable();
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
 
 	if ( ProMan::NoError != ProMan::PushProfile(p->Get()) ) {
-		play->SetLabel(_("Play"));
-		play->Enable();
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
 
@@ -170,44 +190,61 @@ void MainWindow::OnStartFS(wxButton* play) {
 	if ( !::wxSetWorkingDirectory(folder) ) {
 		wxLogError(_T("Unable to change working directory to %s"),
 			folder.c_str());
-		play->SetLabel(_T("Play"));
-		play->Enable();
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
 
-	this->process = new wxProcess(this, ID_FS2_PROCESS);
+	if ( startFred ) {
+		this->process = new wxProcess(this, ID_FRED2_PROCESS);
+	} else {
+		this->process = new wxProcess(this, ID_FS2_PROCESS);
+	}
 	wxString formatString;
 #if IS_APPLE
 	formatString += _T("open ");
 #endif
 	formatString = _T("%s");
 	wxString command(wxString::Format(formatString, path.GetFullPath().c_str()));
+	if ( startFred ) {
+		wxString fredModLine;
+		p->Get()->Read(PRO_CFG_TC_CURRENT_MODLINE, &fredModLine, wxEmptyString);
+		if ( !fredModLine.IsEmpty() ) {
+			command += wxString::Format(_T(" -mod %s"), fredModLine.c_str());
+		}
+	}
+	wxLogDebug(_T("Starting a process using '%s'"), command.c_str());
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, this->process);
 	if ( pid == 0 ) {
-		play->SetLabel(_("Play"));
-		play->Enable();
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
 		return;
 	}
-	this->FS2_pid = pid;
-	wxLogInfo(_T("FreeSpace 2 Open is now running..."));
+	if ( startFred ) {
+		this->FRED2_pid = pid;
+		wxLogInfo(_T("FRED 2 Open is now running..."));
+	} else {
+		this->FS2_pid = pid;
+		wxLogInfo(_T("FreeSpace 2 Open is now running..."));
+	}
 
 	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
 		wxLogError(_T("Unable to change back to working directory %s"),
 			previousWorkingDir.c_str());
 	}
 
-	play->SetLabel(_T("Kill"));
-	play->Enable();
+	button->SetLabel(_T("Kill"));
+	button->Enable();
 }
 
-void MainWindow::OnKillFS(wxButton* play) {
-	play->SetLabel(_T("Stopping"));
-	play->Disable();
+void MainWindow::OnKill(wxButton* button, bool killFred) {
+	button->SetLabel(_T("Stopping"));
+	button->Disable();
 
-	int ret = ::wxKill(this->FS2_pid, wxSIGKILL);
+	int ret = ::wxKill((killFred)?this->FRED2_pid:this->FS2_pid, wxSIGKILL);
 	if ( ret != wxKILL_OK ) {
 		wxLogError(_T("Got KillError %d"), ret);
-		wxLogError(_T("Failed to kill FS2 process!"));
+		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED2"):_T("FS2"));
 	}
 }
 
@@ -241,6 +278,28 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
 	play->SetLabel(_T("Play"));
 	play->Enable();
+	
+}
+
+void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
+	if ( this->FRED2_pid == 0 ) {
+		wxLogError(_T("OnFRED2Exited called before there is a process running"));
+		return;
+	}
+
+	int exitCode = event.GetExitCode();
+
+	wxLogInfo(_T("FRED2 Open exited with a status of %d"), exitCode);
+
+	delete this->process;
+	this->process = NULL;
+	this->FRED2_pid = 0;
+	
+	wxButton* fred = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_FRED_BUTTON, this));
+	wxCHECK_RET(fred != NULL, _T("Unable to find Fred button"));
+	fred->SetLabel(_T("Fred"));
+	fred->Enable();
 	
 }
 

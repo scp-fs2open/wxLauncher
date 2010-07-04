@@ -29,9 +29,16 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 	parent, wxID_ANY, pos, size) {
 		this->SetMinSize(size);
 
+		bool showFred;
+		ProMan::GetProfileManager()->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &showFred, false);
+
 		this->close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
 		this->help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
-		this->fred = NULL; // new wxButton(this, ID_FRED_BUTTON, _("Fred"));
+		if ( showFred ) {
+			this->fred = new wxButton(this, ID_FRED_BUTTON, _("Fred"));
+		} else {
+			this->fred = NULL;
+		}
 		this->update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Available"));
 		this->update->Hide();
 		this->play = new wxButton(this, ID_PLAY_BUTTON, _("Play"));
@@ -41,7 +48,9 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		sizer->AddStretchSpacer(1);
 		sizer->Add(this->update, wxSizerFlags().ReserveSpaceEvenIfHidden());
 		sizer->AddStretchSpacer(1);
-		//sizer->Add(this->fred);
+		if ( this->fred != NULL ) {
+			sizer->Add(this->fred);
+		}
 		sizer->Add(this->play);
 
 		this->SetSizer(sizer);
@@ -49,6 +58,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 
 		TCManager::RegisterTCBinaryChanged(this);
 		TCManager::RegisterTCChanged(this);
+		TCManager::RegisterTCFredBinaryChanged(this);
 		wxCommandEvent nullEvent;
 		this->OnTCChanges(nullEvent);
 }
@@ -56,10 +66,11 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 BEGIN_EVENT_TABLE(BottomButtons, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BottomButtons::OnTCChanges)
+EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BottomButtons::OnTCChanges)
 END_EVENT_TABLE()
 
 void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
-	wxString tc, binary;
+	wxString tc, binary, fredBinary;
 	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tc, wxEmptyString);
 	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
 	if ( tc.IsEmpty() || binary.IsEmpty() ) {
@@ -68,6 +79,17 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 		this->play->Enable();
 	} else {
 		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName().c_str());
+		this->play->Disable();
+	}
+	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);
+	if ( this->fred == NULL ) {
+		// do nothing, no button to manipulate
+	} else if ( tc.IsEmpty() || fredBinary.IsEmpty() ) {
+		this->fred->Disable();
+	} else if ( wxFileName(tc, fredBinary).FileExists() ) {
+		this->fred->Enable();
+	} else {
+		wxLogWarning(_("Fred binary %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
 		this->play->Disable();
 	}
 }

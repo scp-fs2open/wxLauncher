@@ -33,7 +33,9 @@ public:
 	inline const wxString& GetExecutableName() const;
 
 	static bool CheckRootFolder(wxFileName path);
-	static wxArrayString GetBinariesFromRootFolder(wxFileName path);
+	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path);
+	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, const wxString &globPattern);
+	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
 	static wxString MakeVersionStringFromVersion(FSOExecutable version);
 	wxString MakeVersionStringFromVersion();

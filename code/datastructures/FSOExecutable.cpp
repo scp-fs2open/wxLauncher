@@ -71,20 +71,31 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 
 #if IS_WIN32
 #define EXECUTABLE_GLOB_PATTERN _T("fs2_*.exe")
+#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*.exe")
 #elif IS_LINUX
 #define EXECUTABLE_GLOB_PATTERN _T("fs2_*")
+#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*")
 #elif IS_APPLE
 #define EXECUTABLE_GLOB_PATTERN _T("fs2_*.app")
+#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*.app")
 #else
 #error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
 #endif
 
-wxArrayString FSOExecutable::GetBinariesFromRootFolder(wxFileName path) {
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path) {
+	return FSOExecutable::GetBinariesFromRootFolder(path, EXECUTABLE_GLOB_PATTERN);
+}
+
+wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(const wxFileName& path) {
+	return FSOExecutable::GetBinariesFromRootFolder(path, FRED_EXECUTABLE_GLOB_PATTERN);
+}
+
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, const wxString& globPattern) {
 	wxArrayString files;
 	wxDir folder(path.GetPath());
 	wxString filename;
 
-	bool cont = folder.GetFirst(&filename, EXECUTABLE_GLOB_PATTERN, wxDIR_FILES);
+	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_FILES);
 	while (cont == true) {
 #if IS_LINUX
 		if ( !filename.EndsWith(_T(".exe"))
