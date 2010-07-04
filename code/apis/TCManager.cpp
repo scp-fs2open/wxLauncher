@@ -108,7 +108,7 @@ void TCManager::GenerateTCChanged() {
 	TCEventHandlers::iterator iter = TCChangedHandlers.begin();
 	while (iter != TCChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(event);
+		current->ProcessEvent(*(event.Clone()));
 		iter++;
 		wxLogDebug(_T(" Sent event to %p"), &(*iter));
 	}
@@ -119,7 +119,7 @@ void TCManager::GenerateTCBinaryChanged() {
 	TCEventHandlers::iterator iter = TCBinaryChangedHandlers.begin();
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(event);
+		current->ProcessEvent(*(event.Clone()));
 		iter++;
 		wxLogDebug(_T(" Sent event to %p"), &(*iter));
 	}
@@ -130,7 +130,7 @@ void TCManager::GenerateTCSelectedModChanged() {
 	TCEventHandlers::iterator iter = TCSelectedModChangedHandlers.begin();
 	while (iter != TCSelectedModChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(event);
+		current->ProcessEvent(*(event.Clone()));
 		iter++;
 		wxLogDebug(_T(" Sent event to %p"), &(*iter));
 	}
@@ -141,7 +141,7 @@ void TCManager::GenerateTCFredBinaryChanged() {
 	TCEventHandlers::iterator iter = TCFredBinaryChangedHandlers.begin();
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(event);
+		current->ProcessEvent(*(event.Clone()));
 		iter++;
 		wxLogDebug(_T(" Sent event to %p"), &(*iter));
 	}
