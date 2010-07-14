@@ -112,15 +112,21 @@ Building - Windows
 Run CMake in your favourite way (GUI, or on the commandline 
 ccmake (uses curses) or cmake).
 
-Assuming the GUI, select the CMakeLists.txt in the main wxLauncher
- source directory and set your output directory to where you want the native build tool to be placed, somewhere without spaces.
- Click configure until the Generate button Enables.  The lines that are highligted red are new variables that CMake has found. 
+CMake QT Gui
+------------
+Assuming the GUI, select the CMakeLists.txt in the main
+wxLauncher source directory and set your output directory
+to where you want the native build tool to be placed,
+somewhere without spaces. Click configure until the Generate
+button Enables.  The lines that are highligted red are new 
+variables that CMake has found. 
 - Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
 source directory if it remains NOTFOUND.
 - Set PYTHON_EXECUTABLE to the python that you want to use (it may 
 not show up, if not don't worry about it, it means that it found it)
 - Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher.
- Make sure that it is unchecked if you plan distrubting the code as with this checked the launcher will only run on the dev 
+ Make sure that it is unchecked if you plan on distributing the
+code as with this checked the launcher will only run on the dev 
 machine. This option changes where the launcher looks for files to 
 display as the default interface.
 - Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those 
@@ -160,11 +166,4 @@ Commandline
 
 License
 =======
-wxLauncher is Free Software, released under the 
-GNU General Public License, version 2.
-You should have one copy of the license downloaded with the
-source (as this readme file). If it's missing, you can find
-a copy of the license at:
-	http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-	
-Please add it back to the source package ;)
+See License.txt.
