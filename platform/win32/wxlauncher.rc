@@ -7,4 +7,4 @@
 // remains consistent on all systems.
 
 IDI_WXLAUNCHER       ICON         "wxlauncher.ico"
-IDI_SMALL               ICON         "small.ico"
+IDI_SMALL               ICON         "wxlauncher.ico"
