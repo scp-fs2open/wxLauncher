@@ -95,7 +95,12 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	wxDir folder(path.GetPath());
 	wxString filename;
 
+#if IS_APPLE // Binaries are directories on OSX.
+	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_DIRS);
+#else
 	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_FILES);
+#endif
+
 	while (cont == true) {
 #if IS_LINUX
 		if ( !filename.EndsWith(_T(".exe"))
