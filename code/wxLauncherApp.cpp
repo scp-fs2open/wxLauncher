@@ -28,6 +28,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SDL.h"
 #endif
 
+// prevents SDL_main.h (included by SDL.h) from redefining main
+#ifdef main
+#undef main
+#endif
+
 #include "wxLauncherApp.h"
 #include "MainWindow.h"
 #include "apis/SkinManager.h"
