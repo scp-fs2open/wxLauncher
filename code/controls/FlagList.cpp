@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
 
+//#warning Remove iostream inclusion when it's no longer needed.
+//#include <iostream> // FIXME temporary
+
 #include "global/MemoryDebugging.h"
 
 struct FlagInfo {
@@ -85,14 +88,15 @@ void FlagListBox::Initialize() {
 			return;
 	}
 
-	exename.Assign(tcPath, exeName);
-
-	// The binaries are actually directories on OSX.
-#if IS_APPLE
-	if (!exename.DirExists()) {
+#if IS_APPLE  // needed because on OSX exeName is a relative path from TC root dir
+	exename.Assign(tcPath + wxFileName::GetPathSeparator() + exeName);
 #else
-	if (!exename.FileExists()) {
+	exename.Assign(tcPath, exeName);
 #endif
+	//std::wcerr << "exeName: " << exeName.c_str() << "\n";
+	//std::wcerr << "exename (the file - bad naming choice btw): " << exename.GetFullPath().c_str() << "\n";
+	
+	if (!exename.FileExists()) {
 		this->drawStatus = INVALID_BINARY;
 		return;
 	}
@@ -134,12 +138,15 @@ void FlagListBox::Initialize() {
 	}
 
 	wxArrayString output;
-	wxString formatString;
-#if IS_APPLE
-	formatString += _T("open ");
-#endif
-	formatString += _T("%s -get_flags");
-	wxString commandline = wxString::Format(formatString, exename.GetFullPath().c_str());
+
+	wxString commandline;
+	// use "" to correct for spaces in path to exename
+	if (exename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
+		commandline = _T("\"") + exename.GetFullPath() +  _T("\"") + _T(" -get_flags");
+	} else {
+		commandline = exename.GetFullPath() + _T(" -get_flags");
+	}
+
 	wxLogDebug(_T(" Called FSO with commandline '%s'."), commandline.c_str());
 	FlagProcess *process = new FlagProcess(this, flagFileLocations);
 	::wxExecute(commandline, wxEXEC_ASYNC, process);

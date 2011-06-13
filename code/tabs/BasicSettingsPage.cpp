@@ -20,6 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include <wx/choicebk.h>
 
+//#warning Remove iostream inclusion when it's no longer needed.
+//#include <iostream> // FIXME temporary
+
 #include "generated/configure_launcher.h"
 
 #if HAS_SDL == 1
@@ -695,7 +698,11 @@ void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxArrayString
 	wxArrayString::iterator iter = exes.begin();
 	while ( iter != exes.end() ) {
 		wxFileName path(*iter);
+#if IS_APPLE // need complete path through app bundle to executable
+		FSOExecutable ver = FSOExecutable::GetBinaryVersion(path.GetFullPath());
+#else
 		FSOExecutable ver = FSOExecutable::GetBinaryVersion(path.GetFullName());
+#endif
 		exeChoice->Insert(FSOExecutable::MakeVersionStringFromVersion(ver), 0, new FSOExecutable(ver));
 		iter++;
 	}
@@ -855,6 +862,7 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 		->Write(PRO_CFG_VIDEO_RESOLUTION_WIDTH, res->GetWidth());
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, res->GetHeight());
+	//std::wcerr << "chosen width: " << res->GetWidth() << " height: " << res->GetHeight() << "\n";
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {

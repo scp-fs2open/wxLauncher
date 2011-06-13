@@ -36,6 +36,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/StatusBar.h"
 #include "apis/HelpManager.h"
 
+//#warning Remove iostream inclusion when it's no longer needed.
+//#include <iostream> // FIXME temporary
+
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
@@ -167,12 +170,13 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 
-	wxFileName path(folder, binary, wxPATH_NATIVE);
-#if IS_APPLE // Binaries are directories on OSX.
-	if ( !path.DirExists() ) {
+#if IS_APPLE
+	wxFileName path(folder + wxFileName::GetPathSeparator() + binary, wxPATH_NATIVE);
 #else
-	if ( !path.FileExists() ) {
+	wxFileName path(folder, binary, wxPATH_NATIVE);
 #endif
+
+	if ( !path.FileExists() ) {
 		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
@@ -200,12 +204,17 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	} else {
 		this->process = new wxProcess(this, ID_FS2_PROCESS);
 	}
-	wxString formatString;
-#if IS_APPLE
-	formatString += _T("open ");
-#endif
-	formatString = _T("%s");
-	wxString command(wxString::Format(formatString, path.GetFullPath().c_str()));
+
+	wxString command;
+	// the "" are in case of spaces in the path
+	if (path.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
+		command = _T("\"") + path.GetFullPath() + _T("\"");
+	} else {
+		command = path.GetFullPath();
+	}
+	//std::wcerr << "path.GetFullPath(): " << path.GetFullPath().c_str() << "\n";
+	//std::wcerr << "command: " << command.c_str() << "\n";
+	
 	if ( startFred ) {
 		wxString fredModLine;
 		p->Get()->Read(PRO_CFG_TC_CURRENT_MODLINE, &fredModLine, wxEmptyString);
