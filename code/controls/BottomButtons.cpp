@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 
+#include "generated/configure_launcher.h" // needed to check whether OSX is used
+
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
 
@@ -75,10 +77,19 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
 	if ( tc.IsEmpty() || binary.IsEmpty() ) {
 		this->play->Disable();
+#if IS_APPLE
+	} else if ( wxFileName(tc + wxFileName::GetPathSeparator() + binary).FileExists() ) {
+#else
 	} else if ( wxFileName(tc, binary).FileExists() ) {
+#endif
 		this->play->Enable();
 	} else {
+#if IS_APPLE
+		wxLogWarning(_("Executable %s does not exist"),
+					 wxFileName(tc + wxFileName::GetPathSeparator() + binary).GetFullName().c_str());
+#else
 		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName().c_str());
+#endif
 		this->play->Disable();
 	}
 	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);

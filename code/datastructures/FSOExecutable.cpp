@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 
+//#warning Remove iostream inclusion when it's no longer needed.
+//#include <iostream> // FIXME temporary
+
 #include "global/MemoryDebugging.h"
 
 enum BuildCapabilities_enum {
@@ -112,7 +115,35 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 #endif
 		cont = folder.GetNext(&filename);
 	}
+
+	// filter out launcher binaries (at least on OSX)
+	for (int i = files.GetCount() - 1; i >= 0; --i) {
+		if (files[i].Lower().Find(_T("launcher")) != wxNOT_FOUND) {
+			files.RemoveAt(i);
+		}
+	}
+	
+#if IS_APPLE
+	// find actual executable inside .app bundle and call that the "executable"
+	for (wxArrayString::iterator it = files.begin(), end = files.end(); it != end; ++it) {
+		wxString pathToBin = 
+			wxDir::FindFirst(path.GetPath(wxPATH_GET_SEPARATOR) + *it + _T("/Contents/MacOS"),
+							 _T("*"),
+							 wxDIR_FILES);
+//		std::wcerr << "full path to bin: " << pathToBin.c_str() << "\n";
+		pathToBin.Replace(path.GetPath(wxPATH_GET_SEPARATOR), _T(""));
+//		std::wcerr << "relative path to bin: " << pathToBin.c_str() << "\n";
+		*it = pathToBin;
+	}
+#endif
+	
 	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
+	
+	// FIXME temporary debugging code
+//	for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
+//		std::wcerr << "Executable file " << i << " " << files.Item(i).c_str() << "\n";
+//	}
+	
 	return files;
 }
 
