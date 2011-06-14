@@ -71,6 +71,8 @@ Markdown for Python is required in order to build the
 integrated help system. 
 Python Markdown homepage:
 	http://www.freewisdom.org/projects/python-markdown/
+On debian-based systems:
+	apt-get install python-markdown
 
 The OpenAL Software Development Kit is an optional component
 needed to build this program.  OpenAL support requires the 
@@ -122,15 +124,12 @@ button Enables.  The lines that are highligted red are new
 variables that CMake has found. 
 - Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
 source directory if it remains NOTFOUND.
-- Set PYTHON_EXECUTABLE to the python that you want to use (it may 
-not show up, if not don't worry about it, it means that it found it)
+- Set PYTHON_EXECUTABLE to the python that you want to use (it may not show up. If it doesn't show up, don't worry about it, it means that cmake found it)
 - Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher.
  Make sure that it is unchecked if you plan on distributing the
 code as with this checked the launcher will only run on the dev 
-machine. This option changes where the launcher looks for files to 
-display as the default interface.
-- Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those 
-options complied in.
+machine. This option changes where the launcher looks for files to display as the default interface.
+- Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those options complied in.
 - If USE_OPENAL is check, OPENAL_INCLUDE_DIR will appear, this 
 should be set the include folder in the OpenAL SDK folder.
 
@@ -151,16 +150,11 @@ Building - OS X 10.5 (Leopard)
 Commandline
 -----------
 - Download the source
-- Download and install XCode 3.1 if not already installed, you will need a
- Free Apple Developers Center login to download if Xcode in not on your
- Install Disk.
+- Download and install XCode 3.1 if not already installed, you will need a  Free Apple Developers Center login to download if Xcode in not on your OSX Install Disk.
 - Download and install Python 2.6
 - Download and install CMake 2.8
 - Download and install SDL 1.2 (follow instructions in the SDL ReadMe.txt)
-- (Optional) Download and install Mercurial (make sure you have the
- correct download for your version of OS X, if you get an error about
- python not being installed but you already have, you downloaded the 
- version of Mercurial for your version of OS X)
+- (Optional) Download and install Mercurial (make sure you have the correct download for your version of OS X, if you get an error about python not being installed but you already have, you downloaded the version of Mercurial for your version of OS X)
 - Run CMake ( either using cmake or ccmake in the source directory or use Spotlight to find the CMake GUI)
 - Choose XCode as your generator.
 
