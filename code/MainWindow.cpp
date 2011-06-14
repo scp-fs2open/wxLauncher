@@ -36,9 +36,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/StatusBar.h"
 #include "apis/HelpManager.h"
 
-//#warning Remove iostream inclusion when it's no longer needed.
-//#include <iostream> // FIXME temporary
-
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
@@ -212,8 +209,6 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	} else {
 		command = path.GetFullPath();
 	}
-	//std::wcerr << "path.GetFullPath(): " << path.GetFullPath().c_str() << "\n";
-	//std::wcerr << "command: " << command.c_str() << "\n";
 	
 	if ( startFred ) {
 		wxString fredModLine;

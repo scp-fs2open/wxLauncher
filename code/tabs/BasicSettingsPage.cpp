@@ -20,9 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include <wx/choicebk.h>
 
-//#warning Remove iostream inclusion when it's no longer needed.
-//#include <iostream> // FIXME temporary
-
 #include "generated/configure_launcher.h"
 
 #if HAS_SDL == 1
@@ -862,7 +859,6 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 		->Write(PRO_CFG_VIDEO_RESOLUTION_WIDTH, res->GetWidth());
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, res->GetHeight());
-	//std::wcerr << "chosen width: " << res->GetWidth() << " height: " << res->GetHeight() << "\n";
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {

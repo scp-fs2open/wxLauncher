@@ -22,9 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 
-//#warning Remove iostream inclusion when it's no longer needed.
-//#include <iostream> // FIXME temporary
-
 #include "global/MemoryDebugging.h"
 
 enum BuildCapabilities_enum {
@@ -130,19 +127,18 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 			wxDir::FindFirst(path.GetPath(wxPATH_GET_SEPARATOR) + *it + _T("/Contents/MacOS"),
 							 _T("*"),
 							 wxDIR_FILES);
-//		std::wcerr << "full path to bin: " << pathToBin.c_str() << "\n";
+		wxLogDebug(_T("full path to bin: ") + pathToBin);
 		pathToBin.Replace(path.GetPath(wxPATH_GET_SEPARATOR), _T(""));
-//		std::wcerr << "relative path to bin: " << pathToBin.c_str() << "\n";
+		wxLogDebug(_T("relative path to bin: ") + pathToBin);
 		*it = pathToBin;
 	}
 #endif
 	
 	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
-	
-	// FIXME temporary debugging code
-//	for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
-//		std::wcerr << "Executable file " << i << " " << files.Item(i).c_str() << "\n";
-//	}
+
+	for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
+		wxLogDebug(_T("Found executable: ") + files.Item(i));
+	}
 	
 	return files;
 }
