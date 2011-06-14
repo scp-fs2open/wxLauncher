@@ -22,9 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
 
-//#warning Remove iostream inclusion when it's no longer needed.
-//#include <iostream> // FIXME temporary
-
 #include "global/MemoryDebugging.h"
 
 struct FlagInfo {
@@ -72,7 +69,7 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 
 void FlagListBox::Initialize() {
 	wxString tcPath, exeName;
-	wxFileName exename;
+	wxFileName exeFilename;
 
 	wxLogDebug(_T("Initializing FlagList"));
 
@@ -89,14 +86,15 @@ void FlagListBox::Initialize() {
 	}
 
 #if IS_APPLE  // needed because on OSX exeName is a relative path from TC root dir
-	exename.Assign(tcPath + wxFileName::GetPathSeparator() + exeName);
+	exeFilename.Assign(tcPath + wxFileName::GetPathSeparator() + exeName);
 #else
-	exename.Assign(tcPath, exeName);
+	exeFilename.Assign(tcPath, exeName);
 #endif
-	//std::wcerr << "exeName: " << exeName.c_str() << "\n";
-	//std::wcerr << "exename (the file - bad naming choice btw): " << exename.GetFullPath().c_str() << "\n";
+
+	wxLogDebug(_T("exeName: ") + exeName);
+	wxLogDebug(_T("exeFilename: ") + exeFilename.GetFullPath());
 	
-	if (!exename.FileExists()) {
+	if (!exeFilename.FileExists()) {
 		this->drawStatus = INVALID_BINARY;
 		return;
 	}
@@ -140,11 +138,11 @@ void FlagListBox::Initialize() {
 	wxArrayString output;
 
 	wxString commandline;
-	// use "" to correct for spaces in path to exename
-	if (exename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
-		commandline = _T("\"") + exename.GetFullPath() +  _T("\"") + _T(" -get_flags");
+	// use "" to correct for spaces in path to exeFilename
+	if (exeFilename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
+		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -get_flags");
 	} else {
-		commandline = exename.GetFullPath() + _T(" -get_flags");
+		commandline = exeFilename.GetFullPath() + _T(" -get_flags");
 	}
 
 	wxLogDebug(_T(" Called FSO with commandline '%s'."), commandline.c_str());
