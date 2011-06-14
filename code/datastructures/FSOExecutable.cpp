@@ -146,7 +146,8 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	wxLogDebug(_T("Making version struct for '%s'"), binaryname.c_str());
 	FSOExecutable ver;
-	wxStringTokenizer tok(binaryname, _T("_.- ()[]"));
+	// the Lower() works around case-sensitivity of == on wxStrings
+	wxStringTokenizer tok(binaryname.Lower(), _T("_.- ()[]"));
 	wxString first;
 	ver.executablename = binaryname;
 
@@ -179,6 +180,10 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 
 		if ( token.StartsWith(_T("exe")) ) {
 			; // do nothing
+#if IS_APPLE
+		} else if (token.StartsWith(_T("app"))) {
+			break; // we've reached the end of the app name
+#endif
 		} else if ( token.IsNumber() && ver.major == 0 ) {
 			// must be major version number
 			long version = 0;
