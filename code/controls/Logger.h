@@ -31,9 +31,12 @@ public:
 	void SetStatusBarTarget(StatusBar *bar);
 
 	virtual void DoLog(wxLogLevel level, const wxChar *msg, time_t time);
+	
+	virtual void Flush();
 private:
 	wxFFileOutputStream *out;
 	StatusBar *statusBar;
+	wxFFile *outFile;
 };
 
 #endif
