@@ -69,10 +69,11 @@ public:
 		return false;
 	}
 };
-		
+
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	TCManager::Initialize();
+	TCManager::RegisterTCChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
@@ -109,7 +110,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	} else {
 		useExeChoice->Disable();
 	}
-	TCManager::RegisterTCChanged(this);
 
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
@@ -815,7 +815,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 	modes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
 	
 	if ( modes == (SDL_Rect**)NULL ) {
-	  wxLogWarning(_T("Unable retreive any video modes"));
+	  wxLogWarning(_T("Unable to retrieve any video modes"));
 	} else if ( modes == (SDL_Rect**)(-1) ) {
 	  wxLogWarning(_T("All resolutions are available.  If you get this message please report it to the developers as they do not think this response is actually possible"));
 	} else {
@@ -823,9 +823,9 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 	  
 	  for(int i = 0; modes[i]; i++) {
 	    wxLogDebug(_T(" %d x %d"), modes[i]->w, modes[i]->h);
-	    
+		
 	    wxString resolution = wxString::Format(CFG_RES_FORMAT_STRING, modes[i]->w, modes[i]->h);
-	    
+
 	    /*while ( iter != strings.end() ) {
 		    if ( *iter == resolution ) {
 			    exists = true;
@@ -837,7 +837,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 		    exeChoice->Insert(
 			    resolution,
 			    0,
-			    new Resolution(modes[i]->w, modes[i]->h));
+				new Resolution(modes[i]->h, modes[i]->w));
 	    }
 	  }
 	}
