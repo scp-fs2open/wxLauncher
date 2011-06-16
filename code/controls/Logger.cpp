@@ -41,12 +41,17 @@ const wxString levels[] = {
 };
 /** Constructor. */
 Logger::Logger() {
-	wxFileName outfile(wxStandardPaths::Get().GetUserDataDir(), _T("wxLauncher.log"));
-	if (!outfile.DirExists() && 
-		!wxFileName::Mkdir(outfile.GetPath(), 0700, wxPATH_MKDIR_FULL) ) {
-			wxLogFatalError(_T("Unable to create folder to place log in. (%s)"), outfile.GetPath().c_str());
+	wxFileName outFileName(wxStandardPaths::Get().GetUserDataDir(), _T("wxLauncher.log"));
+	if (!outFileName.DirExists() && 
+		!wxFileName::Mkdir(outFileName.GetPath(), 0700, wxPATH_MKDIR_FULL) ) {
+			wxLogFatalError(_T("Unable to create folder to place log in. (%s)"), outFileName.GetPath().c_str());
 	}
-	this->out = new wxFFileOutputStream(outfile.GetFullPath(), _T("wb"));
+
+	this->outFile = new wxFFile(outFileName.GetFullPath(), _T("wb"));
+	if (!outFile->IsOpened()) {
+		wxLogFatalError(_T("Unable to open log output file. (%s)"), outFileName.GetFullPath().c_str());
+	}
+	this->out = new wxFFileOutputStream(*outFile);
 	wxASSERT_MSG(out->IsOk(), _T("Log output file is not valid!"));
 	this->out->Write("\357\273\277", 3);
 
@@ -59,6 +64,7 @@ Logger::~Logger() {
 	this->out->Write(exitmsg, sizeof(exitmsg));
 	this->out->Close();
 	delete this->out;
+	delete this->outFile;
 }
 
 /** Overridden as per wxWidgets docs to implement a wxLog. */
@@ -82,6 +88,10 @@ void Logger::DoLog(wxLogLevel level, const wxChar *msg, time_t time) {
 			this->statusBar->SetMainStatusText(buf, ID_SB_INFO);
 		}
 	}		
+}
+
+void Logger::Flush() {
+	outFile->Flush(); // Warning: ignoring return value from Flush().	
 }
 
 /** Stores the pointer the status bar that I am to send status messages to.
