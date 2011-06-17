@@ -141,7 +141,9 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
 	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flagset choice control") );
 	wxArrayString flagSetsArray;
-	flagSetChoice->Append(this->flagListBox->GetFlagSets(flagSetsArray));
+	if (flagSetChoice->IsEmpty()) { // box should be appended just once
+		flagSetChoice->Append(this->flagListBox->GetFlagSets(flagSetsArray));
+	}
 
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
