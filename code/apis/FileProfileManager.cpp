@@ -77,7 +77,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	wxStringInputStream inConfigStream(_T(""));
 	wxFileConfig outConfig(inConfigStream, wxMBConvUTF8());
-	bool ret;
+	bool ret;	
 
 	int width, height, bitdepth;
 	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
@@ -135,6 +135,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// ScreenshotNum
 
+#if !IS_APPLE // speech is currently not supported in OS X
 	int inMulti, inTechroom, inBriefings, inGame;
 	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
 	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
@@ -162,6 +163,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	ret = outConfig.Write( L"SpeechVoice", speechVoice);
 	ReturnChecker(ret, __LINE__);
+#endif
 
 	// Fullscreen
 
@@ -231,6 +233,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
+	
+#if IS_APPLE // the OS X FSO binary likes having this line at the top.
+	outFileStream.Write("[Default]\n", 10);
+#endif
+
 	outConfig.Save(outFileStream);
 
 	return PushCmdlineFSO(cfg);
