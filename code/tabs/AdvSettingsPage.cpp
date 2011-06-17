@@ -127,7 +127,7 @@ void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 			customFlags += tok;
 		}
 	}
-	customFlagsText->SetLabel(customFlags);
+	customFlagsText->ChangeValue(customFlags);
 	this->OnNeedUpdateCommandLine(event);
 }
 
@@ -162,13 +162,13 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 
 	wxString flagLine = wxString::Format(_T("%s %s"),
 		this->flagListBox->GenerateStringList().c_str(),
-		customFlags->GetLabel().c_str());
+		customFlags->GetValue().c_str());
 
 	wxString cmdLine = wxString::Format(_T("%s%c%s -mod %s %s"),
 		tcPath.c_str(), wxFileName::GetPathSeparator(), exeName.c_str(),
 		modline.c_str(), flagLine.c_str());
 	
-	commandLine->SetLabel(cmdLine);
+	commandLine->ChangeValue(cmdLine);
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
