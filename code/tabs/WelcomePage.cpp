@@ -284,6 +284,11 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 	wxString newProfile = saveButton->GetStringSelection();
 	ProMan* proman = ProMan::GetProfileManager();
 
+	if (newProfile == proman->GetCurrentName()) {
+		// user selected the current profile, so no need to switch, just return
+		return;
+	}
+
 	if ( proman->DoesProfileExist(newProfile) ) {
 		if ( proman->NeedToPromptToSave() ) {
 			int response = wxMessageBox(
