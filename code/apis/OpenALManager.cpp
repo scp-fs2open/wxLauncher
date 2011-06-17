@@ -51,6 +51,16 @@ bool OpenALMan::Initialize() {
 	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
 		isInitialized = true;
 		return true;
+#if IS_APPLE
+	} else if ( OpenALLib.Load(_T("/System/Library/Frameworks/OpenAL.framework/OpenAL"),
+							   wxDL_VERBATIM) ) {
+		isInitialized = true;
+		return true;
+	} else if ( OpenALLib.Load(_T("/Library/Frameworks/OpenAL.framework/OpenAL"),
+							   wxDL_VERBATIM) ) {
+		isInitialized = true;
+		return true;
+#endif
 	} else {
 		return false;
 	}
