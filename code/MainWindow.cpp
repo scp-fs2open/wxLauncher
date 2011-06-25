@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
-	| wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
+	| wxCAPTION | wxCLOSE_BOX | wxMINIMIZE_BOX | wxCLIP_CHILDREN)
 
 MainWindow::MainWindow(SkinSystem* skin) {
 	this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
