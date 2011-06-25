@@ -1,18 +1,23 @@
+# let's go with lower case for commands (or at least be consistent)
+# arbitrarily following http://techbase.kde.org/Policies/CMake_Coding_Style#Upper.2Flower_casing
+
 cmake_minimum_required(VERSION 2.8)
 
 # We don't use C but CMake on linux complains if we don't have it enabled
 project(wxlauncher CXX C) 
 
-SET(VERSION_MAJOR 0)
-SET(VERSION_MINOR 8)
-SET(VERSION_PATCH 0)
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 8)
+set(VERSION_PATCH 0)
 
-SET(CMAKE_OSX_ARCHITECTURES i386)
+set(OSX (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")) # for convenience
+
+set(CMAKE_OSX_ARCHITECTURES i386) ### TODO ADD PPC FOR UNIVERSAL BINARY ###
 
 if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
   if(WIN32)
     set(IS_WIN32 TRUE)
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  elseif(OSX)
     set(IS_APPLE TRUE)
   else()
     set(IS_LINUX TRUE)
@@ -31,15 +36,15 @@ find_program(HG_EXECUTABLE hg)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
-  SET(HELPMAKER_DEBUG "-d")
-  SET(HELPMAKER_QUIET "")
+  set(HELPMAKER_DEBUG "-d")
+  set(HELPMAKER_QUIET "")
 else(onlinehelpmaker_debug)
-  SET(HELPMAKER_DEBUG "")
+  set(HELPMAKER_DEBUG "")
   option(onlinehelpmaker_quiet "Have onlinehelpmaker.py produce even less output than normal" ON)
   if(onlinehelpmaker_quiet)
-    SET(HELPMAKER_QUIET "-q")
+    set(HELPMAKER_QUIET "-q")
   else()
-    SET(HELPMAKER_QUIET "")
+    set(HELPMAKER_QUIET "")
   endif()
 endif(onlinehelpmaker_debug)
 
@@ -47,59 +52,63 @@ endif(onlinehelpmaker_debug)
 # version of the CRT, the one that is being distrubuted in the installer
 add_definitions("/D_BIND_TO_CURRENT_CRT_VERSION=1")
 
-SET(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
+set(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
 option(DEVELOPMENT_MODE "Doing development (cannot build installer in this mode)" OFF)
 if(DEVELOPMENT_MODE)
-  SET(HELP_HTB_LOCATION ${helphtblocation})
-  SET(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
+  set(HELP_HTB_LOCATION ${helphtblocation})
+  set(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
 else(DEVELOPMENT_MODE)
   if(WIN32)
-    SET(RESOURCES_PATH resources)
-    SET(HELP_HTB_LOCATION onlinehelp.htb)
+    set(RESOURCES_PATH resources)
+    set(HELP_HTB_LOCATION onlinehelp.htb)
+  elseif(OSX)
+    set(RESOURCES_PATH wxlauncher.app/Contents/Resources)
+    set(HELP_HTB_LOCATION wxlauncher.app/Contents/Resources/onlinehelp.htb)
   else()
-    SET(RESOURCES_PATH /usr/local/share/wxlauncher/)
-    SET(HELP_HTB_LOCATION /usr/local/share/wxlauncher/onlinehelp.htb)
+    set(RESOURCES_PATH /usr/local/share/wxlauncher/)
+    set(HELP_HTB_LOCATION /usr/local/share/wxlauncher/onlinehelp.htb)
   endif()
 endif(DEVELOPMENT_MODE)
 
-OPTION(USE_SPEECH "Build launcher with speech support?" OFF)
-OPTION(USE_JOYSTICK "Build launcher with joystick support?" ON)
-OPTION(USE_OPENAL "Build launcher with OpenAL support?" ON)
+option(USE_SPEECH "Build launcher with speech support?" OFF)
+option(USE_JOYSTICK "Build launcher with joystick support?" ON)
+option(USE_OPENAL "Build launcher with OpenAL support?" ON)
 if(USE_OPENAL)
   find_package(OpenAL REQUIRED)
-  INCLUDE_DIRECTORIES(${OPENAL_INCLUDE_DIR})
+  include_directories(${OPENAL_INCLUDE_DIR})
 endif(USE_OPENAL)
 
 if(UNIX)
   find_package(SDL REQUIRED)
-  INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR})
-  SET(HAS_SDL true)
+  include_directories(${SDL_INCLUDE_DIR})
+  set(HAS_SDL true)
 endif()
 if(UNIX AND NOT DEFINED PLATFORM_HAS_BROKEN_OPENAL)
-  SET(PLATFORM_HAS_BROKEN_OPENAL True)
+  set(PLATFORM_HAS_BROKEN_OPENAL True)
 endif()
 
 # Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
 # will not try to compile the registry code on non Win32 systems.
 # Allow the user to define this as false even on windows if they want
 if((WIN32) AND (NOT DEFINED PLATFORM_USES_REGISTRY))
-  SET(PLATFORM_USES_REGISTRY TRUE)
+  set(PLATFORM_USES_REGISTRY TRUE)
 endif()
 
-INCLUDE(${wxWidgets_USE_FILE})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
+include(${wxWidgets_USE_FILE})
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
+
 if(WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
   code/apis/RegistryProfileManager.cpp
   platform/win32/registry_helper.cpp
   code/apis/PlatformProfileManagerShared.cpp
   )
-SET_TARGET_PROPERTIES(registry_helper
+set_target_properties(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX
   LINK_FLAGS /MANIFESTUAC:NO
   COMPILE_DEFINITIONS REGISTRY_HELPER
   )
-TARGET_LINK_LIBRARIES(registry_helper ${wxWidgets_LIBRARIES})
+target_link_libraries(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
 # Check to see if we have a HG executable so that we will be able to
@@ -114,21 +123,21 @@ else()
   add_custom_target(version.cpp.maker ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/code/global/version_strings.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
     )
-  MESSAGE( "Cannot find a commandline Mercurial client (hg).  version_strings.cpp will be generated by copying a dummy file.") 
+  message( "Cannot find a commandline Mercurial client (hg).  version_strings.cpp will be generated by copying a dummy file.") 
 endif()
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
 
 add_custom_target(helpmaker ALL
   COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${helphtblocation} ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_QUIET} ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp)
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocation})
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp)
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocation})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
-SET_SOURCE_FILES_PROPERTIES(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
+set_source_files_properties(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
 
-SET(TAB_CODE_FILES
+set(TAB_CODE_FILES
   code/tabs/AdvSettingsPage.h
   code/tabs/AdvSettingsPage.cpp
   code/tabs/BasicSettingsPage.h
@@ -140,8 +149,8 @@ SET(TAB_CODE_FILES
   code/tabs/WelcomePage.h
   code/tabs/WelcomePage.cpp
   )
-SOURCE_GROUP(Tabs FILES ${TAB_CODE_FILES})
-SET(GUI_CONTROL_CODE_FILES
+source_group(Tabs FILES ${TAB_CODE_FILES})
+set(GUI_CONTROL_CODE_FILES
   code/controls/BottomButtons.h
   code/controls/BottomButtons.cpp
   code/controls/FlagList.h
@@ -153,8 +162,8 @@ SET(GUI_CONTROL_CODE_FILES
   code/controls/StatusBar.h
   code/controls/StatusBar.cpp
   )
-SOURCE_GROUP("GUI Controls" FILES ${GUI_CONTROL_CODE_FILES})
-SET(GLOBAL_CODE_FILES
+source_group("GUI Controls" FILES ${GUI_CONTROL_CODE_FILES})
+set(GLOBAL_CODE_FILES
   code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
   code/global/ids.h
@@ -163,14 +172,14 @@ SET(GLOBAL_CODE_FILES
   code/global/version.h
   code/global/version.cpp
   )
-SOURCE_GROUP(Global FILES ${GLOBAL_CODE_FILES})
-SET(DATASTRUCTURE_CODE_FILES
+source_group(Global FILES ${GLOBAL_CODE_FILES})
+set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FlagInfo.cpp
   code/datastructures/FSOExecutable.h
   code/datastructures/FSOExecutable.cpp
   )
-SOURCE_GROUP("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
-SET(API_CODE_FILES
+source_group("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
+set(API_CODE_FILES
   code/apis/HelpManager.h
   code/apis/HelpManager.cpp
   code/apis/JoystickManager.h
@@ -190,21 +199,21 @@ SET(API_CODE_FILES
   code/apis/FileProfileManager.cpp
   code/apis/PlatformProfileManagerShared.cpp
   )
-SOURCE_GROUP(Apis FILES ${API_CODE_FILES})
-SET(RESOURCE_FILES
+source_group(Apis FILES ${API_CODE_FILES})
+set(RESOURCE_FILES
   platform/win32/wxlauncher.rc
   ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   ${helphtblocation}
   )
-SOURCE_GROUP(Resources FILES ${RESOURCE_FILES})
-SET(CODE_FILES
+source_group(Resources FILES ${RESOURCE_FILES})
+set(CODE_FILES
   code/MainWindow.h
   code/MainWindow.cpp
   code/wxLauncherApp.h
   code/wxLauncherApp.cpp
   )
-SOURCE_GROUP("Main Code Files" FILES ${CODE_FILES})
+source_group("Main Code Files" FILES ${CODE_FILES})
 
 add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${TAB_CODE_FILES}
@@ -215,37 +224,38 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${RESOURCE_FILES}
   ${CODE_FILES}
   )
-SET_TARGET_PROPERTIES(wxlauncher
+set_target_properties(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX)
-# Files that are not to be complied directly
-SET_SOURCE_FILES_PROPERTIES(
+# Files that are not to be compiled directly
+set_source_files_properties(
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp   
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/onlinehelp.htb 
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h 
   code/datastructures/FlagInfo.cpp
   code/global/configure_launcher.h.in
   PROPERTIES HEADER_FILE_ONLY true)
-ADD_DEPENDENCIES(wxlauncher helpmaker version.cpp.maker)
+
+add_dependencies(wxlauncher helpmaker version.cpp.maker)
 if(WIN32)
-ADD_DEPENDENCIES(wxlauncher registry_helper)
+add_dependencies(wxlauncher registry_helper)
 endif(WIN32)
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
+configure_file(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h)
 
 foreach(temp_file ${helpmaker_temp_files})
-  SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${temp_file})
+  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${temp_file})
 endforeach(temp_file)
 
-TARGET_LINK_LIBRARIES(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
+target_link_libraries(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
 
 # packaging
-SET(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
+set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 
 if(DEVELOPMENT_MODE)
-  MESSAGE( "Development mode is set. Building of installers is not allowed.  Set DEVELOPMENT_MODE=OFF to build installers.")
-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake COPYONLY)
-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake COPYONLY)
+  message( "Development mode is set. Building of installers is not allowed.  Set DEVELOPMENT_MODE=OFF to build installers.")
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake COPYONLY)
+  configure_file(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake COPYONLY)
 else()
-  INCLUDE(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
+  include(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
 endif()
