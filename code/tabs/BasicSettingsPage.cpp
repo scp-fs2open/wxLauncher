@@ -676,6 +676,9 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		}
 	}
 	this->GetSizer()->Layout();
+
+	// TCManager::CurrentProfileChanged() (which calls TCManager::GenerateTCChanged())
+	// assumes that TCManager::GenerateTCBinaryChanged() is called here unconditionally
 	TCManager::GenerateTCBinaryChanged();
 }
 
