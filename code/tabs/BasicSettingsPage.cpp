@@ -1136,7 +1136,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 		this->joystickDetectButton->Enable();
 	} else {
 		this->joystickSelected
-			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVAILD_JOYSTICK));
+			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVALID_JOYSTICK));
 		for ( unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++ ) {
 			if ( JoyMan::IsJoystickPluggedIn(i) ) {
 				this->joystickSelected
@@ -1159,7 +1159,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 			ProMan::GetProfileManager()->Get()
 				->Read(PRO_CFG_JOYSTICK_ID,
 					&profileJoystick,
-					JOYMAN_INVAILD_JOYSTICK);
+					JOYMAN_INVALID_JOYSTICK);
 			// set current joystick
 			for ( i = 0; i < this->joystickSelected->GetCount(); i++ ) {
 				JoyNumber* data = dynamic_cast<JoyNumber*>(
