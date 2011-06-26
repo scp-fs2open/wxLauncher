@@ -161,7 +161,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 	if ( !p->Get()->Read(cfgBinaryPath, &binary) ) {
-		wxLogError(_T("Binary to execute is not set (%s)"), cfgBinaryPath);
+		wxLogError(_T("Binary to execute is not set (%s)"), cfgBinaryPath.c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
@@ -203,7 +203,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	}
 
 	wxString command;
-	// the "" are in case of spaces in the path
+	// the "" correct for spaces in the path
 	if (path.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
 		command = _T("\"") + path.GetFullPath() + _T("\"");
 	} else {
@@ -253,10 +253,10 @@ void MainWindow::OnKill(wxButton* button, bool killFred) {
 }
 
 void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("Update"));
+	wxMessageBox(_T("Update"));
 }
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_("About"));
+	wxMessageBox(_T("About"));
 }
 
 void MainWindow::OnContextHelp(wxHelpEvent& event) {
@@ -281,8 +281,7 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 		wxWindow::FindWindowById(ID_PLAY_BUTTON, this));
 	wxCHECK_RET(play != NULL, _T("Unable to find play button"));
 	play->SetLabel(_T("Play"));
-	play->Enable();
-	
+	play->Enable();	
 }
 
 void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
@@ -304,6 +303,4 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 	wxCHECK_RET(fred != NULL, _T("Unable to find Fred button"));
 	fred->SetLabel(_T("Fred"));
 	fred->Enable();
-	
 }
-
