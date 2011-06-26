@@ -181,7 +181,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 
 	int currentJoystick;
-	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVAILD_JOYSTICK);
+	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
 
 	ret = outConfig.Write( L"CurrentJoystick", currentJoystick);
 	ReturnChecker(ret, __LINE__);

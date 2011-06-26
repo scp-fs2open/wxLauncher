@@ -123,7 +123,7 @@ bool JoyMan::Initialize() {
 	JoyMan::joysticks.clear();
 
 	SDL_Joystick *joy = NULL;
-	for (size_t i = 0; i < SDL_NumJoysticks(); i++) {
+	for (int i = 0; i < SDL_NumJoysticks(); i++) {
 		joy = SDL_JoystickOpen(i);
 		if ( joy != NULL ) {
 			wxString joystickName(SDL_JoystickName(i), wxConvLocal);
@@ -188,7 +188,7 @@ unsigned int JoyMan::NumberOfPluggedInJoysticks() {
 /** \bug Assumes all joysticks support ForceFeedback */
 #if USE_JOYSTICK
 bool JoyMan::SupportsForceFeedback(unsigned int i) {
-	if ( i == JOYMAN_INVAILD_JOYSTICK ) {
+	if ( i == JOYMAN_INVALID_JOYSTICK ) {
 		return false;
 	} else {
 		return true;
@@ -202,7 +202,7 @@ bool JoyMan::SupportsForceFeedback(unsigned int) {
 /** \bug Assumes all joysticks have a calibrate tool. */
 #if USE_JOYSTICK
 bool JoyMan::HasCalibrateTool(unsigned int i) {
-	if ( i == JOYMAN_INVAILD_JOYSTICK ) {
+	if ( i == JOYMAN_INVALID_JOYSTICK ) {
 		return false;
 	} else {
 		return true;
@@ -235,7 +235,7 @@ wxString JoyMan::JoystickName(unsigned int) {
 /** Returns true when the joystick is plugged in. */
 #if USE_JOYSTICK
 bool JoyMan::IsJoystickPluggedIn(unsigned int i) {
-	if ( i == JOYMAN_INVAILD_JOYSTICK ) {
+	if ( i == JOYMAN_INVALID_JOYSTICK ) {
 		return false;
 	} else {
 		return !JoyMan::joysticks[i].IsEmpty();
@@ -245,7 +245,3 @@ bool JoyMan::IsJoystickPluggedIn(unsigned int) {
 	return false;
 #endif
 }
-
-
-
-	
