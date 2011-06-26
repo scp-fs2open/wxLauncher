@@ -108,7 +108,7 @@ void TCManager::GenerateTCChanged() {
 	TCEventHandlers::iterator iter = TCChangedHandlers.begin();
 	while (iter != TCChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(*(event.Clone()));
+		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_TC_CHANGED event to %p"), &(*iter));
 		iter++;
 	}
@@ -119,7 +119,7 @@ void TCManager::GenerateTCBinaryChanged() {
 	TCEventHandlers::iterator iter = TCBinaryChangedHandlers.begin();
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(*(event.Clone()));
+		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_TC_BINARY_CHANGED event to %p"), &(*iter));
 		iter++;
 	}
@@ -130,7 +130,7 @@ void TCManager::GenerateTCSelectedModChanged() {
 	TCEventHandlers::iterator iter = TCSelectedModChangedHandlers.begin();
 	while (iter != TCSelectedModChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(*(event.Clone()));
+		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_TC_SELECTED_MOD_CHANGED event to %p"), &(*iter));
 		iter++;
 	}
@@ -141,7 +141,7 @@ void TCManager::GenerateTCFredBinaryChanged() {
 	TCEventHandlers::iterator iter = TCFredBinaryChangedHandlers.begin();
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
-		current->ProcessEvent(*(event.Clone()));
+		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_TC_FRED_BINARY_CHANGED event to %p"), &(*iter));
 		iter++;
 	}
@@ -150,7 +150,8 @@ void TCManager::GenerateTCFredBinaryChanged() {
 void TCManager::CurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	TCManager::GenerateTCChanged();
-	TCManager::GenerateTCBinaryChanged();
+//	it's assumed that BasicSettingsPage::OnTCChanged() (which is called on an EVT_TC_CHANGED event)
+//	calls TCManager::GenerateTCBinaryChanged() unconditionally, so no need to explicitly call it here
 	TCManager::GenerateTCSelectedModChanged();
 	TCManager::GenerateTCFredBinaryChanged();
 }
