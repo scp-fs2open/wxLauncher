@@ -1,6 +1,8 @@
+# Note: assuming that this file is included in CMakeLists.txt, so
+#       using IS_WIN32, IS_APPLE, IS_LINUX
 # Setup the packer
 
-if(WIN32) # and WIN64
+if(IS_WIN32) # and WIN64
   # find the runtime files
   if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT")
@@ -44,7 +46,7 @@ if(WIN32) # and WIN64
       NO_DEFAULT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH)
     install(FILES ${VC9_RUNTIME_manifest} DESTINATION bin)
   endif()
-endif() # WIN32
+endif() # IS_WIN32
   
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
@@ -58,14 +60,14 @@ set(CPACK_PACKAGE_DESCRIPTION "Launcher and installer for the FreeSpace 2 Open S
 # TODO we need separate welcome and readme files,
 # and a readme better geared towards end users
 
-if(NOT OSX) # a license agreement popping up whenever people open the DMG will drive them crazy
+if(NOT IS_APPLE) # a license agreement popping up whenever people open the DMG will drive them crazy
   set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
 endif()
 
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/ReadMe.txt)
 set(CPACK_RESOURCE_FILE_WELCOME ${PROJECT_SOURCE_DIR}/ReadMe.txt)
 
-if(WIN32)
+if(IS_WIN32)
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY wxLauncher)
   # the \\\\ is because NSIS does not handle unix paths correctly - http://www.batchmake.org/Wiki/CMake:Packaging_With_CPack
   set(CPACK_NSIS_MUI_ICON ${PROJECT_SOURCE_DIR}/platform/win32\\\\wxlauncher.ico)
@@ -88,31 +90,34 @@ else()
   endif()
 endif()
 
-if( WIN32 AND NOT UNIX )
+if( IS_WIN32 AND NOT UNIX )
     set(CPACK_PACKAGE_EXECUTABLES "wxLauncher" "wxLauncher for the SCP")
 endif()
 
-if(OSX)
+if(IS_APPLE)
+# currently can't get bundle name and long version string to display, grr
+#  set(MACOS_BUNDLE_BUNDLE_NAME "wxLauncher")
+#  set(MACOSX_BUNDLE_LONG_VERSION_STRING "wxLauncher for the SCP, version ${MACOSX_BUNDLE_SHORT_VERSION_STRING}")
   set(MACOSX_BUNDLE_ICON_FILE wxlauncher.icns)
   set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
   set(MACOSX_BUNDLE_COPYRIGHT "Copyright © 2009-2011 ${CPACK_PACKAGE_VENDOR}")
-endif(OSX)
+endif(IS_APPLE)
 
-if(UNIX AND NOT OSX) # i.e., Linux
+if(IS_LINUX)
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Iss Mneur <iss.mneur@telus.net>")
   set(CPACK_PACKAGE_DEPENDS "libwxgtk2.8 libopenal1")
   set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
 endif()
 
-if(WIN32)
+if(IS_WIN32)
   set(CPACK_BINARY_NSIS "ON")
-  option(BUILD_BINARY_ZIP "Generate a binary zip" OFF)
+  option(BUILD_BINARY_ZIP "Generate a binary zip" "OFF")
   if(BUILD_BINARY_ZIP)
     set(CPACK_BINARY_ZIP "ON")
   else()
     set(CPACK_BINARY_ZIP "OFF")
   endif()
-elseif(OSX)
+elseif(IS_APPLE)
   set(CPACK_BINARY_DRAGNDROP "ON")
   set(CPACK_BINARY_PACKAGEMAKER "OFF")
   set(CPACK_BINARY_STGZ "OFF")
@@ -134,10 +139,10 @@ endif()
 
 include(CPack)
 
-if(WIN32)
+if(IS_WIN32)
   install(TARGETS registry_helper RUNTIME DESTINATION bin)
   install(TARGETS wxlauncher RUNTIME DESTINATION bin)
-elseif(OSX)
+elseif(IS_APPLE)
   install(TARGETS wxlauncher 
 	RUNTIME DESTINATION .
 	BUNDLE DESTINATION .)
@@ -147,10 +152,10 @@ else()
 	BUNDLE DESTINATION bin)
 endif()
 
-if(WIN32)
+if(IS_WIN32)
   install(DIRECTORY resources/ DESTINATION resources)
   install(FILES ${helphtblocation} DESTINATION .)
-elseif(OSX)
+elseif(IS_APPLE)
   ### TODO there's probably a better way to add things to the .app, but this works for now
   install(DIRECTORY ${SDL_LIBRARY} DESTINATION wxlauncher.app/Contents/Frameworks)
   file(GLOB resourceFiles "resources/*")
