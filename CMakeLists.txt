@@ -10,14 +10,12 @@ set(VERSION_MAJOR 0)
 set(VERSION_MINOR 8)
 set(VERSION_PATCH 0)
 
-set(OSX (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")) # for convenience
-
 set(CMAKE_OSX_ARCHITECTURES i386) ### TODO ADD PPC FOR UNIVERSAL BINARY ###
 
 if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
   if(WIN32)
     set(IS_WIN32 TRUE)
-  elseif(OSX)
+  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(IS_APPLE TRUE)
   else()
     set(IS_LINUX TRUE)
@@ -58,10 +56,10 @@ if(DEVELOPMENT_MODE)
   set(HELP_HTB_LOCATION ${helphtblocation})
   set(RESOURCES_PATH ${PROJECT_SOURCE_DIR}/resources)
 else(DEVELOPMENT_MODE)
-  if(WIN32)
+  if(IS_WIN32)
     set(RESOURCES_PATH resources)
     set(HELP_HTB_LOCATION onlinehelp.htb)
-  elseif(OSX)
+  elseif(IS_APPLE)
     set(RESOURCES_PATH wxlauncher.app/Contents/Resources)
     set(HELP_HTB_LOCATION wxlauncher.app/Contents/Resources/onlinehelp.htb)
   else()
@@ -84,20 +82,20 @@ if(UNIX)
   set(HAS_SDL true)
 endif()
 if(UNIX AND NOT DEFINED PLATFORM_HAS_BROKEN_OPENAL)
-  set(PLATFORM_HAS_BROKEN_OPENAL True)
+  set(PLATFORM_HAS_BROKEN_OPENAL TRUE)
 endif()
 
 # Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
 # will not try to compile the registry code on non Win32 systems.
 # Allow the user to define this as false even on windows if they want
-if((WIN32) AND (NOT DEFINED PLATFORM_USES_REGISTRY))
+if((IS_WIN32) AND (NOT DEFINED PLATFORM_USES_REGISTRY))
   set(PLATFORM_USES_REGISTRY TRUE)
 endif()
 
 include(${wxWidgets_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 
-if(WIN32) # helper is only needed on windows
+if(IS_WIN32) # helper is only needed on windows
 add_executable(registry_helper WIN32
   code/apis/RegistryProfileManager.cpp
   platform/win32/registry_helper.cpp
@@ -236,9 +234,9 @@ set_source_files_properties(
   PROPERTIES HEADER_FILE_ONLY true)
 
 add_dependencies(wxlauncher helpmaker version.cpp.maker)
-if(WIN32)
-add_dependencies(wxlauncher registry_helper)
-endif(WIN32)
+if(IS_WIN32)
+  add_dependencies(wxlauncher registry_helper)
+endif(IS_WIN32)
 
 configure_file(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h)
