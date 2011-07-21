@@ -85,6 +85,10 @@ if(UNIX AND NOT DEFINED PLATFORM_HAS_BROKEN_OPENAL)
   set(PLATFORM_HAS_BROKEN_OPENAL TRUE)
 endif()
 
+if(IS_APPLE)
+  option(USING_SDL_FRAMEWORK "Check this if building with an SDL framework." ON)
+endif()
+
 # Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
 # will not try to compile the registry code on non Win32 systems.
 # Allow the user to define this as false even on windows if they want

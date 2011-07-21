@@ -157,7 +157,9 @@ if(IS_WIN32)
   install(FILES ${helphtblocation} DESTINATION .)
 elseif(IS_APPLE)
   ### TODO there's probably a better way to add things to the .app, but this works for now
-  install(DIRECTORY ${SDL_LIBRARY} DESTINATION wxlauncher.app/Contents/Frameworks)
+  if(USING_SDL_FRAMEWORK) # then copy the framework into the app
+    install(DIRECTORY ${SDL_LIBRARY} DESTINATION wxlauncher.app/Contents/Frameworks)
+  endif()
   file(GLOB resourceFiles "resources/*")
   install(FILES ${resourceFiles} DESTINATION wxlauncher.app/Contents/Resources)
   install(FILES ${helphtblocation} DESTINATION wxlauncher.app/Contents/Resources)

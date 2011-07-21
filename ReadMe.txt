@@ -25,11 +25,11 @@ Just find the build for your system and you're set.
 
 Building from source
 ============
-The wxLauncher requires the CMake build system to for building.
-CMake is a Cross-platform meta-build system (it makes the files
-that allow a platform native build system to build the 
-launcher).  CMake allows us to support your favourite complier
-from VS2005 and newer, XCode, KDevelop, and of course autotools.
+The wxLauncher requires the CMake build system for building.
+CMake is a cross-platform meta-build system; it generates the
+files that allow a platform's native build system to build the
+launcher.  CMake supports VS2005 and newer, as well as
+Xcode, KDevelop, and of course autotools.
 
 Requirements shortlist:
 All platforms:
@@ -50,20 +50,20 @@ All platforms:
 
 wxLauncher is built using CMake.  Only version 2.8 has been 
 tested (and the CMake file enforces this).  CMake can be 
-downloaded in binary form, from the [CMake Home Page] or from
-your distro's package repository.
+downloaded in binary form, from the [CMake Home Page] or if you
+run Linux, from your distro's package repository.
   [Cmake Home Page]: http://cmake.org
 
-wxLauncher is a wxWidgets based application, thus can 
+wxLauncher is a wxWidgets-based application. It can 
 only be built with wxWidgets version 2.8.10 or higher 
 installed on your system.
 wxWidgets homepage:
 	http://www.wxwidgets.org/
 	
 Python 2.5 or higher is required to build this project.
-This project also assumes that the python execuatble is 
-in your PATH.  See the compiler specific instructions
-on how to add Python to your PATH.
+This project also assumes that the python executable is 
+in your PATH.  Check your operating system's documentation
+for information on how to add Python to your PATH.
 Python homepage:
 	http://www.python.org/
 	
@@ -78,13 +78,13 @@ The OpenAL Software Development Kit is an optional component
 needed to build this program.  OpenAL support requires the 
 preprocessor symbol USE_OPENAL=1.  This symbol is set to 1 by
 default by CMake.  You can pass -DUSE_OPENAL=0 to CMake to
-disable building of OpenAL support.  See the compiler specific
+disable building with OpenAL support.  See the compiler specific
 instructions for getting your compiler ready to build
-with OpenAL.
+with OpenAL. Note that Mac OS X ships with OpenAL pre-installed.
 OpenAL homepage:
 	http://connect.creativelabs.com/openal/default.aspx
 
-The Microsoft Windows SDK (formorly the Platform SDK) is
+The Microsoft Windows SDK (formerly the Platform SDK) is
 required to build both this application and wxWidgets when
  on Windows.  Note that only the Windows SDK for Windows
 Vista and Windows 7 have been tested with this application.
@@ -102,11 +102,11 @@ source page:
   
 To get the source, you'll need Mercurial:
 	http://mercurial.selenic.com/
-or the TortiseHG frontend (which includes Mercurial):
+or the TortoiseHG frontend (which includes Mercurial):
 	http://tortoisehg.bitbucket.org/
 
 Once Mercurial is installed, you can get a copy of the source
-by runningthe following command (in a folder of your choice):
+by running the following command in a folder of your choice:
 	hg clone https://wxlauncher.googlecode.com/hg/ wxlauncher  
   
 Building - Windows
@@ -129,7 +129,7 @@ source directory if it remains NOTFOUND.
  Make sure that it is unchecked if you plan on distributing the
 code as with this checked the launcher will only run on the dev 
 machine. This option changes where the launcher looks for files to display as the default interface.
-- Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those options complied in.
+- Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those options compiled in.
 - If USE_OPENAL is check, OPENAL_INCLUDE_DIR will appear, this 
 should be set the include folder in the OpenAL SDK folder.
 
@@ -145,18 +145,56 @@ Commandline
 - cd build
 - cmake -DUSE_OPENAL=1 ../
 
-Building - OS X 10.5 (Leopard)
+Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 ==============================
 Commandline
 -----------
+- Download and install the most recent version of Python 2 if you don't
+already have at least Python 2.6; whether Python 3 will work is unknown
+- Download and install Mercurial, making sure that you select the version of
+  Mercurial for your version of OS X
 - Download the source
-- Download and install XCode 3.1 if not already installed, you will need a  Free Apple Developers Center login to download if Xcode in not on your OSX Install Disk.
-- Download and install Python 2.6
+- Download and install the most recent version of Xcode 3. You will need
+a free Apple Developer Center account to download Xcode. If you have a different
+version of Xcode 3, such as a copy provided on your OS X install disc, that
+might also work, but it can't be guaranteed.
 - Download and install CMake 2.8
-- Download and install SDL 1.2 (follow instructions in the SDL ReadMe.txt)
-- (Optional) Download and install Mercurial (make sure you have the correct download for your version of OS X, if you get an error about python not being installed but you already have, you downloaded the version of Mercurial for your version of OS X)
-- Run CMake ( either using cmake or ccmake in the source directory or use Spotlight to find the CMake GUI)
-- Choose XCode as your generator.
+- Download and build wxWidgets 2.8 (use the wxMac version)
+- Install SDL: you can either (1) download, build, and install it yourself (such
+as with MacPorts) or (2) simply download the Frameworks.tgz tarball from the
+FreeSpace Open source tree
+<http://svn.icculus.org/*checkout*/fs2open/trunk/fs2_open/projects/Xcode/Frameworks.tgz>
+and extract the SDL.framework, then copy the SDL.framework folder to your
+/Library/Frameworks directory
+- Run CMake *twice* either by using cmake at the command line or by using the
+CMake GUI (which is most likely in /Applications, although you can find it using
+Spotlight), selecting Xcode as your generator. For currently unknown reasons,
+CMake must be run twice for CPack to correctly generate drag-and-drop .apps.
+- A few notes on configuring the CMake variables:
+ * Set wxWidgets_CONFIG_EXECUTABLE and wxWidgets_wxrc_EXECUTABLE to point
+ to the version of wxWidgets you built, not the pre-installed version in
+ /usr/local. wxWidgets_CONFIG_EXECUTABLE is most likely located at
+ /yourWxWidgetsBuildDir/wx-config and wxWidgets_wxrc_EXECUTABLE is most likely
+ located at /yourWxWidgetsBuildDir/utils/wxrc/wxrc
+ * If you are not using SDL.framework, uncheck USING_SDL_FRAMEWORK (or on
+ command line, add -DUSING_SDL_FRAMEWORK=0)
+- Once you have your Xcode project set up, build the "package" target. If it
+builds successfully, you will find a standalone wxlauncher.app in
+/yourWxLauncherBuildDir/_CPack_Packages/Darwin/DragNDrop/wxlauncher-x.y.z/ ,
+where x.y.z indicate the current version of wxLauncher.
+
+Currently, the wxlauncher.app in /yourWxLauncherBuildDir/SelectedBuildConfig/
+does not have the resources needed to run, although the app in
+_CPack_Packages/... does. You can fix this problem by copying the wxlauncher.app
+in _CPack_Packages/... over the other wxlauncher.app. After doing this, you'll
+be able to run wxlauncher.app from within Xcode if needed, as long as you make
+changes to the source code and not to the resources needed (such as images). If
+you change any resources, you'll need to rebuild the "package" target and then
+copy over the wxlauncher.app as above.
+
+Important known issues on OS X:
+ - Text does not appear with icons on the left sidebar. The widget used is
+ broken on OS X; there are plans to switch to a different widget instead.
 
 License
 =======
