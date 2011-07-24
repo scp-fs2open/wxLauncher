@@ -311,7 +311,7 @@ wxString OpenALMan::GetCurrentVersion() {
 		return _("Error in closing device");
 	}
 
-	return wxString::Format(_("Detected OpenAL Version: %s"), Version.c_str());
+	return wxString::Format(_("Detected OpenAL version: %s"), Version.c_str());
 #else
 	return wxEmptyString;
 #endif
