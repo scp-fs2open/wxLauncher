@@ -63,8 +63,9 @@ StatusBar::StatusBar(wxWindow *parent)
 
 	// Just creating these now, will place them in the OnSize event handler
 	new wxStaticBitmap(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
+#if 0 // this progress bar doesn't need to be here
 	new wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
-
+#endif
 	int widths[] = { 25, -1, 100, 200 };
 
 	wxASSERT_MSG( sizeof(widths)/sizeof(int) == SB_FIELD_MAX,
@@ -91,13 +92,14 @@ void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
 	this->GetFieldRect(SB_FIELD_ICON, iconrect);
 	icon->SetSize(iconrect);
 
+#if 0 // this progress bar doesn't need to be here
 	wxWindow* bar = dynamic_cast<wxWindow*>(wxWindow::FindWindowById(ID_STATUSBAR_PROGRESS_BAR, this));
 	wxCHECK_RET( bar != NULL, _T("Cannot find status bar progress bar"));
 
 	wxRect barrect;
 	this->GetFieldRect(SB_FIELD_PROGRESS_BAR, barrect);
 	bar->SetSize(barrect);
-
+#endif
 }
 
 void StatusBar::SetMainStatusText(wxString msg, int icon) {
