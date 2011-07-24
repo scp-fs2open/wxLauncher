@@ -51,13 +51,18 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	}
 
 	this->flagListBox = new FlagListBox(this, this->skin);
+
+#if 0 // doesn't do anything
 	wxHtmlWindow* description = new wxHtmlWindow(this);
 	description->SetPage(_T("<p></p>"));
-	
+#endif
+
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
-	topSizer->Add(this->flagListBox, wxSizerFlags().Proportion(2).Expand());
+	topSizer->Add(this->flagListBox, wxSizerFlags().Proportion(1).Expand());
+#if 0
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
-	topSizer->SetMinSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT/2);
+#endif
+	topSizer->SetMinSize(TAB_AREA_WIDTH, (7*TAB_AREA_HEIGHT)/12);
 
 #if 0
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
@@ -77,13 +82,15 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	idealFlagsRowSizer->AddStretchSpacer(1);
 	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Right());
 
+#if 0 // doesn't do anything
 	wxStaticBox* flagsetNotesBox = new wxStaticBox(this, wxID_ANY, _("Flag set notes"));
 	wxTextCtrl* flagsetNotes = new wxTextCtrl(this, ID_FLAG_SET_NOTES_TEXT,
 		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/8),
 		wxTE_MULTILINE|wxTE_READONLY);
 	wxStaticBoxSizer* flagsetNotesSizer = new wxStaticBoxSizer(flagsetNotesBox, wxVERTICAL);
 	flagsetNotesSizer->Add(flagsetNotes, wxSizerFlags().Expand());
-
+#endif
+	
 	wxStaticBox* customFlagsBox = new wxStaticBox(this, wxID_ANY, _("Custom flags"));
 	wxTextCtrl* customFlagsText = new wxTextCtrl(this, ID_CUSTOM_FLAGS_TEXT);
 	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
@@ -91,24 +98,19 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	
 	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current commandline"));
 	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
-		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/8),
+		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/5),
 		wxTE_MULTILINE|wxTE_READONLY);
 	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer);
+	sizer->Add(topSizer, wxSizerFlags().Expand());
 	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand());
+#if 0
 	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand());
+#endif
 	sizer->Add(customFlagsSizer, wxSizerFlags().Expand());
 	sizer->Add(commandLineSizer, wxSizerFlags().Expand());
-
-	// FIXME huh? what's that border for?
-//	sizer->Add(topSizer, wxSizerFlags().Border(wxRIGHT, 25));
-//	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-//	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-//	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-//	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
 
 	this->SetSizer(sizer);
 	this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
