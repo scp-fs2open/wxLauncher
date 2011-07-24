@@ -96,7 +96,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
 	customFlagsSizer->Add(customFlagsText, wxSizerFlags().Expand());
 	
-	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current commandline"));
+	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current command line"));
 	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
 		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/5),
 		wxTE_MULTILINE|wxTE_READONLY);
