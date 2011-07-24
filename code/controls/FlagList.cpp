@@ -276,7 +276,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		flag->checkboxSizer->Add(flag->checkbox);
 		flag->checkboxSizer->AddStretchSpacer(1);
 
-		flag->isRecomendedFlag = true; //!< \todo implement logic to do the recomnmended flag
+		flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
 		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
 		flag->shortDescription = wxString(description, wxConvUTF8, strlen(description));
 		flag->webURL = wxString(web_url, wxConvUTF8, strlen(web_url));

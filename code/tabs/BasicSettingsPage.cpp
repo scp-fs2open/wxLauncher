@@ -161,7 +161,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	graphicsCombo->Disable();
 
 	wxStaticText* resolutionText = 
-		new wxStaticText(this, wxID_ANY, _("Resolution:"));
+		new wxStaticText(this, wxID_ANY, _("Resolution: "));
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
 	this->FillResolutionDropBox(resolutionCombo);
 	int width, height;
@@ -180,7 +180,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 	wxStaticText* textureFilterText = 
-		new wxStaticText(this, wxID_ANY, _("Texture Filter:"));
+		new wxStaticText(this, wxID_ANY, _("Texture filter: "));
 	wxChoice* textureFilterCombo = new wxChoice(this, ID_TEXTURE_FILTER_COMBO);
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
@@ -222,7 +222,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	anisotropicCombo->SetSelection(anisotropic);
 
 
-	wxStaticText* aaText = new wxStaticText(this, wxID_ANY, _("Anti-Alias:"));
+	wxStaticText* aaText = new wxStaticText(this, wxID_ANY, _("Anti-aliasing:"));
 	wxChoice* aaCombo = new wxChoice(this, ID_AA_COMBO);
 	int antialias;
 	aaCombo->Append(_("Off"));
@@ -253,6 +253,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 	aaCombo->SetSelection(antialias);
 
+#if !IS_APPLE
 	wxStaticText* gsText = 
 		new wxStaticText(this, wxID_ANY, _("General settings (recommend: highest):"));
 	wxChoice* gsCombo = new wxChoice(this, ID_GS_COMBO);
@@ -275,22 +276,24 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &fixFont, false);
 	fontDistortion->SetValue(fixFont);
 	fontDistortion->Disable(); // DirectX only
-	
+#endif
+
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); 
 	videoSizer1->Add(graphicsText);
 	videoSizer1->Add(graphicsCombo);
-	videoSizer1->Add(resolutionText);
-	videoSizer1->Add(resolutionCombo);
-	videoSizer1->Add(depthText);
-	videoSizer1->Add(depthCombo);
 	videoSizer1->Add(textureFilterText);
 	videoSizer1->Add(textureFilterCombo);
+	videoSizer1->Add(resolutionText);
+	videoSizer1->Add(resolutionCombo);
 	videoSizer1->Add(anisotropicText);
 	videoSizer1->Add(anisotropicCombo);
+	videoSizer1->Add(depthText);
+	videoSizer1->Add(depthCombo);
 	videoSizer1->Add(aaText);
 	videoSizer1->Add(aaCombo);
 
+#if !IS_APPLE
 	wxBoxSizer* videoSizergs = new wxBoxSizer(wxHORIZONTAL);
 	videoSizergs->Add(gsText);
 	videoSizergs->Add(gsCombo);
@@ -298,13 +301,17 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxBoxSizer* videoSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	videoSizer3->Add(largeTextureCheck);
 	videoSizer3->Add(fontDistortion);
+#endif
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxVERTICAL);
 	videoSizer->SetMinSize(wxSize(300, -1));
 	videoSizer->Add(videoSizer1);
+#if !IS_APPLE
 	videoSizer->Add(videoSizergs);
 	videoSizer->Add(videoSizer3);
+#endif
 
+#if !IS_APPLE
 	// Speech
 	wxStaticBox* speechBox = new wxStaticBox(this, wxID_ANY, _("Speech"));
 	wxTextCtrl* speechTestText = new wxTextCtrl(this, ID_SPEECH_TEST_TEXT,
@@ -414,6 +421,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		speechInMultiCheck->Disable();
 		speechMoreVoicesButton->Disable();
 	}
+#endif
 
 	// Network
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
@@ -455,7 +463,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxStaticText(this, wxID_ANY, _("Port:")));
 	networkInsideSizer->Add(networkPort);
 	networkInsideSizer->Add(
-		new wxStaticText(this, wxID_ANY, _("Connection speed:")));
+		new wxStaticText(this, wxID_ANY, _("Connection speed: ")));
 	networkInsideSizer->Add(networkSpeed);
 	networkInsideSizer->Add(
 		new wxStaticText(this, wxID_ANY, _("IP:")));
@@ -474,16 +482,18 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
 	openALVersion->Wrap(153); /* HACKHACK: hard coded width, using number of
 							  pixels wide the text is on the prototype.*/
+#if !IS_APPLE
 	this->downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
 	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect"));
-
+#endif
 	wxStaticBoxSizer* audioSizer = new wxStaticBoxSizer(audioBox, wxVERTICAL);
 	audioSizer->Add(soundDeviceText);
 	audioSizer->Add(soundDeviceCombo, wxSizerFlags().Expand());
 	audioSizer->Add(openALVersion, wxSizerFlags().Center());
+#if !IS_APPLE
 	audioSizer->Add(downloadOpenALButton, wxSizerFlags().Center());
 	audioSizer->Add(detectOpenALButton, wxSizerFlags().Center());
-
+#endif
 	// fill in controls
 	this->SetupOpenALSection();
 
@@ -492,23 +502,33 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticText* selectedJoystickText = new wxStaticText(this, wxID_ANY, _("Selected joystick:"));
 	this->joystickSelected = new wxChoice(this, ID_JOY_SELECTED);
+#if !IS_APPLE
 	this->joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
 	this->joystickDirectionalHit = new wxCheckBox(this, ID_JOY_DIRECTIONAL_HIT, _("Directional hit"));
 	this->joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
 	this->joystickDetectButton = new wxButton(this, ID_JOY_DETECT_BUTTON, _("Detect"));
-
+#endif
+	// FIXME get Detect button working
+	wxStaticText* detectJoystickText = new wxStaticText(this, wxID_ANY, _("Restart launcher to re-detect."),
+														wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	
 	this->SetupJoystickSection();
 
 	wxBoxSizer* joyButtonSizer = new wxBoxSizer(wxHORIZONTAL);
+#if !IS_APPLE
 	joyButtonSizer->Add(joystickCalibrateButton);
 	joyButtonSizer->Add(joystickDetectButton);
-
+#endif
+	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center().Expand());
+	
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxVERTICAL);
 	joystickSizer->Add(selectedJoystickText);
 	joystickSizer->Add(joystickSelected, wxSizerFlags().Expand());
+#if !IS_APPLE
 	joystickSizer->Add(joystickForceFeedback);
 	joystickSizer->Add(joystickDirectionalHit);
-	joystickSizer->Add(joyButtonSizer);
+#endif
+	joystickSizer->Add(joyButtonSizer, wxSizerFlags().Expand().Center());
 
 	// Proxy
 	wxStaticBox* proxyBox = new wxStaticBox(this, wxID_ANY, _("Proxy"));
@@ -521,7 +541,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	// Final Layout
 	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
 	leftColumnSizer->Add(videoSizer, wxSizerFlags().Expand());
+#if !IS_APPLE
 	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
+#endif
 	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
 
 	wxBoxSizer* rightColumnSizer = new wxBoxSizer(wxVERTICAL);
@@ -1095,8 +1117,10 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
 		this->openALVersion->SetLabel(OpenALMan::GetCurrentVersion());
+#if !IS_APPLE
 		this->downloadOpenALButton->Disable();
 		this->detectOpenALButton->Disable();
+#endif
 	}
 }
 
@@ -1123,17 +1147,21 @@ void BasicSettingsPage::SetupJoystickSection() {
 	if ( !JoyMan::WasCompiledIn() ) {
 		this->joystickSelected->Disable();
 		this->joystickSelected->Append(_("No Launcher Support"));
+#if !IS_APPLE
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
 		this->joystickCalibrateButton->Disable();
 		this->joystickDetectButton->Disable();
+#endif
 	} else if ( !JoyMan::Initialize() ) {
 		this->joystickSelected->Disable();
 		this->joystickSelected->Append(_("Initialize Failed"));
+#if !IS_APPLE
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
 		this->joystickCalibrateButton->Disable();
 		this->joystickDetectButton->Enable();
+#endif
 	} else {
 		this->joystickSelected
 			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVALID_JOYSTICK));
@@ -1147,15 +1175,19 @@ void BasicSettingsPage::SetupJoystickSection() {
 		if ( JoyMan::NumberOfPluggedInJoysticks() == 0 ) {
 			this->joystickSelected->SetSelection(0);
 			this->joystickSelected->Disable();
+#if !IS_APPLE
 			this->joystickForceFeedback->Disable();
 			this->joystickDirectionalHit->Disable();
 			this->joystickCalibrateButton->Disable();
 			this->joystickDetectButton->Enable();
+#endif
 		} else {
 			int profileJoystick;
 			unsigned int i;
 			this->joystickSelected->Enable();
+#if !IS_APPLE
 			this->joystickDetectButton->Enable();
+#endif
 			ProMan::GetProfileManager()->Get()
 				->Read(PRO_CFG_JOYSTICK_ID,
 					&profileJoystick,
@@ -1192,6 +1224,8 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 		this->joystickSelected->GetClientObject(i));
 	wxCHECK_RET( joynumber != NULL,
 		_T("JoyNumber is not joystickSelected's client data"));
+
+#if !IS_APPLE // calibration and force feedback don't work on OS X at the moment
 	if ( JoyMan::HasCalibrateTool(joynumber->GetNumber()) ) {
 		this->joystickCalibrateButton->Enable();
 	} else {
@@ -1213,6 +1247,8 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 		this->joystickDirectionalHit->Disable();
 		this->joystickForceFeedback->Disable();
 	}
+#endif
+
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_JOYSTICK_ID, joynumber->GetNumber());
 }

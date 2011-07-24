@@ -86,10 +86,12 @@ private:
 	wxButton* detectOpenALButton;
 
 	wxChoice* joystickSelected;
+#if 0
 	wxCheckBox* joystickForceFeedback;
 	wxCheckBox* joystickDirectionalHit;
 	wxButton* joystickCalibrateButton;
 	wxButton* joystickDetectButton;
+#endif
 };
 
 #endif

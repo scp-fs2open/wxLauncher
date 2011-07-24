@@ -59,20 +59,23 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 	topSizer->SetMinSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT/2);
 
-
+#if 0
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
+#endif
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
+#if 0
 	idealFlagsRowSizer->Add(idealIcon);
 	wxBoxSizer* idealLabelSizer = new wxBoxSizer(wxVERTICAL);
 	idealLabelSizer->AddStretchSpacer(1);
 	idealLabelSizer->Add(idealLabel);
 	idealLabelSizer->AddStretchSpacer(1);
 	idealFlagsRowSizer->Add(idealLabelSizer);
+#endif
 	idealFlagsRowSizer->AddStretchSpacer(1);
-	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Left());
+	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Right());
 
 	wxStaticBox* flagsetNotesBox = new wxStaticBox(this, wxID_ANY, _("Flag set notes"));
 	wxTextCtrl* flagsetNotes = new wxTextCtrl(this, ID_FLAG_SET_NOTES_TEXT,

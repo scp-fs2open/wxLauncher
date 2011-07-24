@@ -94,16 +94,19 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 		this->SetSizer(invalidTCSizer);
 	} else {
+#if !IS_APPLE
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
 			_("Installed MODs.  Click on Install/Update in the left to search, download, and install additional MODs and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		header->Wrap(TAB_AREA_WIDTH);
-
+#endif
 		wxSize modGridSize(TAB_AREA_WIDTH, 500);
 		ModList* modGrid = new ModList(this, modGridSize, skin, tcPath);
 		modGrid->SetMinSize(modGridSize);
 
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+#if !IS_APPLE
 		sizer->Add(header);
+#endif
 		sizer->Add(modGrid, 1);
 
 		this->SetSizer(sizer);
