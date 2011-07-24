@@ -238,7 +238,9 @@ bool JoyMan::IsJoystickPluggedIn(unsigned int i) {
 	if ( i == JOYMAN_INVALID_JOYSTICK ) {
 		return false;
 	} else {
-		return !JoyMan::joysticks[i].IsEmpty();
+		// FIXME because we're using indexes to represent joysticks, there's no guarantee
+		//       that an index value always refers to the same joystick
+		return i >= JoyMan::joysticks.GetCount() ? false : !JoyMan::joysticks[i].IsEmpty();
 	}
 #else
 bool JoyMan::IsJoystickPluggedIn(unsigned int) {
