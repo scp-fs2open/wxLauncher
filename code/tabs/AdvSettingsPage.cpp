@@ -97,11 +97,18 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer, wxSizerFlags().Border(wxRIGHT, 25));
-	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
-	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+	sizer->Add(topSizer);
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand());
+	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand());
+	sizer->Add(customFlagsSizer, wxSizerFlags().Expand());
+	sizer->Add(commandLineSizer, wxSizerFlags().Expand());
+
+	// FIXME huh? what's that border for?
+//	sizer->Add(topSizer, wxSizerFlags().Border(wxRIGHT, 25));
+//	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+//	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+//	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
+//	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Border(wxRIGHT, 25));
 
 	this->SetSizer(sizer);
 	this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));

@@ -279,19 +279,27 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 
 	// Sizer for graphics, resolution, depth, etc
-	wxGridSizer* videoSizer1 = new wxFlexGridSizer(4); 
-	videoSizer1->Add(graphicsText);
-	videoSizer1->Add(graphicsCombo);
-	videoSizer1->Add(textureFilterText);
-	videoSizer1->Add(textureFilterCombo);
-	videoSizer1->Add(resolutionText);
-	videoSizer1->Add(resolutionCombo);
-	videoSizer1->Add(anisotropicText);
-	videoSizer1->Add(anisotropicCombo);
-	videoSizer1->Add(depthText);
-	videoSizer1->Add(depthCombo);
-	videoSizer1->Add(aaText);
-	videoSizer1->Add(aaCombo);
+	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
+	videoSizerL->Add(graphicsText);
+	videoSizerL->Add(graphicsCombo, wxSizerFlags().Expand());
+	videoSizerL->Add(resolutionText);
+	videoSizerL->Add(resolutionCombo, wxSizerFlags().Expand());
+	videoSizerL->Add(depthText);
+	videoSizerL->Add(depthCombo, wxSizerFlags().Expand());
+
+	wxGridSizer* videoSizerR = new wxFlexGridSizer(2);
+	videoSizerR->Add(textureFilterText);
+	videoSizerR->Add(textureFilterCombo, wxSizerFlags().Expand());
+	videoSizerR->Add(anisotropicText);
+	videoSizerR->Add(anisotropicCombo, wxSizerFlags().Expand());
+	videoSizerR->Add(aaText);
+	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
+
+	wxBoxSizer* videoSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	videoSizer1->Add(videoSizerL);
+	videoSizer1->AddStretchSpacer(5);
+	videoSizer1->Add(videoSizerR);
+	videoSizer1->AddStretchSpacer(5);
 
 #if !IS_APPLE
 	wxBoxSizer* videoSizergs = new wxBoxSizer(wxHORIZONTAL);
@@ -304,8 +312,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxVERTICAL);
-	videoSizer->SetMinSize(wxSize(300, -1));
-	videoSizer->Add(videoSizer1);
+	videoSizer->Add(videoSizer1, wxSizerFlags().Expand());
 #if !IS_APPLE
 	videoSizer->Add(videoSizergs);
 	videoSizer->Add(videoSizer3);
@@ -454,24 +461,28 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString ip;
 	proman->Get()->Read(PRO_CFG_NETWORK_IP, &ip, _T(""));
 	networkIP->SetValue(ip);
-
-	wxGridSizer* networkInsideSizer = new wxFlexGridSizer(4);
-	networkInsideSizer->Add(
-		new wxStaticText(this, wxID_ANY, _("Connection type:")));
-	networkInsideSizer->Add(networkType);
-	networkInsideSizer->Add(
-		new wxStaticText(this, wxID_ANY, _("Port:")));
-	networkInsideSizer->Add(networkPort);
-	networkInsideSizer->Add(
-		new wxStaticText(this, wxID_ANY, _("Connection speed: ")));
-	networkInsideSizer->Add(networkSpeed);
-	networkInsideSizer->Add(
-		new wxStaticText(this, wxID_ANY, _("IP:")));
-	networkInsideSizer->Add(networkIP);
+	
+	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")));
+	networkInsideSizerL->Add(networkType, wxSizerFlags().Expand());
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection speed: ")));
+	networkInsideSizerL->Add(networkSpeed, wxSizerFlags().Expand());
+	
+	wxGridSizer* networkInsideSizerR = new wxFlexGridSizer(2);
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Port: ")));
+	networkInsideSizerR->Add(networkPort);
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("IP:")));
+	networkInsideSizerR->Add(networkIP);
+	
+	wxBoxSizer* networkInsideSizer = new wxBoxSizer(wxHORIZONTAL);
+	networkInsideSizer->Add(networkInsideSizerL);
+	networkInsideSizer->AddStretchSpacer(5);
+	networkInsideSizer->Add(networkInsideSizerR);
+	networkInsideSizer->AddStretchSpacer(5);
 
 	wxStaticBoxSizer* networkSizer = 
 		new wxStaticBoxSizer(networkBox, wxVERTICAL);
-	networkSizer->Add(networkInsideSizer);
+	networkSizer->Add(networkInsideSizer, wxSizerFlags().Expand());
 
 	// Audio
 	wxStaticBox* audioBox = new wxStaticBox(this, wxID_ANY, _("Audio"));
@@ -509,7 +520,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->joystickDetectButton = new wxButton(this, ID_JOY_DETECT_BUTTON, _("Detect"));
 #endif
 	// FIXME get Detect button working
-	wxStaticText* detectJoystickText = new wxStaticText(this, wxID_ANY, _("Restart launcher to re-detect."),
+	wxStaticText* detectJoystickText = new wxStaticText(this, wxID_ANY,
+														_("Restart launcher to re-detect joysticks."),
 														wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	
 	this->SetupJoystickSection();
@@ -519,7 +531,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	joyButtonSizer->Add(joystickCalibrateButton);
 	joyButtonSizer->Add(joystickDetectButton);
 #endif
-	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center().Expand());
+	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center());
 	
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxVERTICAL);
 	joystickSizer->Add(selectedJoystickText);
@@ -528,7 +540,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	joystickSizer->Add(joystickForceFeedback);
 	joystickSizer->Add(joystickDirectionalHit);
 #endif
-	joystickSizer->Add(joyButtonSizer, wxSizerFlags().Expand().Center());
+	joystickSizer->Add(joyButtonSizer, wxSizerFlags().Center());
 
 	// Proxy
 	wxStaticBox* proxyBox = new wxStaticBox(this, wxID_ANY, _("Proxy"));
@@ -544,16 +556,22 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 #if !IS_APPLE
 	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
 #endif
+	
+	// switch to left column
+	leftColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
+	leftColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
 	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
-
-	wxBoxSizer* rightColumnSizer = new wxBoxSizer(wxVERTICAL);
-	rightColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
-	rightColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
-	rightColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
+	leftColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
+	
+//	wxBoxSizer* rightColumnSizer = new wxBoxSizer(wxVERTICAL);
+//	rightColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
+//	rightColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
+//	rightColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
 
 	wxBoxSizer* columnsSizer = new wxBoxSizer(wxHORIZONTAL);
+	leftColumnSizer->SetMinSize(TAB_AREA_WIDTH, -1);
 	columnsSizer->Add(leftColumnSizer);
-	columnsSizer->Add(rightColumnSizer);
+//	columnsSizer->Add(rightColumnSizer);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	exeSizer->SetMinSize(TAB_AREA_WIDTH, -1);
