@@ -94,9 +94,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("TC root folder and Executable"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("TC root folder and executable"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 Root Folder:"));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 root folder: "));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Select"));
 
