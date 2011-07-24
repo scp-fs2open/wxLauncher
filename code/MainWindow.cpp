@@ -63,7 +63,9 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	images->Add(skin->GetModsIcon());
 	images->Add(skin->GetBasicIcon());
 	images->Add(skin->GetAdvancedIcon());
+#if !IS_APPLE
 	images->Add(skin->GetInstallIcon());
+#endif
 
 	this->mainTab = new wxToolbook();
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(745,-1),	wxNB_LEFT);
@@ -72,8 +74,9 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false, ID_TAB_MOD_IMAGE);
 	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false, ID_TAB_BASIC_SETTINGS_IMAGE);
 	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab, skin), _("Advanced Settings"), false, ID_TAB_ADV_SETTINGS_IMAGE);
+#if !IS_APPLE
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
-
+#endif
 	wxPoint bbpoint(0, -1);
 	wxSize bbsize(745, -1);
 	BottomButtons* bb = new BottomButtons(this, bbpoint, bbsize);

@@ -33,8 +33,9 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 
 		bool showFred;
 		ProMan::GetProfileManager()->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &showFred, false);
-
+#if !IS_APPLE
 		this->close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
+#endif
 		this->help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
 		if ( showFred ) {
 			this->fred = new wxButton(this, ID_FRED_BUTTON, _("Fred"));
@@ -44,8 +45,13 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		this->update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Available"));
 		this->update->Hide();
 		this->play = new wxButton(this, ID_PLAY_BUTTON, _("Play"));
+		wxFont playButtonFont = this->play->GetFont();
+		playButtonFont.SetWeight(wxFONTWEIGHT_BOLD);
+		this->play->SetFont(playButtonFont);
 		wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+#if !IS_APPLE
 		sizer->Add(this->close);
+#endif
 		sizer->Add(this->help);
 		sizer->AddStretchSpacer(1);
 		sizer->Add(this->update, wxSizerFlags().ReserveSpaceEvenIfHidden());

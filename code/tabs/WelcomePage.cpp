@@ -100,6 +100,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	this->lastLinkInfo = NULL;
 	ProMan* profile = ProMan::GetProfileManager();
 
+#if !IS_APPLE
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
 	wxChoice* launcherLanguageCombo = new wxChoice(this, wxID_ANY);
@@ -111,7 +112,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	languageSizer->AddStretchSpacer(2);
 	languageSizer->Add(launcherLanguageText);
 	languageSizer->Add(launcherLanguageCombo);
-
+#endif
 	// header image
 	HeaderBitmap* header = new HeaderBitmap(this, this->stuffWidth, skin);
 	
@@ -178,7 +179,9 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+#if !IS_APPLE
 	sizer->Add(languageSizer);
+#endif
 	sizer->Add(header);
 	sizer->Add(generalSizer);
 	sizer->Add(profileVerticalSizer);
