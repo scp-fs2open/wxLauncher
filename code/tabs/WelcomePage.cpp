@@ -613,22 +613,22 @@ wxString CloneProfileDialog::GetOriginalName() {
 }
 
 DeleteProfileDialog::DeleteProfileDialog(wxWindow* parent, wxString name):
-wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile..."), wxDefaultPosition, wxDefaultSize) {
+wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile?"), ::wxGetMousePosition(), wxDefaultSize) {
 	wxStaticText* text = new wxStaticText(this, wxID_ANY,
-		wxString::Format(_("Are you sure you would like to delete profile %s"), name.c_str()));
+		wxString::Format(_("Are you sure you want to delete profile '%s'?"), name.c_str()));
 
 	wxButton *deleteButton = new wxButton(this, wxID_ANY, _("Delete"));
 	wxButton *cancelButton = new wxButton(this, wxID_ANY, _("Cancel"));
 
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	buttonSizer->Add(deleteButton);
-	buttonSizer->Add(cancelButton);
+	buttonSizer->Add(deleteButton, wxSizerFlags().Border(wxALL, 5));
+	buttonSizer->Add(cancelButton, wxSizerFlags().Border(wxALL, 5));
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(text);
-	sizer->Add(buttonSizer, wxSizerFlags().Right());
+	sizer->Add(text, wxSizerFlags().Expand().Border(wxALL, 5));
+	sizer->Add(buttonSizer, wxSizerFlags().Right().Border(wxALL, 5));
 
-	this->SetSizer(sizer);
+	this->SetSizerAndFit(sizer);
 	this->Layout();
 
 	this->SetAffirmativeId(deleteButton->GetId());
