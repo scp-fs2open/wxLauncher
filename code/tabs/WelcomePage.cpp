@@ -38,10 +38,15 @@ public:
 	CloneProfileDialog(wxWindow* parent, wxString orignalname, wxString desinationName);
 	wxString GetOriginalName();
 	wxString GetTargetName();
+	void OnUpdateText(wxCommandEvent& event);
+	void OnPressEnterKey(wxCommandEvent& event);
 private:
 	wxString target;
 	int fromNumber;
+	wxButton *createButton;
 	wxChoice *cloneFrom;
+	
+	DECLARE_EVENT_TABLE();
 };
 
 class DeleteProfileDialog: public wxDialog {
@@ -93,6 +98,11 @@ EVT_CHOICE(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
 EVT_CHECKBOX(ID_NET_DOWNLOAD_NEWS, WelcomePage::OnDownloadNewsCheck)
 
 EVT_IDLE(WelcomePage::UpdateNews)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(CloneProfileDialog, wxDialog)
+EVT_TEXT(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnUpdateText)
+EVT_TEXT_ENTER(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnPressEnterKey)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
@@ -344,14 +354,18 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 		if ( profile->CloneProfile(
 			cloneDialog.GetOriginalName(),
 			cloneDialog.GetTargetName()) ) {
-				wxLogStatus(_("Cloned profile '%s' from '%s'"),
-					cloneDialog.GetOriginalName().c_str(),
-					cloneDialog.GetTargetName().c_str());
+//				wxLogStatus(_("Cloned profile '%s' from '%s'"),
+//					cloneDialog.GetOriginalName().c_str(),
+//					cloneDialog.GetTargetName().c_str());
+				wxLogStatus(_("Created profile '%s'"),
+						cloneDialog.GetTargetName().c_str());
 				profile->SwitchTo(cloneDialog.GetTargetName());
 		} else {
-				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
-					cloneDialog.GetOriginalName().c_str(),
-					cloneDialog.GetTargetName().c_str());							
+//				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
+//					cloneDialog.GetOriginalName().c_str(),
+//					cloneDialog.GetTargetName().c_str());
+				wxLogError(_("Unable to create profile '%s'. See log for details."),
+					cloneDialog.GetTargetName().c_str());
 		}
 	} else {
 		wxLogStatus(_("Profile clone aborted"));
@@ -566,30 +580,37 @@ CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, w
 wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition, wxDefaultSize) {
 	this->target = destName;
 
-	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New Profile Name:"));
-	wxTextCtrl *newName = new wxTextCtrl(this, wxID_ANY, this->target, wxDefaultPosition, wxSize(200,-1));
+	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New profile name: "));
+	wxTextCtrl *newName = new wxTextCtrl(this, ID_CLONE_PROFILE_NEWNAME,
+										 this->target, wxDefaultPosition, wxSize(200,-1),
+										 wxTE_PROCESS_ENTER);
 	
 	wxSizer* nameSizer = new wxFlexGridSizer(2);
 	nameSizer->Add(newNameText);
 	nameSizer->Add(newName);
 
-	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
+	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from: "));
 	cloneFrom = new wxChoice(this, wxID_ANY);
-
+#if 0
 	nameSizer->Add(cloneFromText);
 	nameSizer->Add(cloneFrom);
-
-	wxButton *createButton = new wxButton(this, wxID_OK, _("Clone"));
-	wxButton *closeButton = new wxButton(this, wxID_CANCEL, _("Close"));
+#endif
+	// well, if we can't easily get rid of the clone components, let's get them off the screen
+	cloneFromText->Hide();
+	cloneFrom->Hide();
+	
+	this->createButton = new wxButton(this, wxID_OK, _("Create"));
+	wxCommandEvent initDialogEvent;
+	CloneProfileDialog::OnUpdateText(initDialogEvent);
+	wxButton *closeButton = new wxButton(this, wxID_CANCEL, _("Cancel"));
 
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	buttonSizer->Add(createButton);
-	buttonSizer->Add(closeButton);
+	buttonSizer->Add(createButton, wxSizerFlags().Border(wxALL, 5));
+	buttonSizer->Add(closeButton, wxSizerFlags().Border(wxALL, 5));
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(nameSizer, wxSizerFlags().Expand().Border(wxALL, 5));
-	sizer->AddSpacer(15);
-	sizer->Add(buttonSizer, wxSizerFlags().Right());
+	sizer->Add(buttonSizer, wxSizerFlags().Right().Border(wxALL, 5));
 
 	this->SetSizer(sizer);
 
@@ -600,6 +621,7 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 	cloneFrom->SetStringSelection(orignalName);
 
 	this->Fit();
+	this->Layout();
 	this->Center();
 	wxLogDebug(_T("Clone Profile Dialog Created"));
 }
@@ -612,8 +634,23 @@ wxString CloneProfileDialog::GetOriginalName() {
 	return cloneFrom->GetStringSelection();
 }
 
+void CloneProfileDialog::OnUpdateText(wxCommandEvent& event) {
+	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
+	wxCHECK_RET(newName != NULL, _T("can't find the clone profile new name text ctrl"));
+	this->createButton->Enable(!(newName->GetValue().IsEmpty()));
+}
+
+void CloneProfileDialog::OnPressEnterKey(wxCommandEvent& event) {
+	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
+	wxCHECK_RET(newName != NULL, _T("can't find the clone profile new name text ctrl"));
+	if (!(newName->GetValue().IsEmpty())) {
+		wxCommandEvent simulatedClickEvent(wxEVT_COMMAND_BUTTON_CLICKED, wxID_OK);
+		this->createButton->Command(simulatedClickEvent);
+	}
+}
+
 DeleteProfileDialog::DeleteProfileDialog(wxWindow* parent, wxString name):
-wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile?"), ::wxGetMousePosition(), wxDefaultSize) {
+wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile?"), wxDefaultPosition, wxDefaultSize) {
 	wxStaticText* text = new wxStaticText(this, wxID_ANY,
 		wxString::Format(_("Are you sure you want to delete profile '%s'?"), name.c_str()));
 
@@ -630,6 +667,7 @@ wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile?"), ::wxGetMousePos
 
 	this->SetSizerAndFit(sizer);
 	this->Layout();
+	this->Center();
 
 	this->SetAffirmativeId(deleteButton->GetId());
 	this->SetEscapeId(cancelButton->GetId());
