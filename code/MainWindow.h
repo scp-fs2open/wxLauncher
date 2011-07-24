@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include <wx/notebook.h>
-#include <wx/toolbook.h>
 #include <wx/process.h>
 #include "apis/SkinManager.h"
 
@@ -44,7 +43,7 @@ public:
 
 private:
 	wxProcess* process;
-	wxToolbook* mainTab;
+	wxNotebook* mainTab;
 	long FS2_pid, FRED2_pid;
 
 	DECLARE_EVENT_TABLE();

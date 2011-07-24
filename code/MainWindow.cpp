@@ -18,7 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include <wx/gdicmn.h>
-#include <wx/toolbook.h>
 #include <wx/imagpng.h>
 #include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
@@ -41,10 +40,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define MAINWINDOW_STYLE (wxBORDER_SUNKEN | wxSYSTEM_MENU\
 	| wxCAPTION | wxCLOSE_BOX | wxMINIMIZE_BOX | wxCLIP_CHILDREN)
 
+const int WINDOW_WIDTH = TAB_AREA_WIDTH;
+
 MainWindow::MainWindow(SkinSystem* skin) {
 	this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
-		wxDefaultPosition, wxSize(745, 550), MAINWINDOW_STYLE);
+		wxDefaultPosition, wxSize(WINDOW_WIDTH, 550), MAINWINDOW_STYLE);
 
 	this->FS2_pid = 0;
 	this->FRED2_pid = 0;
@@ -56,6 +57,7 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	// setup tabs
 
+#if !IS_APPLE
 	// Images used by wxImageList must be all the same dimentions
 	wxImageList* images = new wxImageList;
   images->Create(64,64);
@@ -63,13 +65,14 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	images->Add(skin->GetModsIcon());
 	images->Add(skin->GetBasicIcon());
 	images->Add(skin->GetAdvancedIcon());
-#if !IS_APPLE
 	images->Add(skin->GetInstallIcon());
 #endif
 
-	this->mainTab = new wxToolbook();
-	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(745,-1),	wxNB_LEFT);
+	this->mainTab = new wxNotebook();
+	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(WINDOW_WIDTH,-1), wxNB_TOP);
+#if !IS_APPLE
 	this->mainTab->AssignImageList(images);
+#endif
 	this->mainTab->AddPage(new WelcomePage(this->mainTab, skin), _("Welcome"), true, ID_TAB_WELCOME_IMAGE);
 	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false, ID_TAB_MOD_IMAGE);
 	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false, ID_TAB_BASIC_SETTINGS_IMAGE);
@@ -78,7 +81,7 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
 #endif
 	wxPoint bbpoint(0, -1);
-	wxSize bbsize(745, -1);
+	wxSize bbsize(WINDOW_WIDTH, -1);
 	BottomButtons* bb = new BottomButtons(this, bbpoint, bbsize);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
