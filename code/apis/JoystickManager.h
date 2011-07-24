@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 
-#define JOYMAN_INVALID_JOYSTICK 99999
+const unsigned int JOYMAN_INVALID_JOYSTICK = 99999;
 
 namespace JoyMan {
 	bool Initialize();
