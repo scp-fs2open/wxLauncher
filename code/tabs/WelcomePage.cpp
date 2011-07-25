@@ -46,6 +46,8 @@ private:
 	wxButton *createButton;
 	wxChoice *cloneFrom;
 	
+	bool NewNameIsValid();
+	
 	DECLARE_EVENT_TABLE();
 };
 
@@ -368,7 +370,8 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 					cloneDialog.GetTargetName().c_str());
 		}
 	} else {
-		wxLogStatus(_("Profile clone aborted"));
+//		wxLogStatus(_("Profile clone aborted"));
+		wxLogStatus(_("Profile creation aborted"));
 	}
 }
 
@@ -627,7 +630,7 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 }
 
 wxString CloneProfileDialog::GetTargetName() {
-	return this->target;
+	return this->target.Trim(true).Trim(false); // strip trailing/leading whitespace
 }
 
 wxString CloneProfileDialog::GetOriginalName() {
@@ -635,18 +638,21 @@ wxString CloneProfileDialog::GetOriginalName() {
 }
 
 void CloneProfileDialog::OnUpdateText(wxCommandEvent& event) {
-	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
-	wxCHECK_RET(newName != NULL, _T("can't find the clone profile new name text ctrl"));
-	this->createButton->Enable(!(newName->GetValue().IsEmpty()));
+	this->createButton->Enable(this->NewNameIsValid());
 }
 
 void CloneProfileDialog::OnPressEnterKey(wxCommandEvent& event) {
-	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
-	wxCHECK_RET(newName != NULL, _T("can't find the clone profile new name text ctrl"));
-	if (!(newName->GetValue().IsEmpty())) {
+	if (this->NewNameIsValid()) {
 		wxCommandEvent simulatedClickEvent(wxEVT_COMMAND_BUTTON_CLICKED, wxID_OK);
 		this->createButton->Command(simulatedClickEvent);
 	}
+}
+
+// a valid name is non-empty and does not consist purely of whitespace
+bool CloneProfileDialog::NewNameIsValid() {
+	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
+	wxASSERT_MSG(newName != NULL, _T("can't find the clone profile new name text ctrl"));
+	return !(newName->GetValue().Trim().IsEmpty());
 }
 
 DeleteProfileDialog::DeleteProfileDialog(wxWindow* parent, wxString name):
