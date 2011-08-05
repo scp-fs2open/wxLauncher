@@ -300,6 +300,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 			Flag* headFlag = new Flag();
 			headFlag->fsoCatagory = flag->fsoCatagory;
 			headFlag->checkbox = NULL;
+			headFlag->isRecomendedFlag = false;
 			flagCat->flags.Append(headFlag);
 			flagCat->flags.Append(flag);
 			this->allSupportedFlagsByCategory.Append(flagCat);
