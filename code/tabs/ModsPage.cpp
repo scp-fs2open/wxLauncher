@@ -53,7 +53,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->DeleteWindows();
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available MODs, you must first specify a Total Conversion root folder.\n You can do that on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion.\n You can do that on the Basic Settings page."),//\n\n(please check the help system for more info)"),
+											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
 		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
@@ -74,7 +75,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->SetSizer(noTCSizer);
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently specified Total Conversion root folder does not contain a valid Total Conversion.\nSelect a valid Total Conversion root folder on the Basic Settings page.\n\n(please check the help system for more info)"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),//\n\n(please check the help system for more info)"),
+												   wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
 		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
@@ -96,7 +98,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	} else {
 #if !IS_APPLE
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
-			_("Installed MODs.  Click on Install/Update in the left to search, download, and install additional MODs and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+			_("Installed mods.  Click on Install/Update in the left to search, download, and install additional mods and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		header->Wrap(TAB_AREA_WIDTH);
 #endif
 		wxSize modGridSize(TAB_AREA_WIDTH, 500);

@@ -82,8 +82,8 @@ bool wxLauncher::OnInit() {
 		wxFileName expectedDir(::wxGetCwd(), _T(RESOURCES_PATH));
 		wxLogFatalError(wxString::Format(
 			_T("Unable to load splash image. ")
-			_T("This normally means that you are running the Launcher from a directory")
-			_T(" that the launcher does not know how to find the resource directory from.")
+			_T("This normally means that you are running the Launcher from a folder")
+			_T(" that the launcher does not know how to find the resource folder from.")
 			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
 			expectedDir.GetFullPath().c_str()).c_str());
 		return false;

@@ -134,7 +134,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	}
 #endif
 	
-	wxLogInfo(_T(" Found %d fs2_open executables in '%s'"), files.Count(), path.GetPath().c_str());
+	wxLogInfo(_T(" Found %d FreeSpace 2 Open executables in '%s'"), files.Count(), path.GetPath().c_str());
 
 	for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
 		wxLogDebug(_T("Found executable: ") + files.Item(i));

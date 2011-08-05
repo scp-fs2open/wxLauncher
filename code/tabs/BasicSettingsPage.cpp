@@ -94,15 +94,15 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FS2/TC root folder and executable"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 root folder: "));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2/TC root folder: "));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
 	rootFolderBox->SetEditable(false);
 
-	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open binary: "));
+	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable: "));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	if ( hastcfolder ) {
 		BasicSettingsPage::FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
@@ -114,7 +114,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
 	if ( fredEnabled ) {
-		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open binary: "));
+		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable: "));
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
 
 		if ( hastcfolder ) {
@@ -646,7 +646,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
-	wxDirDialog filechooser(this, _T("Please choose the base directory of the Total Conversion"),
+	wxDirDialog filechooser(this, _T("Choose the root folder of a FreeSpace 2 installation or a total conversion"),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
 	wxString chosenDirectory;
@@ -657,20 +657,20 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		}
 		chosenDirectory = filechooser.GetPath();
 		if ( chosenDirectory == directory ) {
-			wxLogInfo(_T("The exe folder selection was not changed."));
+			wxLogInfo(_T("The TC root folder selection was not changed."));
 			return; // User canceled, bail out.
 		}
 		path.SetPath(chosenDirectory);
 		if ( !path.IsOk() ) {
-			wxLogWarning(_T("Directory is not valid"));
+			wxLogWarning(_T("Folder is not valid"));
 			continue;
 		} else if ( FSOExecutable::CheckRootFolder(path) ) {
 			break;
 		} else {
-			wxLogWarning(_T("Directory does not have supported executables in it"));
+			wxLogWarning(_T("Folder does not have any supported executables"));
 		}
 	}
-	wxLogDebug(_T("User chose '%s' as the TC directory"), path.GetPath().c_str());
+	wxLogDebug(_T("User chose '%s' as the TC root folder"), path.GetPath().c_str());
 	proman->Get()->Write(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
 	TCManager::GenerateTCChanged();
 }
