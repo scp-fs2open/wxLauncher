@@ -156,7 +156,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
-	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profile"));
+	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
 	profile->Global()->Read(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
@@ -178,8 +178,8 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
-	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Auto update highlights"));
-	updateNewsCheck->SetToolTip(_("Check this to have the Launcher update the highlights on next run"));
+	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Automatically retrieve highlights at startup"));
+	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the hard-light.net highlights the next time it runs"));
 	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
 	this->needToUpdateNews = true;
 
@@ -187,7 +187,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	headlines->SetMinSize(wxSize(this->stuffWidth, 150));
 	headlines->Add(headlinesView, 
 		wxSizerFlags().Expand().Center().Proportion(1));
-	headlines->Add(updateNewsCheck, wxSizerFlags().Right());
+	headlines->Add(updateNewsCheck, wxSizerFlags().Right().Border(wxTOP,5));
 
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -413,7 +413,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	}
 	this->needToUpdateNews = false;
 	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
-	wxCHECK_RET(newsWindow != NULL, _T("Update news called, but can't find the news window"));
+	wxCHECK_RET(newsWindow != NULL, _T("Update highlights called, but can't find the highlights window"));
 
 	ProMan* profile = ProMan::GetProfileManager();
 
@@ -439,12 +439,12 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			wxFileSystem filesystem;
 			wxFSFile* news = filesystem.OpenFile(_("http://www.audiozone.ro/hl/"), wxFS_READ);
 			if ( news == NULL ) {
-				wxLogError(_("Error in retrieving news"));
+				wxLogError(_("Error in retrieving highlights"));
 				return;
 			}
 
 			wxInputStream* theNews = news->GetStream();
-			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
+			wxLogDebug(_T("highlights loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
 
 			wxString newsData;
 			wxStringOutputStream newsDataStream(&newsData);
@@ -453,9 +453,9 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			wxStringTokenizer tok(newsData, _T("\t"), wxTOKEN_STRTOK);
 			while(tok.HasMoreTokens()) {
 				wxString title(tok.GetNextToken());
-				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
+				wxCHECK_RET(tok.HasMoreTokens(), _T("highlights formatter has run out of tokens at wrong time"));
 				wxString link(tok.GetNextToken());
-				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
+				wxCHECK_RET(tok.HasMoreTokens(), _T("highlights formatter has run out of tokens at wrong time"));
 				wxString imglink(tok.GetNextToken());
 				
 				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
@@ -468,7 +468,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			profile->Global()->Write(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
 		}
 	} else {
-		newsWindow->SetPage(_("Auto news download disabled."));
+		newsWindow->SetPage(_("Automatic highlights retrieval disabled."));
 	}
 }
 
@@ -478,7 +478,7 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
 		wxDialog* updateNewsQuestion = 
 			new wxDialog(NULL, wxID_ANY, 
-			_("wxLauncher - Network Access Request"),
+			_("wxLauncher - network access request"),
 			wxDefaultPosition, wxDefaultSize, 
 			wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxDIALOG_NO_PARENT);
 		updateNewsQuestion->SetBackgroundColour(
@@ -490,33 +490,38 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxASSERT(updateNewsQuestionIcon.IsOk());
 
 		updateNewsQuestion->SetIcon(updateNewsQuestionIcon);
+#if 0
 		wxStaticText* updateNewsText1 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("wxLauncher has the built-in capability of retrieving and displaying the Hard-Light.net highlights on the Welcome page of the launcher."),
+				_("wxLauncher has the built-in capability of retrieving and displaying the Hard-Light.net highlights on the Welcome tab of the launcher."),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+#endif
 		wxStaticText* updateNewsText2 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("Would you like to allow wxLauncher to go online and retrieve the highlights automatically?"),
+				_("Would you like wxLauncher to retrieve the highlights from hard-light.net automatically?"),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		
 		wxStaticText* updateNewsText3 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY,
-				_("(this setting can can be changed anytime on the Install page, please click \"?\" for more info)"),
+				_("You can change this setting on the Welcome tab."),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
 		wxButton* allowNewsUpdate = 
 			new wxButton(updateNewsQuestion, wxID_ANY, 
-				_("Allow automatic Welcome page highlights update"));
+				_("Yes"));
 		wxButton* denyNewsUpdate = 
 			new wxButton(updateNewsQuestion, wxID_ANY,
-				_("Do not update the highlights on the Welcome page"));
+				_("No"));
 		updateNewsQuestion->SetAffirmativeId(allowNewsUpdate->GetId());
 		updateNewsQuestion->SetEscapeId(denyNewsUpdate->GetId());
+#if 0
 		wxButton* helpButton = new wxButton(updateNewsQuestion, wxID_ANY,
 			_T("?"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
 
 		helpButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED,
 			wxCommandEventHandler(WelcomePage::OnUpdateNewsHelp));
-		
+#endif
+
 		wxBoxSizer* updateNewsSizer = new wxBoxSizer(wxHORIZONTAL);
 		wxBoxSizer* bodySizer= new wxBoxSizer(wxVERTICAL);
 		wxBoxSizer* choiceSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -528,24 +533,24 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxASSERT(questionMark.IsOk());
 		wxStaticBitmap* questionImage = 
 			new wxStaticBitmap(updateNewsQuestion, wxID_ANY, questionMark);
-		
+
 		choiceSizer->AddStretchSpacer(1);
 		choiceSizer->Add(allowNewsUpdate);
-		choiceSizer->AddSpacer(15);
+		choiceSizer->AddSpacer(10);
 		choiceSizer->Add(denyNewsUpdate);
+#if 0
 		choiceSizer->AddSpacer(15);
 		choiceSizer->Add(helpButton);
+#endif
 		choiceSizer->AddStretchSpacer(1);
-		
-		bodySizer->AddSpacer(10);
+
+#if 0
 		bodySizer->Add(updateNewsText1, wxSizerFlags().Expand().Center());
-		bodySizer->AddSpacer(5);
-		bodySizer->Add(updateNewsText2, wxSizerFlags().Expand().Center());
-		bodySizer->AddSpacer(5);
-		bodySizer->Add(updateNewsText3, wxSizerFlags().Expand().Center());
-		bodySizer->AddSpacer(10);
+#endif
+		bodySizer->Add(updateNewsText2, wxSizerFlags().Expand().Center().Border(wxTOP, 5));
+		bodySizer->Add(updateNewsText3, wxSizerFlags().Expand().Center().Border(wxBOTTOM, 10));
 		bodySizer->Add(choiceSizer, wxSizerFlags().Expand().Center());
-		bodySizer->AddSpacer(10);
+		bodySizer->AddSpacer(5);
 
 		updateNewsSizer->Add(questionImage,0, wxALL | wxCENTER, 5);
 		updateNewsSizer->Add(bodySizer, wxSizerFlags().Expand().Center());
