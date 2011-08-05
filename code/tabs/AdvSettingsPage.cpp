@@ -68,6 +68,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
 #endif
+	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, wxID_ANY, _T("Flag sets:"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -80,6 +81,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	idealFlagsRowSizer->Add(idealLabelSizer);
 #endif
 	idealFlagsRowSizer->AddStretchSpacer(1);
+	idealFlagsRowSizer->Add(flagSetChoiceLabel, wxSizerFlags().Border(wxRIGHT, 5));
 	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Right());
 
 #if 0 // doesn't do anything
@@ -154,7 +156,22 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flagset choice control") );
 	wxArrayString flagSetsArray;
 	if (flagSetChoice->IsEmpty()) { // box should be appended just once
-		flagSetChoice->Append(this->flagListBox->GetFlagSets(flagSetsArray));
+		this->flagListBox->GetFlagSets(flagSetsArray);
+
+		// before populating the flag set choice box, let's remove the flag sets that don't make sense
+		// and can thus potentially confuse users
+
+		flagSetsArray.Remove(_T("Custom"));
+
+		// workaround for removing "All features on", since the flag set names other than Custom seem
+		// to end in some kind of weird unprintable char(s), which is then messing up string comparison.
+		for (int i = flagSetsArray.GetCount() - 1; i >= 0; --i) {
+			if (flagSetsArray[i].StartsWith(_T("All features on"))) {
+				flagSetsArray.RemoveAt(i);
+			}
+		}
+		
+		flagSetChoice->Append(flagSetsArray);
 	}
 
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
