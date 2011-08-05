@@ -196,7 +196,7 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 				offset += len+1;
 			} while ( len != 0 );
 		} else {
-			wxLogError(_T("OpenAL gave use NULL for list of devices."));
+			wxLogError(_T("OpenAL gave NULL for list of devices."));
 			return arr;
 		}
 	} else {
@@ -280,7 +280,7 @@ wxString OpenALMan::GetCurrentVersion() {
 	
 	const ALCchar* version = (*GetString)(AL_VERSION);
 	if ( !checkForALError() || version == NULL ) {
-		wxLogError(_T("OpenAL: Unable to retrive Version String"));
+		wxLogError(_T("OpenAL: Unable to retrieve Version String"));
 		return _("Unknown version");
 	}
 	wxString Version(version, wxConvUTF8);

@@ -49,7 +49,7 @@ inline wxFileName GetPlatformDefaultConfigFilePath() {
 
 #define ReturnChecker(retvalue, location) \
 	if ( retvalue != true ) {\
-		wxLogError(_T("Unhandled error in writing to the configation file above line %d"), location);\
+		wxLogError(_T("Unhandled error in writing to the configuration file above line %d"), location);\
 		return ProMan::UnknownError;\
 	}
 
@@ -60,7 +60,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &outFileNameString)) {
 			outFileName.Assign(outFileNameString);
 		} else {
-			wxLogError(_T("Unable to retrive Config File location even though config says key exists"));
+			wxLogError(_T("Unable to retrieve Config File location even though config says key exists"));
 			return ProMan::UnknownError;
 		}
 	} else {
@@ -250,7 +250,7 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &inFileNameString)) {
 			inFileName.Assign(inFileNameString);
 		} else {
-			wxLogError(_T("Unable to retrive Config File location even though config says key exists"));
+			wxLogError(_T("Unable to retrieve Config File location even though config says key exists"));
 			return ProMan::UnknownError;
 		}
 	} else {

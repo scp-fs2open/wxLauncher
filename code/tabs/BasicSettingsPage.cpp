@@ -94,7 +94,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("TC root folder and executable"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FS2/TC root folder and executable"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 root folder: "));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
@@ -102,7 +102,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	rootFolderBox->SetEditable(false);
 
-	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("Use this FS2 Open binary: "));
+	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open binary: "));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	if ( hastcfolder ) {
 		BasicSettingsPage::FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
@@ -114,7 +114,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
 	if ( fredEnabled ) {
-		useFredText = new wxStaticText(this, wxID_ANY, _("Use this FRED2 Open binary: "));
+		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open binary: "));
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
 
 		if ( hastcfolder ) {
@@ -128,7 +128,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
 	rootFolderSizer->Add(rootFolderText);
 	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1));
-	rootFolderSizer->Add(selectButton);
+	rootFolderSizer->Add(selectButton, wxSizerFlags().Border(wxLEFT, 5));
 
 	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
 	selectExeSizer->Add(useExeText);
@@ -368,7 +368,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		int speechVoice;
 		int speechSystemVoice = SpeechMan::GetVoice();
 		if ( speechSystemVoice < 0 ) {
-			wxLogWarning(_T("Had problem retriving the system voice, using voice 0"));
+			wxLogWarning(_T("Had problem retrieving the system voice, using voice 0"));
 			speechSystemVoice = 0;
 		}
 		// set the voice to what is in the profile, if not set in profile use
@@ -387,7 +387,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		int speechVolume;
 		int speechSystemVolume = SpeechMan::GetVolume();
 		if (speechSystemVolume < 0) {
-			wxLogWarning(_T("Had problem in retriving the system speech volume,")
+			wxLogWarning(_T("Had problem in retrieving the system speech volume,")
 				_T(" setting to 50"));
 			speechSystemVolume = 50;
 		}
@@ -670,7 +670,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 			wxLogWarning(_T("Directory does not have supported executables in it"));
 		}
 	}
-	wxLogDebug(_T("User choose '%s' as the TC directory"), path.GetPath().c_str());
+	wxLogDebug(_T("User chose '%s' as the TC directory"), path.GetPath().c_str());
 	proman->Get()->Write(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
 	TCManager::GenerateTCChanged();
 }

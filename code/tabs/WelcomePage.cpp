@@ -352,7 +352,8 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	CloneProfileDialog cloneDialog(this, originalName, targetName);
 
 	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
-		wxLogDebug(_T("User clicked clone"));
+//		wxLogDebug(_T("User clicked clone"));
+		wxLogDebug(_T("User clicked create"));
 		if ( profile->CloneProfile(
 			cloneDialog.GetOriginalName(),
 			cloneDialog.GetTargetName()) ) {
@@ -392,7 +393,7 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
 			wxLogStatus(_("Deletion of profile '%s' cancelled"), nametodelete.c_str());
 		}
 	} else {
-		wxLogWarning(_T("Unable to delete non existant profile '%s'"), nametodelete.c_str());
+		wxLogWarning(_T("Unable to delete non-existent profile '%s'"), nametodelete.c_str());
 	}
 }
 
@@ -438,7 +439,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			wxFileSystem filesystem;
 			wxFSFile* news = filesystem.OpenFile(_("http://www.audiozone.ro/hl/"), wxFS_READ);
 			if ( news == NULL ) {
-				wxLogError(_("Error in retriving news"));
+				wxLogError(_("Error in retrieving news"));
 				return;
 			}
 

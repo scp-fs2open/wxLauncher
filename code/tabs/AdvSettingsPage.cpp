@@ -210,7 +210,7 @@ void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
 	wxString selectedSet = choice->GetString(choice->GetSelection());
 	bool ret = this->flagListBox->SetFlagSet(selectedSet);
 	if ( ret == false ) {
-		wxLogError(_T("Unable to set FlagSet (%s). Set does not exist"), selectedSet.c_str());
+		wxLogError(_T("Unable to set flag set (%s). Set does not exist"), selectedSet.c_str());
 	}
 	wxCommandEvent event;
 	this->OnNeedUpdateCommandLine(event);

@@ -243,7 +243,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
 #if 0 // what's the user supposed to do about this?
 		if ( config->Exists(_T("/multimod/secondrylist")) ) {
-			wxLogInfo(_T("  DEPCRECIATION WARNING: Mod '%s' uses depreciated mod.ini parameter 'secondrylist'"),
+			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
 #endif

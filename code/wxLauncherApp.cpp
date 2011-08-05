@@ -84,7 +84,7 @@ bool wxLauncher::OnInit() {
 			_T("Unable to load splash image. ")
 			_T("This normally means that you are running the Launcher from a directory")
 			_T(" that the launcher does not know how to find the resource directory from.")
-			_T("\n\nThe Launcher is expecting (%s) to contain the resource images."),
+			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
 			expectedDir.GetFullPath().c_str()).c_str());
 		return false;
 	}
@@ -94,7 +94,7 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
 	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 
-	wxLogInfo(_T("Initing profiles..."));
+	wxLogInfo(_T("Initializing profiles..."));
 	if ( !ProMan::Initialize() ) {
 		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
 		return false;
@@ -102,13 +102,13 @@ bool wxLauncher::OnInit() {
 	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	wxFileSystem::AddHandler(new wxInternetFSHandler);
 
-	wxLogInfo(_T("Initing Skin System..."));
+	wxLogInfo(_T("Initializing Skin System..."));
 	this->skin = new SkinSystem();
 
-	wxLogInfo(_T("Initing HelpManager..."));
+	wxLogInfo(_T("Initializing HelpManager..."));
 	HelpManager::Initialize();
 
-	wxLogInfo(_T("wxLauncher Starting up."));
+	wxLogInfo(_T("wxLauncher starting up."));
 
 
 	MainWindow* window = new MainWindow(skin);

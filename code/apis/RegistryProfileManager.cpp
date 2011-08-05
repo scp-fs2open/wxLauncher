@@ -531,7 +531,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
 		} else {
-			wxLogError(_T("Unable to read FS2Open settings from the registry (%d)"), ret);
+			wxLogError(_T("Unable to read FS2 Open settings from the registry (%d)"), ret);
 			return static_cast<ProMan::RegistryCodes>(ret);
 		}
 #endif	
