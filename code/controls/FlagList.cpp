@@ -447,7 +447,7 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nPlease select a FreeSpace 2 installation or a total conversion\non the Basic Settings tab.");
 				break;
 			case MISSING_EXE:
-				msg = _("No FreeSpace 2 Open executable has been selected.\nPlease select an executable on the basic settings tab.");
+				msg = _("No FreeSpace 2 Open executable has been selected.\nPlease select an executable on the Basic Settings tab.");
 				break;
 			case INVALID_BINARY:
 				msg = _("Selected executable does not exist.\nPlease choose another on the Basic Settings tab.");
