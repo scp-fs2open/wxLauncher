@@ -830,8 +830,8 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSiz
 	imgrect.x = titlerect.width;
 
 	wxRect infotextrect = rect;
-	// The 2 is to keep the text from touching the image.
-	infotextrect.x = titlerect.width + imgrect.width + 2;
+	// The 5 is to keep the text away from the image.
+	infotextrect.x = titlerect.width + imgrect.width + 5;
 	infotextrect.width = rect.width - infotextrect.x;
 
 	wxFont titlefont = this->skinSystem->GetFont();
@@ -918,7 +918,9 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 					break;
 				}
 			} else {
-				string.append(_T(" "));
+				if (!(string.IsEmpty())) { // prevent leading space in info text
+					string.append(_T(" "));	
+				}
 			}
 			string.append(words[i].word);
 			currentwidth += words[i].size.x + spaceSize.x;
