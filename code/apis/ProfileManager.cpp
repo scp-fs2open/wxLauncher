@@ -49,7 +49,7 @@ WX_DEFINE_LIST(EventHandlers);
 
 void ProMan::GenerateChangeEvent() {
 	wxCommandEvent event(EVT_PROFILE_CHANGE, wxID_NONE);
-	wxLogDebug(_T("Generating PRofile change event"));
+	wxLogDebug(_T("Generating profile change event"));
 	EventHandlers::iterator iter = this->eventHandlers.begin();
 	do {
 		wxEvtHandler* current = *iter;
@@ -158,7 +158,7 @@ bool ProMan::Initialize() {
 	}
 
 	ProMan::isInitialized = true;
-	wxLogDebug(_T(" Profile Manager is setup"));
+	wxLogDebug(_T(" Profile Manager is set up"));
 	return true;
 }
 
@@ -284,7 +284,7 @@ unsaved changes. So we only check the current profile. */
 void ProMan::SaveCurrentProfile() {
 	wxConfigBase* configbase = wxFileConfig::Get(false);
 	if ( configbase == NULL ) {
-		wxLogWarning(_T("There is no global fileconfig."));
+		wxLogWarning(_T("There is no global file config."));
 		return;
 	}
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
@@ -292,7 +292,7 @@ void ProMan::SaveCurrentProfile() {
 		if ( this->isAutoSaving ) {
 			wxString profilename;
 			if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profilename) ) {
-				wxLogWarning(_T("Current Profile does not have a file name, and I am unable to auto save."));
+				wxLogWarning(_T("Current profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
 				file.Assign(GET_PROFILE_STORAGEFOLDER(), profilename);
@@ -358,7 +358,7 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 bool ProMan::DeleteProfile(wxString name) {
 	wxLogDebug(_T("Deleting profile: %s"), name.c_str());
 	if ( name == _T("Default") ) {
-		wxLogWarning(_("Cannot delete Default profile."));
+		wxLogWarning(_("Cannot delete 'Default' profile."));
 		return false;
 	}
 	if ( name == this->currentProfileName ) {

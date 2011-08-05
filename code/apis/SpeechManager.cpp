@@ -96,7 +96,7 @@ bool EnumerateVoices() {
 
 	while( comVoicesCount > 0 ) {
 		ISpObjectToken * comAVoice = NULL;
-		comVoices->Next(1, &comAVoice, NULL); // retrive just one
+		comVoices->Next(1, &comAVoice, NULL); // retrieve just one
 		LPWSTR id = NULL;
 		comAVoice->GetStringValue(NULL, &id);
 		size_t idlength = wcslen(id);
@@ -237,7 +237,7 @@ int SpeechMan::GetVolume() {
 
 	USHORT volume = 100;
 	HRESULT result = comVoice->GetVolume(&volume);
-	wxCHECK_MSG( SUCCEEDED(result), -1, _T("Unable to retrive volume"));
+	wxCHECK_MSG( SUCCEEDED(result), -1, _T("Unable to retrieve volume"));
 
 	return volume;
 #else

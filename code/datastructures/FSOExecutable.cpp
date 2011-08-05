@@ -152,7 +152,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	ver.executablename = binaryname;
 
 	if ( !tok.HasMoreTokens() ) {
-		wxLogError(_T("Have not gotten fs2"));
+		wxLogError(_T("Have not gotten 'fs2'"));
 		return ver;
 	}
 	first = tok.GetNextToken();
@@ -165,7 +165,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				ver.binaryname = _T("Fred 2 Open");
 			}
 		} else {
-			wxLogWarning(_T("was expecting open; got %s"), first1.c_str());
+			wxLogWarning(_T("was expecting 'open'; got %s"), first1.c_str());
 			return ver;
 		}
 	} else {
@@ -251,7 +251,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			if ( ok && version > 0 ) {
 				ver.build = (int)version;
 			} else {
-				wxLogWarning(_T("SirKightly build number out of range (%d)"), version);
+				wxLogWarning(_T("SirKnightly build number out of range (%d)"), version);
 			}
 		} else if ( token.StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
