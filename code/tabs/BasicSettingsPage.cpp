@@ -98,7 +98,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 root folder: "));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
-	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Select"));
+	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
 	rootFolderBox->SetEditable(false);
 
