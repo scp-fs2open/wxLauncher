@@ -161,13 +161,13 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
 	if ( !p->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
-		wxLogError(_T("TC folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
+		wxLogError(_T("TC root folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
 	}
 	if ( !p->Get()->Read(cfgBinaryPath, &binary) ) {
-		wxLogError(_T("Binary to execute is not set (%s)"), cfgBinaryPath.c_str());
+		wxLogError(_T("No FreeSpace 2 Open executable has been selected (%s)"), cfgBinaryPath.c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
@@ -180,7 +180,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 #endif
 
 	if ( !path.FileExists() ) {
-		wxLogError(_T("Binary %s does not exist"), path.GetFullName().c_str());
+		wxLogError(_T("Executable %s does not exist"), path.GetFullName().c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
@@ -277,7 +277,7 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 
 	int exitCode = event.GetExitCode();
 
-	wxLogInfo(_T("FS2 Open exited with a status of %d"), exitCode);
+	wxLogInfo(_T("FreeSpace 2 Open exited with a status of %d"), exitCode);
 
 	delete this->process;
 	this->process = NULL;
@@ -298,7 +298,7 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 
 	int exitCode = event.GetExitCode();
 
-	wxLogInfo(_T("FRED2 Open exited with a status of %d"), exitCode);
+	wxLogInfo(_T("FRED 2 Open exited with a status of %d"), exitCode);
 
 	delete this->process;
 	this->process = NULL;

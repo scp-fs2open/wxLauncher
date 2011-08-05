@@ -84,7 +84,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	this->semicolon[0] = ';';
 	this->semicolon[1] = '\0';
 
-	this->stringNoMod = _("(No MOD)");
+	this->stringNoMod = _("(No mod)");
 
 	this->appendmods = NULL;
 	this->prependmods = NULL;
@@ -102,7 +102,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	// parse mod.ini's in all of the directories that contain one
 	this->configFiles = new ConfigArray();
 
-	wxLogDebug(_T("Inserting '(No MOD)'"));
+	wxLogDebug(_T("Inserting '(No mod)'"));
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
@@ -381,10 +381,10 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	this->SetItemCount(this->tableData->Count());
 
 	// set currently select mod as selected or
-	// set (No MOD) if none or previous does not exist
+	// set (No mod) if none or previous does not exist
 	wxString currentMod;
 	ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No MOD)"));
+		->Read(PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No mod)"));
 
 	{
 		size_t i;
@@ -411,7 +411,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
 	this->warnBitmap =
 		new wxStaticBitmap(this, wxID_ANY, this->skinSystem->GetWarningIcon());
-	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it, please click Info for more details"));
+	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it. Please click Info for more details."));
 
 	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
 	this->buttonSizer->AddStretchSpacer(2);
@@ -611,7 +611,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		modline += _T(",");
 	}
 	if ( selected != 0 ) {
-		// put current mods name into the list unless it is (No MOD)
+		// put current mods name into the list unless it is (No mod)
 		modline += *shortname;
 	}
 

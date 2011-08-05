@@ -100,7 +100,7 @@ bool ProMan::Initialize() {
 	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullPath().c_str());
 	if ( !wxFileName::DirExists(file.GetPath())
 		&& !wxFileName::Mkdir(file.GetPath(), 0700, wxPATH_MKDIR_FULL ) ) {
-		wxLogError(_T(" Unable to make profile directory."));
+		wxLogError(_T(" Unable to make profile folder."));
 		return false;
 	}
 
@@ -229,7 +229,7 @@ bool ProMan::CreateNewProfile(wxString newName) {
 
 	if ( !wxFileName::DirExists(profile.GetPath())
 		&& !wxFileName::Mkdir( profile.GetPath(), wxPATH_MKDIR_FULL) ) {
-		wxLogWarning(_T("  Unable to create profile directory: %s"), profile.GetPath().c_str());
+		wxLogWarning(_T("  Unable to create profile folder: %s"), profile.GetPath().c_str());
 		return false;
 	}
 

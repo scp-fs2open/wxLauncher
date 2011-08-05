@@ -106,7 +106,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	} else if ( wxFileName(tc, fredBinary).FileExists() ) {
 		this->fred->Enable();
 	} else {
-		wxLogWarning(_("Fred binary %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
+		wxLogWarning(_("Fred executable %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
 		this->fred->Disable();
 	}
 }
