@@ -16,10 +16,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "generated/configure_launcher.h"
+
 #include "tabs/AdvSettingsPage.h"
 
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
+#include "controls/ModList.h" // for code needed in rendering command line text
 #include "global/ids.h"
 
 #include <wx/html/htmlwin.h>
@@ -193,10 +196,79 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxString cmdLine = wxString::Format(_T("%s%c%s -mod %s %s"),
 		tcPath.c_str(), wxFileName::GetPathSeparator(), exeName.c_str(),
 		modline.c_str(), flagLine.c_str());
-	
-	commandLine->ChangeValue(cmdLine);
+
+	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
+													 commandLine->GetSize().GetWidth() - 20)); // 20 for scrollbar
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
+}
+
+// Adapted from ModList.cpp - FIXME there should really be just one copy
+void ASPFillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
+								   wxDC& dc,
+								   wxFont *testFont,
+								   ArrayOfWords *words)
+{
+	while ( tokens.HasMoreTokens() ) {
+		wxString tok = tokens.GetNextToken();
+#if IS_APPLE
+		if (tok.Lower() == _T("(debug)")) { // leftover from tokenizing executable in debug .app
+			continue;
+		}
+		// remove the text after ".app" in the FSO executable name
+		int DotAppIndex = tok.Find(_T(".app/")); // the trailing / ensures that the .app indicates an extension
+		if (DotAppIndex != wxNOT_FOUND) {
+			tok = tok.Mid(0, DotAppIndex + 4); // 4 so that ".app" is retained
+		}
+#endif
+		int x, y;
+		dc.GetTextExtent(tok, &x, &y, NULL, NULL, testFont);
+		
+		Words* temp = new Words();
+		temp->size.SetWidth(x);
+		temp->size.SetHeight(y);
+		temp->word = tok;
+		
+		words->Add(temp);
+	}
+}
+
+wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
+												  const int textAreaWidth) {
+	// inspired by ModItem::InfoText::Draw()
+	wxStringTokenizer tokens(origCmdLine);
+	ArrayOfWords words;
+	words.Alloc(tokens.CountTokens());
+	
+	wxClientDC dc(this);
+	ASPFillArrayOfWordsFromTokens(tokens, dc, NULL, &words);
+
+	const int spaceWidth = dc.GetTextExtent(_T(" ")).GetWidth();
+	
+	int currentWidth = 0;
+	
+	wxString formattedCmdLine;
+	wxString currentLine;
+
+	for (size_t i = 0, n = words.Count(); i < n; i++) {
+		if (currentWidth + words[i].size.x + spaceWidth > textAreaWidth) {
+			formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
+			
+			currentLine.Empty();
+			currentWidth = 0;
+		} else {
+			if (!currentLine.IsEmpty()) {
+				currentLine.append(_T(" "));
+			}
+		}
+		currentLine.append(words[i].word);
+		currentWidth += words[i].size.x + spaceWidth;
+	}
+	if (!currentLine.IsEmpty()) {
+		formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
+	}
+
+	return formattedCmdLine;
 }
 
 void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
