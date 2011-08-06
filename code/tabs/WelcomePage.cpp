@@ -197,7 +197,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT, 5));
 	sizer->Add(headlines, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-	this->SetSizer(sizer);
+	this->SetSizerAndFit(sizer);
 	this->Layout();
 }
 
@@ -619,7 +619,7 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 	sizer->Add(nameSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 	sizer->Add(buttonSizer, wxSizerFlags().Right().Border(wxALL, 5));
 
-	this->SetSizer(sizer);
+	this->SetSizerAndFit(sizer);
 
 	newName->SetValidator(wxTextValidator(wxFILTER_NONE, &(this->target)));
 	cloneFrom->SetValidator(wxGenericValidator(&(this->fromNumber)));

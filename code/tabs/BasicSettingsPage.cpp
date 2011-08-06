@@ -566,7 +566,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	sizer->Add(exeSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 	sizer->Add(settingsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-	this->SetSizerAndFit(sizer);
+	this->SetSizer(sizer);
 	this->Layout();
 
 }
