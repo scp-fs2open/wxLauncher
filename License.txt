@@ -10,6 +10,9 @@ missing, you can find a copy of the license at:
 	
 Please add it back to the source package ;)
 
+The source code for this software is available for download
+at http://code.google.com/p/wxlauncher/downloads/list
+
 ** The interfaces that wxLauncher uses to interact
 with the FreeSpace 2 Open binaries are licensed (
 including but not limited to the Volition Pack files,
