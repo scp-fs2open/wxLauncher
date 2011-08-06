@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include <wx/wx.h>
+#include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include "generated/configure_launcher.h"
@@ -32,6 +33,19 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	cmdLineString += tcPath.c_str();
 	cmdLineString += wxFileName::GetPathSeparator();
 	cmdLineString += _T("data");
+#if IS_APPLE
+	// if data folder does not exist in TC root folder, attempt to create it first
+	if (!wxDir::Exists(cmdLineString)) {
+		if (!::wxMkdir(cmdLineString)) {
+			wxLogError(_T("Couldn't create data folder in TC root folder %s"),
+					   tcPath.c_str());
+			return ProMan::UnknownError;
+		}
+		wxLogDebug(_T("data folder created in TC root folder"));
+	} else {
+		wxLogDebug(_T("data folder found in TC root folder"));	
+	}
+#endif
 	cmdLineString += wxFileName::GetPathSeparator();
 	cmdLineString += _T("cmdline_fso.cfg");
 	wxFileName cmdLineFileName(cmdLineString);
