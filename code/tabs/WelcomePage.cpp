@@ -112,7 +112,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	this->lastLinkInfo = NULL;
 	ProMan* profile = ProMan::GetProfileManager();
 
-#if !IS_APPLE
+#if 0
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));
 	wxChoice* launcherLanguageCombo = new wxChoice(this, wxID_ANY);
@@ -126,7 +126,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	languageSizer->Add(launcherLanguageCombo);
 #endif
 	// header image
-	HeaderBitmap* header = new HeaderBitmap(this, this->stuffWidth, skin);
+	HeaderBitmap* header = new HeaderBitmap(this, skin->GetBanner().GetWidth(), skin);
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
@@ -135,8 +135,8 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	general->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);
-	generalSizer->SetMinSize(wxSize(this->stuffWidth, 200));
-	generalSizer->Add(general, 1, wxEXPAND);
+	generalSizer->SetMinSize(wxSize(-1, 175));
+	generalSizer->Add(general, wxSizerFlags().Expand().Proportion(1));
 
 	// Profiles
 	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile"));
@@ -171,7 +171,6 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	wxStaticBoxSizer* profileVerticalSizer = new wxStaticBoxSizer(profileBox, wxVERTICAL);
 	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 4);
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 4);
-	profileVerticalSizer->SetMinSize(wxSize(this->stuffWidth, -1));
 
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from the front"));
@@ -184,20 +183,19 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 	this->needToUpdateNews = true;
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
-	headlines->SetMinSize(wxSize(this->stuffWidth, 150));
 	headlines->Add(headlinesView, 
 		wxSizerFlags().Expand().Center().Proportion(1));
 	headlines->Add(updateNewsCheck, wxSizerFlags().Right().Border(wxTOP,5));
 
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-#if !IS_APPLE
+#if 0
 	sizer->Add(languageSizer);
 #endif
-	sizer->Add(header);
-	sizer->Add(generalSizer);
-	sizer->Add(profileVerticalSizer);
-	sizer->Add(headlines);
+	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Center());
+	sizer->Add(generalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(headlines, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	this->SetSizer(sizer);
 	this->Layout();
@@ -589,19 +587,19 @@ CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, w
 wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition, wxDefaultSize) {
 	this->target = destName;
 
-	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New profile name: "));
+	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New profile name:"));
 	wxTextCtrl *newName = new wxTextCtrl(this, ID_CLONE_PROFILE_NEWNAME,
 										 this->target, wxDefaultPosition, wxSize(200,-1),
 										 wxTE_PROCESS_ENTER);
 	
 	wxSizer* nameSizer = new wxFlexGridSizer(2);
-	nameSizer->Add(newNameText);
+	nameSizer->Add(newNameText, wxSizerFlags().Border(wxRIGHT, 5));
 	nameSizer->Add(newName);
 
-	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from: "));
+	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
 	cloneFrom = new wxChoice(this, wxID_ANY);
 #if 0
-	nameSizer->Add(cloneFromText);
+	nameSizer->Add(cloneFromText, wxSizerFlags().Border(wxRIGHT, 5));
 	nameSizer->Add(cloneFrom);
 #endif
 	// well, if we can't easily get rid of the clone components, let's get them off the screen

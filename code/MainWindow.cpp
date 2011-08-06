@@ -57,7 +57,7 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	// setup tabs
 
-#if !IS_APPLE
+#if 0
 	// Images used by wxImageList must be all the same dimentions
 	wxImageList* images = new wxImageList;
   images->Create(64,64);
@@ -70,15 +70,16 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	this->mainTab = new wxNotebook();
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(WINDOW_WIDTH,-1), wxNB_TOP);
-#if !IS_APPLE
+#if 0
 	this->mainTab->AssignImageList(images);
 #endif
-	this->mainTab->AddPage(new WelcomePage(this->mainTab, skin), _("Welcome"), true, ID_TAB_WELCOME_IMAGE);
-	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false, ID_TAB_MOD_IMAGE);
-	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false, ID_TAB_BASIC_SETTINGS_IMAGE);
-	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab, skin), _("Advanced Settings"), false, ID_TAB_ADV_SETTINGS_IMAGE);
-#if !IS_APPLE
-	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false, ID_TAB_INSTALL_IMAGE);
+
+	this->mainTab->AddPage(new WelcomePage(this->mainTab, skin), _("Welcome"), true);
+	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false);
+	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false);
+	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab, skin), _("Advanced Settings"), false);
+#if 0
+	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false);
 #endif
 	wxPoint bbpoint(0, -1);
 	wxSize bbsize(WINDOW_WIDTH, -1);
