@@ -111,9 +111,9 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #if !IS_APPLE
 		sizer->Add(header);
 #endif
-		sizer->Add(modGrid, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM,5));
+		sizer->Add(modGrid, wxSizerFlags().Border(wxLEFT|wxRIGHT|wxBOTTOM,5));
 
-		this->SetSizerAndFit(sizer);
+		this->SetSizer(sizer);
 	}
 	this->Layout();
 }
