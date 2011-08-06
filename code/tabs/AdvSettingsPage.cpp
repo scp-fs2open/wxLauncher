@@ -29,7 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
-	this->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
@@ -62,7 +61,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 #if 0
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 #endif
-	topSizer->SetMinSize(TAB_AREA_WIDTH, (7*TAB_AREA_HEIGHT)/12);
 
 #if 0
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
@@ -100,22 +98,21 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	
 	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current command line"));
 	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
-		wxEmptyString, wxDefaultPosition, wxSize(-1, TAB_AREA_HEIGHT/5),
+		wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE|wxTE_READONLY);
 	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
-	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand());
+	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer, wxSizerFlags().Expand());
-	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand());
+	sizer->Add(topSizer, wxSizerFlags().Expand().Proportion(5).Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
 #if 0
-	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand());
+	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 #endif
-	sizer->Add(customFlagsSizer, wxSizerFlags().Expand());
-	sizer->Add(commandLineSizer, wxSizerFlags().Expand());
+	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(2).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	this->SetSizer(sizer);
-	this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 	this->Layout();
 
 	this->OnDrawStatusChange(event);

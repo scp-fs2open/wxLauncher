@@ -96,13 +96,13 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2/TC root folder: "));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2/TC root folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
 	rootFolderBox->SetEditable(false);
 
-	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable: "));
+	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	if ( hastcfolder ) {
 		BasicSettingsPage::FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
@@ -114,7 +114,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
 	if ( fredEnabled ) {
-		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable: "));
+		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable:"));
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
 
 		if ( hastcfolder ) {
@@ -126,18 +126,18 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
-	rootFolderSizer->Add(rootFolderText);
+	rootFolderSizer->Add(rootFolderText, wxSizerFlags().Border(wxRIGHT, 5));
 	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1));
 	rootFolderSizer->Add(selectButton, wxSizerFlags().Border(wxLEFT, 5));
 
 	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
-	selectExeSizer->Add(useExeText);
+	selectExeSizer->Add(useExeText, wxSizerFlags().Border(wxRIGHT, 5));
 	selectExeSizer->Add(useExeChoice, wxSizerFlags().Proportion(1));
 
 	wxBoxSizer* selectFredExeSizer = NULL;
 	if ( useFredText != NULL && useFredChoice != NULL ) {
 		selectFredExeSizer = new wxBoxSizer(wxHORIZONTAL);
-		selectFredExeSizer->Add(useFredText);
+		selectFredExeSizer->Add(useFredText, wxSizerFlags().Border(wxRIGHT, 5));
 		selectFredExeSizer->Add(useFredChoice, wxSizerFlags().Proportion(1));
 	}
 
@@ -161,7 +161,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	graphicsCombo->Disable();
 
 	wxStaticText* resolutionText = 
-		new wxStaticText(this, wxID_ANY, _("Resolution: "));
+		new wxStaticText(this, wxID_ANY, _("Resolution:"));
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
 	this->FillResolutionDropBox(resolutionCombo);
 	int width, height;
@@ -180,7 +180,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 	wxStaticText* textureFilterText = 
-		new wxStaticText(this, wxID_ANY, _("Texture filter: "));
+		new wxStaticText(this, wxID_ANY, _("Texture filter:"));
 	wxChoice* textureFilterCombo = new wxChoice(this, ID_TEXTURE_FILTER_COMBO);
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
@@ -253,7 +253,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 	aaCombo->SetSelection(antialias);
 
-#if !IS_APPLE
+#if 0
 	wxStaticText* gsText = 
 		new wxStaticText(this, wxID_ANY, _("General settings (recommend: highest):"));
 	wxChoice* gsCombo = new wxChoice(this, ID_GS_COMBO);
@@ -280,28 +280,34 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
-	videoSizerL->Add(graphicsText);
+	videoSizerL->Add(graphicsText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerL->Add(graphicsCombo, wxSizerFlags().Expand());
-	videoSizerL->Add(resolutionText);
+	videoSizerL->Add(resolutionText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerL->Add(resolutionCombo, wxSizerFlags().Expand());
-	videoSizerL->Add(depthText);
+	videoSizerL->Add(depthText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerL->Add(depthCombo, wxSizerFlags().Expand());
 
 	wxGridSizer* videoSizerR = new wxFlexGridSizer(2);
-	videoSizerR->Add(textureFilterText);
+	videoSizerR->Add(textureFilterText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerR->Add(textureFilterCombo, wxSizerFlags().Expand());
-	videoSizerR->Add(anisotropicText);
+	videoSizerR->Add(anisotropicText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerR->Add(anisotropicCombo, wxSizerFlags().Expand());
-	videoSizerR->Add(aaText);
+	videoSizerR->Add(aaText, wxSizerFlags().Border(wxRIGHT, 5));
 	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
 
-	wxBoxSizer* videoSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	videoSizer1->Add(videoSizerL);
-	videoSizer1->AddStretchSpacer(5);
-	videoSizer1->Add(videoSizerR);
-	videoSizer1->AddStretchSpacer(5);
+	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
+	videoSizer->Add(videoSizerL, wxSizerFlags().Expand());
+	videoSizer->AddStretchSpacer(5);
+	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
+	videoSizer->AddStretchSpacer(5);
 
-#if !IS_APPLE
+#if 0
+	wxBoxSizer* videoSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	videoSizer1->Add(videoSizerL, wxSizerFlags().Expand());
+	videoSizer1->AddStretchSpacer(5);
+	videoSizer1->Add(videoSizerR, wxSizerFlags().Expand());
+	videoSizer1->AddStretchSpacer(5);
+	
 	wxBoxSizer* videoSizergs = new wxBoxSizer(wxHORIZONTAL);
 	videoSizergs->Add(gsText);
 	videoSizergs->Add(gsCombo);
@@ -309,11 +315,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxBoxSizer* videoSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	videoSizer3->Add(largeTextureCheck);
 	videoSizer3->Add(fontDistortion);
-#endif
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxVERTICAL);
 	videoSizer->Add(videoSizer1, wxSizerFlags().Expand());
-#if !IS_APPLE
 	videoSizer->Add(videoSizergs);
 	videoSizer->Add(videoSizer3);
 #endif
@@ -463,26 +467,22 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkIP->SetValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
-	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")));
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")), wxSizerFlags().Border(wxRIGHT, 5));
 	networkInsideSizerL->Add(networkType, wxSizerFlags().Expand());
-	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection speed: ")));
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection speed:")), wxSizerFlags().Border(wxRIGHT, 5));
 	networkInsideSizerL->Add(networkSpeed, wxSizerFlags().Expand());
 	
 	wxGridSizer* networkInsideSizerR = new wxFlexGridSizer(2);
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Port: ")));
-	networkInsideSizerR->Add(networkPort);
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("IP:")));
-	networkInsideSizerR->Add(networkIP);
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Port:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(networkPort, wxSizerFlags().Expand());
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("IP:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(networkIP, wxSizerFlags().Expand());
 	
-	wxBoxSizer* networkInsideSizer = new wxBoxSizer(wxHORIZONTAL);
-	networkInsideSizer->Add(networkInsideSizerL);
-	networkInsideSizer->AddStretchSpacer(5);
-	networkInsideSizer->Add(networkInsideSizerR);
-	networkInsideSizer->AddStretchSpacer(5);
-
-	wxStaticBoxSizer* networkSizer = 
-		new wxStaticBoxSizer(networkBox, wxVERTICAL);
-	networkSizer->Add(networkInsideSizer, wxSizerFlags().Expand());
+	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxHORIZONTAL);
+	networkSizer->Add(networkInsideSizerL, wxSizerFlags().Expand());
+	networkSizer->AddStretchSpacer(5);
+	networkSizer->Add(networkInsideSizerR, wxSizerFlags().Expand());
+	networkSizer->AddStretchSpacer(5);
 
 	// Audio
 	wxStaticBox* audioBox = new wxStaticBox(this, wxID_ANY, _("Audio"));
@@ -551,34 +551,22 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proxySizer->Add(proxyChoice, wxSizerFlags().Expand());
 
 	// Final Layout
-	wxBoxSizer* leftColumnSizer = new wxBoxSizer(wxVERTICAL);
-	leftColumnSizer->Add(videoSizer, wxSizerFlags().Expand());
+	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
+	settingsSizer->Add(videoSizer, wxSizerFlags().Expand());
 #if !IS_APPLE
-	leftColumnSizer->Add(speechSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(speechSizer, wxSizerFlags().Expand());
 #endif
-	
-	// switch to left column
-	leftColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
-	leftColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
-	leftColumnSizer->Add(networkSizer, wxSizerFlags().Expand());
-	leftColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
-	
-//	wxBoxSizer* rightColumnSizer = new wxBoxSizer(wxVERTICAL);
-//	rightColumnSizer->Add(audioSizer, wxSizerFlags().Expand());
-//	rightColumnSizer->Add(joystickSizer, wxSizerFlags().Expand());
-//	rightColumnSizer->Add(proxySizer, wxSizerFlags().Expand());
-
-	wxBoxSizer* columnsSizer = new wxBoxSizer(wxHORIZONTAL);
-	leftColumnSizer->SetMinSize(TAB_AREA_WIDTH, -1);
-	columnsSizer->Add(leftColumnSizer);
-//	columnsSizer->Add(rightColumnSizer);
+	settingsSizer->Add(audioSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(proxySizer, wxSizerFlags().Expand());
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	exeSizer->SetMinSize(TAB_AREA_WIDTH, -1);
-	sizer->Add(exeSizer);
-	sizer->Add(columnsSizer);
+	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-5, -1)); // 5 being for the border
+	sizer->Add(exeSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(settingsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-	this->SetSizer(sizer);
+	this->SetSizerAndFit(sizer);
 	this->Layout();
 
 }
@@ -1112,14 +1100,18 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
+#if !IS_APPLE
 		this->downloadOpenALButton->Disable();
 		this->detectOpenALButton->Disable();
+#endif
 	} else if ( !OpenALMan::Initialize() ) {
 		this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
+#if !IS_APPLE
 		this->detectOpenALButton->SetLabel(_("Redetect OpenAL"));
 		this->downloadOpenALButton->Enable();
+#endif
 	} else {
 		// have working openal
 		this->soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());

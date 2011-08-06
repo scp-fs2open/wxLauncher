@@ -31,7 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
-	this->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
 	TCManager::RegisterTCChanged(this);
 	wxCommandEvent nullEvent;
@@ -53,9 +52,9 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->DeleteWindows();
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion.\n You can do that on the Basic Settings tab."),//\n\n(please check the help system for more info)"),
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion.\n You can do that on the Basic Settings tab."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
 		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		noTC->Wrap(TAB_AREA_WIDTH-50);
@@ -71,13 +70,14 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTCSizer->AddSpacer(10);
 		noTCSizer->Add(noTC, 0, wxEXPAND| wxALL | wxCENTER);
 		noTCSizer->AddStretchSpacer(1);
+		noTCSizer->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
-		this->SetSizer(noTCSizer);
+		this->SetSizerAndFit(noTCSizer);
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings tab."),//\n\n(please check the help system for more info)"),
+			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings tab."),
 												   wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
 		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		invalidTC->Wrap(TAB_AREA_WIDTH-50);
@@ -93,15 +93,17 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTCSizer->AddSpacer(10);
 		invalidTCSizer->Add(invalidTC, 0, wxEXPAND| wxALL | wxCENTER);
 		invalidTCSizer->AddStretchSpacer(1);
+		
+		invalidTCSizer->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
-		this->SetSizer(invalidTCSizer);
+		this->SetSizerAndFit(invalidTCSizer);
 	} else {
 #if !IS_APPLE
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
 			_("Installed mods.  Click on Install/Update in the left to search, download, and install additional mods and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		header->Wrap(TAB_AREA_WIDTH);
 #endif
-		wxSize modGridSize(TAB_AREA_WIDTH, 500);
+		wxSize modGridSize(TAB_AREA_WIDTH - 15, TAB_AREA_HEIGHT); // FIXME for left and right borders of 5 pixels each -- but why does it have to be 15?
 		ModList* modGrid = new ModList(this, modGridSize, skin, tcPath);
 		modGrid->SetMinSize(modGridSize);
 
@@ -109,9 +111,9 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #if !IS_APPLE
 		sizer->Add(header);
 #endif
-		sizer->Add(modGrid, 1);
+		sizer->Add(modGrid, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM,5));
 
-		this->SetSizer(sizer);
+		this->SetSizerAndFit(sizer);
 	}
 	this->Layout();
 }

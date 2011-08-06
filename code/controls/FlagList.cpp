@@ -53,6 +53,10 @@ WX_DEFINE_LIST(FlagSetsList);
 #include <wx/arrimpl.cpp> // Magic Incantation
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
+// allows flag checkbox and text to be lined up, while avoiding
+// visual collisions with flag category lines
+const int ITEM_VERTICAL_OFFSET = 2; // in pixels
+
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
 	wxASSERT(skin != NULL);
@@ -272,9 +276,8 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 			wxEVT_COMMAND_CHECKBOX_CLICKED,
 			wxCommandEventHandler(AdvSettingsPage::OnNeedUpdateCommandLine));
 		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
-		flag->checkboxSizer->AddStretchSpacer(1);
+		flag->checkboxSizer->AddSpacer(ITEM_VERTICAL_OFFSET);
 		flag->checkboxSizer->Add(flag->checkbox);
-		flag->checkboxSizer->AddStretchSpacer(1);
 
 		flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
 		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
@@ -395,11 +398,17 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 		}
 		if ( item->flagString.IsEmpty() ) {
 			// draw a category
-			dc.DrawText(item->fsoCatagory, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
+			dc.DrawText(wxString(_T(" ")) + item->fsoCatagory,
+						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+						rect.y + ITEM_VERTICAL_OFFSET);
 		} else if ( item->shortDescription.IsEmpty() ) {
-			dc.DrawText(item->flagString, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
+			dc.DrawText(wxString(_T(" ")) + item->flagString,
+						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+						rect.y + ITEM_VERTICAL_OFFSET);
 		} else {
-			dc.DrawText(item->shortDescription, rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX, rect.y);
+			dc.DrawText(wxString(_T(" ")) + item->shortDescription,
+						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+						rect.y + ITEM_VERTICAL_OFFSET);
 		}
 	} else {
 		wxASSERT_MSG( n == 0, _T("FLAGLISTBOX: Trying to draw background n != 0") );
@@ -444,13 +453,13 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 		wxString msg;
 		switch(this->drawStatus) {
 			case MISSING_TC:
-				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nPlease select a FreeSpace 2 installation or a total conversion\non the Basic Settings tab.");
+				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings tab.");
 				break;
 			case MISSING_EXE:
-				msg = _("No FreeSpace 2 Open executable has been selected.\nPlease select an executable on the Basic Settings tab.");
+				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings tab.");
 				break;
 			case INVALID_BINARY:
-				msg = _("Selected executable does not exist.\nPlease choose another on the Basic Settings tab.");
+				msg = _("Selected executable does not exist.\nSelect another on the Basic Settings tab.");
 				break;
 			case WAITING_FOR_FLAGFILE:
 				msg = _("Waiting for flag file to be produced and parsed.");

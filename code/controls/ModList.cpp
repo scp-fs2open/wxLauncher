@@ -411,7 +411,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
 	this->warnBitmap =
 		new wxStaticBitmap(this, wxID_ANY, this->skinSystem->GetWarningIcon());
-	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it. Please click Info for more details."));
+	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it. Click Info for more details."));
 
 	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
 	this->buttonSizer->AddStretchSpacer(2);
