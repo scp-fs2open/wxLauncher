@@ -30,6 +30,8 @@ public:
 	void OnNeedUpdateCommandLine(wxCommandEvent &event);
 
 private:
+	wxString FormatCommandLineString(const wxString& origCmdLine,
+									 const int textAreaWidth);
 	SkinSystem *skin;
 	FlagListBox* flagListBox;
 	
