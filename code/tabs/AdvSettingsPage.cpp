@@ -212,8 +212,8 @@ void ASPFillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
 	while ( tokens.HasMoreTokens() ) {
 		wxString tok = tokens.GetNextToken();
 #if IS_APPLE
-		if (tok.Lower() == _T("(debug)")) { // leftover from tokenizing executable in debug .app
-			continue;
+		if (tok.Lower() == _T("(debug)")) { // left over from tokenizing executable in debug .app
+			tok = _T("");
 		}
 		// remove the text after ".app" in the FSO executable name
 		int DotAppIndex = tok.Find(_T(".app/")); // the trailing / ensures that the .app indicates an extension
@@ -250,8 +250,12 @@ wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 	wxString formattedCmdLine;
 	wxString currentLine;
 
+	bool spaceAdded = false;
+
 	for (size_t i = 0, n = words.Count(); i < n; i++) {
-		if (currentWidth + words[i].size.x + spaceWidth > textAreaWidth) {
+		if (words[i].word.IsEmpty()) { // skip over remnants of words eliminated in tokens-to-words conversion
+			continue;
+		} else if (currentWidth + words[i].size.x + spaceWidth > textAreaWidth) {
 			formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
 			
 			currentLine.Empty();
@@ -259,10 +263,12 @@ wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 		} else {
 			if (!currentLine.IsEmpty()) {
 				currentLine.append(_T(" "));
+				spaceAdded = true;
 			}
 		}
 		currentLine.append(words[i].word);
-		currentWidth += words[i].size.x + spaceWidth;
+		currentWidth += words[i].size.x + (spaceAdded ? spaceWidth : 0);
+		spaceAdded = false;
 	}
 	if (!currentLine.IsEmpty()) {
 		formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
