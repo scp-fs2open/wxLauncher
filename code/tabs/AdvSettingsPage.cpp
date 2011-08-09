@@ -170,8 +170,26 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 				flagSetsArray.RemoveAt(i);
 			}
 		}
-		
+
 		flagSetChoice->Append(flagSetsArray);
+
+		wxClientDC dc(this);
+		wxArrayString flagSets = flagSetChoice->GetStrings();
+		wxFont font(this->GetFont());
+		int maxStringWidth = 0;
+		int x, y;
+
+		for (int i = 0, n = flagSets.GetCount(); i < n; ++i) {
+			dc.GetTextExtent(flagSets[i], &x, &y, NULL, NULL, &font);
+
+			if (x > maxStringWidth) {
+				maxStringWidth = x;
+			}
+		}
+
+		flagSetChoice->SetMinSize(wxSize(maxStringWidth + 40, // 40 to include drop down box control
+			flagSetChoice->GetSize().GetHeight()));
+		this->Layout();
 	}
 
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
@@ -223,12 +241,12 @@ void ASPFillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
 #endif
 		int x, y;
 		dc.GetTextExtent(tok, &x, &y, NULL, NULL, testFont);
-		
+
 		Words* temp = new Words();
 		temp->size.SetWidth(x);
 		temp->size.SetHeight(y);
 		temp->word = tok;
-		
+
 		words->Add(temp);
 	}
 }
@@ -241,7 +259,9 @@ wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 	words.Alloc(tokens.CountTokens());
 	
 	wxClientDC dc(this);
-	ASPFillArrayOfWordsFromTokens(tokens, dc, NULL, &words);
+	wxFont font(this->GetFont());
+
+	ASPFillArrayOfWordsFromTokens(tokens, dc, &font, &words);
 
 	const int spaceWidth = dc.GetTextExtent(_T(" ")).GetWidth();
 	
