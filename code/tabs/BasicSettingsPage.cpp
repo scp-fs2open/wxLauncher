@@ -515,7 +515,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	// Joystick
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
 
-	wxStaticText* selectedJoystickText = new wxStaticText(this, wxID_ANY, _("Selected joystick:"));
 	this->joystickSelected = new wxChoice(this, ID_JOY_SELECTED);
 #if 0
 	this->joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
@@ -538,7 +537,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center());
 	
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxVERTICAL);
-	joystickSizer->Add(selectedJoystickText);
 	joystickSizer->Add(joystickSelected, wxSizerFlags().Expand());
 #if 0
 	joystickSizer->Add(joystickForceFeedback);
