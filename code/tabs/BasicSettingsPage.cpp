@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 #include <wx/choicebk.h>
+#include <wx/gbsizer.h>
 
 #include "generated/configure_launcher.h"
 
@@ -322,7 +323,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizer->Add(videoSizer3);
 #endif
 
-#if !IS_APPLE
+#if IS_WIN32
 	// Speech
 	wxStaticBox* speechBox = new wxStaticBox(this, wxID_ANY, _("Speech"));
 	wxTextCtrl* speechTestText = new wxTextCtrl(this, ID_SPEECH_TEST_TEXT,
@@ -333,38 +334,41 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxSlider* speechVoiceVolume = 
 		new wxSlider(this, ID_SPEECH_VOICE_VOLUME, 50, 0, 100);
 	wxButton* speechPlayButton = 
-		new wxButton(this, ID_SPEECH_PLAY_BUTTON, _("Play String"));
+		new wxButton(this, ID_SPEECH_PLAY_BUTTON, _("Play"));
 	wxStaticText* speechUseInText = 
-		new wxStaticText(this, wxID_ANY, _("Use simulated speech:"));
+		new wxStaticText(this, wxID_ANY, _("Use simulated speech in:"));
 	wxCheckBox* speechInTechroomCheck = 
-		new wxCheckBox(this, ID_SPEECH_IN_TECHROOM, _("Techroom"));
+		new wxCheckBox(this, ID_SPEECH_IN_TECHROOM, _("Tech room"));
 	wxCheckBox* speechInBriefingCheck = 
 		new wxCheckBox(this, ID_SPEECH_IN_BRIEFING, _("Briefings"));
 	wxCheckBox* speechInGameCheck = 
-		new wxCheckBox(this, ID_SPEECH_IN_GAME, _("Ingame"));
+		new wxCheckBox(this, ID_SPEECH_IN_GAME, _("In-game"));
 	wxCheckBox* speechInMultiCheck=
 		new wxCheckBox(this, ID_SPEECH_IN_MULTI, _("Multiplayer"));
 
 	wxButton* speechMoreVoicesButton = 
-		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get More Voices"));
+		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get more voices"));
 
-	wxBoxSizer* speechLeftSizer = new wxBoxSizer(wxVERTICAL);
-	speechLeftSizer->Add(speechTestText, wxSizerFlags().Expand());
-	speechLeftSizer->Add(speechVoiceCombo);
-	speechLeftSizer->Add(speechVoiceVolume, wxSizerFlags().Expand());
-	speechLeftSizer->Add(speechPlayButton, wxSizerFlags().Center());
+	wxGridBagSizer* speechLeftSizer = new wxGridBagSizer();
+	speechLeftSizer->Add(speechVoiceCombo, wxGBPosition(0,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
+	speechLeftSizer->Add(speechMoreVoicesButton, wxGBPosition(0,2), wxGBSpan(1,1), wxEXPAND|wxLEFT, 10);
+	speechLeftSizer->Add(speechTestText, wxGBPosition(1,0), wxGBSpan(2,3), wxEXPAND|wxTOP|wxBOTTOM, 5);
+	speechLeftSizer->Add(speechPlayButton, wxGBPosition(3,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
+	speechLeftSizer->Add(speechVoiceVolume, wxGBPosition(3,2), wxGBSpan(1,1), wxEXPAND|wxALIGN_RIGHT|wxLEFT, 5);
 
 	wxBoxSizer* speechRightSizer = new wxBoxSizer(wxVERTICAL);
-	speechRightSizer->Add(speechUseInText);
-	speechRightSizer->Add(speechInTechroomCheck);
-	speechRightSizer->Add(speechInBriefingCheck);
-	speechRightSizer->Add(speechInGameCheck);
-	speechRightSizer->Add(speechInMultiCheck);
-	speechRightSizer->Add(speechMoreVoicesButton);
+	speechRightSizer->Add(speechUseInText, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	speechRightSizer->Add(speechInTechroomCheck, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	speechRightSizer->Add(speechInBriefingCheck, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	speechRightSizer->Add(speechInGameCheck, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	speechRightSizer->Add(speechInMultiCheck, wxSizerFlags().Expand());
+
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
-	speechSizer->Add(speechLeftSizer);
-	speechSizer->Add(speechRightSizer);
+	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand());
+	speechSizer->AddStretchSpacer(3);
+	speechSizer->Add(speechRightSizer, wxSizerFlags().Expand());
+	speechSizer->AddStretchSpacer(2);
 
 	if ( SpeechMan::WasBuiltIn() && SpeechMan::Initialize() ) {
 
@@ -513,7 +517,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticText* selectedJoystickText = new wxStaticText(this, wxID_ANY, _("Selected joystick:"));
 	this->joystickSelected = new wxChoice(this, ID_JOY_SELECTED);
-#if !IS_APPLE
+#if 0
 	this->joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
 	this->joystickDirectionalHit = new wxCheckBox(this, ID_JOY_DIRECTIONAL_HIT, _("Directional hit"));
 	this->joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
@@ -527,7 +531,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->SetupJoystickSection();
 
 	wxBoxSizer* joyButtonSizer = new wxBoxSizer(wxHORIZONTAL);
-#if !IS_APPLE
+#if 0
 	joyButtonSizer->Add(joystickCalibrateButton);
 	joyButtonSizer->Add(joystickDetectButton);
 #endif
@@ -536,30 +540,35 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxVERTICAL);
 	joystickSizer->Add(selectedJoystickText);
 	joystickSizer->Add(joystickSelected, wxSizerFlags().Expand());
-#if !IS_APPLE
+#if 0
 	joystickSizer->Add(joystickForceFeedback);
 	joystickSizer->Add(joystickDirectionalHit);
 #endif
 	joystickSizer->Add(joyButtonSizer, wxSizerFlags().Center());
 
 	// Proxy
+	// sorry, but there won't be space for the proxy on Windows
+#if !IS_WIN32
 	wxStaticBox* proxyBox = new wxStaticBox(this, wxID_ANY, _("Proxy"));
 
 	wxChoicebook* proxyChoice = new ProxyChoice(this, ID_PROXY_TYPE);
 
 	wxStaticBoxSizer* proxySizer = new wxStaticBoxSizer(proxyBox, wxVERTICAL);
 	proxySizer->Add(proxyChoice, wxSizerFlags().Expand());
+#endif
 
 	// Final Layout
 	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
 	settingsSizer->Add(videoSizer, wxSizerFlags().Expand());
-#if !IS_APPLE
+	settingsSizer->Add(audioSizer, wxSizerFlags().Expand());
+#if IS_WIN32
 	settingsSizer->Add(speechSizer, wxSizerFlags().Expand());
 #endif
-	settingsSizer->Add(audioSizer, wxSizerFlags().Expand());
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand());
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
+#if !IS_WIN32
 	settingsSizer->Add(proxySizer, wxSizerFlags().Expand());
+#endif
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-5, -1)); // 5 being for the border
@@ -1157,7 +1166,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 	if ( !JoyMan::WasCompiledIn() ) {
 		this->joystickSelected->Disable();
 		this->joystickSelected->Append(_("No Launcher Support"));
-#if !IS_APPLE
+#if 0
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
 		this->joystickCalibrateButton->Disable();
@@ -1166,7 +1175,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 	} else if ( !JoyMan::Initialize() ) {
 		this->joystickSelected->Disable();
 		this->joystickSelected->Append(_("Initialize Failed"));
-#if !IS_APPLE
+#if 0
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
 		this->joystickCalibrateButton->Disable();
@@ -1185,7 +1194,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 		if ( JoyMan::NumberOfPluggedInJoysticks() == 0 ) {
 			this->joystickSelected->SetSelection(0);
 			this->joystickSelected->Disable();
-#if !IS_APPLE
+#if 0
 			this->joystickForceFeedback->Disable();
 			this->joystickDirectionalHit->Disable();
 			this->joystickCalibrateButton->Disable();
@@ -1195,7 +1204,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 			int profileJoystick;
 			unsigned int i;
 			this->joystickSelected->Enable();
-#if !IS_APPLE
+#if 0
 			this->joystickDetectButton->Enable();
 #endif
 			ProMan::GetProfileManager()->Get()
@@ -1235,7 +1244,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	wxCHECK_RET( joynumber != NULL,
 		_T("JoyNumber is not joystickSelected's client data"));
 
-#if !IS_APPLE // calibration and force feedback don't work on OS X at the moment
+#if 0 // calibration and force feedback don't work on OS X at the moment
 	if ( JoyMan::HasCalibrateTool(joynumber->GetNumber()) ) {
 		this->joystickCalibrateButton->Enable();
 	} else {
