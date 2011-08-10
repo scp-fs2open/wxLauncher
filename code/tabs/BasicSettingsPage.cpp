@@ -331,6 +331,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE);
 	wxChoice* speechVoiceCombo = new wxChoice(this, ID_SPEECH_VOICE_COMBO);
+	wxStaticText* speechVolumeLabel = new wxStaticText(this, wxID_ANY, _T("Volume:"));
 	wxSlider* speechVoiceVolume = 
 		new wxSlider(this, ID_SPEECH_VOICE_VOLUME, 50, 0, 100);
 	wxButton* speechPlayButton = 
@@ -350,11 +351,12 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get more voices"));
 
 	wxGridBagSizer* speechLeftSizer = new wxGridBagSizer();
-	speechLeftSizer->Add(speechVoiceCombo, wxGBPosition(0,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
-	speechLeftSizer->Add(speechMoreVoicesButton, wxGBPosition(0,2), wxGBSpan(1,1), wxEXPAND|wxLEFT, 10);
+	speechLeftSizer->Add(speechVoiceCombo, wxGBPosition(0,0), wxGBSpan(1,1), wxEXPAND);
+	speechLeftSizer->Add(speechMoreVoicesButton, wxGBPosition(0,2), wxGBSpan(1,1), wxEXPAND);
 	speechLeftSizer->Add(speechTestText, wxGBPosition(1,0), wxGBSpan(2,3), wxEXPAND|wxTOP|wxBOTTOM, 5);
 	speechLeftSizer->Add(speechPlayButton, wxGBPosition(3,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
-	speechLeftSizer->Add(speechVoiceVolume, wxGBPosition(3,2), wxGBSpan(1,1), wxEXPAND|wxALIGN_RIGHT|wxLEFT, 5);
+	speechLeftSizer->Add(speechVolumeLabel, wxGBPosition(3,1), wxGBSpan(1,1), wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxTOP, 5);
+	speechLeftSizer->Add(speechVoiceVolume, wxGBPosition(3,2), wxGBSpan(1,1), wxEXPAND);
 
 	wxBoxSizer* speechRightSizer = new wxBoxSizer(wxVERTICAL);
 	speechRightSizer->Add(speechUseInText, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
@@ -365,7 +367,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
-	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand());
+	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	speechSizer->AddStretchSpacer(3);
 	speechSizer->Add(speechRightSizer, wxSizerFlags().Expand());
 	speechSizer->AddStretchSpacer(2);
@@ -373,6 +375,27 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	if ( SpeechMan::WasBuiltIn() && SpeechMan::Initialize() ) {
 
 		speechVoiceCombo->Append(SpeechMan::EnumVoices());
+
+		// FIXME consolidate this code and similar code in AdvSettingsPage.cpp
+		// FIXME Play button will become wide if longest voice name is very long
+		wxClientDC dc(this);
+		wxArrayString voices = speechVoiceCombo->GetStrings();
+		wxFont font(this->GetFont());
+		int maxStringWidth = 0;
+		int x, y;
+
+		for (int i = 0, n = voices.GetCount(); i < n; ++i) {
+			dc.GetTextExtent(voices[i], &x, &y, NULL, NULL, &font);
+
+			if (x > maxStringWidth) {
+				maxStringWidth = x;
+			}
+		}
+
+		speechVoiceCombo->SetMinSize(wxSize(maxStringWidth + 40, // 40 to include drop down box control
+			speechVoiceCombo->GetSize().GetHeight()));
+		this->Layout();
+
 		int speechVoice;
 		int speechSystemVoice = SpeechMan::GetVoice();
 		if ( speechSystemVoice < 0 ) {
