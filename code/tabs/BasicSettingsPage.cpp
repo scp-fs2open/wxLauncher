@@ -577,7 +577,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoicebook* proxyChoice = new ProxyChoice(this, ID_PROXY_TYPE);
 
 	wxStaticBoxSizer* proxySizer = new wxStaticBoxSizer(proxyBox, wxVERTICAL);
-	proxySizer->Add(proxyChoice, wxSizerFlags().Expand());
+	proxySizer->Add(proxyChoice, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 #endif
 
 	// Final Layout
