@@ -276,8 +276,9 @@ wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 		if (words[i].word.IsEmpty()) { // skip over remnants of words eliminated in tokens-to-words conversion
 			continue;
 		} else if (currentWidth + words[i].size.x + spaceWidth > textAreaWidth) {
-			formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
-			
+			// prevents trailing newline in cmdLineString (nitpicky, I know)
+			formattedCmdLine += wxString::Format(formattedCmdLine.IsEmpty() ? _T("%s") : _T("\n%s"),
+												 currentLine.c_str());
 			currentLine.Empty();
 			currentWidth = 0;
 		} else {
@@ -291,7 +292,8 @@ wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 		spaceAdded = false;
 	}
 	if (!currentLine.IsEmpty()) {
-		formattedCmdLine += wxString::Format(_T("%s\n"), currentLine.c_str());
+		formattedCmdLine += wxString::Format(formattedCmdLine.IsEmpty() ? _T("%s") : _T("\n%s"),
+											 currentLine.c_str());
 	}
 
 	return formattedCmdLine;
