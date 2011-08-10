@@ -143,10 +143,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxVERTICAL);
-	exeSizer->Add(rootFolderSizer, wxSizerFlags().Expand());
-	exeSizer->Add(selectExeSizer,  wxSizerFlags().Expand());
+	exeSizer->Add(rootFolderSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	exeSizer->Add(selectExeSizer,  wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 	if ( selectFredExeSizer != NULL ) {
-		exeSizer->Add(selectFredExeSizer, wxSizerFlags().Expand());
+		exeSizer->Add(selectFredExeSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 	}
 
 	// Video Section
@@ -297,7 +297,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
-	videoSizer->Add(videoSizerL, wxSizerFlags().Expand());
+	videoSizer->Add(videoSizerL, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	videoSizer->AddStretchSpacer(5);
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
 	videoSizer->AddStretchSpacer(5);
@@ -351,7 +351,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxButton(this, ID_SPEECH_MORE_VOICES_BUTTON, _("Get more voices"));
 
 	wxGridBagSizer* speechLeftSizer = new wxGridBagSizer();
-	speechLeftSizer->Add(speechVoiceCombo, wxGBPosition(0,0), wxGBSpan(1,1), wxEXPAND);
+	speechLeftSizer->Add(speechVoiceCombo, wxGBPosition(0,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
 	speechLeftSizer->Add(speechMoreVoicesButton, wxGBPosition(0,2), wxGBSpan(1,1), wxEXPAND);
 	speechLeftSizer->Add(speechTestText, wxGBPosition(1,0), wxGBSpan(2,3), wxEXPAND|wxTOP|wxBOTTOM, 5);
 	speechLeftSizer->Add(speechPlayButton, wxGBPosition(3,0), wxGBSpan(1,1), wxEXPAND|wxRIGHT, 10);
@@ -509,7 +509,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkInsideSizerR->Add(networkIP, wxSizerFlags().Expand());
 	
 	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxHORIZONTAL);
-	networkSizer->Add(networkInsideSizerL, wxSizerFlags().Expand());
+	networkSizer->Add(networkInsideSizerL, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	networkSizer->AddStretchSpacer(5);
 	networkSizer->Add(networkInsideSizerR, wxSizerFlags().Expand());
 	networkSizer->AddStretchSpacer(5);
@@ -526,9 +526,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect"));
 #endif
 	wxStaticBoxSizer* audioSizer = new wxStaticBoxSizer(audioBox, wxVERTICAL);
-	audioSizer->Add(soundDeviceText);
-	audioSizer->Add(soundDeviceCombo, wxSizerFlags().Expand());
-	audioSizer->Add(openALVersion, wxSizerFlags().Center());
+	audioSizer->Add(soundDeviceText, wxSizerFlags().Border(wxLEFT|wxBOTTOM, 5));
+	audioSizer->Add(soundDeviceCombo, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	audioSizer->Add(openALVersion, wxSizerFlags().Center().Border(wxLEFT, 5));
 
 #if !IS_APPLE
 	audioSizer->Add(downloadOpenALButton, wxSizerFlags().Center());
@@ -559,10 +559,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	joyButtonSizer->Add(joystickCalibrateButton);
 	joyButtonSizer->Add(joystickDetectButton);
 #endif
-	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center());
+	joyButtonSizer->Add(detectJoystickText, wxSizerFlags().Center().Border(wxLEFT|wxTOP, 5));
 	
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxVERTICAL);
-	joystickSizer->Add(joystickSelected, wxSizerFlags().Expand());
+	joystickSizer->Add(joystickSelected, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 #if 0
 	joystickSizer->Add(joystickForceFeedback);
 	joystickSizer->Add(joystickDirectionalHit);
@@ -582,20 +582,23 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// Final Layout
 	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
-	settingsSizer->Add(videoSizer, wxSizerFlags().Expand());
-	settingsSizer->Add(audioSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 #if IS_WIN32
-	settingsSizer->Add(speechSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 #endif
-	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand());
+	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+
+#if IS_WIN32
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
-#if !IS_WIN32
+#else
+	settingsSizer->Add(networkSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(proxySizer, wxSizerFlags().Expand());
 #endif
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-5, -1)); // 5 being for the border
-	sizer->Add(exeSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(exeSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 	sizer->Add(settingsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	this->SetSizer(sizer);

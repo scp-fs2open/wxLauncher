@@ -192,10 +192,14 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, w
 #if 0
 	sizer->Add(languageSizer);
 #endif
-	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Center());
-	sizer->Add(generalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT, 5));
-	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Center().Border(wxTOP, 5));
+	sizer->Add(generalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(headlines, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+
+#if !IS_APPLE // needed for sizer to expand properly on Windows and Linux for some reason
+	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-10, TAB_AREA_HEIGHT-5));
+#endif
 
 	this->SetSizerAndFit(sizer);
 	this->Layout();
