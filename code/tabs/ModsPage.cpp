@@ -98,20 +98,20 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 		this->SetSizerAndFit(invalidTCSizer);
 	} else {
-#if !IS_APPLE
+#if 0
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
 			_("Installed mods.  Click on Install/Update in the left to search, download, and install additional mods and updates."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		header->Wrap(TAB_AREA_WIDTH);
 #endif
-		wxSize modGridSize(TAB_AREA_WIDTH - 15, TAB_AREA_HEIGHT); // FIXME for left and right borders of 5 pixels each -- but why does it have to be 15?
+		wxSize modGridSize(TAB_AREA_WIDTH - 20, TAB_AREA_HEIGHT); // FIXME for left and right borders of 5 pixels each -- but why does it have to be 20?
 		ModList* modGrid = new ModList(this, modGridSize, skin, tcPath);
 		modGrid->SetMinSize(modGridSize);
 
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-#if !IS_APPLE
+#if 0
 		sizer->Add(header);
 #endif
-		sizer->Add(modGrid, wxSizerFlags().Border(wxLEFT|wxRIGHT|wxBOTTOM,5));
+		sizer->Add(modGrid, wxSizerFlags().Center().Border(wxALL,5));
 
 		this->SetSizer(sizer);
 	}

@@ -43,7 +43,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 const int WINDOW_WIDTH = TAB_AREA_WIDTH;
 
 MainWindow::MainWindow(SkinSystem* skin) {
-	this->SetExtraStyle(wxFRAME_EX_CONTEXTHELP);
 	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetTitle(),
 		wxDefaultPosition, wxSize(WINDOW_WIDTH, 550), MAINWINDOW_STYLE);
 

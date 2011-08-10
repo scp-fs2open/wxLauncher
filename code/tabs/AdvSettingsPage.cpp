@@ -107,12 +107,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer, wxSizerFlags().Expand().Proportion(5).Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(topSizer, wxSizerFlags().Expand().Proportion(5).Border(wxLEFT|wxRIGHT|wxTOP, 5));
 	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
 #if 0
 	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 #endif
-	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(2).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	this->SetSizer(sizer);
