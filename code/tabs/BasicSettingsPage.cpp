@@ -486,8 +486,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
 	int port;
 	proman->Get()->Read(PRO_CFG_NETWORK_PORT, &port, 0);
-	networkPort->SetValue(wxString::Format(_T("%d"), port));
+	if (port != 0) {
+		networkPort->SetValue(wxString::Format(_T("%d"), port));
+	}
 	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
 	proman->Get()->Read(PRO_CFG_NETWORK_IP, &ip, _T(""));
@@ -500,9 +503,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkInsideSizerL->Add(networkSpeed, wxSizerFlags().Expand());
 	
 	wxGridSizer* networkInsideSizerR = new wxFlexGridSizer(2);
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Port:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force local port:")), wxSizerFlags().Border(wxRIGHT, 5));
 	networkInsideSizerR->Add(networkPort, wxSizerFlags().Expand());
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("IP:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force IP address:")), wxSizerFlags().Border(wxRIGHT, 5));
 	networkInsideSizerR->Add(networkIP, wxSizerFlags().Expand());
 	
 	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxHORIZONTAL);
