@@ -378,6 +378,12 @@ void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
 }
 
 void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
+#if IS_WIN32 // replace the ugly default font with one based on the system default
+	wxFont font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	font.SetPointSize(8);
+	dc.SetFont(font);
+#endif
+
 	if ( this->drawStatus == DRAW_OK ) {
 		this->errorText->Hide();
 		Flag* item = NULL;
@@ -398,6 +404,10 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 		}
 		if ( item->flagString.IsEmpty() ) {
 			// draw a category
+#if IS_WIN32
+			font.SetWeight(wxFONTWEIGHT_BOLD);
+			dc.SetFont(font);
+#endif
 			dc.DrawText(wxString(_T(" ")) + item->fsoCatagory,
 						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
 						rect.y + ITEM_VERTICAL_OFFSET);
