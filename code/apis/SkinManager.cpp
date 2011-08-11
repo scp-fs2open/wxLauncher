@@ -148,7 +148,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	if ( this->defaultSkin->welcomePageText == NULL ) {
 		this->defaultSkin->welcomePageText =
 			new wxString(
-_("<p><center><b><font size='3'>Welcome to wxLauncher," + FORMAT_FIX + "your one-stop shop for FreeSpace 2 and related content</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> =<br>= <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = <br><!--<br>Also, don't  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>--></center></p>"));
+_("<p><center><b><font size='3'>Welcome to wxLauncher,") + FORMAT_FIX + _("your one-stop shop for FreeSpace 2 and related content</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> =<br>= <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = <br><!--<br>Also, don't  forget the help file, there is a nice '<a href='help://Getting started tutorial'>Getting Started</a>' tutorial there.<br>--></center></p>"));
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
