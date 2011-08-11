@@ -56,6 +56,11 @@ WX_DEFINE_OBJARRAY(FlagFileArray);
 // allows flag checkbox and text to be lined up, while avoiding
 // visual collisions with flag category lines
 const int ITEM_VERTICAL_OFFSET = 2; // in pixels
+#if IS_LINUX
+const int VERTICAL_OFFSET_MULTIPLIER = 2; // in pixels
+#else
+const int VERTICAL_OFFSET_MULTIPLIER = 1; // in pixels
+#endif
 
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,wxID_ANY) {
@@ -410,15 +415,15 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 #endif
 			dc.DrawText(wxString(_T(" ")) + item->fsoCatagory,
 						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
-						rect.y + ITEM_VERTICAL_OFFSET);
+				    rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
 		} else if ( item->shortDescription.IsEmpty() ) {
 			dc.DrawText(wxString(_T(" ")) + item->flagString,
 						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
-						rect.y + ITEM_VERTICAL_OFFSET);
+				    rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
 		} else {
 			dc.DrawText(wxString(_T(" ")) + item->shortDescription,
 						rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
-						rect.y + ITEM_VERTICAL_OFFSET);
+				    rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
 		}
 	} else {
 		wxASSERT_MSG( n == 0, _T("FLAGLISTBOX: Trying to draw background n != 0") );

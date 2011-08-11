@@ -127,18 +127,18 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
-	rootFolderSizer->Add(rootFolderText, wxSizerFlags().Border(wxRIGHT, 5));
+	rootFolderSizer->Add(rootFolderText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1));
 	rootFolderSizer->Add(selectButton, wxSizerFlags().Border(wxLEFT, 5));
 
 	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
-	selectExeSizer->Add(useExeText, wxSizerFlags().Border(wxRIGHT, 5));
+	selectExeSizer->Add(useExeText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	selectExeSizer->Add(useExeChoice, wxSizerFlags().Proportion(1));
 
 	wxBoxSizer* selectFredExeSizer = NULL;
 	if ( useFredText != NULL && useFredChoice != NULL ) {
 		selectFredExeSizer = new wxBoxSizer(wxHORIZONTAL);
-		selectFredExeSizer->Add(useFredText, wxSizerFlags().Border(wxRIGHT, 5));
+		selectFredExeSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 		selectFredExeSizer->Add(useFredChoice, wxSizerFlags().Proportion(1));
 	}
 
@@ -281,19 +281,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
-	videoSizerL->Add(graphicsText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerL->Add(graphicsText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(graphicsCombo, wxSizerFlags().Expand());
-	videoSizerL->Add(resolutionText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerL->Add(resolutionText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(resolutionCombo, wxSizerFlags().Expand());
-	videoSizerL->Add(depthText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerL->Add(depthText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(depthCombo, wxSizerFlags().Expand());
 
 	wxGridSizer* videoSizerR = new wxFlexGridSizer(2);
-	videoSizerR->Add(textureFilterText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerR->Add(textureFilterText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(textureFilterCombo, wxSizerFlags().Expand());
-	videoSizerR->Add(anisotropicText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerR->Add(anisotropicText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(anisotropicCombo, wxSizerFlags().Expand());
-	videoSizerR->Add(aaText, wxSizerFlags().Border(wxRIGHT, 5));
+	videoSizerR->Add(aaText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
@@ -497,15 +497,15 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkIP->SetValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
-	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	networkInsideSizerL->Add(networkType, wxSizerFlags().Expand());
-	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection speed:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection speed:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	networkInsideSizerL->Add(networkSpeed, wxSizerFlags().Expand());
 	
 	wxGridSizer* networkInsideSizerR = new wxFlexGridSizer(2);
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force local port:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force local port:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	networkInsideSizerR->Add(networkPort, wxSizerFlags().Expand());
-	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force IP address:")), wxSizerFlags().Border(wxRIGHT, 5));
+	networkInsideSizerR->Add(new wxStaticText(this, wxID_ANY, _("Force IP address:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	networkInsideSizerR->Add(networkIP, wxSizerFlags().Expand());
 	
 	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxHORIZONTAL);
@@ -1372,7 +1372,7 @@ ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
 	wxTextCtrl* proxyHttpPort = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_PORT, wxString::Format(_T("%d"), port));
 
 	wxBoxSizer* manualProxyPortSizer = new wxBoxSizer(wxHORIZONTAL);
-	manualProxyPortSizer->Add(proxyHttpPortText);
+	manualProxyPortSizer->Add(proxyHttpPortText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	manualProxyPortSizer->Add(proxyHttpPort, wxSizerFlags().Proportion(1));
 
 	wxBoxSizer* manualProxySizer = new wxBoxSizer(wxVERTICAL);

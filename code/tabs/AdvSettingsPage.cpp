@@ -82,7 +82,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	idealFlagsRowSizer->Add(idealLabelSizer);
 #endif
 	idealFlagsRowSizer->AddStretchSpacer(1);
-	idealFlagsRowSizer->Add(flagSetChoiceLabel, wxSizerFlags().Border(wxRIGHT, 5));
+	idealFlagsRowSizer->Add(flagSetChoiceLabel, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Right());
 
 #if 0 // doesn't do anything
