@@ -152,6 +152,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, ID_VIDEO_STATIC_BOX, _("Video"));
 
+#if 0 // preprocessing out the non-option "Graphics: OpenGL" (no choice to be made)
 	wxStaticText* graphicsText = 
 		new wxStaticText(this, wxID_ANY, _("Graphics:"));
 	wxChoice* graphicsCombo = new wxChoice(this, ID_GRAPHICS_COMBO);
@@ -160,6 +161,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Get()->Read(PRO_CFG_VIDEO_API, &graphicsAPI, _T("OpenGL"));
 	graphicsCombo->SetStringSelection(graphicsAPI);
 	graphicsCombo->Disable();
+#endif
 
 	wxStaticText* resolutionText = 
 		new wxStaticText(this, wxID_ANY, _("Resolution:"));
@@ -281,8 +283,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
+#if 0 // preprocessing out the non-option "Graphics: OpenGL"
 	videoSizerL->Add(graphicsText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(graphicsCombo, wxSizerFlags().Expand());
+#endif
 	videoSizerL->Add(resolutionText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(resolutionCombo, wxSizerFlags().Expand());
 	videoSizerL->Add(depthText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -297,7 +301,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
-	videoSizer->Add(videoSizerL, wxSizerFlags().Expand().Border(wxLEFT, 5));
+	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5);
 	videoSizer->AddStretchSpacer(5);
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
 	videoSizer->AddStretchSpacer(5);
