@@ -122,7 +122,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			BasicSettingsPage::FillFredExecutableDropBox(useFredChoice, wxFileName(tcfolder, wxEmptyString));
 			useFredChoice->FindAndSetSelectionWithClientData(fredBinary);
 		} else {
-			useExeChoice->Disable();
+			useFredChoice->Disable();
 		}
 	}
 
