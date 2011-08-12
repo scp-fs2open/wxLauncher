@@ -510,19 +510,24 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->soundDeviceCombo = new wxChoice(this, ID_SELECT_SOUND_DEVICE);
 	this->openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
-#if !IS_APPLE
 	this->downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
-	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect"));
-#endif
-	wxStaticBoxSizer* audioSizer = new wxStaticBoxSizer(audioBox, wxVERTICAL);
-	audioSizer->Add(soundDeviceText, wxSizerFlags().Border(wxLEFT|wxBOTTOM, 5));
-	audioSizer->Add(soundDeviceCombo, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
-	audioSizer->Add(openALVersion, wxSizerFlags().Center().Border(wxLEFT, 5));
+	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect OpenAL"));
 
-#if !IS_APPLE
-	audioSizer->Add(downloadOpenALButton, wxSizerFlags().Center());
-	audioSizer->Add(detectOpenALButton, wxSizerFlags().Center());
-#endif
+	this->audioNonButtonsSizer = new wxBoxSizer(wxVERTICAL);
+	this->audioNonButtonsSizer->Add(soundDeviceText, wxSizerFlags().Border(wxLEFT|wxBOTTOM, 5));
+	this->audioNonButtonsSizer->Add(soundDeviceCombo,
+					wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	this->audioNonButtonsSizer->Add(openALVersion,
+					wxSizerFlags().Center().Border(wxTOP|wxLEFT|wxRIGHT, 5));
+	
+	this->audioButtonsSizer = new wxBoxSizer(wxVERTICAL);
+	this->audioButtonsSizer->Add(downloadOpenALButton, wxSizerFlags().Expand());
+	this->audioButtonsSizer->Add(detectOpenALButton, wxSizerFlags().Expand());
+	
+	this->audioSizer = new wxStaticBoxSizer(audioBox, wxHORIZONTAL);
+	this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(3).Expand());
+	this->audioSizer->Add(audioButtonsSizer, wxSizerFlags().Proportion(1).Expand());
+
 	// fill in controls
 	this->SetupOpenALSection();
 
@@ -1125,19 +1130,15 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
-#if !IS_APPLE
 		this->downloadOpenALButton->Disable();
 		this->detectOpenALButton->Disable();
-#endif
 	} else if ( !OpenALMan::Initialize() ) {
 		wxLogError(_T("Unable to initialize OpenAL"));
 		this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
-#if !IS_APPLE
 		this->detectOpenALButton->SetLabel(_("Redetect OpenAL"));
 		this->downloadOpenALButton->Enable();
-#endif
 	} else {
 		// have working openal
 		this->soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
@@ -1153,7 +1154,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 			if (!defaultSoundDevice.IsEmpty() &&
 				(soundDeviceCombo->FindString(defaultSoundDevice) != wxNOT_FOUND)) {
 				soundDeviceCombo->SetStringSelection(defaultSoundDevice);	
-			} else {
+			} else { // just pick the first one on the list as the default
 				soundDeviceCombo->SetSelection(0);
 			}
 		}
@@ -1161,14 +1162,16 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceCombo->Enable();
 		this->openALVersion->Hide();
 		wxLogInfo(_T("%s"), OpenALMan::GetCurrentVersion().c_str());
-#if 0 // no need to keep OpenAL version displayed in GUI; logging it is enough
-		this->openALVersion->SetLabel(OpenALMan::GetCurrentVersion());
-#endif
-		
-#if !IS_APPLE
+				
 		this->downloadOpenALButton->Disable();
+		this->downloadOpenALButton->Hide();
 		this->detectOpenALButton->Disable();
-#endif
+		this->detectOpenALButton->Hide();
+
+		this->audioSizer->Remove(audioButtonsSizer);
+		this->audioSizer->Detach(audioNonButtonsSizer);
+		this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand());
+		this->Layout();
 	}
 }
 
