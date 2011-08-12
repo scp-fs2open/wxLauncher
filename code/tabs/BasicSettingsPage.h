@@ -85,6 +85,10 @@ private:
 	wxButton* downloadOpenALButton;
 	wxButton* detectOpenALButton;
 
+	wxSizer* audioButtonsSizer;
+	wxSizer* audioNonButtonsSizer;
+	wxSizer* audioSizer;
+
 	wxChoice* joystickSelected;
 #if 0
 	wxCheckBox* joystickForceFeedback;
