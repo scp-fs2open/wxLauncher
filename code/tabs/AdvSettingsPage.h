@@ -34,10 +34,6 @@ private:
 									 const int textAreaWidth);
 	SkinSystem *skin;
 	FlagListBox* flagListBox;
-
-	// indicates whether a given call to OnExeChanged()
-	// is the first call to OnExeChanged() in the current launcher session
-	bool isFirstOnExeChanged;
 	
 public:
 	void OnExeChanged(wxCommandEvent& event);
