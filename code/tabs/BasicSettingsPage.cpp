@@ -98,7 +98,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2/TC root folder:"));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 or TC root folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
@@ -127,28 +127,33 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		}
 	}
 
+	// new sizer layout that should line things up nicely
+	// inspired by the thread http://markmail.org/message/rlgv6y6xbw5dkvyy#query:+page:1+mid:5cqagz2jbygwqt2x+state:results
+	// or "RE: [wxPython-users] wx.FlexGridSizer..." Mar 31, 2005 in com.googlegroups.wxpython-users
+	// this idea could also work on, say, the video box, if you needed, for Windows
 	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
-	rootFolderSizer->Add(rootFolderText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1));
+	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1).Expand());
 	rootFolderSizer->Add(selectButton, wxSizerFlags().Border(wxLEFT, 5));
 
-	wxBoxSizer* selectExeSizer = new wxBoxSizer(wxHORIZONTAL);
-	selectExeSizer->Add(useExeText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	selectExeSizer->Add(useExeChoice, wxSizerFlags().Proportion(1));
+	wxFlexGridSizer* exeInsideSizer;
+	if (useFredText != NULL && useFredChoice != NULL) {
+		exeInsideSizer = new wxFlexGridSizer(3,2,0,0);
+	} else {
+		exeInsideSizer = new wxFlexGridSizer(2,2,0,0);
+	}
+	exeInsideSizer->AddGrowableCol(1);
 
-	wxBoxSizer* selectFredExeSizer = NULL;
-	if ( useFredText != NULL && useFredChoice != NULL ) {
-		selectFredExeSizer = new wxBoxSizer(wxHORIZONTAL);
-		selectFredExeSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-		selectFredExeSizer->Add(useFredChoice, wxSizerFlags().Proportion(1));
+	exeInsideSizer->Add(rootFolderText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	exeInsideSizer->Add(rootFolderSizer, wxSizerFlags().Proportion(1).Expand());
+	exeInsideSizer->Add(useExeText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	exeInsideSizer->Add(useExeChoice, wxSizerFlags().Proportion(1).Expand());
+	if (useFredText != NULL && useFredChoice != NULL) {
+		exeInsideSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+		exeInsideSizer->Add(useFredChoice, wxSizerFlags().Proportion(1).Expand());
 	}
 
-	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxVERTICAL);
-	exeSizer->Add(rootFolderSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
-	exeSizer->Add(selectExeSizer,  wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
-	if ( selectFredExeSizer != NULL ) {
-		exeSizer->Add(selectFredExeSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
-	}
+	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxHORIZONTAL);
+	exeSizer->Add(exeInsideSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT, 5));
 
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, ID_VIDEO_STATIC_BOX, _("Video"));
