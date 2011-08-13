@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include <wx/choicebk.h>
 #include <wx/gbsizer.h>
+#include <wx/hyperlink.h>
 
 #include "generated/configure_launcher.h"
 
@@ -171,6 +172,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Get()->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 16);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
+#if !IS_WIN32 // TF/AF/AA don't yet work on Windows
 	wxStaticText* textureFilterText = 
 		new wxStaticText(this, wxID_ANY, _("Texture filter:"));
 	wxChoice* textureFilterCombo = new wxChoice(this, ID_TEXTURE_FILTER_COMBO);
@@ -244,6 +246,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			antialias = 0;
 	}
 	aaCombo->SetSelection(antialias);
+#endif
 
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
@@ -252,6 +255,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizerL->Add(depthText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(depthCombo, wxSizerFlags().Expand());
 
+#if !IS_WIN32 // TF/AF/AA don't yet work on Windows
 	wxGridSizer* videoSizerR = new wxFlexGridSizer(2);
 	videoSizerR->Add(textureFilterText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(textureFilterCombo, wxSizerFlags().Expand());
@@ -259,12 +263,61 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizerR->Add(anisotropicCombo, wxSizerFlags().Expand());
 	videoSizerR->Add(aaText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(aaCombo, wxSizerFlags().Expand());
+#endif
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
+#if IS_WIN32
+	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5); // FIXME ALIGN_BOTTOM or ALIGN_CENTER_VERTICAL?
+#else
 	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5);
 	videoSizer->AddStretchSpacer(5);
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
 	videoSizer->AddStretchSpacer(5);
+#endif
+
+	// Lighting presets FIXME DOESN'T WORK YET
+	wxStaticBox* lightingPresetsBox = new wxStaticBox(this, wxID_ANY, _("Lighting presets"));
+
+	wxHyperlinkCtrl* presetDescsUrl = new wxHyperlinkCtrl(this, wxID_ANY, _T("Preset descriptions"),
+		_T("http://www.hard-light.net/wiki/index.php/Sample_Lighting_Settings"));
+	wxButton* customFlagsCopyButton = new wxButton(this, wxID_ANY,
+		_T("Copy selected preset's settings to custom flags"));
+	customFlagsCopyButton->Enable(false); // should be disabled if "Presets off" button is used
+	wxRadioButton* radioButton1 = new wxRadioButton (this, wxID_ANY, _T("Presets off"),
+		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	radioButton1->SetValue(true);
+	wxRadioButton* radioButton2 = new wxRadioButton (this, wxID_ANY, _T("Baseline recommended"));
+	wxRadioButton* radioButton3 = new wxRadioButton (this, wxID_ANY, _T("DaBrain's"));
+	wxRadioButton* radioButton4 = new wxRadioButton (this, wxID_ANY, _T("Herra Tohtori's"));
+	wxRadioButton* radioButton5 = new wxRadioButton (this, wxID_ANY, _T("CKid's"));
+	wxRadioButton* radioButton6 = new wxRadioButton (this, wxID_ANY, _T("ColeCampbell666's"));
+	wxRadioButton* radioButton7 = new wxRadioButton (this, wxID_ANY, _T("Castor's"));
+	wxRadioButton* radioButton8 = new wxRadioButton (this, wxID_ANY, _T("Spidey's"));
+
+	wxGridBagSizer* lightingInsideSizer = new wxGridBagSizer();
+	lightingInsideSizer->Add(presetDescsUrl, wxGBPosition(0,0), wxGBSpan(1,1),
+		wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT, 5);
+	lightingInsideSizer->Add(customFlagsCopyButton, wxGBPosition(0,1), wxGBSpan(1,3),
+		wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 5);
+	lightingInsideSizer->Add(radioButton1, wxGBPosition(1,0), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton2, wxGBPosition(2,0), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton3, wxGBPosition(1,1), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton4, wxGBPosition(2,1), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton5, wxGBPosition(1,2), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton6, wxGBPosition(2,2), wxGBSpan(1,1), 
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	lightingInsideSizer->Add(radioButton7, wxGBPosition(1,3), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5);
+	lightingInsideSizer->Add(radioButton8, wxGBPosition(2,3), wxGBSpan(1,1),
+		wxEXPAND|wxALIGN_CENTER_VERTICAL);
+
+	wxStaticBoxSizer* lightingPresetsSizer = new wxStaticBoxSizer(lightingPresetsBox, wxHORIZONTAL);
+	lightingPresetsSizer->Add(lightingInsideSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 
 #if IS_WIN32
 	// Speech
@@ -320,7 +373,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		speechVoiceCombo->Append(SpeechMan::EnumVoices());
 
 		// FIXME consolidate this code and similar code in AdvSettingsPage.cpp
-		// FIXME Play button will become wide if longest voice name is very long
 		wxClientDC dc(this);
 		wxArrayString voices = speechVoiceCombo->GetStrings();
 		wxFont font(this->GetFont());
@@ -518,8 +570,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	joystickSizer->Add(joyButtonSizer, wxSizerFlags().Center());
 
 	// Proxy
-	// sorry, but there won't be space for the proxy on Windows
-#if !IS_WIN32
+	// sorry, but there won't be space for the proxy on any platform
+#if 0
 	wxStaticBox* proxyBox = new wxStaticBox(this, wxID_ANY, _("Proxy"));
 
 	wxChoicebook* proxyChoice = new ProxyChoice(this, ID_PROXY_TYPE);
@@ -530,18 +582,22 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// Final Layout
 	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
-	settingsSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-#if IS_WIN32
-	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-#endif
-	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 
 #if IS_WIN32
+	wxBoxSizer* videoLightingSizer = new wxBoxSizer(wxHORIZONTAL);
+	videoLightingSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxRIGHT, 10));
+	videoLightingSizer->Add(lightingPresetsSizer, wxSizerFlags().Proportion(1).Expand());
+	settingsSizer->Add(videoLightingSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #else
-	settingsSizer->Add(networkSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(proxySizer, wxSizerFlags().Expand());
+	settingsSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(lightingPresetsSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #endif
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -551,7 +607,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	this->SetSizer(sizer);
 	this->Layout();
-
 }
 
 BasicSettingsPage::~BasicSettingsPage() {
