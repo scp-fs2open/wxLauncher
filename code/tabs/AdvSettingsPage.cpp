@@ -32,7 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
-	this->isFirstOnExeChanged = true;
 
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
@@ -49,6 +48,10 @@ EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
+	if (this->GetSizer() != NULL) {
+		this->GetSizer()->Clear(true);
+	}
+
 	this->flagListBox = new FlagListBox(this, this->skin);
 
 #if 0 // doesn't do anything
@@ -103,7 +106,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
 
-	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	wxSizer* sizer = this->GetSizer();
+
+	if (sizer == NULL) {
+		sizer = new wxBoxSizer(wxVERTICAL);
+	}
+
 	sizer->Add(topSizer, wxSizerFlags().Expand().Proportion(5).Border(wxLEFT|wxRIGHT|wxTOP, 5));
 	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
 #if 0
@@ -112,12 +120,10 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(2).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-	this->SetSizer(sizer);
-	if (this->isFirstOnExeChanged) {
-		sizer->SetSizeHints(this);
-		sizer->Fit(this);
-		this->isFirstOnExeChanged = false;
+	if (this->GetSizer() == NULL) {
+		this->SetSizerAndFit(sizer);
 	}
+
 	this->Layout();
 
 	this->OnDrawStatusChange(event);
