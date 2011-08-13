@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
+	this->isFirstOnExeChanged = true;
 
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
@@ -48,10 +49,6 @@ EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
-	if (this->GetSizer() != NULL) {
-		this->GetSizer()->DeleteWindows();
-	}
-
 	this->flagListBox = new FlagListBox(this, this->skin);
 
 #if 0 // doesn't do anything
@@ -116,6 +113,11 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(2).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	this->SetSizer(sizer);
+	if (this->isFirstOnExeChanged) {
+		sizer->SetSizeHints(this);
+		sizer->Fit(this);
+		this->isFirstOnExeChanged = false;
+	}
 	this->Layout();
 
 	this->OnDrawStatusChange(event);
