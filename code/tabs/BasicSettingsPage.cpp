@@ -245,31 +245,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 	aaCombo->SetSelection(antialias);
 
-#if 0
-	wxStaticText* gsText = 
-		new wxStaticText(this, wxID_ANY, _("General settings (recommend: highest):"));
-	wxChoice* gsCombo = new wxChoice(this, ID_GS_COMBO);
-	gsCombo->Append(_("1. Lowest"));
-	gsCombo->Append(_("2. Low"));
-	gsCombo->Append(_("3. High"));
-	gsCombo->Append(_("4. Highest"));
-	int gamespeed;
-	proman->Get()->Read(PRO_CFG_VIDEO_GENERAL_SETTINGS, &gamespeed, 3);
-	gsCombo->SetSelection(gamespeed);
-
-	wxCheckBox* largeTextureCheck = 
-		new wxCheckBox(this, ID_LARGE_TEXTURE_CHECK, _("Use large textures"));
-	bool largeTextures;
-	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &largeTextures, false);
-	largeTextureCheck->SetValue(largeTextures);
-	wxCheckBox* fontDistortion = 
-		new wxCheckBox(this, ID_FONT_DISTORTION_CHECK, _("Fix font distortion"));
-	bool fixFont;
-	proman->Get()->Read(PRO_CFG_VIDEO_USE_LARGE_TEXTURES, &fixFont, false);
-	fontDistortion->SetValue(fixFont);
-	fontDistortion->Disable(); // DirectX only
-#endif
-
 	// Sizer for graphics, resolution, depth, etc
 	wxGridSizer* videoSizerL = new wxFlexGridSizer(2);
 	videoSizerL->Add(resolutionText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -290,27 +265,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizer->AddStretchSpacer(5);
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
 	videoSizer->AddStretchSpacer(5);
-
-#if 0
-	wxBoxSizer* videoSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	videoSizer1->Add(videoSizerL, wxSizerFlags().Expand());
-	videoSizer1->AddStretchSpacer(5);
-	videoSizer1->Add(videoSizerR, wxSizerFlags().Expand());
-	videoSizer1->AddStretchSpacer(5);
-	
-	wxBoxSizer* videoSizergs = new wxBoxSizer(wxHORIZONTAL);
-	videoSizergs->Add(gsText);
-	videoSizergs->Add(gsCombo);
-
-	wxBoxSizer* videoSizer3 = new wxBoxSizer(wxHORIZONTAL);
-	videoSizer3->Add(largeTextureCheck);
-	videoSizer3->Add(fontDistortion);
-
-	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxVERTICAL);
-	videoSizer->Add(videoSizer1, wxSizerFlags().Expand());
-	videoSizer->Add(videoSizergs);
-	videoSizer->Add(videoSizer3);
-#endif
 
 #if IS_WIN32
 	// Speech
@@ -617,15 +571,11 @@ EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 
 // Video controls
-EVT_CHOICE(ID_GRAPHICS_COMBO, BasicSettingsPage::OnSelectGraphicsAPI)
 EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectVideoResolution)
 EVT_CHOICE(ID_DEPTH_COMBO, BasicSettingsPage::OnSelectVideoDepth)
 EVT_CHOICE(ID_TEXTURE_FILTER_COMBO, BasicSettingsPage::OnSelectVideoTextureFilter)
 EVT_CHOICE(ID_ANISOTROPIC_COMBO, BasicSettingsPage::OnSelectVideoAnistropic)
 EVT_CHOICE(ID_AA_COMBO, BasicSettingsPage::OnSelectVideoAntiAlias)
-EVT_CHOICE(ID_GS_COMBO, BasicSettingsPage::OnSelectVideoGeneralSettings)
-EVT_CHECKBOX(ID_LARGE_TEXTURE_CHECK, BasicSettingsPage::OnToggleVideoUseLargeTexture)
-EVT_CHECKBOX(ID_FONT_DISTORTION_CHECK, BasicSettingsPage::OnToggleVideoFixFontDistortion)
 
 // Speech Controls
 EVT_CHOICE(ID_SPEECH_VOICE_COMBO, BasicSettingsPage::OnSelectSpeechVoice)
@@ -799,20 +749,6 @@ void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) 
 	TCManager::GenerateTCFredBinaryChanged();
 }
 
-void BasicSettingsPage::OnSelectGraphicsAPI(wxCommandEvent &WXUNUSED(event)) {
-	wxChoice* api = dynamic_cast<wxChoice*>(
-		wxWindow::FindWindowById(ID_GRAPHICS_COMBO, this));
-	wxCHECK_RET( api != NULL, _T("Cannot find graphics api choice box"));
-
-	wxStaticBox* box = dynamic_cast<wxStaticBox*>(
-		wxWindow::FindWindowById(ID_VIDEO_STATIC_BOX, this));
-	wxCHECK_RET( box != NULL, _T("Cannot find static box for video settings"));
-	
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_API, api->GetStringSelection());
-	box->SetLabel(wxString::Format(_("Video (%s)"), api->GetStringSelection().c_str()));
-}
-
 class Resolution: public wxClientData {
 public:
 	Resolution(int height, int width) {
@@ -959,33 +895,6 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_ANTI_ALIAS, (aa->GetSelection() == 0) ? 0 : 1 << aa->GetSelection());
 
-}
-
-void BasicSettingsPage::OnSelectVideoGeneralSettings(wxCommandEvent &WXUNUSED(event)) {
-	wxChoice* gs = dynamic_cast<wxChoice*>(
-		wxWindow::FindWindowById(ID_GS_COMBO, this));
-	wxCHECK_RET( gs != NULL, _T("Unable to find general settings choice"));
-
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_GENERAL_SETTINGS, gs->GetSelection());
-}
-
-void BasicSettingsPage::OnToggleVideoUseLargeTexture(wxCommandEvent &WXUNUSED(event)) {
-	wxCheckBox* large = dynamic_cast<wxCheckBox*>(
-		wxWindow::FindWindowById(ID_LARGE_TEXTURE_CHECK));
-	wxCHECK_RET( large != NULL, _T("Unable to find large texture checkbox"));
-
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_USE_LARGE_TEXTURES,  large->IsChecked());
-}
-
-void BasicSettingsPage::OnToggleVideoFixFontDistortion(wxCommandEvent &WXUNUSED(event)) {
-	wxCheckBox* font = dynamic_cast<wxCheckBox*>(
-		wxWindow::FindWindowById(ID_FONT_DISTORTION_CHECK));
-	wxCHECK_RET( font != NULL, _T("Unable to find font distortion checkbox"));
-
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_FIX_FONT_DISTORTION, font->IsChecked());
 }
 
 void BasicSettingsPage::OnSelectSpeechVoice(wxCommandEvent &WXUNUSED(event)) {
