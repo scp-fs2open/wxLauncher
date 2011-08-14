@@ -83,7 +83,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 
 void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	if (this->GetSizer() != NULL) {
-		this->GetSizer()->DeleteWindows();
+		this->GetSizer()->Clear(true);
 	}
 
 	ProMan* proman = ProMan::GetProfileManager();

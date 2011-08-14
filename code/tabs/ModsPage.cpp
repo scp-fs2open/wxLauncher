@@ -49,7 +49,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxSizer* currentSizer = this->GetSizer();
 	if ( currentSizer != NULL ) {
-		currentSizer->DeleteWindows();
+		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
 		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion.\n You can do that on the Basic Settings tab."),
