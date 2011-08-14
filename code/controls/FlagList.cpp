@@ -63,7 +63,7 @@ const int VERTICAL_OFFSET_MULTIPLIER = 1; // in pixels
 #endif
 
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
-:wxVListBox(parent,wxID_ANY) {
+:wxVListBox(parent,ID_FLAGLISTBOX) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 	this->drawStatus = DRAW_OK;
@@ -507,6 +507,27 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 	}
 }
 
+void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
+	int selected = this->GetSelection();
+	int flagIndex = 0;
+
+	FlagCategoryList::const_iterator category =
+	this->allSupportedFlagsByCategory.begin();
+	while (category != this->allSupportedFlagsByCategory.end()) {
+		FlagList::const_iterator flag = (*category)->flags.begin();
+		while( flag != (*category)->flags.end() ) {
+			if ( flagIndex == selected
+				&& !(*flag)->webURL.IsEmpty() ) {
+				wxLaunchDefaultBrowser((*flag)->webURL);
+				return;
+			}
+			flag++;
+			flagIndex++;
+		}
+		category++;
+	}
+}
+
 void FlagListBox::OnCheckCategoryBox(wxCommandEvent &WXUNUSED(event)) {
 	this->RefreshRect(this->GetRect(), true);
 }
@@ -554,6 +575,7 @@ bool FlagListBox::SetFlag(wxString flagString, bool state) {
 
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)
 EVT_SIZE(FlagListBox::OnSize)
+EVT_LISTBOX_DCLICK(ID_FLAGLISTBOX, FlagListBox::OnDoubleClickFlag)
 END_EVENT_TABLE()
 
 bool FlagListBox::SetFlagSet(wxString setToFind) {

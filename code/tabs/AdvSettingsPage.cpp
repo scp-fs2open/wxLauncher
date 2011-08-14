@@ -77,6 +77,11 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 #endif
 
+	wxStaticText* wikiLinkText =
+	new wxStaticText(this, wxID_ANY, _T("Double-click on a flag for its online documentation, if available."));
+	wxBoxSizer* wikiLinkSizer = new wxBoxSizer(wxVERTICAL);
+	wikiLinkSizer->Add(wikiLinkText, 0, wxALIGN_CENTER_HORIZONTAL);
+
 #if 0
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
@@ -118,11 +123,13 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
 
+	// final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(topSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
-	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
+	sizer->Add(topSizer, wxSizerFlags().Expand().Border(wxALL, 5));
+	sizer->Add(wikiLinkSizer, wxSizerFlags().Center().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 #if 0
-	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 #endif
 	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
