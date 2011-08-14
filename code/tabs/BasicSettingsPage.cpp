@@ -366,7 +366,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	speechRightSizer->Add(speechInGameCheck, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	speechRightSizer->Add(speechInMultiCheck, wxSizerFlags().Expand());
 
-
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
 	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	speechSizer->AddStretchSpacer(3);
@@ -604,6 +603,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #endif
+
+	// FIXME TEMP hiding the lighting presets until it's finished
+	settingsSizer->Hide(lightingPresetsSizer, true);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-5, -1)); // 5 being for the border
