@@ -49,7 +49,7 @@ END_EVENT_TABLE()
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	if (this->GetSizer() != NULL) {
-		this->GetSizer()->DeleteWindows();
+		this->GetSizer()->Clear(true);
 	}
 
 	this->flagListBox = new FlagListBox(this, this->skin);
