@@ -75,6 +75,7 @@ public:
 	virtual wxCoord OnMeasureItem(size_t n) const;
 	virtual void OnSize(wxSizeEvent &event);
 
+	void OnDoubleClickFlag(wxCommandEvent &event);
 	void OnCheckCategoryBox(wxCommandEvent &event);
 	wxString GenerateStringList();
 	/** Tries to find flagString in the list of flags and set it to state,
