@@ -49,7 +49,7 @@ END_EVENT_TABLE()
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	if (this->GetSizer() != NULL) {
-		this->GetSizer()->Clear(true);
+		this->GetSizer()->DeleteWindows();
 	}
 
 	this->flagListBox = new FlagListBox(this, this->skin);
@@ -59,8 +59,20 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	description->SetPage(_T("<p></p>"));
 #endif
 
+// FIXME HACK for now, hard-code flag list box height (sigh)
+#if IS_WIN32
+	const int FLAG_LIST_BOX_HEIGHT = 410;
+#elif IS_LINUX
+	const int FLAG_LIST_BOX_HEIGHT = 390;
+#elif IS_APPLE
+	const int FLAG_LIST_BOX_HEIGHT = 363;
+#else
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
 	topSizer->Add(this->flagListBox, wxSizerFlags().Proportion(1).Expand());
+	flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK
 #if 0
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 #endif
@@ -106,24 +118,16 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
 	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
 
-	wxSizer* sizer = this->GetSizer();
-
-	if (sizer == NULL) {
-		sizer = new wxBoxSizer(wxVERTICAL);
-	}
-
-	sizer->Add(topSizer, wxSizerFlags().Expand().Proportion(5).Border(wxLEFT|wxRIGHT|wxTOP, 5));
+	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(topSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
 	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxTOP, 5));
 #if 0
 	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
 #endif
 	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(2).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-	if (this->GetSizer() == NULL) {
-		this->SetSizerAndFit(sizer);
-	}
-
+	this->SetSizer(sizer);
 	this->Layout();
 
 	this->OnDrawStatusChange(event);
