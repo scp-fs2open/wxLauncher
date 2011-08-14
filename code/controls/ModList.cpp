@@ -597,12 +597,12 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	this->appendmods = this->tableData->Item(selected).secondarylist;
 
 	if ( this->prependmods != NULL ) {
-		wxStringTokenizer prependtokens(*(this->prependmods), _T(", "), wxTOKEN_STRTOK); // no empty tokens
+		wxStringTokenizer prependtokens(*(this->prependmods), _T(","), wxTOKEN_STRTOK); // no empty tokens
 		while ( prependtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
 			}
-			modline += prependtokens.GetNextToken();
+			modline += prependtokens.GetNextToken().Trim(true).Trim(false);
 		}
 	}
 
@@ -616,12 +616,12 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	if ( this->appendmods != NULL ) {
-		wxStringTokenizer appendtokens(*(this->appendmods), _T(", "), wxTOKEN_STRTOK);
+		wxStringTokenizer appendtokens(*(this->appendmods), _T(","), wxTOKEN_STRTOK);
 		while ( appendtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
 			}
-			modline += appendtokens.GetNextToken();
+			modline += appendtokens.GetNextToken().Trim(true).Trim(false);
 		}
 	}
 
@@ -642,10 +642,17 @@ void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 	new ModInfoDialog(this->skinSystem, new ModItem(this->tableData->Item(selected)), this);
 }
 
+// comparison is case-insensitive, and mod names containing spaces are preserved
 bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
-	wxStringTokenizer tokens(modlist, _T(", "), wxTOKEN_STRTOK);
+	wxLogDebug(_T("mod: %s modlist: %s"), mod.c_str(), modlist.c_str());
+	wxString normalizedModName(mod);
+
+	normalizedModName.Trim(true).Trim(false).MakeLower();
+
+	wxLogDebug(_T("normalizedModName: %s"), normalizedModName.c_str());
+	wxStringTokenizer tokens(modlist, _T(","), wxTOKEN_STRTOK);
 	while ( tokens.HasMoreTokens() ) {
-		if ( tokens.GetNextToken() == mod ) {
+		if ( tokens.GetNextToken().Trim(true).Trim(false).Lower() == normalizedModName ) {
 			return true;
 		}
 	}
