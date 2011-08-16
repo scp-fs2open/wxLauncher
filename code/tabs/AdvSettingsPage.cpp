@@ -226,13 +226,21 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->Get()->
 		Read(PRO_CFG_TC_CURRENT_MODLINE, &modline);
 
-	wxString flagLine = wxString::Format(_T("%s %s"),
-		this->flagListBox->GenerateStringList().c_str(),
-		customFlags->GetValue().c_str());
+	wxString flagLine =
+		wxString::Format(_T("%s%s"),
+						 this->flagListBox->GenerateStringList().c_str(),
+						 (customFlags->IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
 
-	wxString cmdLine = wxString::Format(_T("%s%c%s -mod %s %s"),
-		tcPath.c_str(), wxFileName::GetPathSeparator(), exeName.c_str(),
-		modline.c_str(), flagLine.c_str());
+	wxString cmdLine =
+		wxString::Format(_T("%s%c%s%s%s"),
+						 tcPath.c_str(),
+						 wxFileName::GetPathSeparator(),
+						 exeName.c_str(),
+						 (modline.IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" -mod %s"), modline.c_str()).c_str()),
+						 (flagLine.IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" %s"), flagLine.c_str()).c_str()));
 
 	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
 													 commandLine->GetSize().GetWidth() - 20)); // 20 for scrollbar
