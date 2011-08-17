@@ -813,19 +813,130 @@ void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) 
 
 class Resolution: public wxClientData {
 public:
-	Resolution(int height, int width) {
-		this->height = height;
+	Resolution(const int width, const int height, const bool isHeader) {
+		wxASSERT_MSG(width > 0, wxString::Format(_T("Resolution: provided width %d is invalid"), width));
+		wxASSERT_MSG(height > 0, wxString::Format(_T("Resolution: provided height %d is invalid"), height));
 		this->width = width;
+		this->height = height;
+		this->isHeader = isHeader;
+		resString = isHeader ? wxString::Format(_T("--- %d:%d ---"), width, height)
+			: wxString::Format(CFG_RES_FORMAT_STRING, width, height);
 	}
 	virtual ~Resolution() {}
-	int GetHeight() { return this->height; }
-	int GetWidth() { return this->width; }
+	const int GetWidth() const { return this->width; }
+	const int GetHeight() const { return this->height; }
+	const bool IsHeader() const { return this->isHeader; }
+	const wxString &GetResString() const { return this->resString; }
 private:
-	int height;
 	int width;
+	int height;
+	bool isHeader;
+	wxString resString;
 };
 
-void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
+WX_DEFINE_ARRAY_PTR(Resolution *, ResolutionArray);
+
+// sort by aspect ratio, then by size, in descending order
+int CompareResolutions(Resolution **resp1, Resolution **resp2) {
+
+	wxASSERT_MSG(resp1 != NULL, _T("CompareResolutions: provided resp1 is NULL"));
+	wxASSERT_MSG((*resp1) != NULL, _T("CompareResolutions: resp1 points to NULL"));
+	wxASSERT_MSG(resp2 != NULL, _T("CompareResolutions: provided resp2 is NULL"));
+	wxASSERT_MSG((*resp2) != NULL, _T("CompareResolutions: resp2 points to NULL"));
+	
+	// compare the two width/height ratios by cross-multiplying and comparing the results
+	const int width1 = (*resp1)->GetWidth();
+	const int height1 = (*resp1)->GetHeight();
+	const int width2 = (*resp2)->GetWidth();
+	const int height2 = (*resp2)->GetHeight();
+	
+	wxASSERT_MSG(width1 > 0, wxString::Format(_T("CompareResolutions: width1 %d is invalid"), width1));
+	wxASSERT_MSG(height1 > 0, wxString::Format(_T("CompareResolutions: height1 %d is invalid"), height1));
+	wxASSERT_MSG(width2 > 0, wxString::Format(_T("CompareResolutions: width2 %d is invalid"), width2));
+	wxASSERT_MSG(height2 > 0, wxString::Format(_T("CompareResolutions: height2 %d is invalid"), height2));
+	
+	const int value1 = width1 * height2;
+	const int value2 = width2 * height1;
+	int result;
+	// first compare aspect ratio
+	if (value1 < value2) {
+		result = -1;
+	} else if (value1 > value2) {
+		result = 1;
+	} else { // then compare size if aspect ratios are equal
+		if (width1 < width2) {
+			result = -1;
+		} else if (width1 > width2) {
+			result = 1;
+		} else {
+			result = 0;
+		}
+	}
+
+	return (-1) * result; // for reverse comparison (descending order)
+}
+
+// brought to you by http://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+int ComputeGCD(int a, int b) {
+	wxASSERT_MSG(a > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): a must be positive"), a, b));
+	wxASSERT_MSG(b > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): b must be positive"), a, b));
+
+//	part of the original algorithm, but irrelevant, since a and b are positive
+//	if (a == 0) {
+//		return b;
+//	}
+	while (b != 0) {
+		if (a > b) {
+			a = a - b;
+		} else {
+			b = b - a;
+		}
+	}
+	return a;
+}
+
+// Assumed resolutions has been sorted using CompareResolutions
+void AddHeaders(ResolutionArray &resolutions) {
+	wxASSERT_MSG(!resolutions.IsEmpty(), _T("AddHeaders: provided ResolutionArray is empty"));
+
+	ResolutionArray headers;
+	wxArrayInt headerIndexes;
+
+	int lastAspectWidth = -1;
+	int lastAspectHeight = -1;
+	int width;
+	int height;
+	int gcd;
+	
+	// find aspect ratios and determine where the aspect ratio headers should be inserted
+	for (int i = 0, n = resolutions.GetCount(); i < n; ++i) {
+		width = resolutions.Item(i)->GetWidth();
+		height = resolutions.Item(i)->GetHeight();
+		gcd = ComputeGCD(width, height);
+		width /= gcd;
+		height /= gcd;
+		
+		if ((width != lastAspectWidth) || (height != lastAspectHeight)) {
+			wxLogDebug(_T(" found aspect ratio %d:%d"), width, height);
+			headers.Add(new Resolution(width, height, true));
+			headerIndexes.Add(i);
+			lastAspectWidth = width;
+			lastAspectHeight = height;
+		}
+	}
+	
+	// now insert the headers into resolutions
+	// must insert in reverse to avoid messing up insertion indexes
+	for (int i = headerIndexes.GetCount() - 1; i >= 0; --i) {
+		resolutions.Insert(headers.Item(i), headerIndexes.Item(i));
+	}
+}
+
+void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
+	
+	ResolutionArray resolutions;
+	
+	// first, detect supported resolutions
 #ifdef WIN32
 	DEVMODE deviceMode;
 	DWORD modeCounter = 0;
@@ -849,7 +960,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 			wxString resolution = wxString::Format(
 				CFG_RES_FORMAT_STRING, deviceMode.dmPelsWidth, deviceMode.dmPelsHeight);
 			// check to see if the resolution has already been added.
-			wxArrayString strings = exeChoice->GetStrings();
+			wxArrayString strings = resChoice->GetStrings();
 			wxArrayString::iterator iter = strings.begin();
 			bool exists = false;
 			while ( iter != strings.end() ) {
@@ -859,10 +970,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 				iter++;
 			}
 			if ( !exists ) {
-				exeChoice->Insert(
-					resolution,
-					0,
-					new Resolution(deviceMode.dmPelsHeight, deviceMode.dmPelsWidth));
+				resolutions.Add(new Resolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight), false);
 			}
 		}
 		modeCounter++;
@@ -881,27 +989,20 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *exeChoice) {
 	  
 	  for(int i = 0; modes[i]; i++) {
 	    wxLogDebug(_T(" %d x %d"), modes[i]->w, modes[i]->h);
-		
-	    wxString resolution = wxString::Format(CFG_RES_FORMAT_STRING, modes[i]->w, modes[i]->h);
-
-	    /*while ( iter != strings.end() ) {
-		    if ( *iter == resolution ) {
-			    exists = true;
-		    }
-		    iter++;
-	    }
-	    if ( !exists ) {*/
-	    {
-		    exeChoice->Insert(
-			    resolution,
-			    0,
-				new Resolution(modes[i]->h, modes[i]->w));
-	    }
+		// FIXME why is "check to see if resolution has already been added" not used here?
+		resolutions.Add(new Resolution(modes[i]->w, modes[i]->h, false));
 	  }
 	}
 #else
 #error "BasicSettingsPage::FillResolutionDropBox not implemented because not on windows and SDL is not implemented"
 #endif
+	// then arrange the resolutions for drop down box and insert them
+	resolutions.Sort(CompareResolutions);
+	AddHeaders(resolutions);
+	for (ResolutionArray::iterator it = resolutions.begin(), end = resolutions.end();
+		 it != end; ++it) {
+		resChoice->Append((*it)->GetResString(), *it);
+	}
 }
 
 void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event)) {
@@ -913,6 +1014,13 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 		choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( res != NULL, _T("Choice does not have Resolution objects"));
 
+	if (res->IsHeader()) { // then advance to first resolution in the header's list
+		choice->SetSelection(choice->GetSelection() + 1);
+	}
+	
+	res = dynamic_cast<Resolution*>(choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( res != NULL, _T("after adjusting selection from header, Choice does not have Resolution objects"));
+	
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_VIDEO_RESOLUTION_WIDTH, res->GetWidth());
 	ProMan::GetProfileManager()->Get()
