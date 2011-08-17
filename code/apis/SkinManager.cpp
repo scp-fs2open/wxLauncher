@@ -78,7 +78,7 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 
 	if ( this->defaultSkin->windowTitle == NULL ) {
 		this->defaultSkin->windowTitle = 
-			new wxString(_("wxLauncher for the FreeSpace Source Code Project"));
+			new wxString(_("wxLauncher for the FreeSpace 2 Source Code Project"));
 	}
 
 	if ( this->defaultSkin->windowIcon == NULL ) {
