@@ -827,6 +827,11 @@ public:
 	const int GetHeight() const { return this->height; }
 	const bool IsHeader() const { return this->isHeader; }
 	const wxString &GetResString() const { return this->resString; }
+	bool IsSameResolution(const int otherWidth, const int otherHeight) const {
+		return ((this->width == otherWidth) &&
+				(this->height == otherHeight));
+	}
+
 private:
 	int width;
 	int height;
@@ -957,20 +962,30 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 				deviceMode.dmBitsPerPel,
 				deviceMode.dmDisplayFrequency,
 				deviceMode.dmDisplayFlags);
-			wxString resolution = wxString::Format(
-				CFG_RES_FORMAT_STRING, deviceMode.dmPelsWidth, deviceMode.dmPelsHeight);
-			// check to see if the resolution has already been added.
-			wxArrayString strings = resChoice->GetStrings();
-			wxArrayString::iterator iter = strings.begin();
-			bool exists = false;
-			while ( iter != strings.end() ) {
-				if ( *iter == resolution ) {
-					exists = true;
+			//wxString resolution = wxString::Format(
+			//	CFG_RES_FORMAT_STRING, deviceMode.dmPelsWidth, deviceMode.dmPelsHeight);
+			//// check to see if the resolution has already been added.
+			//wxArrayString strings = resChoice->GetStrings();
+			//wxArrayString::iterator iter = strings.begin();
+			//bool exists = false;
+			//while ( iter != strings.end() ) {
+			//	if ( *iter == resolution ) {
+			//		exists = true;
+			//	}
+			//	iter++;
+			//}
+			// check to see if the resolution has already been added
+			// FIXME is there a reasonable way to not make populating resolutions O(n^2)?
+			bool resExists = false;
+			for (ResolutionArray::iterator it = resolutions.begin(), end = resolutions.end();
+				it != end; ++it) {
+				if ((*it)->IsSameResolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight)) {
+					resExists = true;
 				}
-				iter++;
 			}
-			if ( !exists ) {
-				resolutions.Add(new Resolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight), false);
+
+			if ( !resExists ) {
+				resolutions.Add(new Resolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight, false));
 			}
 		}
 		modeCounter++;
