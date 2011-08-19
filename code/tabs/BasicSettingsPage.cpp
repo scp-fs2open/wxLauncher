@@ -153,7 +153,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxHORIZONTAL);
-	exeSizer->Add(exeInsideSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT, 5));
+	exeSizer->Add(exeInsideSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	// Video Section
 	wxStaticBox* videoBox = new wxStaticBox(this, ID_VIDEO_STATIC_BOX, _("Video"));
@@ -272,11 +272,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
 #if IS_WIN32
-	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5); // FIXME ALIGN_BOTTOM or ALIGN_CENTER_VERTICAL?
+	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 #else
-	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5);
+	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxBOTTOM, 5);
 	videoSizer->AddStretchSpacer(5);
-	videoSizer->Add(videoSizerR, wxSizerFlags().Expand());
+	videoSizer->Add(videoSizerR, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	videoSizer->AddStretchSpacer(5);
 #endif
 
@@ -367,9 +367,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	speechRightSizer->Add(speechInMultiCheck, wxSizerFlags().Expand());
 
 	wxStaticBoxSizer* speechSizer = new wxStaticBoxSizer(speechBox, wxHORIZONTAL);
-	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand().Border(wxLEFT, 5));
+	speechSizer->Add(speechLeftSizer, wxSizerFlags().Expand().Border(wxLEFT|wxBOTTOM, 5));
 	speechSizer->AddStretchSpacer(3);
-	speechSizer->Add(speechRightSizer, wxSizerFlags().Expand());
+	speechSizer->Add(speechRightSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	speechSizer->AddStretchSpacer(2);
 
 	if ( SpeechMan::WasBuiltIn() && SpeechMan::Initialize() ) {
@@ -508,9 +508,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkInsideSizerR->Add(networkIP, wxSizerFlags().Expand());
 	
 	wxStaticBoxSizer* networkSizer = new wxStaticBoxSizer(networkBox, wxHORIZONTAL);
-	networkSizer->Add(networkInsideSizerL, wxSizerFlags().Expand().Border(wxLEFT, 5));
+	networkSizer->Add(networkInsideSizerL, wxSizerFlags().Expand().Border(wxLEFT|wxBOTTOM, 5));
 	networkSizer->AddStretchSpacer(5);
-	networkSizer->Add(networkInsideSizerR, wxSizerFlags().Expand());
+	networkSizer->Add(networkInsideSizerR, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	networkSizer->AddStretchSpacer(5);
 
 	// Audio
@@ -524,19 +524,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect OpenAL"));
 
 	this->audioNonButtonsSizer = new wxBoxSizer(wxVERTICAL);
-	this->audioNonButtonsSizer->Add(soundDeviceText, wxSizerFlags().Border(wxLEFT|wxBOTTOM, 5));
+	this->audioNonButtonsSizer->Add(soundDeviceText, wxSizerFlags().Border(wxBOTTOM, 5));
 	this->audioNonButtonsSizer->Add(soundDeviceCombo,
-					wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT, 5));
+					wxSizerFlags().Expand());
 	this->audioNonButtonsSizer->Add(openALVersion,
-					wxSizerFlags().Center().Border(wxTOP|wxLEFT|wxRIGHT, 5));
+					wxSizerFlags().Center().Border(wxTOP, 5));
 	
 	this->audioButtonsSizer = new wxBoxSizer(wxVERTICAL);
 	this->audioButtonsSizer->Add(downloadOpenALButton, wxSizerFlags().Expand());
 	this->audioButtonsSizer->Add(detectOpenALButton, wxSizerFlags().Expand());
 	
 	this->audioSizer = new wxStaticBoxSizer(audioBox, wxHORIZONTAL);
-	this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(3).Expand());
-	this->audioSizer->Add(audioButtonsSizer, wxSizerFlags().Proportion(1).Expand());
+	this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	this->audioSizer->Add(audioButtonsSizer, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 
 	// fill in controls
 	this->SetupOpenALSection();
@@ -1273,7 +1273,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 
 		this->audioSizer->Remove(audioButtonsSizer);
 		this->audioSizer->Detach(audioNonButtonsSizer);
-		this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand());
+		this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 		this->Layout();
 	}
 }
