@@ -33,7 +33,7 @@ inline wxFileName GetPlatformDefaultConfigFilePath() {
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
 	path.AppendDir(_T("FS2 Open"));
 #elif IS_APPLE
-	path.AssignDir(_T("~")); // user home
+	path.AssignDir(wxFileName::GetHomeDir());
 	path.AppendDir(_T("Library"));
 	path.AppendDir(_T("FS2_Open"));
 #elif IS_LINUX
