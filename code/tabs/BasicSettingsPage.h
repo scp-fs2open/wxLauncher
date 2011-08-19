@@ -90,7 +90,7 @@ private:
 	wxSizer* audioSizer;
 
 	wxChoice* joystickSelected;
-#if 0
+#if IS_WIN32
 	wxCheckBox* joystickForceFeedback;
 	wxCheckBox* joystickDirectionalHit;
 	wxButton* joystickCalibrateButton;
