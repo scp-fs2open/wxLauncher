@@ -1,29 +1,29 @@
 <title>Profiles</title>
-#Profiles
+# Profiles
 
-Profiles are one of the biggest features introduced by wxLauncher. It allows you to save various "snapshots" of the launcher settings, for ease of access. Think of them like the "save" feature in the modern games. You can save your current settings and restore them later.
+Profiles are one of the biggest features introduced by wxLauncher,  allowing you to save "snapshots" of the launcher settings. Think of them like the "save" feature commonly found in games: you can save your current settings and restore them later.
 
-###Why use profiles
-Since most of the available [MODs][mod]![][li]/[TCs][tc]![][li] use different settings to achieve the best experience for the player, the profiles feature was created in order to allow the player to quicly switch between settings for his/her MODs instead of manually having to set the various options that [FSO][]![][li] supports when switching to another MOD.
+### Why use profiles
+Since most of the available [mods][mod]![][li]/[TCs][tc]![][li] use different settings to achieve the best experience for the player, the profiles feature was created in order to allow the player to quickly switch between settings for his/her mods instead of manually having to set the various options that [FSO][]![][li] supports when switching to another mod.
 
-###Copying settings from one profile to another
+<!-- ###Copying settings from one profile to another
 While you cannot directly copy settings from one profile to another, when creating a new profile you can choose on what existing profile the new profile will be based on, efectively copying the old profile under a new name
 
-**Tip**: You can use this feature to rename a profile. Simply click the new profile button, choose the profile you want to rename and type in the new name. Click "OK" to create the new profile and then delete the old one.
+**Tip**: You can use this feature to rename a profile. Simply click the new profile button, choose the profile you want to rename and type in the new name. Click "OK" to create the new profile and then delete the old one. --> <!-- copying profiles not yet supported -->
 
-###What data is saved
-Basicly, a profile contains the following data:
+### What data is saved
+A profile contains the following data: **TODO verify that this information is correct**
 
 * The selected mod.
 * Status of all the options from the [Basic Settings][basic]![][li] page.
-* Status of all the flags from the [Advanced Settings][advanced]![][li] page (the "custom flags" section is included) .
+* Status of all the flags from the [Advanced Settings][advanced]![][li] page, including the custom flags.
 
-**What is not saved**: The Highlights autoupdate option and the proxy configuration
+**What is not saved**: The option of whether to automatically retrieve the highlights from Hard Light Productions at launcher startup. <!-- and the proxy configuration -->
 
-###Using the launcher without this feature
-While you cannot disable the profiles, you can make there function transparent to the user by just checking the "Automatically save profile" and never change the selected profile.
+### Using the launcher without using profiles
+While you cannot disable the profiles feature, you can avoid using them by just checking the "Automatically save profiles" box on the Welcome tab and then only using the default profile, which has the name "Default".
 
-Now, every change you make is automatically saved to the default profile. wxLauncher will behave from now on just like the old launcher did.
+This way, every change you make is automatically saved to the default profile, and wxLauncher will behave just as the standard Windows launcher does.
 
 [li]: /images/li.png
 [mod]: /50TechnicalStuff/02Terminology.help

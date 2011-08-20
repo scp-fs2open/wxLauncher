@@ -1,53 +1,45 @@
 <meta name="control" content="ID_SPEECH_MORE_VOICES_BUTTON" />
 <title>Speech settings</title>
 
-#Speech settings
+# Speech settings (Windows only)
 
-Here you can set various aspects related to the speech engine. This is intended to be used by the numerous user-made campaigns that lack voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes it is better than nothing.
+Here you can set various aspects related to the speech engine. This is intended as an option while playing a user-made campaigns that lacks voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes it is better than nothing.
 
-###Test string
-Input a test string to test the selected voice. A "Press play to test this string" is provided by default.
+**Compatibility note:** Speech is currently supported on Windows only.
+
+### Test string
+Type a test string for testing the selected voice. "Press play to test this string." is provided by default.
  
-**Note**: When testing the voice, the launcher will be unrensponsive until the simulated speech stops, so try to limit your string to a few words only.
+**Note**: When testing the voice, the launcher will be unresponsive until the simulated speech stops, so try to limit your string to a few words only.
 
-###Voice selection
-Lists the available voices installed on your system. Choose one that you like.
+### Voice selection
+Lists the available voices installed on your system, from which you can select one.
 
-###Volume slider
+### Volume slider
 This slider sets the volume of simulated speech in game. Drag it all the way to the right to set the volume to maximum.
 
-**Note**: Remember that when you play the game there will be countless other sounds beside the simulated voices, and if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when testing your settings from the launcher, especially if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background when playing.
+**Tip**: Remember that when you play the game, there will be countless other sounds beside the simulated voices, so if you plan to use the simulated speech in-game, you might want to set the volume a bit higher than what you find acceptable when testing your settings from the launcher, especially if you're in a quiet room. That way, the simulated speech will be more than some indistinguishable noise in the background when playing.
 
-###"Play string" button
-Starts the simulated-voice playback of the string that was typed above. 
+### Play button
+Starts the simulated-voice playback of the test string.
 
-###Where to use
+### Where to use speech
 Defines the areas of the game where the simulated speech should be used. Check as needed.
 
-* Techroom
+* Tech room
 * Briefings
 * In-game
 * Multiplayer
 
-###Get more voices
-Several options are available, depending on your operating platform:
-
-#####Windows
+### Get more voices
 
 * **Windows XP or older**: You can download Mike and Mary from [Microsoft's Download Center][mdc]![][le].
 * **Vista or 7**: There are no other free voices available from Microsoft (the voices available for Windows XP or older will install but Windows will not allow them to be used)
+**TODO verify the above statements** 
 
-#####Linux
- -- more details here --
-
-#####Mac OS
-
--- more details here --
-
-#####All platforms
+<!-- #####All platforms
 -- if anyone knows any quality free or commercial voices that work with FS2 please add them here --
-There might be other free or commercial voices available on the Internet. You can use the [Google search engine][google]![][le] to try to locate them.
+There might be other free or commercial voices available on the Internet. You can use the [Google search engine][google]![][le] to try to locate them. -->
 
 [le]:/images/le.png
 [mdc]:  http://www.microsoft.com/downloads/details.aspx?FamilyId=5E86EC97-40A7-453F-B0EE-6583171B4530&displaylang=en
-[google]: http://www.google.com

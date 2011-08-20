@@ -1,17 +1,10 @@
-<title>MODs page</title>
+<title>Mods page</title>
 
-#MODs page
+# Mods page
 
-This page allows you to manage the [MODs][mod]![][li] installed for the current selected [TC][]![][li].
-
-* [Changing the active MOD][am]![][li]
-* [Removing a MOD][rm]![][li]
-
-Installing new MODs can be done from the [Install/Update][iu]![][li] page.
+This page allows you to [select a mod to activate][am]![][li] among the [mods][mod]![][li] installed for the current selected [TC][]![][li].
 
 [li]: /images/li.png
 [mod]: /50TechnicalStuff/02Terminology.help
 [tc]: /50TechnicalStuff/02Terminology.help
 [am]: activate.help
-[rm]: remove.help
-[iu]: ../50InstallUpdate/index.help

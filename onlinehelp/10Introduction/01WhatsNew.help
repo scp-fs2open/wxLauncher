@@ -1,26 +1,22 @@
-<title>New highlights for this release</title>
+<title>Highlights for this release</title>
 
-#New highlights for this release
-Here you can find a list of additions to the current release. Enjoy!
-###Version 1.0
+#Highlights for this release
+
+###Version 0.8.1
 
 * A brand-new cross-platform launcher.
-* Integrated context-sensitive help system - the one you're reading now.
-* [Internationalization][inter]![][li].
 * [Profiles][]![][li].
-* Hard-light.net [highlights][]![][li] at your fingertips.
-* Improved [MOD management][modmng]![][li].
-* Redesigned configuration pages - split into [Basic][]![][li] and [Advanced][]![][li] settings.
-* For [MOD][]![][li]/[TC][]![][li] authors: [improved control][modauthors]![][li] over your own MOD/TC.
+* The [highlights][]![][li] from [Hard Light Productions][hl]![][le] at your fingertips.
+* Mods displayed as a [single list][modmng]![][li].
+* Redesigned configuration pages - split into [basic][]![][li] and [advanced][]![][li] settings.
 
 [le]: /images/le.png
 [li]: /images/li.png
-[inter]: 03Languages.help
 [profiles]: 02Profiles.help
+[hl]: http://www.hard-light.net/
 [highlights]: /30Reference/10Welcome/03news.help
 [modmng]: /30Reference/20MODs/index.help
 [basic]: /30Reference/30BasicSettings/index.help
 [advanced]: /30Reference/40AdvancedSettings/index.help
 [mod]: /50TechnicalStuff/02Terminology.help
 [TC]: /50TechnicalStuff/02Terminology.help
-[modauthors]: /40ForModders/index.help

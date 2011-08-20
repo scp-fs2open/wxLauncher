@@ -1,13 +1,13 @@
-<title>Hard-Light.net highlights</title>
-#Hard-Light.net highlights
+<title>Highlights from Hard Light Productions</title>
+# Highlights from Hard Light Productions
 
-The highlights give you a quick preview of new releases on [Hard-Light.net][hl]![][le]. They are read directly from the Hard-Light.net homepage on every launcher start.
+The highlights give you a quick preview of new releases on [Hard Light Productions][hl]![][le] (HLP). If you have checked the "Automatically retrieve highlights at startup" box, wxLauncher will retrieve and display the highlights from the HLP website when it starts up.
 
-**Hint**: (*planned feature*) You can force a manual highlights reload by double-clicking any empty area in the "Latest news from the front" box.
+<!-- **Hint**: (*planned feature*) You can force a manual highlights reload by double-clicking any empty area in the "Latest news from the front" box.
 
 -- highlights section screenshots --
 
-**Note:** If you have no internet access or you have explicitly denied the launcher internet access (via the launcher's own options or via a firewall) the launcher will show the latest cached highlights (if available) or a blank page.
+**Note:** If you have no internet access or you have explicitly denied the launcher internet access (via the launcher's own options or via a firewall) the launcher will show the latest cached highlights (if available) or a blank page. -->
 
 [le]: ../../images/le.png
 [hl]: http://www.hard-light.net/

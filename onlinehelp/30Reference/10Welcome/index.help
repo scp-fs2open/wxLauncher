@@ -3,12 +3,11 @@
 #Welcome page
 The welcome page is your first contact with the launcher and the first page you'll always see on a fresh launcher start. It's like your browser homepage.
 
-Because of that, the welcome page contains the [language selector][language]![][li] and two items that are essential to any FreeSpace 2 fan:
+Because of that, the welcome page contains two items that are essential to any FreeSpace 2 fan:
 
 * [Profile management controls][profiles]![][li]
 * [Hard-Light.net highlights][hlnews]![][li]
 
 [li]: /images/li.png
-[language]: 01language.help
-[profiles]: 02profiles.help
-[hlnews]: 03news.help
+[profiles]: 01profiles.help
+[hlnews]: 02news.help

@@ -1,28 +1,31 @@
 <title>Profiles management</title>
 
-#Profiles management
+# Profiles management
 
 This set of controls allows you to to create and delete profiles. Check the [Profiles][profiles]![][li] section for information about what profiles are and how they work.
 
--- profiles section screenshot --
+<!-- -- profiles section screenshot -- -->
 
 ### New
-Click this button allows you to create a new profile. To make things easily, you can base your new profile on an existing profile in order to speed up profile creation. That way, if you have a profile for, let's say [Derelict][derelict]![][le], and want to create a new profile for [Blue Planet][bp]![][le], you can base the new profile on the existing Derelict profile and modify just the selected mod and one or two options if needed, save the profile and have a Blue Planet profile with just a few clicks.
+Click this button to create a new profile. <!-- To make things easily, you can base your new profile on an existing profile in order to speed up profile creation. That way, if you have a profile for, let's say [Derelict][derelict]![][le], and want to create a new profile for [Blue Planet][bp]![][le], you can base the new profile on the existing Derelict profile and modify just the selected mod and one or two options if needed, save the profile and have a Blue Planet profile with just a few clicks. --> <!-- sadly, profile cloning doesn't work yet. -->
 
 ### Delete
-If you don't need a particular profile you can delete it by clicking here. First, select the unneeded profile then click Delete to remove it. You will be asked to confirm the operation, just in case.
+Click this button to delete the selected profile. You will be asked to confirm the deletion.
+
+**Note**: You can't delete the "Default" profile.
 
 ### Save
-Manually saves the current profile. If a profile contains unsaved changes, the launcher will ask you on exit if you want to save your changes.
+Click this button to manually save the current profile. <!-- If a profile contains unsaved changes, the launcher will ask you on exit if you want to save your changes. -->
 
-**Note**: an unsaved profile is denoted with an \* in the tilebar
+<!-- **Note**: an unsaved profile is denoted with an \* in the titlebar
 
--- title bar with unsaved profile marked screenshot --
+- - title bar with unsaved profile marked screenshot - -
+-->
 
-### Always save default profile
-If checked, the Default profile (that is "the profile named Default") will always be saved on launcher exit and/or profile switch. 
+### Always save default profile <!-- TODO really? is that what it does? -->
+If checked, the Default profile (that is, the profile named "Default") will always be saved on launcher exit and/or profile switch. 
 
-**Note**: If you don't want to use profiles or if you don't know what they are, check this box, select the Default profile and the launcher will act like the old launcher, remembering your changes without asking.
+**Tip**: If you don't want to use profiles, check this box and select the Default profile, at which point wxLauncher will act like the standard Windows launcher, remembering your changes automatically.
 
 [li]: /images/li.png
 [le]: ../../images/le.png
