@@ -96,7 +96,7 @@ endif()
 
 if(IS_APPLE)
 # currently can't get bundle name and long version string to display, grr
-#  set(MACOS_BUNDLE_BUNDLE_NAME "wxLauncher")
+#  set(MACOSX_BUNDLE_BUNDLE_NAME "wxLauncher")
 #  set(MACOSX_BUNDLE_LONG_VERSION_STRING "wxLauncher for the SCP, version ${MACOSX_BUNDLE_SHORT_VERSION_STRING}")
   set(MACOSX_BUNDLE_ICON_FILE wxlauncher.icns)
   set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
@@ -152,18 +152,24 @@ else()
 	BUNDLE DESTINATION bin)
 endif()
 
+# prototype for post-processing code that will be needed later
+#   to automatically generate .dmg that doesn't have /Applications symlink
+#if(IS_APPLE)
+#  set(DRAGNDROP_PATH ${CMAKE_CURRENT_BINARY_DIR}/_CPack_Packages/Darwin/DragNDrop)
+#  set(DMG_FOLDER_PATH ${DRAGNDROP_PATH}/${PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+#  message(${DRAGNDROP_PATH})
+#  message(${DMG_FOLDER_PATH})
+#  TODO the current major problem is getting the command to run at the right time
+#  add_custom_command(TARGET package POST_BUILD
+#    COMMAND echo post-build test
+#    # TODO delete auto-generated .dmg, delete /Applications symlink, re-generate .dmg
+#    )
+#endif(IS_APPLE)
+
 if(IS_WIN32)
   install(DIRECTORY resources/ DESTINATION resources)
   install(FILES ${helphtblocation} DESTINATION .)
 elseif(IS_APPLE)
-  ### TODO there's probably a better way to add things to the .app, but this works for now
-  if(USING_SDL_FRAMEWORK) # then copy the framework into the app
-    install(DIRECTORY ${SDL_LIBRARY} DESTINATION wxlauncher.app/Contents/Frameworks)
-  endif()
-  file(GLOB resourceFiles "resources/*")
-  install(FILES ${resourceFiles} DESTINATION wxlauncher.app/Contents/Resources)
-  install(FILES ${helphtblocation} DESTINATION wxlauncher.app/Contents/Resources)
-  install(FILES ${PROJECT_SOURCE_DIR}/platform/macosx/wxlauncher.icns DESTINATION wxlauncher.app/Contents/Resources)
   install(FILES ${PROJECT_SOURCE_DIR}/License.txt DESTINATION .)
   install(FILES ${PROJECT_SOURCE_DIR}/GPLv2.txt DESTINATION .)
 #  add_custom_target(RemoveAppsLink ALL ${PROJECT_SOURCE_DIR}/platform/macosx/removeAppsLink.sh "${CMAKE_CURRENT_BINARY_DIR}/_CPack_Packages/Darwin/DragNDrop/wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" VERBATIM) # attempt to remove link to Applications folder, will keep this as placeholder until I come up with a better idea -- maybe a postinstall script to delete the generated DMG, remove the Applications link, then create a new DMG with hdiutil? 

@@ -178,19 +178,10 @@ CMake must be run twice for CPack to correctly generate drag-and-drop .apps.
  located at /yourWxWidgetsBuildDir/utils/wxrc/wxrc
  * If you are not using SDL.framework, uncheck USING_SDL_FRAMEWORK (or on
  command line, add -DUSING_SDL_FRAMEWORK=0)
-- Once you have your Xcode project set up, build the "package" target. If it
-builds successfully, you will find a standalone wxlauncher.app in
-/yourWxLauncherBuildDir/_CPack_Packages/Darwin/DragNDrop/wxlauncher-x.y.z/ ,
-where x.y.z indicate the current version of wxLauncher.
-
-Currently, the wxlauncher.app in /yourWxLauncherBuildDir/SelectedBuildConfig/
-does not have the resources needed to run, although the app in
-_CPack_Packages/... does. You can fix this problem by copying the wxlauncher.app
-in _CPack_Packages/... over the other wxlauncher.app. After doing this, you'll
-be able to run wxlauncher.app from within Xcode if needed, as long as you make
-changes to the source code and not to the resources needed (such as images). If
-you change any resources, you'll need to rebuild the "package" target and then
-copy over the wxlauncher.app as above.
+- Once you have your Xcode project set up, build the "ALL_BUILD" target to build
+wxlauncher.app in /yourWxLauncherBuildDir/YourSelectedBuildConfig/ , or type
+"xcodebuild -configuration <YourSelectedBuildConfig>" at the shell prompt in
+your wxLauncher build folder.
 
 Important known issues on OS X:
  - Text does not appear with icons on the left sidebar. The widget used is

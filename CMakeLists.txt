@@ -48,7 +48,9 @@ endif(onlinehelpmaker_debug)
 
 # This needs to be set so that VS2008 will link against the most recent
 # version of the CRT, the one that is being distrubuted in the installer
-add_definitions("/D_BIND_TO_CURRENT_CRT_VERSION=1")
+if(IS_WIN32)
+  add_definitions("/D_BIND_TO_CURRENT_CRT_VERSION=1")
+endif(IS_WIN32)
 
 set(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
 option(DEVELOPMENT_MODE "Doing development (cannot build installer in this mode)" OFF)
@@ -250,6 +252,25 @@ foreach(temp_file ${helpmaker_temp_files})
 endforeach(temp_file)
 
 target_link_libraries(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
+
+# adapted from http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_apply_resources_on_Mac_OS_X_automatically.3F
+# copies necessary resources (and frameworks, if needed) to .app bundle
+if(IS_APPLE)
+  set(APP_RESOURCES_PATH ${CMAKE_CURRENT_BINARY_DIR}/$(CONFIGURATION)/${RESOURCES_PATH})
+  set(APP_FRAMEWORKS_PATH ${CMAKE_CURRENT_BINARY_DIR}/$(CONFIGURATION)/wxlauncher.app/Contents/Frameworks)
+  add_custom_command(TARGET wxlauncher POST_BUILD
+    COMMAND rm -rf ${APP_RESOURCES_PATH}
+    COMMAND rm -rf ${APP_FRAMEWORKS_PATH}
+    COMMAND mkdir ${APP_RESOURCES_PATH}
+    COMMAND mkdir ${APP_FRAMEWORKS_PATH}
+    COMMAND cp ${PROJECT_SOURCE_DIR}/resources/* ${APP_RESOURCES_PATH}
+    COMMAND cp ${helphtblocation} ${APP_RESOURCES_PATH}
+    COMMAND cp ${PROJECT_SOURCE_DIR}/platform/macosx/wxlauncher.icns ${APP_RESOURCES_PATH})
+  if(USING_SDL_FRAMEWORK) # then copy the framework into the app
+    add_custom_command(TARGET wxlauncher POST_BUILD
+      COMMAND cp -R ${SDL_LIBRARY} ${APP_FRAMEWORKS_PATH})
+  endif(USING_SDL_FRAMEWORK)
+endif(IS_APPLE)
 
 # packaging
 set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
