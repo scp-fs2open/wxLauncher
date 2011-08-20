@@ -143,7 +143,7 @@ Commandline
 - cd <source directory>
 - mkdir build
 - cd build
-- cmake -DUSE_OPENAL=1 ../
+- cmake -DUSE_OPENAL=1 -DCMAKE_INSTALL_PREFIX=/usr/local ../
 
 Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 ==============================
