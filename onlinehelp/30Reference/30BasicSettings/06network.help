@@ -1,20 +1,20 @@
 <title>Network configuration</title>
-#Network configuration
-Here you can set several options regarding your network.
+# Network configuration
+Here you can set several options regarding your network connection.
 
---screenshot with the network area highlighted
+<!-- --screenshot with the network area highlighted -->
 
-###Connection type
-In order to play on online, [FSO][]![][li] needs to know what kind of network configuration you have. Choose the apropiate value.
+### Connection type
+In order to play online, [FSO][]![][li] needs to know what kind of network configuration you have. Choose the appropriate value.
 
-###Connection speed
-For a smooth experience, select the apropiate connection speed here.
+### Connection speed
+For a smooth experience, select the appropriate connection speed here.
 
-###Port
-If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here. Used for getting around problems with older Network Address Translation (NAT) Firewalls.
+### Force local port
+If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here. Most users will not need to use this setting, but some may need it to handle problems with older Network Address Translation (NAT) firewalls.
 
-###IP
-Same as above, but for the [IP][]![][le] address. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.  As with port, normaly not required, but is used to get around older NAT Firewalls.
+### Force IP address
+Same as above, but for the [IP address][]![][le]. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.  As with **Force local port**, most users will not need to use this setting, but some may need it to get around older NAT firewalls.
 
 [li]: /images/li.png
 [le]: /images/le.png
