@@ -36,7 +36,7 @@ All platforms:
  - CMake 2.8
  - wxWidgets
  - Python
- - Markdown for Python
+ - Markdown in Python
 Windows
  - Platform SDK
 Linux
@@ -60,14 +60,14 @@ installed on your system.
 wxWidgets homepage:
 	http://www.wxwidgets.org/
 	
-Python 2.5 or higher is required to build this project.
+Python 2.6 or higher is required to build this project.
 This project also assumes that the python executable is 
 in your PATH.  Check your operating system's documentation
 for information on how to add Python to your PATH.
 Python homepage:
 	http://www.python.org/
 	
-Markdown for Python is required in order to build the 
+Markdown in Python is required in order to build the 
 integrated help system. 
 Python Markdown homepage:
 	http://www.freewisdom.org/projects/python-markdown/
@@ -150,7 +150,8 @@ Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 Commandline
 -----------
 - Download and install the most recent version of Python 2 if you don't
-already have at least Python 2.6; whether Python 3 will work is unknown
+already have at least Python 2.6; Python 3 will not work
+- Download and install Markdown in Python (link is provided above)
 - Download and install Mercurial, making sure that you select the version of
   Mercurial for your version of OS X
 - Download the source
@@ -184,8 +185,10 @@ wxlauncher.app in /yourWxLauncherBuildDir/YourSelectedBuildConfig/ , or type
 your wxLauncher build folder.
 
 Important known issues on OS X:
- - Text does not appear with icons on the left sidebar. The widget used is
- broken on OS X; there are plans to switch to a different widget instead.
+ - After startup or after a FS2 Open binary is (re-)selected, checkboxes on
+the advanced settings page may not appear until after a moment or after the
+user interacts with the advanced settings page, such as by clicking on the
+flag list. 
 
 License
 =======
