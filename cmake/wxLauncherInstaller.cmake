@@ -148,8 +148,7 @@ elseif(IS_APPLE)
 	BUNDLE DESTINATION .)
 else()  
   install(TARGETS wxlauncher 
-	RUNTIME DESTINATION local/bin
-	BUNDLE DESTINATION bin)
+	RUNTIME DESTINATION bin)
 endif()
 
 # prototype for post-processing code that will be needed later
@@ -174,6 +173,6 @@ elseif(IS_APPLE)
   install(FILES ${PROJECT_SOURCE_DIR}/GPLv2.txt DESTINATION .)
 #  add_custom_target(RemoveAppsLink ALL ${PROJECT_SOURCE_DIR}/platform/macosx/removeAppsLink.sh "${CMAKE_CURRENT_BINARY_DIR}/_CPack_Packages/Darwin/DragNDrop/wxlauncher-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}" VERBATIM) # attempt to remove link to Applications folder, will keep this as placeholder until I come up with a better idea -- maybe a postinstall script to delete the generated DMG, remove the Applications link, then create a new DMG with hdiutil? 
 else()
-  install(DIRECTORY resources/ DESTINATION local/share/wxlauncher)
-  install(FILES ${helphtblocation} DESTINATION local/share/wxlauncher)
+  install(DIRECTORY resources/ DESTINATION share/wxlauncher)
+  install(FILES ${helphtblocation} DESTINATION share/wxlauncher)
 endif()
