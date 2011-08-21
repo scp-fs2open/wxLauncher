@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "tabs/AdvSettingsPage.h"
 
+#include "apis/CmdLineManager.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 #include "controls/ModList.h" // for code needed in rendering command line text
@@ -33,6 +34,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
 
+	CmdLineManager::RegisterCmdLineChanged(this);
+	CmdLineManager::RegisterCustomFlagsChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	wxCommandEvent nullEvent;
@@ -43,6 +46,8 @@ BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, AdvSettingsPage::OnDrawStatusChange)
+EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
+EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnDrawStatusChange)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
@@ -161,7 +166,7 @@ void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 		}
 	}
 	customFlagsText->ChangeValue(customFlags);
-	this->OnNeedUpdateCommandLine(event);
+	CmdLineManager::GenerateCmdLineChanged();
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
@@ -336,7 +341,6 @@ void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
 	if ( ret == false ) {
 		wxLogError(_T("Unable to set flag set (%s). Set does not exist"), selectedSet.c_str());
 	}
-	wxCommandEvent event;
-	this->OnNeedUpdateCommandLine(event);
+	CmdLineManager::GenerateCmdLineChanged();
 }
 	
