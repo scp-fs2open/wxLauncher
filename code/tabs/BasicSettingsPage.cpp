@@ -971,18 +971,6 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 				deviceMode.dmBitsPerPel,
 				deviceMode.dmDisplayFrequency,
 				deviceMode.dmDisplayFlags);
-			//wxString resolution = wxString::Format(
-			//	CFG_RES_FORMAT_STRING, deviceMode.dmPelsWidth, deviceMode.dmPelsHeight);
-			//// check to see if the resolution has already been added.
-			//wxArrayString strings = resChoice->GetStrings();
-			//wxArrayString::iterator iter = strings.begin();
-			//bool exists = false;
-			//while ( iter != strings.end() ) {
-			//	if ( *iter == resolution ) {
-			//		exists = true;
-			//	}
-			//	iter++;
-			//}
 			// check to see if the resolution has already been added
 			// FIXME is there a reasonable way to not make populating resolutions O(n^2)?
 			bool resExists = false;
@@ -990,6 +978,7 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 				it != end; ++it) {
 				if ((*it)->IsSameResolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight)) {
 					resExists = true;
+					break; // no need to keep looking
 				}
 			}
 
