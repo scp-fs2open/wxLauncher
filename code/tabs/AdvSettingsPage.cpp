@@ -248,7 +248,7 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 							wxString::Format(_T(" %s"), flagLine.c_str()).c_str()));
 
 	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
-													 commandLine->GetSize().GetWidth() - 20)); // 20 for scrollbar
+													 commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
