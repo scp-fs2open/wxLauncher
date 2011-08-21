@@ -81,7 +81,7 @@ BEGIN_EVENT_TABLE(HeaderBitmap, wxPanel)
 	EVT_PAINT(HeaderBitmap::OnPaint)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(WelcomePage, wxWindow)
+BEGIN_EVENT_TABLE(WelcomePage, wxPanel)
 EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkHover)
 EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
@@ -107,7 +107,7 @@ EVT_TEXT(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnUpdateText)
 EVT_TEXT_ENTER(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnPressEnterKey)
 END_EVENT_TABLE()
 
-WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxWindow(parent, wxID_ANY) {
+WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
 	// member varirable init
 	this->lastLinkInfo = NULL;
 	ProMan* profile = ProMan::GetProfileManager();
