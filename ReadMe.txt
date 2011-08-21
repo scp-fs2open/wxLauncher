@@ -189,8 +189,8 @@ CMake must be run twice for CPack to correctly generate drag-and-drop .apps.
 - A few notes on configuring the CMake variables:
  * Set wxWidgets_CONFIG_EXECUTABLE and wxWidgets_wxrc_EXECUTABLE to point
  to the version of wxWidgets you built, not the pre-installed version in
- /usr/local. wxWidgets_CONFIG_EXECUTABLE is most likely located at
- /yourWxWidgetsBuildDir/wx-config and wxWidgets_wxrc_EXECUTABLE is most likely
+ /usr/local. wxWidgets_CONFIG_EXECUTABLE is located at
+ /yourWxWidgetsBuildDir/wx-config and wxWidgets_wxrc_EXECUTABLE is
  located at /yourWxWidgetsBuildDir/utils/wxrc/wxrc
  * If you are not using SDL.framework, uncheck USING_SDL_FRAMEWORK (or on
  command line, add -DUSING_SDL_FRAMEWORK=0)
@@ -199,6 +199,14 @@ CMake must be run twice for CPack to correctly generate drag-and-drop .apps.
  automatically add extra stuff to SDL_LIBRARY, such as ";-framework Cocoa"
  * If you're building on Snow Leopard or later with Leopard compatibility, make
  sure that CMAKE_OSX_SYSROOT is set to /Developer/SDKs/MacOSX10.5.sdk
+- Example command-line usage of CMake if you're not building for 10.5 and are
+using the SDL.framework:
+ * cd <wxLauncherSourceDir>
+ * mkdir build
+ * cd build
+ * cmake -G Xcode -DwxWidgets_CONFIG_EXECUTABLE=/<wxWidgetsBuildDir>/wx-config
+   -DwxWidgets_wxrc_EXECUTABLE=<wxWidgetsBuildDir>/utils/wxrc/wxrc
+   -DSDL_LIBRARY=/Library/Frameworks/SDL.framework -DUSE_OPENAL=1 ../
 - Once you have your Xcode project set up, build the "ALL_BUILD" target to build
 wxlauncher.app in /yourWxLauncherBuildDir/YourSelectedBuildConfig/ , or type
 "xcodebuild -configuration <YourSelectedBuildConfig>" at the shell prompt in
