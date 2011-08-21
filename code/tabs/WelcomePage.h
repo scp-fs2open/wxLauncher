@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ids.h"
 #include "apis/ProfileManager.h"
 
-class WelcomePage: public wxWindow {
+class WelcomePage: public wxPanel {
 public:
 	WelcomePage(wxWindow* parent, SkinSystem* skin);
 	void LinkClicked(wxHtmlLinkEvent& event);
