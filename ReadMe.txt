@@ -137,7 +137,7 @@ Building - Linux (Ubuntu)
 =========================
 Commandline
 -----------
-- Download the source
+- Download the wxLauncher source
 - sudo apt-get install build-essential libopenal-dev libwxgtk2.8-dev libwxgtk2.8-dbg python-markdown
 - Download and install the cmake 2.8 .debs for your platform from: <https://launchpad.net/ubuntu/+source/cmake>.  You will need cmake-data, and cmake-2.8.0* for your platform, plus cmake-curses-gui or cmake-qt-gui
 - cd <source directory>
@@ -147,26 +147,41 @@ Commandline
 
 Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 ==============================
-Commandline
------------
+- Download and install the most recent version of Xcode 3. You will need
+a free Apple Developer Center account to download Xcode 3. If you have a
+different version of Xcode 3, such as a copy provided on your OS X install disc,
+that might also work, but it can't be guaranteed.
 - Download and install the most recent version of Python 2 if you don't
 already have at least Python 2.6; Python 3 will not work
 - Download and install Markdown in Python (link is provided above)
 - Download and install Mercurial, making sure that you select the version of
   Mercurial for your version of OS X
-- Download the source
-- Download and install the most recent version of Xcode 3. You will need
-a free Apple Developer Center account to download Xcode. If you have a different
-version of Xcode 3, such as a copy provided on your OS X install disc, that
-might also work, but it can't be guaranteed.
+- Download the wxLauncher source
 - Download and install CMake 2.8
-- Download and build wxWidgets 2.8 (use the wxMac version)
+- Download and build wxWidgets 2.8.12 (use the wxMac version). Once you've
+downloaded and extracted the wxMac-2.8.12 tarball, do these things:
+ * cd wxMac-2.8.12/
+ * type either "mkdir build-debug" or "mkdir build-release" (your choice)
+ * cd <TheBuildDirYouJustMade>
+ * Type the following to configure, adjusting according to the notes that follow:
+ * arch_flags="-arch i386"
+ * ../configure CFLAGS="$arch_flags" CXXFLAGS="$arch_flags"
+ CPPFLAGS="$arch_flags" LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags"
+ OBJCXXFLAGS="$arch_flags" --enable-unicode --enable-debug --disable-shared
+ --with-macosx-sdk=/Developer/SDKs/MacOSX10.5.sdk --with-macosx-version-min=10.5
+   > If you're building on Leopard, leave out the 'arch_flags="-arch i386"' and
+   the 'CFLAGS="$arch_flags" CXXFLAGS="$arch_flags" CPPFLAGS="$arch_flags"
+   LDFLAGS="$arch_flags" OBJCFLAGS="$arch_flags" OBJCXXFLAGS="$arch_flags"' parts
+   > If you're not interested in compatibility with Leopard, leave out the
+   '--with-macosx-sdk=/Developer/SDKs/MacOSX10.5.sdk --with-macosx-version-min=10.5' part
+   > If you want a release build rather than a debug build, leave out the '--enable-debug'
+ * make
 - Install SDL: you can either (1) download, build, and install it yourself (such
 as with MacPorts) or (2) simply download the Frameworks.tgz tarball from the
 FreeSpace Open source tree
 <http://svn.icculus.org/*checkout*/fs2open/trunk/fs2_open/projects/Xcode/Frameworks.tgz>
 and extract the SDL.framework, then copy the SDL.framework folder to your
-/Library/Frameworks directory
+/Library/Frameworks folder
 - Run CMake *twice* either by using cmake at the command line or by using the
 CMake GUI (which is most likely in /Applications, although you can find it using
 Spotlight), selecting Xcode as your generator. For currently unknown reasons,
@@ -179,10 +194,16 @@ CMake must be run twice for CPack to correctly generate drag-and-drop .apps.
  located at /yourWxWidgetsBuildDir/utils/wxrc/wxrc
  * If you are not using SDL.framework, uncheck USING_SDL_FRAMEWORK (or on
  command line, add -DUSING_SDL_FRAMEWORK=0)
+ * If you are using SDL.framework in /Library/Frameworks, make sure that
+ SDL_LIBRARY is set to /Library/Frameworks/SDL.framework, since CMake might
+ automatically add extra stuff to SDL_LIBRARY, such as ";-framework Cocoa"
+ * If you're building on Snow Leopard or later with Leopard compatibility, make
+ sure that CMAKE_OSX_SYSROOT is set to /Developer/SDKs/MacOSX10.5.sdk
 - Once you have your Xcode project set up, build the "ALL_BUILD" target to build
 wxlauncher.app in /yourWxLauncherBuildDir/YourSelectedBuildConfig/ , or type
 "xcodebuild -configuration <YourSelectedBuildConfig>" at the shell prompt in
-your wxLauncher build folder.
+your wxLauncher build folder. Make sure that the build configuration you choose
+(Debug or Release) matches the build configuration you used when you built wxWidgets.
 
 Important known issues on OS X:
  - After startup or after a FS2 Open binary is (re-)selected, checkboxes on
