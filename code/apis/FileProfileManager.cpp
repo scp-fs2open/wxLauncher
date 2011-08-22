@@ -201,18 +201,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
-	int computerspeed;
-	cfg->Read(PRO_CFG_VIDEO_GENERAL_SETTINGS, &computerspeed, 4);
-
-	ret = outConfig.Write( L"ComputerSpeed", computerspeed);
-	ReturnChecker(ret, __LINE__);
-
-
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
 	if (forcedport != 0) { // only write if it's a valid port
-		ret = outConfig.Write( L"ForcePort", computerspeed);
+		ret = outConfig.Write( L"ForcePort", forcedport);
 		ReturnChecker(ret, __LINE__);
 	}
 
@@ -397,11 +390,6 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	ret = inConfig.Read(L"EnableHitEffect", &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, readNumber);
-	}
-
-	ret = inConfig.Read(L"ComputerSpeed", &readNumber);
-	if ( ret == true ) {
-		cfg->Write(PRO_CFG_VIDEO_GENERAL_SETTINGS, readNumber);
 	}
 
 	ret = inConfig.Read(L"SpeechVoice", &readNumber);

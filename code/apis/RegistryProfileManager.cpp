@@ -345,20 +345,6 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		sizeof(joystickHit));
 	ReturnChecker(ret, __LINE__);
 
-
-	int computerspeed;
-	cfg->Read(PRO_CFG_VIDEO_GENERAL_SETTINGS, &computerspeed, 4);
-
-	ret = RegSetValueExW(
-		regHandle,
-		L"ComputerSpeed",
-		0,
-		REG_DWORD,
-		(BYTE*)&computerspeed,
-		sizeof(computerspeed));
-	ReturnChecker(ret, __LINE__);
-
-
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
@@ -369,7 +355,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			0,
 			REG_DWORD,
 			(BYTE*)&forcedport,
-			sizeof(computerspeed));
+			sizeof(forcedport));
 		ReturnChecker(ret, __LINE__);
 	}
 	// PXOBanners
@@ -522,9 +508,6 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		}
 		if ( inConfig.Read(PRO_CFG_JOYSTICK_ID, &configData) ) {
 			cfg->Write(PRO_CFG_JOYSTICK_ID, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_GENERAL_SETTINGS, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_GENERAL_SETTINGS, configData);
 		}
 		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
 			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
@@ -927,26 +910,6 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
 	} else {
 		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		L"ComputerSpeed",
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_VIDEO_GENERAL_SETTINGS, static_cast<long>(numberdata));
 	}
 
 	type = 0;
