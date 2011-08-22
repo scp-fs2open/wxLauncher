@@ -60,6 +60,17 @@ enum WindowIDS {
 	ID_ANISOTROPIC_COMBO,
 	ID_AA_COMBO,
 
+	// Lighting presets
+	ID_PRESETS_OFF,
+	ID_PRESET_BASELINE,
+	ID_PRESET_DABRAIN,
+	ID_PRESET_HERRA_TOHTORI,
+	ID_PRESET_CKID,
+	ID_PRESET_COLECAMPBELL666,
+	ID_PRESET_CASTOR,
+	ID_PRESET_SPIDEY,
+	ID_COPY_PRESET_BUTTON,
+
 	ID_SPEECH_TEST_TEXT,
 	ID_SPEECH_VOICE_COMBO,
 	ID_SPEECH_VOICE_VOLUME,
@@ -193,6 +204,8 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_VIDEO_GENERAL_SETTINGS		_T("/video/general")	//!< int
 #define PRO_CFG_VIDEO_USE_LARGE_TEXTURES	_T("/video/largetextures")	//!< bool
 #define PRO_CFG_VIDEO_FIX_FONT_DISTORTION	_T("/video/fixfontdistortion")	//!< bool
+
+#define PRO_CFG_LIGHTING_PRESET				_T("/lighting/preset")	//!< string
 
 #define PRO_CFG_SPEECH_VOICE				_T("/speech/voice")		//!< int, same as what the current engine uses
 #define PRO_CFG_SPEECH_VOLUME				_T("/speech/volume")	//!< int

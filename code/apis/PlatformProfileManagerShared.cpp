@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wfstream.h>
 #include "generated/configure_launcher.h"
 #include "apis/PlatformProfileManager.h"
+#include "controls/LightingPresets.h"
 #include "global/ids.h"
 
 ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
@@ -29,6 +30,13 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_TC_CURRENT_MODLINE, &modLine);
 	cfg->Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+	
+	wxString presetName;
+	wxString lightingPresetString;
+	if (cfg->Read(PRO_CFG_LIGHTING_PRESET, &presetName)) {
+		lightingPresetString = LightingPresets::PresetNameToPresetString(presetName);
+	}
+
 	wxString cmdLineString;
 	cmdLineString += tcPath.c_str();
 	cmdLineString += wxFileName::GetPathSeparator();
@@ -60,6 +68,10 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	if ( !flagLine.IsEmpty() ) {
 		outStream.Write(" ", 1);
 		outStream.Write(flagLine.char_str(), flagLine.size());
+	}
+	if ( !lightingPresetString.IsEmpty()) {
+		outStream.Write(" ", 1);
+		outStream.Write(lightingPresetString.char_str(), lightingPresetString.size());
 	}
 	if ( !outStream.Close() ) {
 		return ProMan::UnknownError;

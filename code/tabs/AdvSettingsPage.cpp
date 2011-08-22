@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/CmdLineManager.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
+#include "controls/LightingPresets.h"
 #include "controls/ModList.h" // for code needed in rendering command line text
 #include "global/ids.h"
 
@@ -230,25 +231,38 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		Read(PRO_CFG_TC_CURRENT_BINARY, &exeName);
 	ProMan::GetProfileManager()->Get()->
 		Read(PRO_CFG_TC_CURRENT_MODLINE, &modline);
+	
+	wxString presetName;
+	wxString lightingPresetString;
+	if (ProMan::GetProfileManager()->Get()->Read(PRO_CFG_LIGHTING_PRESET, &presetName)) {
+		lightingPresetString = LightingPresets::PresetNameToPresetString(presetName);
+	}
 
-	wxString flagLine =
-		wxString::Format(_T("%s%s"),
-						 this->flagListBox->GenerateStringList().c_str(),
-						 (customFlags->IsEmpty() ? wxEmptyString :
-							wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
-
+	wxString flagFileFlags = this->flagListBox->GenerateStringList();
+	
 	wxString cmdLine =
-		wxString::Format(_T("%s%c%s%s%s"),
+		wxString::Format(_T("%s%c%s%s%s%s%s"),
 						 tcPath.c_str(),
 						 wxFileName::GetPathSeparator(),
 						 exeName.c_str(),
 						 (modline.IsEmpty() ? wxEmptyString :
 							wxString::Format(_T(" -mod %s"), modline.c_str()).c_str()),
-						 (flagLine.IsEmpty() ? wxEmptyString :
-							wxString::Format(_T(" %s"), flagLine.c_str()).c_str()));
+						 (flagFileFlags.IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" %s"), flagFileFlags.c_str()).c_str()),
+						 (lightingPresetString.IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" %s"), lightingPresetString.c_str()).c_str()),
+						 (customFlags->IsEmpty() ? wxEmptyString :
+							wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
 
 	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
 													 commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
+	
+	wxString flagLine =
+		wxString::Format(_T("%s%s"),
+						 flagFileFlags.c_str(),
+						 (customFlags->IsEmpty() ? wxEmptyString :
+						  wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
+	
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }

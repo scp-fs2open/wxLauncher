@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/OpenALManager.h"
 #include "apis/JoystickManager.h"
 #include "apis/HelpManager.h"
+#include "controls/LightingPresets.h"
 #include "datastructures/FSOExecutable.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
@@ -71,7 +72,6 @@ public:
 		return false;
 	}
 };
-
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	TCManager::Initialize();
@@ -279,50 +279,12 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	videoSizer->AddStretchSpacer(5);
 #endif
+	
+	// Lighting presets
+	LightingPresets* lightingPresets = new LightingPresets(this);
 
-	// Lighting presets FIXME DOESN'T WORK YET
-	wxStaticBox* lightingPresetsBox = new wxStaticBox(this, wxID_ANY, _("Lighting presets"));
-
-	wxHyperlinkCtrl* presetDescsUrl = new wxHyperlinkCtrl(this, wxID_ANY, _T("Preset descriptions"),
-		_T("http://www.hard-light.net/wiki/index.php/Sample_Lighting_Settings"));
-	wxButton* customFlagsCopyButton = new wxButton(this, wxID_ANY,
-		_T("Copy selected preset's settings to custom flags"));
-	customFlagsCopyButton->Enable(false); // should be disabled if "Presets off" button is used
-	wxRadioButton* radioButton1 = new wxRadioButton (this, wxID_ANY, _T("Presets off"),
-		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	radioButton1->SetValue(true);
-	wxRadioButton* radioButton2 = new wxRadioButton (this, wxID_ANY, _T("Baseline recommended"));
-	wxRadioButton* radioButton3 = new wxRadioButton (this, wxID_ANY, _T("DaBrain's"));
-	wxRadioButton* radioButton4 = new wxRadioButton (this, wxID_ANY, _T("Herra Tohtori's"));
-	wxRadioButton* radioButton5 = new wxRadioButton (this, wxID_ANY, _T("CKid's"));
-	wxRadioButton* radioButton6 = new wxRadioButton (this, wxID_ANY, _T("ColeCampbell666's"));
-	wxRadioButton* radioButton7 = new wxRadioButton (this, wxID_ANY, _T("Castor's"));
-	wxRadioButton* radioButton8 = new wxRadioButton (this, wxID_ANY, _T("Spidey's"));
-
-	wxGridBagSizer* lightingInsideSizer = new wxGridBagSizer();
-	lightingInsideSizer->Add(presetDescsUrl, wxGBPosition(0,0), wxGBSpan(1,1),
-		wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(customFlagsCopyButton, wxGBPosition(0,1), wxGBSpan(1,3),
-		wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 5);
-	lightingInsideSizer->Add(radioButton1, wxGBPosition(1,0), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton2, wxGBPosition(2,0), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton3, wxGBPosition(1,1), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton4, wxGBPosition(2,1), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton5, wxGBPosition(1,2), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton6, wxGBPosition(2,2), wxGBSpan(1,1), 
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton7, wxGBPosition(1,3), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5);
-	lightingInsideSizer->Add(radioButton8, wxGBPosition(2,3), wxGBSpan(1,1),
-		wxEXPAND|wxALIGN_CENTER_VERTICAL);
-
-	wxStaticBoxSizer* lightingPresetsSizer = new wxStaticBoxSizer(lightingPresetsBox, wxHORIZONTAL);
-	lightingPresetsSizer->Add(lightingInsideSizer, wxSizerFlags().Expand().Border(wxALL, 5));
+	wxBoxSizer* lightingPresetsSizer = new wxBoxSizer(wxVERTICAL);
+	lightingPresetsSizer->Add(lightingPresets, wxSizerFlags().Proportion(1).Expand());
 
 #if IS_WIN32
 	// Speech
@@ -612,9 +574,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #endif
-
-	// FIXME TEMP hiding the lighting presets until it's finished
-	settingsSizer->Hide(lightingPresetsSizer, true);
 
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-5, -1)); // 5 being for the border

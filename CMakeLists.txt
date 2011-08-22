@@ -159,6 +159,8 @@ set(GUI_CONTROL_CODE_FILES
   code/controls/BottomButtons.cpp
   code/controls/FlagList.h
   code/controls/FlagList.cpp
+  code/controls/LightingPresets.h
+  code/controls/LightingPresets.cpp
   code/controls/Logger.h
   code/controls/Logger.cpp
   code/controls/ModList.h
