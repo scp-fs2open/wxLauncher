@@ -614,6 +614,7 @@ EVT_BUTTON(ID_SPEECH_PLAY_BUTTON, BasicSettingsPage::OnPlaySpeechText)
 EVT_CHECKBOX(ID_SPEECH_IN_TECHROOM, BasicSettingsPage::OnToggleSpeechInTechroom)
 EVT_CHECKBOX(ID_SPEECH_IN_BRIEFING, BasicSettingsPage::OnToggleSpeechInBriefing)
 EVT_CHECKBOX(ID_SPEECH_IN_GAME, BasicSettingsPage::OnToggleSpeechInGame)
+EVT_CHECKBOX(ID_SPEECH_IN_MULTI, BasicSettingsPage::OnToggleSpeechInMulti)
 EVT_BUTTON(ID_SPEECH_MORE_VOICES_BUTTON, BasicSettingsPage::OnGetMoreVoices)
 
 // Network
@@ -1040,7 +1041,7 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) 
 }
 
 void BasicSettingsPage::OnSelectSpeechVoice(wxCommandEvent &WXUNUSED(event)) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	wxChoice* voice = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_SPEECH_VOICE_COMBO, this));
 	wxCHECK_RET( voice != NULL, _T("Unable to find voice choice box"));
@@ -1054,7 +1055,7 @@ void BasicSettingsPage::OnSelectSpeechVoice(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void BasicSettingsPage::OnChangeSpeechVolume(wxCommandEvent &WXUNUSED(event)) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	wxSlider* volume = dynamic_cast<wxSlider*>(
 		wxWindow::FindWindowById(ID_SPEECH_VOICE_VOLUME, this));
 	wxCHECK_RET( volume != NULL, _T("Unable to find speech volume slider"));
@@ -1068,7 +1069,7 @@ void BasicSettingsPage::OnChangeSpeechVolume(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void BasicSettingsPage::OnPlaySpeechText(wxCommandEvent &WXUNUSED(event)) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	wxTextCtrl *text = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_SPEECH_TEST_TEXT, this));
 	wxCHECK_RET( text != NULL, _T("Unable to find text control to get play text"));
@@ -1079,7 +1080,7 @@ void BasicSettingsPage::OnPlaySpeechText(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void BasicSettingsPage::OnToggleSpeechInTechroom(wxCommandEvent &event) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
 	ProMan::GetProfileManager()->Get()
@@ -1087,7 +1088,7 @@ void BasicSettingsPage::OnToggleSpeechInTechroom(wxCommandEvent &event) {
 }
 
 void BasicSettingsPage::OnToggleSpeechInBriefing(wxCommandEvent &event) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
 	ProMan::GetProfileManager()->Get()
@@ -1095,11 +1096,19 @@ void BasicSettingsPage::OnToggleSpeechInBriefing(wxCommandEvent &event) {
 }
 
 void BasicSettingsPage::OnToggleSpeechInGame(wxCommandEvent &event) {
-	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not complied in."));
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
 	ProMan::GetProfileManager()->Get()
 		->Write(PRO_CFG_SPEECH_IN_GAME, checked);
+}
+
+void BasicSettingsPage::OnToggleSpeechInMulti(wxCommandEvent &event) {
+	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
+	bool checked = event.IsChecked();
+
+	ProMan::GetProfileManager()->Get()
+		->Write(PRO_CFG_SPEECH_IN_MULTI, checked);
 }
 
 void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
