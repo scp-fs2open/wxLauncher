@@ -151,10 +151,10 @@ void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Cannot find custom flags box") );
 
-	wxString cmdline, customFlags;
+	wxString flagLine, customFlags;
 	ProMan::GetProfileManager()->Get()->
-		Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &cmdline);
-	wxStringTokenizer tokenizer(cmdline, _T(" "));
+		Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
+	wxStringTokenizer tokenizer(flagLine, _T(" "));
 	while(tokenizer.HasMoreTokens()) {
 		wxString tok = tokenizer.GetNextToken();
 		if ( this->flagListBox->SetFlag(tok, true) ) {

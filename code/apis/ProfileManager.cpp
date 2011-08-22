@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
 
+const wxString ProMan::DEFAULT_PROFILE_NAME = _T("Default");
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
 
 ///////////// Events
@@ -104,9 +105,9 @@ bool ProMan::Initialize() {
 		return false;
 	}
 
-	wxFFileInputStream profileListInput(file.GetFullPath(),
+	wxFFileInputStream globalProfileInput(file.GetFullPath(),
 		(file.FileExists())?_T("rb"):_T("w+b"));
-	ProMan::proman->profileList = new wxFileConfig(profileListInput);
+	ProMan::proman->globalProfile = new wxFileConfig(globalProfileInput);
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
@@ -126,29 +127,29 @@ bool ProMan::Initialize() {
 	}
 
 	wxString currentProfile;
-	ProMan::proman->profileList->Read(
-		GBL_CFG_MAIN_LASTPROFILE, &currentProfile, _T("Default"));
+	ProMan::proman->globalProfile->Read(
+		GBL_CFG_MAIN_LASTPROFILE, &currentProfile, ProMan::DEFAULT_PROFILE_NAME);
 	
 	wxLogDebug(_T(" Searching for profile: %s"), currentProfile.c_str());
 	if ( ProMan::proman->profiles.find(currentProfile)
 	== ProMan::proman->profiles.end() ) {
 		// lastprofile does not exist
 		wxLogDebug(_T(" lastprofile '%s' does not exist!"), currentProfile.c_str());
-		if ( ProMan::proman->profiles.find(_T("Default"))
+		if ( ProMan::proman->profiles.find(ProMan::DEFAULT_PROFILE_NAME)
 		== ProMan::proman->profiles.end() ) {
 			// default profile also does not exist.
 			// Means this is likely the first run this system
 			// Create a default profile
 			wxLogInfo(_T(" Default profile does not exist! Creating..."));
-			ProMan::proman->CreateNewProfile(_T("Default"));
+			ProMan::proman->CreateNewProfile(ProMan::DEFAULT_PROFILE_NAME);
 			wxLogInfo(_T(" Priming profile..."));
-			PullProfile(ProMan::proman->profiles[_T("Default")]);
+			PullProfile(ProMan::proman->profiles[ProMan::DEFAULT_PROFILE_NAME]);
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
-		ProMan::proman->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, _T("Default"));
-		wxFFileOutputStream profileListOutput(file.GetFullPath());
-		ProMan::proman->profileList->Save(profileListOutput);
-		currentProfile = _T("Default");
+		ProMan::proman->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, ProMan::DEFAULT_PROFILE_NAME);
+		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
+		ProMan::proman->globalProfile->Save(globalProfileOutput);
+		currentProfile = ProMan::DEFAULT_PROFILE_NAME;
 	}
 
 	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile.c_str());
@@ -189,23 +190,23 @@ ProMan* ProMan::GetProfileManager() {
 to setup class, then call GetProfileManager() to get a pointer to the instance.
 */
 ProMan::ProMan() {
-	this->profileList = NULL;
+	this->globalProfile = NULL;
 	this->isAutoSaving = true;
 	this->currentProfile = NULL;
 }
 
 /** Destructor. */
 ProMan::~ProMan() {
-	if ( this->profileList != NULL ) {
+	if ( this->globalProfile != NULL ) {
 		if ( this->isAutoSaving ) {
 			wxFileName file;
 			file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
-			wxFFileOutputStream profileListOutput(file.GetFullPath());
-			this->profileList->Save(profileListOutput);
+			wxFFileOutputStream globalProfileOutput(file.GetFullPath());
+			this->globalProfile->Save(globalProfileOutput);
 		} else {
 			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
 		}
-		delete this->profileList;
+		delete this->globalProfile;
 	}
 
 	this->SaveCurrentProfile();
@@ -255,7 +256,7 @@ wxFileConfig* ProMan::Get() {
 
 /** Returns the pointer to the global profile. */
 wxFileConfig* ProMan::Global() {
-	return this->profileList;
+	return this->globalProfile;
 }
 
 /** Returns true if the named profile exists, false otherwise. */
@@ -290,12 +291,12 @@ void ProMan::SaveCurrentProfile() {
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
 	if ( config != NULL ) {
 		if ( this->isAutoSaving ) {
-			wxString profilename;
-			if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profilename) ) {
+			wxString profileFilename;
+			if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
 				wxLogWarning(_T("Current profile does not have a file name, and I am unable to auto save."));
 			} else {
 				wxFileName file;
-				file.Assign(GET_PROFILE_STORAGEFOLDER(), profilename);
+				file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
 				wxASSERT( file.IsOk() );
 				wxFFileOutputStream configOutput(file.GetFullPath());
 				config->Save(configOutput);
@@ -320,7 +321,7 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
-		this->profileList->Write(GBL_CFG_MAIN_LASTPROFILE, name);
+		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
 		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}
@@ -357,13 +358,13 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 
 bool ProMan::DeleteProfile(wxString name) {
 	wxLogDebug(_T("Deleting profile: %s"), name.c_str());
-	if ( name == _T("Default") ) {
+	if ( name == ProMan::DEFAULT_PROFILE_NAME ) {
 		wxLogWarning(_("Cannot delete 'Default' profile."));
 		return false;
 	}
 	if ( name == this->currentProfileName ) {
 		wxLogInfo(_T("Deleting current profile. Switching current to 'Default' profile"));
-		this->SwitchTo(_T("Default"));
+		this->SwitchTo(ProMan::DEFAULT_PROFILE_NAME);
 	}
 	if ( this->DoesProfileExist(name) ) {
 		wxLogDebug(_T(" Profile exists"));

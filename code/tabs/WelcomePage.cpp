@@ -150,7 +150,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	profile->AddEventHandler(this);
 
 	wxString lastselected;
-	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, _T("Default"));
+	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
 	profileCombo->SetStringSelection(lastselected);
 
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));

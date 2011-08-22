@@ -69,7 +69,7 @@ public:
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
 
-
+	static const wxString DEFAULT_PROFILE_NAME;
 private:
 	static ProMan* proman;
 	static bool isInitialized;
@@ -78,7 +78,7 @@ private:
 
 	ProMan();
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
-	wxFileConfig* profileList;  //!< Global profile settings, like language, or proxy
+	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
 	void GenerateChangeEvent();
 	void GenerateCurrentProfileChangedEvent();
