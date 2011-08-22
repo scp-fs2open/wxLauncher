@@ -156,10 +156,15 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
+
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
 	profile->Global()->Read(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
+
+	wxCommandEvent autoSaveEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_SAVE_DEFAULT_CHECK);
+	autoSaveEvent.SetInt(autosave);
+	this->SaveDefaultChecked(autoSaveEvent);
 
 	wxBoxSizer* profileButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 	profileButtonsSizer->Add(newButton);
