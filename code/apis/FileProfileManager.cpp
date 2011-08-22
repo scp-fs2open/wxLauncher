@@ -135,7 +135,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// ScreenshotNum
 
-#if !IS_APPLE // speech is currently not supported in OS X
+#if IS_WIN32 // speech is currently not supported in OS X or Linux (although Windows doesn't use this code)
 	int inMulti, inTechroom, inBriefings, inGame;
 	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
 	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
@@ -211,8 +211,10 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
-	ret = outConfig.Write( L"ForcePort", computerspeed);
-	ReturnChecker(ret, __LINE__);
+	if (forcedport != 0) { // only write if it's a valid port
+		ret = outConfig.Write( L"ForcePort", computerspeed);
+		ReturnChecker(ret, __LINE__);
+	}
 
 	// PXOBanners
 
@@ -221,15 +223,17 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	// PXO folder
 
 	// Network folder
-	outConfig.SetPath( L"/Network" );
-
-	wxString networkIP;
-	if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
-		ret = outConfig.Write( L"CustomIP", networkIP);
-		ReturnChecker(ret, __LINE__);
+	if (forcedport != 0) { // only write if it's a valid port
+		outConfig.SetPath( L"/Network" );
+		
+		wxString networkIP;
+		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
+			ret = outConfig.Write( L"CustomIP", networkIP);
+			ReturnChecker(ret, __LINE__);
+		}
+		
+		outConfig.SetPath( L"/");
 	}
-
-	outConfig.SetPath( L"/");
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
