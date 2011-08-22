@@ -1122,6 +1122,12 @@ void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(port != NULL, _T("Unable to find Port Text Control"));
 
+	if (port->IsEmpty()) {
+		wxLogInfo(_T("Port field is blank, writing 0 to profile"));
+		ProMan::GetProfileManager()->Get()->Write(PRO_CFG_NETWORK_PORT, 0);
+		return;
+	}
+	
 	long portNumber;
 	if ( port->GetValue().ToLong(&portNumber) ) {
 		if ( portNumber < 0 ) {

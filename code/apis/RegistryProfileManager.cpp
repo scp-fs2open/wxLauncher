@@ -362,15 +362,16 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
-	ret = RegSetValueExW(
-		regHandle,
-		L"ForcePort",
-		0,
-		REG_DWORD,
-		(BYTE*)&forcedport,
-		sizeof(computerspeed));
-	ReturnChecker(ret, __LINE__);
-
+	if (forcedport != 0) { // only write port if it's a valid port
+		ret = RegSetValueExW(
+			regHandle,
+			L"ForcePort",
+			0,
+			REG_DWORD,
+			(BYTE*)&forcedport,
+			sizeof(computerspeed));
+		ReturnChecker(ret, __LINE__);
+	}
 	// PXOBanners
 
 	// ProcessorAffinity
@@ -391,16 +392,18 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		NULL);  // just want handle, don't care if it was created or opened
 	ReturnChecker(ret, __LINE__);
 
-	wxString networkIP;
-	if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
-		ret = RegSetValueExW(
-			networkRegHandle,
-			L"CustomIP",
-			0,
-			REG_SZ,
-			(BYTE*)networkIP.c_str(),
-			(networkIP.size()+1)*2);
-		ReturnChecker(ret, __LINE__);
+	if (forcedport != 0) { // only write if forcedport is a valid port
+		wxString networkIP;
+		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
+			ret = RegSetValueExW(
+				networkRegHandle,
+				L"CustomIP",
+				0,
+				REG_SZ,
+				(BYTE*)networkIP.c_str(),
+				(networkIP.size()+1)*2);
+			ReturnChecker(ret, __LINE__);
+		}
 	}
 
 	RegCloseKey(regHandle);
