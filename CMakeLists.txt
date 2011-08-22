@@ -106,6 +106,12 @@ add_executable(registry_helper WIN32
   code/apis/RegistryProfileManager.cpp
   platform/win32/registry_helper.cpp
   code/apis/PlatformProfileManagerShared.cpp
+  code/apis/CmdLineManager.h
+  code/apis/CmdLineManager.cpp
+  code/apis/ProfileManager.h
+  code/apis/ProfileManager.cpp
+  code/controls/LightingPresets.h
+  code/controls/LightingPresets.cpp
   )
 set_target_properties(registry_helper
   PROPERTIES LINKER_LANGUAGE CXX
