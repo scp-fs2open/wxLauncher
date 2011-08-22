@@ -302,8 +302,8 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 	}
 }
 void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
-	wxChoice* saveButton = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
-	wxString newProfile = saveButton->GetStringSelection();
+	wxChoice* profileCombo = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
+	wxString newProfile = profileCombo->GetStringSelection();
 	ProMan* proman = ProMan::GetProfileManager();
 
 	if (newProfile == proman->GetCurrentName()) {
@@ -314,22 +314,31 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 	if ( proman->DoesProfileExist(newProfile) ) {
 		if ( proman->NeedToPromptToSave() ) {
 			int response = wxMessageBox(
+				wxEmptyString,
 				wxString::Format(
-					_("There are unsaved changes to your profile '%s'.\n\nWould you like to save your changes?"),
+					_("Save changes to profile '%s'?"),
 					proman->GetCurrentName().c_str()),
-				_("Save profile changes?"), wxYES_NO, this);
-
+				wxYES_NO|wxCANCEL, this);
 			if ( response == wxYES ) {
+				wxLogDebug(_T("saving profile %s before switching to profile %s"),
+					proman->GetCurrentName().c_str(), newProfile.c_str());
 				proman->SaveCurrentProfile();
+			} else if ( response == wxCANCEL ) {
+				wxLogInfo(_T("Cancelled switch to profile %s."), newProfile.c_str());
+				profileCombo->SetSelection(profileCombo->FindString(proman->GetCurrentName()));
+				return;
+			} else {
+				wxLogWarning(_T("switching from profile %s to profile %s without saving changes"),
+					proman->GetCurrentName().c_str(), newProfile.c_str());
 			}
 		}
 		if ( proman->SwitchTo(newProfile) ) {
 			wxLogMessage(_T("Profile %s is now the active profile."), proman->GetCurrentName().c_str());
 		} else {
-			wxLogWarning(_T("Unable to switch to %s, staying on %s."), newProfile.c_str(), proman->GetCurrentName().c_str());
+			wxLogError(_T("Unable to switch to %s, staying on %s."), newProfile.c_str(), proman->GetCurrentName().c_str());
 		}
 	} else {
-		wxLogWarning(_T("Profile does not exist. Use Clone to create profile first"));
+		wxLogError(_T("Profile does not exist. Use Clone to create profile first"));
 	}
 }
 
