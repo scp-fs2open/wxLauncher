@@ -191,6 +191,7 @@ to setup class, then call GetProfileManager() to get a pointer to the instance.
 */
 ProMan::ProMan() {
 	this->globalProfile = NULL;
+	this->hasUnsavedChanges = false;
 	this->isAutoSaving = true;
 	this->currentProfile = NULL;
 }
@@ -245,14 +246,7 @@ bool ProMan::CreateNewProfile(wxString newName) {
 	return true;
 }
 
-/** Returns the pointer to the currently selected profile. */
-wxFileConfig* ProMan::Get() {
-	if ( this->isInitialized ) {
-		return this->currentProfile;
-	} else {
-		return NULL;
-	}
-}
+// global profile access functions
 
 /** Tests whether the key strName is in the global profile. */
 bool ProMan::GlobalExists(wxString& strName) const {
@@ -291,14 +285,14 @@ bool ProMan::GlobalRead(const wxString& key, bool* b) const {
 /** Reads a bool from the global profile,
  using the default value if the key is not present.
  Returns true on success. */
-bool ProMan::GlobalRead(const wxString& key, bool* d, bool defaultVal) const {
+bool ProMan::GlobalRead(const wxString& key, bool* b, bool defaultVal) const {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read bool for key %s with default value %s from null global profile"),
 			key.c_str(), defaultVal ? _T("true") : _T("false"));
 		return false;
 	} else {
-		return this->globalProfile->Read(key, d, defaultVal);
+		return this->globalProfile->Read(key, b, defaultVal);
 	}
 }
 
@@ -378,6 +372,151 @@ bool ProMan::GlobalWrite(const wxString& key, bool value) {
 	}
 }
 
+// current profile access functions
+
+/** Reads a bool from the current profile. Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, bool* b) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read bool for key %s from null current profile"),
+			key.c_str());
+		return false;
+	} else {
+		return this->currentProfile->Read(key, b);
+	}
+}
+
+/** Reads a bool from the current profile,
+ using the default value if the key is not present.
+ Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, bool* b, bool defaultVal) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read bool for key %s with default value %s from null current profile"),
+			key.c_str(), defaultVal ? _T("true") : _T("false"));
+		return false;
+	} else {
+		return this->currentProfile->Read(key, b, defaultVal);
+	}
+}
+
+/** Reads a string from the current profile. Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, wxString* str) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read string for key %s with from null current profile"),
+			key.c_str());
+		return false;
+	} else {
+		return this->currentProfile->Read(key, str);
+	}
+}
+
+/** Reads a string from the current profile,
+ using the default value if the key is not present.
+ Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read string for key %s with default value %s from null current profile"),
+			key.c_str(), defaultVal.c_str());
+		return false;
+	} else {
+		return this->currentProfile->Read(key, str, defaultVal);
+	}
+}
+
+/** Reads a long from the current profile,
+ using the default value if the key is not present.
+ Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read long for key %s with default value %d from null current profile"),
+			key.c_str(), defaultVal);
+		return false;
+	} else {
+		return this->currentProfile->Read(key, l, defaultVal);
+	}
+}
+
+/** Writes a string for the given key to the current profile.
+ Returns true on success. */
+bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
+			value.c_str(), key.c_str());
+		return false;
+	} else {
+		if (!this->currentProfile->Exists(key)) {
+			this->SetHasUnsavedChanges();
+		} else {
+			wxString oldValue;
+			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				this->SetHasUnsavedChanges();
+			}
+		}
+		return this->currentProfile->Write(key, value);
+	}
+}
+
+/** Writes a long for the given key to the current profile.
+ Returns true on success. */
+bool ProMan::ProfileWrite(const wxString& key, long value) {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to write %d to %s in null current profile"),
+			value, key.c_str());
+		return false;
+	} else {
+		if (!this->currentProfile->Exists(key)) {
+			this->SetHasUnsavedChanges();
+		} else {
+			long oldValue;
+			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				this->SetHasUnsavedChanges();
+			}
+		}
+		return this->currentProfile->Write(key, value);
+	}
+}
+
+/** Writes a bool for the given key to the current profile.
+ Returns true on success. */
+bool ProMan::ProfileWrite(const wxString& key, bool value) {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
+			value ? _T("true") : _T("false"), key.c_str());
+		return false;
+	} else {
+		if (!this->currentProfile->Exists(key)) {
+			this->SetHasUnsavedChanges();
+		} else {
+			bool oldValue;
+			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				this->SetHasUnsavedChanges();
+			}
+		}
+		
+		return this->currentProfile->Write(key, value);
+	}
+}
+
+/** Deletes an entry from the current profile,
+ deleting the group if the entry was the only one in the group
+ and the second parameter is true. */
+bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to delete entry %s in null current profile"),
+			key.c_str());
+		return false;
+	} else {
+		if (this-currentProfile->Exists(key)) {
+			this->SetHasUnsavedChanges();
+		}
+		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
+	}
+}
+
 /** Returns true if the named profile exists, false otherwise. */
 bool ProMan::DoesProfileExist(wxString name) {
 	/* Item exists if the returned value from find() does not equal 
@@ -419,6 +558,7 @@ void ProMan::SaveCurrentProfile() {
 				wxASSERT( file.IsOk() );
 				wxFFileOutputStream configOutput(file.GetFullPath());
 				config->Save(configOutput);
+				this->ResetHasUnsavedChanges();
 				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
 			}
 		} else {
@@ -441,6 +581,7 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
 		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
+		this->ResetHasUnsavedChanges();
 		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}
@@ -518,6 +659,18 @@ bool ProMan::DeleteProfile(wxString name) {
 	}
 	return false;
 }
+
+/** Applies the current profile to the registry where 
+ Freespace 2 can read it. */
+ProMan::RegistryCodes ProMan::PushCurrentProfile() {
+	if (this->currentProfile == NULL) {
+		wxLogError(_T("PushCurrentProfile: attempt to push null current profile"));
+		return ProMan::UnknownError;
+	} else {
+		return ProMan::PushProfile(this->currentProfile);
+	}
+}
+
 /** Applies the passed wxFileConfig profile to the registry where 
 Freespace 2 can read it. */
 ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {

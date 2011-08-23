@@ -38,7 +38,6 @@ public:
 	static bool PrepareForAppShutdown();
 
 	virtual ~ProMan();
-	wxFileConfig* Get();
 	wxArrayString GetAllProfileNames();
 	wxString GetCurrentName();
 
@@ -55,14 +54,27 @@ public:
 	bool GlobalWrite(const wxString& key, long value);
 	bool GlobalWrite(const wxString& key, bool value);
 	
+	bool ProfileRead(const wxString& key, bool* b) const;
+	bool ProfileRead(const wxString& key, bool* d, bool defaultVal) const;
+	bool ProfileRead(const wxString& key, wxString* str) const;
+	bool ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal) const;
+	bool ProfileRead(const wxString& key, long* l, long defaultVal) const;
+	
+	bool ProfileWrite(const wxString& key, const wxString& value);
+	bool ProfileWrite(const wxString& key, long value);
+	bool ProfileWrite(const wxString& key, bool value);
+	
+	bool ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty = true);
+	
 	bool CreateNewProfile(wxString newName);
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
-	inline bool NeedToPromptToSave() { return !this->isAutoSaving; };
-	void SetAutoSave(bool value) { this->isAutoSaving = value; };
+	inline bool NeedToPromptToSave() { return !this->isAutoSaving; }
+	void SetAutoSave(bool value) { this->isAutoSaving = value; }
+	inline bool HasUnsavedChanges() const { return this->hasUnsavedChanges; }
 
 	void AddEventHandler(wxEvtHandler *handler);
 	void RemoveEventHandler(wxEvtHandler *handler);
@@ -78,8 +90,7 @@ public:
 		UnknownError,
 	};
 
-	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
-	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
+	RegistryCodes PushCurrentProfile(); //!< push current profile into registry
 
 	static const wxString& DEFAULT_PROFILE_NAME;
 private:
@@ -87,11 +98,16 @@ private:
 	static bool isInitialized;
 	wxFileConfig* currentProfile;
 	wxString currentProfileName;
-
+	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
+	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
+	
 	ProMan();
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
+	bool hasUnsavedChanges; //!< Does current profile have unsaved changes?
+	inline void SetHasUnsavedChanges() { this->hasUnsavedChanges = true; }
+	inline void ResetHasUnsavedChanges() { this->hasUnsavedChanges = false; }
 	void GenerateChangeEvent();
 	void GenerateCurrentProfileChangedEvent();
 

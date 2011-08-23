@@ -163,8 +163,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 	wxCHECK_RET( customFlagsText != NULL, _T("Cannot find custom flags box") );
 
 	wxString flagLine, customFlags;
-	ProMan::GetProfileManager()->Get()->
-		Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 
 	if (resetFlagList) {
 		this->flagListBox->ResetFlags();
@@ -240,16 +239,13 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flag box"));
 
 	wxString tcPath, exeName, modline;
-	ProMan::GetProfileManager()->Get()->
-		Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
-	ProMan::GetProfileManager()->Get()->
-		Read(PRO_CFG_TC_CURRENT_BINARY, &exeName);
-	ProMan::GetProfileManager()->Get()->
-		Read(PRO_CFG_TC_CURRENT_MODLINE, &modline);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MODLINE, &modline);
 	
 	wxString presetName;
 	wxString lightingPresetString;
-	if (ProMan::GetProfileManager()->Get()->Read(PRO_CFG_LIGHTING_PRESET, &presetName)) {
+	if (ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName)) {
 		lightingPresetString = LightingPresets::PresetNameToPresetString(presetName);
 	}
 
@@ -280,8 +276,7 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		flagLine.Append(customFlags->GetValue());
 	}
 
-	ProMan::GetProfileManager()->Get()->
-		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
 
 // Adapted from ModList.cpp - FIXME there should really be just one copy

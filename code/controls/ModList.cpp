@@ -383,8 +383,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	// set currently select mod as selected or
 	// set (No mod) if none or previous does not exist
 	wxString currentMod;
-	ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No mod)"));
+	ProMan::GetProfileManager()->ProfileRead(
+		PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No mod)"));
 
 	{
 		size_t i;
@@ -535,8 +535,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	wxString activeMod;
-	ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod);
 	wxBrush b;
 	wxRect selectedRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
 	wxRect activeRect(selectedRect.x+3, selectedRect.y+3, selectedRect.width-7, selectedRect.height-7);
@@ -627,10 +626,8 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 
 	wxLogDebug(_T("New modline is %s"), modline.c_str());
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_MODLINE, modline);
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_MOD, *shortname);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MODLINE, modline);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MOD, *shortname);
 
 	TCManager::GenerateTCSelectedModChanged();
 	this->Refresh();
@@ -1082,7 +1079,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	titleBox->SetFont(titleFont);
 
 	wxString tcPath;
-	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
 	wxString modFolderString = 
 		wxString::Format(_T("%s%c%s"), tcPath.c_str(), wxFileName::GetPathSeparator(), item->shortname->c_str());
 	wxStaticText* modFolderBox = 

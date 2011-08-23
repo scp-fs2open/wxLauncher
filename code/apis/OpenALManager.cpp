@@ -236,8 +236,7 @@ wxString OpenALMan::GetCurrentVersion() {
 	}
 	
 	wxString selectedDevice;
-	ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_OPENAL_DEVICE, &selectedDevice);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &selectedDevice);
 
 	// clear errors, I have not done any openAL stuff, so make sure that any
 	// errors that are active are because of me.
