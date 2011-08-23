@@ -282,21 +282,13 @@ void WelcomePage::ProfileButtonClicked(wxCommandEvent& event) {
 }
 
 void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
-	wxButton* saveButton = dynamic_cast<wxButton*>(wxWindow::FindWindowById(ID_SAVE_PROFILE, this));
-	wxCHECK_RET( saveButton != NULL , _("SaveDefaultChecked is unable to get the SaveButton") );
-
 	ProMan* proman = ProMan::GetProfileManager();
 
 	if ( event.IsChecked() ) {
-		// I am to save all changes, so force save and disable the save button.
-		saveButton->Disable();
-		
 		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
 		proman->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
-		saveButton->Enable();
-		
 		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
