@@ -39,10 +39,22 @@ public:
 
 	virtual ~ProMan();
 	wxFileConfig* Get();
-	wxFileConfig* Global();
 	wxArrayString GetAllProfileNames();
 	wxString GetCurrentName();
 
+	bool GlobalExists(const wxChar* strName) const;
+	bool GlobalExists(wxString& strName) const;
+	
+	bool GlobalRead(const wxString& key, bool* b) const;
+	bool GlobalRead(const wxString& key, bool* d, bool defaultVal) const;
+	bool GlobalRead(const wxString& key, wxString* str) const;
+	bool GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal) const;
+	bool GlobalRead(const wxString& key, long* l, long defaultVal) const;
+	
+	bool GlobalWrite(const wxString& key, const wxString& value);
+	bool GlobalWrite(const wxString& key, long value);
+	bool GlobalWrite(const wxString& key, bool value);
+	
 	bool CreateNewProfile(wxString newName);
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);

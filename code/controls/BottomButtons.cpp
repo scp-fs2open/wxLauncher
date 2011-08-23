@@ -32,7 +32,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		this->SetMinSize(size);
 
 		bool showFred;
-		ProMan::GetProfileManager()->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &showFred, false);
+		ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &showFred, false);
 #if 0
 		this->close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
 #endif

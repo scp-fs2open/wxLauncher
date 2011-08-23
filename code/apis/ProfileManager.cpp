@@ -254,9 +254,128 @@ wxFileConfig* ProMan::Get() {
 	}
 }
 
-/** Returns the pointer to the global profile. */
-wxFileConfig* ProMan::Global() {
-	return this->globalProfile;
+/** Tests whether the key strName is in the global profile. */
+bool ProMan::GlobalExists(wxString& strName) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to check existence of key %s in null global profile"),
+			strName.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Exists(strName);
+	}
+}
+
+/** Tests whether the key strName is in the global profile */
+bool ProMan::GlobalExists(const wxChar* strName) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to check existence of key %s in null global profile"),
+			strName);
+		return false;
+	} else {
+		return this->globalProfile->Exists(strName);
+	}
+}
+
+/** Reads a bool from the global profile. Returns true on success. */
+bool ProMan::GlobalRead(const wxString& key, bool* b) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read bool for key %s from null global profile"),
+			key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Read(key, b);
+	}
+}
+
+/** Reads a bool from the global profile,
+ using the default value if the key is not present.
+ Returns true on success. */
+bool ProMan::GlobalRead(const wxString& key, bool* d, bool defaultVal) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read bool for key %s with default value %s from null global profile"),
+			key.c_str(), defaultVal ? _T("true") : _T("false"));
+		return false;
+	} else {
+		return this->globalProfile->Read(key, d, defaultVal);
+	}
+}
+
+/** Reads a string from the global profile. Returns true on success. */
+bool ProMan::GlobalRead(const wxString& key, wxString* str) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read string for key %s with from null global profile"),
+			key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Read(key, str);
+	}
+}
+
+/** Reads a string from the global profile,
+ using the default value if the key is not present.
+Returns true on success. */
+bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read string for key %s with default value %s from null global profile"),
+			key.c_str(), defaultVal.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Read(key, str, defaultVal);
+	}
+}
+
+/** Reads a long from the global profile,
+ using the default value if the key is not present.
+ Returns true on success. */
+bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal) const {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read long for key %s with default value %d from null global profile"),
+			key.c_str(), defaultVal);
+		return false;
+	} else {
+		return this->globalProfile->Read(key, l, defaultVal);
+	}
+}
+
+/** Writes a string for the given key to the global profile.
+ Returns true on success. */
+bool ProMan::GlobalWrite(const wxString& key, const wxString& value) {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
+			value.c_str(), key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Write(key, value);
+	}
+}
+
+/** Writes a long for the given key to the global profile.
+ Returns true on success. */
+bool ProMan::GlobalWrite(const wxString& key, long value) {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to write %d to %s in null global profile"),
+			value, key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Write(key, value);
+	}
+}
+
+/** Writes a bool for the given key to the global profile.
+ Returns true on success. */
+bool ProMan::GlobalWrite(const wxString& key, bool value) {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
+			value ? _T("true") : _T("false"), key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Write(key, value);
+	}
 }
 
 /** Returns true if the named profile exists, false otherwise. */
