@@ -81,7 +81,7 @@ public:
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
 
-	static const wxString DEFAULT_PROFILE_NAME;
+	static const wxString& DEFAULT_PROFILE_NAME;
 private:
 	static ProMan* proman;
 	static bool isInitialized;
