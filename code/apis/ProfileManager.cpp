@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
 
-const wxString ProMan::DEFAULT_PROFILE_NAME = _T("Default");
+const wxString& ProMan::DEFAULT_PROFILE_NAME = _T("Default");
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
 
 ///////////// Events
