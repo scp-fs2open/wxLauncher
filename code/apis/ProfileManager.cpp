@@ -521,6 +521,7 @@ bool ProMan::DeleteProfile(wxString name) {
 /** Applies the passed wxFileConfig profile to the registry where 
 Freespace 2 can read it. */
 ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
+	wxCHECK_MSG(cfg != NULL, ProMan::UnknownError, _T("ProMan::PushProfile given null wxFileConfig!"));
 #if IS_WIN32
 	// check if binary supports configfile
 	return RegistryPushProfile(cfg);
@@ -533,6 +534,7 @@ ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
 
 /** Takes the settings in the registry and puts them into the wxFileConfig */
 ProMan::RegistryCodes ProMan::PullProfile(wxFileConfig *cfg) {
+	wxCHECK_MSG(cfg != NULL, ProMan::UnknownError, _T("ProMan::PullProfile given null wxFileConfig!"));
 #if IS_WIN32
 	// check if binary supports configfile
 	return RegistryPullProfile(cfg);
