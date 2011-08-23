@@ -44,8 +44,7 @@ END_EVENT_TABLE()
 void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString tcPath;
 
-	ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
 
 	wxSizer* currentSizer = this->GetSizer();
 	if ( currentSizer != NULL ) {

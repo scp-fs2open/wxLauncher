@@ -82,16 +82,14 @@ void FlagListBox::Initialize() {
 
 	wxLogDebug(_T("Initializing FlagList"));
 
-	if ( !ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
-			this->drawStatus = MISSING_TC;
-			return;
+	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
+		this->drawStatus = MISSING_TC;
+		return;
 	}
 	
-	if ( !ProMan::GetProfileManager()->Get()
-		->Read(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
-			this->drawStatus = MISSING_EXE;
-			return;
+	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
+		this->drawStatus = MISSING_EXE;
+		return;
 	}
 
 #if IS_APPLE  // needed because on OSX exeName is a relative path from TC root dir

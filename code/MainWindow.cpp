@@ -159,13 +159,13 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
-	if ( !p->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
+	if ( !p->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
 		wxLogError(_T("TC root folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
 	}
-	if ( !p->Get()->Read(cfgBinaryPath, &binary) ) {
+	if ( !p->ProfileRead(cfgBinaryPath, &binary) ) {
 		wxLogError(_T("No FreeSpace 2 Open executable has been selected (%s)"), cfgBinaryPath.c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
@@ -185,7 +185,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 
-	if ( ProMan::NoError != ProMan::PushProfile(p->Get()) ) {
+	if ( ProMan::NoError != ProMan::GetProfileManager()->PushCurrentProfile() ) {
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
@@ -217,7 +217,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	
 	if ( startFred ) {
 		wxString fredModLine;
-		p->Get()->Read(PRO_CFG_TC_CURRENT_MODLINE, &fredModLine, wxEmptyString);
+		p->ProfileRead(PRO_CFG_TC_CURRENT_MODLINE, &fredModLine, wxEmptyString);
 		if ( !fredModLine.IsEmpty() ) {
 			command += wxString::Format(_T(" -mod %s"), fredModLine.c_str());
 		}

@@ -83,8 +83,8 @@ END_EVENT_TABLE()
 
 void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	wxString tc, binary, fredBinary;
-	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tc, wxEmptyString);
-	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tc, wxEmptyString);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
 	if ( tc.IsEmpty() || binary.IsEmpty() ) {
 		this->play->Disable();
 #if IS_APPLE
@@ -102,7 +102,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 #endif
 		this->play->Disable();
 	}
-	ProMan::GetProfileManager()->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);
 	if ( this->fred == NULL ) {
 		// do nothing, no button to manipulate
 	} else if ( tc.IsEmpty() || fredBinary.IsEmpty() ) {

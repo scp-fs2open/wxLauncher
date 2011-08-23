@@ -89,12 +89,12 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	ProMan* proman = ProMan::GetProfileManager();
 	// exe Selection
 	wxString tcfolder, binary;
-	bool hastcfolder = proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
-	proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
+	bool hastcfolder = proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
+	proman->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
 	wxString fredBinary;
 	bool fredEnabled;
 	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
-	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
+	proman->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
 
@@ -162,19 +162,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxStaticText(this, wxID_ANY, _("Resolution:"));
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
 	this->FillResolutionDropBox(resolutionCombo);
-	int width, height;
-	proman->Get()->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 800);
-	proman->Get()->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 600);
+	long width, height;
+	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 800);
+	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 600);
 	resolutionCombo->SetStringSelection(
 		wxString::Format(CFG_RES_FORMAT_STRING, width, height));
 
 	wxStaticText* depthText = 
 		new wxStaticText(this, wxID_ANY, _("Depth:"));
 	wxChoice* depthCombo = new wxChoice(this, ID_DEPTH_COMBO);
-	int bitDepth;
+	long bitDepth;
 	depthCombo->Append(_("16 bit"));
 	depthCombo->Append(_("32 bit"));
-	proman->Get()->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 16);
+	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 16);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 #if !IS_WIN32 // TF/AF/AA don't yet work on Windows
@@ -184,21 +184,21 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
 	textureFilterCombo->Append(_("Trilinear"));
-	proman->Get()->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"));
+	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"));
 	filter.MakeLower();
 	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
 	wxStaticText* anisotropicText = 
 		new wxStaticText(this, wxID_ANY, _("Anisotropic:"));
 	wxChoice* anisotropicCombo = new wxChoice(this, ID_ANISOTROPIC_COMBO);
-	int anisotropic;
+	long anisotropic;
 	anisotropicCombo->Append(_("Off"));
 	anisotropicCombo->Append(_T(" 1x"));
 	anisotropicCombo->Append(_T(" 2x"));
 	anisotropicCombo->Append(_T(" 4x"));
 	anisotropicCombo->Append(_T(" 8x"));
 	anisotropicCombo->Append(_T("16x"));
-	proman->Get()->Read(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0);
 	switch(anisotropic) {
 		case 1:
 			anisotropic = 1;
@@ -223,14 +223,14 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticText* aaText = new wxStaticText(this, wxID_ANY, _("Anti-aliasing:"));
 	wxChoice* aaCombo = new wxChoice(this, ID_AA_COMBO);
-	int antialias;
+	long antialias;
 	aaCombo->Append(_("Off"));
 	aaCombo->Append(_T(" 1x"));
 	aaCombo->Append(_T(" 2x"));
 	aaCombo->Append(_T(" 4x"));
 	aaCombo->Append(_T(" 8x"));
 	aaCombo->Append(_T("16x"));
-	proman->Get()->Read(PRO_CFG_VIDEO_ANISOTROPIC, &antialias, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &antialias, 0);
 	switch(antialias) {
 		case 1:
 			antialias = 1;
@@ -365,7 +365,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		}
 		// set the voice to what is in the profile, if not set in profile use
 		// system settings
-		proman->Get()->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, speechSystemVoice);
+		proman->ProfileRead(PRO_CFG_SPEECH_VOICE, &speechVoice, speechSystemVoice);
 		// there should not be more than MAX_INT voices installed on a system so
 		// the cast of an unsigned int to a signed int should not result in a 
 		// loss of data.
@@ -383,7 +383,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 				_T(" setting to 50"));
 			speechSystemVolume = 50;
 		}
-		proman->Get()->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume);
+		proman->ProfileRead(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume);
 		if ( speechVolume < 0 || speechVolume > 100 ) {
 			wxLogWarning(_T("Speech Volume recorded in profile is out of range,")
 				_T(" resetting to 50"));
@@ -393,19 +393,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 
 		bool speechInTechroom;
-		proman->Get()->Read(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true);
 		speechInTechroomCheck->SetValue(speechInTechroom);
 
 		bool speechInBriefings;
-		proman->Get()->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true);
 		speechInBriefingCheck->SetValue(speechInBriefings);
 
 		bool speechInGame;
-		proman->Get()->Read(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true);
 		speechInGameCheck->SetValue(speechInGame);
 
 		bool speechInMulti;
-		proman->Get()->Read(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true);
 		speechInMultiCheck->SetValue(speechInMulti);
 	} else {
 		speechBox->Disable();
@@ -430,7 +430,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkType->Append(_T("Dialup"));
 	networkType->Append(_T("LAN/Direct Connection"));
 	wxString type;
-	proman->Get()->Read(PRO_CFG_NETWORK_TYPE, &type, _T("None"));
+	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type, _T("None"));
 	networkType->SetStringSelection(type);
 	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
 	networkSpeed->Append(_T("None"));
@@ -440,13 +440,13 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkSpeed->Append(_T("Cable"));
 	networkSpeed->Append(_T("Fast"));
 	wxString speed;
-	proman->Get()->Read(PRO_CFG_NETWORK_SPEED, &speed, _T("None"));
+	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed, _T("None"));
 	networkSpeed->SetStringSelection(speed);
 
 	wxTextCtrl* networkPort = 
 		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
-	int port;
-	proman->Get()->Read(PRO_CFG_NETWORK_PORT, &port, 0);
+	long port;
+	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, 0);
 	if (port != 0) {
 		networkPort->SetValue(wxString::Format(_T("%d"), port));
 	}
@@ -454,7 +454,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
-	proman->Get()->Read(PRO_CFG_NETWORK_IP, &ip, _T(""));
+	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, _T(""));
 	networkIP->SetValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
@@ -643,7 +643,7 @@ END_EVENT_TABLE()
 void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
-	proman->Get()->Read(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
+	proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
 	wxDirDialog filechooser(this, _T("Choose the root folder of a FreeSpace 2 installation or a total conversion"),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
@@ -669,7 +669,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		}
 	}
 	wxLogDebug(_T("User chose '%s' as the TC root folder"), path.GetPath().c_str());
-	proman->Get()->Write(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
+	proman->ProfileWrite(PRO_CFG_TC_ROOT_FOLDER, path.GetPath());
 	TCManager::GenerateTCChanged();
 }
 
@@ -697,8 +697,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString tcPath, binaryName;
 	exeChoice->Clear();
 
-	if ( ProMan::GetProfileManager()->Get()
-			->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
+	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 		tcFolder->SetValue(tcPath);
 
 		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
@@ -706,11 +705,9 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 		/* check to see if the exe listed in the profile actually does exist in
 		the list */
-		ProMan::GetProfileManager()->Get()
-			->Read(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
+		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
 		if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
-			ProMan::GetProfileManager()->Get()
-				->DeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+			ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
 		}
 	}
 	this->GetSizer()->Layout();
@@ -758,8 +755,7 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 		_T("OnSelectExecutable: choice does not have FSOVersion data"));
 	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName().c_str());
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_BINARY, ver->GetExecutableName());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_BINARY, ver->GetExecutableName());
 	TCManager::GenerateTCBinaryChanged();
 }
 
@@ -775,8 +771,7 @@ void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) 
 		_T("OnSelectExecutable: choice does not have FSOVersion data"));
 	wxLogDebug(_T("Have selected ver for %s"), ver->GetExecutableName().c_str());
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_TC_CURRENT_FRED, ver->GetExecutableName());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FRED, ver->GetExecutableName());
 	TCManager::GenerateTCFredBinaryChanged();
 }
 
@@ -994,10 +989,12 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 	res = dynamic_cast<Resolution*>(choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( res != NULL, _T("after adjusting selection from header, Choice does not have Resolution objects"));
 	
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_RESOLUTION_WIDTH, res->GetWidth());
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, res->GetHeight());
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_RESOLUTION_WIDTH,
+		static_cast<long>(res->GetWidth()));
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_RESOLUTION_HEIGHT,
+		static_cast<long>(res->GetHeight()));
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
@@ -1005,9 +1002,9 @@ void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
 	wxCHECK_RET( depth != NULL, _T("Unable to find depth choice box"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_BIT_DEPTH,
-		(depth->GetSelection() == 0) ? 16 : 32);
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_BIT_DEPTH,
+		(depth->GetSelection() == 0) ? static_cast<long>(16) : static_cast<long>(32));
 }
 
 void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &WXUNUSED(event)) {
@@ -1015,8 +1012,8 @@ void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &WXUNUSED(even
 		wxWindow::FindWindowById(ID_TEXTURE_FILTER_COMBO, this));
 	wxCHECK_RET( tex != NULL, _T("Unable to find texture filter choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_TEXTURE_FILTER,
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_TEXTURE_FILTER,
 		(tex->GetSelection() == 0) ? _T("Bilinear") : _T("Trilinear"));
 }
 
@@ -1025,9 +1022,9 @@ void BasicSettingsPage::OnSelectVideoAnistropic(wxCommandEvent &WXUNUSED(event))
 		wxWindow::FindWindowById(ID_ANISOTROPIC_COMBO, this));
 	wxCHECK_RET( as != NULL, _T("Unable to find anisotropic choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_ANISOTROPIC,
-		(as->GetSelection() == 0) ? 0 : 1 << as->GetSelection());
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_ANISOTROPIC,
+		(as->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << as->GetSelection()));
 }
 
 void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) {
@@ -1035,8 +1032,9 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) 
 		wxWindow::FindWindowById(ID_AA_COMBO, this));
 	wxCHECK_RET( aa != NULL, _T("Unable to find anti-alias choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_VIDEO_ANTI_ALIAS, (aa->GetSelection() == 0) ? 0 : 1 << aa->GetSelection());
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_VIDEO_ANTI_ALIAS,
+		(aa->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << aa->GetSelection()));
 
 }
 
@@ -1050,8 +1048,7 @@ void BasicSettingsPage::OnSelectSpeechVoice(wxCommandEvent &WXUNUSED(event)) {
 	
 	SpeechMan::SetVoice(v);
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_VOICE, v);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_VOICE, static_cast<long>(v));
 }
 
 void BasicSettingsPage::OnChangeSpeechVolume(wxCommandEvent &WXUNUSED(event)) {
@@ -1064,8 +1061,7 @@ void BasicSettingsPage::OnChangeSpeechVolume(wxCommandEvent &WXUNUSED(event)) {
 
 	SpeechMan::SetVolume(v);
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_VOLUME, v);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_VOLUME, static_cast<long>(v));
 }
 
 void BasicSettingsPage::OnPlaySpeechText(wxCommandEvent &WXUNUSED(event)) {
@@ -1083,32 +1079,28 @@ void BasicSettingsPage::OnToggleSpeechInTechroom(wxCommandEvent &event) {
 	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_IN_TECHROOM, checked);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_IN_TECHROOM, checked);
 }
 
 void BasicSettingsPage::OnToggleSpeechInBriefing(wxCommandEvent &event) {
 	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, checked);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_IN_BRIEFINGS, checked);
 }
 
 void BasicSettingsPage::OnToggleSpeechInGame(wxCommandEvent &event) {
 	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_IN_GAME, checked);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_IN_GAME, checked);
 }
 
 void BasicSettingsPage::OnToggleSpeechInMulti(wxCommandEvent &event) {
 	wxCHECK_RET( SpeechMan::WasBuiltIn(), _T("Speech was not compiled in."));
 	bool checked = event.IsChecked();
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_SPEECH_IN_MULTI, checked);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_SPEECH_IN_MULTI, checked);
 }
 
 void BasicSettingsPage::OnGetMoreVoices(wxCommandEvent &WXUNUSED(event)) {
@@ -1122,8 +1114,7 @@ void BasicSettingsPage::OnChangeIP(wxCommandEvent &event) {
 
 	wxString string(ip->GetValue());
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_NETWORK_IP, string);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_IP, string);
 }
 
 void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
@@ -1133,7 +1124,7 @@ void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
 
 	if (port->IsEmpty()) {
 		wxLogInfo(_T("Port field is blank, writing 0 to profile"));
-		ProMan::GetProfileManager()->Get()->Write(PRO_CFG_NETWORK_PORT, 0);
+		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_PORT, static_cast<long>(0));
 		return;
 	}
 	
@@ -1144,9 +1135,7 @@ void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
 		} else if ( portNumber > 65535 ) {
 			wxLogInfo(_T("Port number must be less than 65536"));
 		} else {
-			int portNumber1 = static_cast<int>(portNumber);
-			ProMan::GetProfileManager()->Get()
-				->Write(PRO_CFG_NETWORK_PORT, portNumber1);
+			ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_PORT, portNumber);
 		}
 	} else {
 		wxLogWarning(_T("Port number is not a number"));
@@ -1158,8 +1147,7 @@ void BasicSettingsPage::OnSelectNetworkSpeed(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(networkSpeed != NULL, _T("Unable to find Network speed choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_NETWORK_SPEED, networkSpeed->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_SPEED, networkSpeed->GetStringSelection());
 }
 
 void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
@@ -1167,8 +1155,7 @@ void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(networkType != NULL, _T("Unable to find Network type choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_NETWORK_SPEED, networkType->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_SPEED, networkType->GetStringSelection());
 }
 
 void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
@@ -1176,8 +1163,7 @@ void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(openaldevice != NULL, _T("Unable to find OpenAL Device choice"));
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
 }
 
 void BasicSettingsPage::OnDownloadOpenAL(wxCommandEvent &WXUNUSED(event)) {
@@ -1210,8 +1196,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
 		wxASSERT_MSG(soundDeviceCombo->GetCount() > 0, _T("sound device combo box is empty!"));
 		wxString openaldevice;
-		if ( ProMan::GetProfileManager()->Get()
-			->Read(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
+		if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
 				soundDeviceCombo->SetStringSelection(
 					openaldevice);
 		} else {
@@ -1299,14 +1284,14 @@ void BasicSettingsPage::SetupJoystickSection() {
 			this->joystickDetectButton->Enable();
 #endif
 		} else {
-			int profileJoystick;
+			long profileJoystick;
 			unsigned int i;
 			this->joystickSelected->Enable();
 #if IS_WIN32
 			this->joystickDetectButton->Enable();
 #endif
-			ProMan::GetProfileManager()->Get()
-				->Read(PRO_CFG_JOYSTICK_ID,
+			ProMan::GetProfileManager()->
+				ProfileRead(PRO_CFG_JOYSTICK_ID,
 					&profileJoystick,
 					JOYMAN_INVALID_JOYSTICK);
 			// set current joystick
@@ -1351,10 +1336,8 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 
 	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
 		bool ff, direct;
-		ProMan::GetProfileManager()->Get()
-			->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false);
-		ProMan::GetProfileManager()->Get()
-			->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false);
+		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false);
+		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false);
 		this->joystickDirectionalHit->SetValue(direct);
 		this->joystickForceFeedback->SetValue(ff);
 
@@ -1366,8 +1349,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	}
 #endif
 
-	ProMan::GetProfileManager()->Get()
-		->Write(PRO_CFG_JOYSTICK_ID, joynumber->GetNumber());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_ID, static_cast<long>(joynumber->GetNumber()));
 }
 
 void BasicSettingsPage::OnSelectJoystick(
@@ -1378,14 +1360,12 @@ void BasicSettingsPage::OnSelectJoystick(
 
 void BasicSettingsPage::OnCheckForceFeedback(
 	wxCommandEvent &event) {
-		ProMan::GetProfileManager()->Get()
-			->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, event.IsChecked());
+		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, event.IsChecked());
 }
 
 void BasicSettingsPage::OnCheckDirectionalHit(
 	wxCommandEvent &event) {
-		ProMan::GetProfileManager()->Get()
-			->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, event.IsChecked());
+		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_DIRECTIONAL, event.IsChecked());
 }
 
 void BasicSettingsPage::OnCalibrateJoystick(
