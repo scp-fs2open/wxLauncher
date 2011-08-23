@@ -110,7 +110,7 @@ END_EVENT_TABLE()
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
 	// member varirable init
 	this->lastLinkInfo = NULL;
-	ProMan* profile = ProMan::GetProfileManager();
+	ProMan* proman = ProMan::GetProfileManager();
 
 #if 0
 	// language
@@ -146,11 +146,11 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 		0,	// number of choices
 		0,	// choices
 		wxCB_SORT);
-	profileCombo->Append(profile->GetAllProfileNames());
-	profile->AddEventHandler(this);
+	profileCombo->Append(proman->GetAllProfileNames());
+	proman->AddEventHandler(this);
 
 	wxString lastselected;
-	profile->GlobalRead(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
+	proman->GlobalRead(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
 	profileCombo->SetStringSelection(lastselected);
 
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
@@ -159,7 +159,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
-	profile->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
+	proman->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
 
 	wxCommandEvent autoSaveEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_SAVE_DEFAULT_CHECK);
@@ -262,19 +262,19 @@ void WelcomePage::OnMouseOut(wxMouseEvent &WXUNUSED(event)) {
 /** Calls the dialogs for cloning, saving or deleting profiles. */
 void WelcomePage::ProfileButtonClicked(wxCommandEvent& event) {
 	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
-	ProMan *profile = ProMan::GetProfileManager();
+	ProMan *proman = ProMan::GetProfileManager();
 
 	switch(event.GetId()) {
 		case ID_NEW_PROFILE:
-			cloneNewProfile(combobox, profile);
+			cloneNewProfile(combobox, proman);
 			break;
 
 		case ID_DELETE_PROFILE:
-			deleteProfile(combobox, profile);
+			deleteProfile(combobox, proman);
 			break;
 
 		case ID_SAVE_PROFILE:
-			profile->SaveCurrentProfile();
+			proman->SaveCurrentProfile();
 			break;
 		default:
 			wxCHECK_RET( false, _("Reached impossible location.\nHandler has been attached to a button that it cannot handle."));
@@ -285,19 +285,19 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 	wxButton* saveButton = dynamic_cast<wxButton*>(wxWindow::FindWindowById(ID_SAVE_PROFILE, this));
 	wxCHECK_RET( saveButton != NULL , _("SaveDefaultChecked is unable to get the SaveButton") );
 
-	ProMan* profile = ProMan::GetProfileManager();
+	ProMan* proman = ProMan::GetProfileManager();
 
 	if ( event.IsChecked() ) {
 		// I am to save all changes, so force save and disable the save button.
 		saveButton->Disable();
 		
-		profile->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
-		profile->SaveCurrentProfile();
+		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
+		proman->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
 		saveButton->Enable();
 		
-		profile->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
+		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
 }
@@ -342,7 +342,7 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 	}
 }
 
-void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
+void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* proman) {
 	wxString originalName;
 	wxString targetName;
 
@@ -355,13 +355,13 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	use that as the profile to clone from, leaving the newname blank.
 	*/
 	wxLogDebug(_T("Combo's text box contains '%s'."), combobox->GetStringSelection().c_str());
-	if ( profile->DoesProfileExist(combobox->GetStringSelection()) ) {
+	if ( proman->DoesProfileExist(combobox->GetStringSelection()) ) {
 		// is a vaild profile
 		originalName = combobox->GetStringSelection();
 		wxLogDebug(_T("  Which is an existing profile."));
 	} else {
 		targetName = combobox->GetStringSelection();
-		originalName = profile->GetCurrentName();
+		originalName = proman->GetCurrentName();
 		wxLogDebug(_T("  Which is not an existing profile."));
 	}
 
@@ -370,7 +370,7 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
 //		wxLogDebug(_T("User clicked clone"));
 		wxLogDebug(_T("User clicked create"));
-		if ( profile->CloneProfile(
+		if ( proman->CloneProfile(
 			cloneDialog.GetOriginalName(),
 			cloneDialog.GetTargetName()) ) {
 //				wxLogStatus(_("Cloned profile '%s' from '%s'"),
@@ -378,7 +378,7 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 //					cloneDialog.GetTargetName().c_str());
 				wxLogStatus(_("Created profile '%s'"),
 						cloneDialog.GetTargetName().c_str());
-				profile->SwitchTo(cloneDialog.GetTargetName());
+				proman->SwitchTo(cloneDialog.GetTargetName());
 		} else {
 //				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
 //					cloneDialog.GetOriginalName().c_str(),
@@ -393,14 +393,14 @@ void WelcomePage::cloneNewProfile(wxChoice* combobox, ProMan* profile) {
 }
 
 
-void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
+void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* proman) {
 	wxString nametodelete = combobox->GetStringSelection();
 	
-	if ( profile->DoesProfileExist(nametodelete) ) {
+	if ( proman->DoesProfileExist(nametodelete) ) {
 		DeleteProfileDialog deleteDialog(this, nametodelete);
 		
 		if ( deleteDialog.ShowModal() == deleteDialog.GetAffirmativeId()) {
-			if ( profile->DeleteProfile(nametodelete) ) {
+			if ( proman->DeleteProfile(nametodelete) ) {
 				wxLogStatus(_("Deleted profile named '%s'."), nametodelete.c_str());
 			} else {
 				wxLogWarning(_("Unable to delete profile '%s', see log for more details."), nametodelete.c_str());
@@ -416,11 +416,11 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* profile) {
 void WelcomePage::ProfileCountChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* combobox = dynamic_cast<wxChoice*>(wxWindow::FindWindowById(ID_PROFILE_COMBO, this));
 	wxCHECK_RET(combobox != NULL, _T("can't find the profile combobox"));
-	ProMan *profile = ProMan::GetProfileManager();
+	ProMan *proman = ProMan::GetProfileManager();
 
 	combobox->Clear();
-	combobox->Append(profile->GetAllProfileNames());
-	combobox->SetStringSelection(profile->GetCurrentName());
+	combobox->Append(proman->GetAllProfileNames());
+	combobox->SetStringSelection(proman->GetCurrentName());
 }
 
 void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
@@ -431,22 +431,22 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
 	wxCHECK_RET(newsWindow != NULL, _T("Update highlights called, but can't find the highlights window"));
 
-	ProMan* profile = ProMan::GetProfileManager();
+	ProMan* proman = ProMan::GetProfileManager();
 
 	bool allowedToUpdateNews;
-	if ( !profile->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &allowedToUpdateNews)) {
+	if ( !proman->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &allowedToUpdateNews)) {
 		return;
 	}
 	if (allowedToUpdateNews) {
 		wxString lastTimeString;
-		profile->GlobalRead(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
+		proman->GlobalRead(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
 		wxDateTime lasttime;
 		if ( (NULL != lasttime.ParseFormat(lastTimeString, NEWS_LAST_TIME_FORMAT) )
 			&& (wxDateTime::Now() - lasttime < TIME_BETWEEN_NEWS_UPDATES) 
-			&& (profile->GlobalExists(GBL_CFG_NET_THE_NEWS)) ) {
+			&& (proman->GlobalExists(GBL_CFG_NET_THE_NEWS)) ) {
 			// post the news that we have on file for now
 			wxString theNews;
-			if ( profile->GlobalRead(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
+			if ( proman->GlobalRead(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
 				newsWindow->SetPage(theNews);
 			} else {
 				wxLogFatalError(_T("%s does not exist but the exists function says it does"), GBL_CFG_NET_THE_NEWS);
@@ -477,11 +477,11 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
 			}
 			formattedData += _T("\n</ul>");
-			profile->GlobalWrite(GBL_CFG_NET_THE_NEWS, formattedData);
+			proman->GlobalWrite(GBL_CFG_NET_THE_NEWS, formattedData);
 			newsWindow->SetPage(formattedData);
 
 			wxString currentTime(wxDateTime::Now().Format(NEWS_LAST_TIME_FORMAT));
-			profile->GlobalWrite(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
+			proman->GlobalWrite(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
 		}
 	} else {
 		newsWindow->SetPage(_("Automatic highlights retrieval disabled."));
