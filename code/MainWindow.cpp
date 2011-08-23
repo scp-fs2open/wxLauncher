@@ -123,8 +123,7 @@ void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event)) {
 }
 void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	bool fredEnabled;
-	ProMan::GetProfileManager()->Global()->Read(
-		GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 	if ( fredEnabled ) {
 		wxButton* fred = dynamic_cast<wxButton*>(
 			wxWindow::FindWindowById(ID_FRED_BUTTON, this));

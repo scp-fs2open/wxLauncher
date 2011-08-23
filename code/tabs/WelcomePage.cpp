@@ -150,7 +150,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	profile->AddEventHandler(this);
 
 	wxString lastselected;
-	profile->Global()->Read(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
+	profile->GlobalRead(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
 	profileCombo->SetStringSelection(lastselected);
 
 	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
@@ -159,7 +159,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 
 	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
-	profile->Global()->Read(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
+	profile->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
 	saveDefaultCheck->SetValue(autosave);
 
 	wxCommandEvent autoSaveEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_SAVE_DEFAULT_CHECK);
@@ -291,13 +291,13 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 		// I am to save all changes, so force save and disable the save button.
 		saveButton->Disable();
 		
-		profile->Global()->Write(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
+		profile->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
 		profile->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
 		saveButton->Enable();
 		
-		profile->Global()->Write(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
+		profile->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
 }
@@ -434,19 +434,19 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	ProMan* profile = ProMan::GetProfileManager();
 
 	bool allowedToUpdateNews;
-	if ( !profile->Global()->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &allowedToUpdateNews)) {
+	if ( !profile->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &allowedToUpdateNews)) {
 		return;
 	}
 	if (allowedToUpdateNews) {
 		wxString lastTimeString;
-		profile->Global()->Read(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
+		profile->GlobalRead(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
 		wxDateTime lasttime;
 		if ( (NULL != lasttime.ParseFormat(lastTimeString, NEWS_LAST_TIME_FORMAT) )
 			&& (wxDateTime::Now() - lasttime < TIME_BETWEEN_NEWS_UPDATES) 
-			&& (profile->Global()->Exists(GBL_CFG_NET_THE_NEWS)) ) {
+			&& (profile->GlobalExists(GBL_CFG_NET_THE_NEWS)) ) {
 			// post the news that we have on file for now
 			wxString theNews;
-			if ( profile->Global()->Read(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
+			if ( profile->GlobalRead(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
 				newsWindow->SetPage(theNews);
 			} else {
 				wxLogFatalError(_T("%s does not exist but the exists function says it does"), GBL_CFG_NET_THE_NEWS);
@@ -477,11 +477,11 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
 			}
 			formattedData += _T("\n</ul>");
-			profile->Global()->Write(GBL_CFG_NET_THE_NEWS, formattedData);
+			profile->GlobalWrite(GBL_CFG_NET_THE_NEWS, formattedData);
 			newsWindow->SetPage(formattedData);
 
 			wxString currentTime(wxDateTime::Now().Format(NEWS_LAST_TIME_FORMAT));
-			profile->Global()->Write(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
+			profile->GlobalWrite(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
 		}
 	} else {
 		newsWindow->SetPage(_("Automatic highlights retrieval disabled."));
@@ -490,8 +490,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 
 bool WelcomePage::getOrPromptUpdateNews() {
 	bool updateNews;
-	if (!ProMan::GetProfileManager()->Global()
-		->Read(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
+	if (!ProMan::GetProfileManager()->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
 		wxDialog* updateNewsQuestion = 
 			new wxDialog(NULL, wxID_ANY, 
 			_("wxLauncher - network access request"),
@@ -580,7 +579,7 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		} else {
 			updateNews = false;
 		}
-		ProMan::GetProfileManager()->Global()->Write(GBL_CFG_NET_DOWNLOAD_NEWS, updateNews);
+		ProMan::GetProfileManager()->GlobalWrite(GBL_CFG_NET_DOWNLOAD_NEWS, updateNews);
 		
 		updateNewsQuestion->Destroy();
 	}
@@ -591,7 +590,7 @@ void WelcomePage::OnDownloadNewsCheck(wxCommandEvent& event) {
 	wxCheckBox* checkbox = dynamic_cast<wxCheckBox*>(wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET( checkbox != NULL, _T("OnDownloadNewsCheck called by non checkbox"));
 
-	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_NET_DOWNLOAD_NEWS, checkbox->IsChecked());
+	ProMan::GetProfileManager()->GlobalWrite(GBL_CFG_NET_DOWNLOAD_NEWS, checkbox->IsChecked());
 }
 
 void WelcomePage::OnUpdateNewsHelp(wxCommandEvent &WXUNUSED(event)) {

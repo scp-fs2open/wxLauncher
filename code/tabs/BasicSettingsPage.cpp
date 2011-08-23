@@ -93,7 +93,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
 	wxString fredBinary;
 	bool fredEnabled;
-	proman->Global()->Read(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 	proman->Get()->Read(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
 	
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
@@ -1409,8 +1409,7 @@ void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
 ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
 :wxChoicebook(parent, id) {
 	wxString type;
-	ProMan::GetProfileManager()->Global()
-		->Read(GBL_CFG_PROXY_TYPE, &type, _T("none"));
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_PROXY_TYPE, &type, _T("none"));
 
 	wxPanel* noneProxyPanel = new wxPanel(this);
 	this->AddPage(noneProxyPanel, _("None"));
@@ -1419,14 +1418,12 @@ ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
 	wxPanel* manualProxyPanel = new wxPanel(this);
 	wxStaticText* proxyHttpText = new wxStaticText(manualProxyPanel, wxID_ANY, _("HTTP Proxy:"));
 	wxString server;
-	ProMan::GetProfileManager()->Global()
-		->Read(GBL_CFG_PROXY_SERVER, &server, _T(""));
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_PROXY_SERVER, &server, _T(""));
 	wxTextCtrl* proxyHttpServer = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_SERVER, server);
 	wxStaticText* proxyHttpPortText = new wxStaticText(manualProxyPanel, wxID_ANY, _("Port:"));
 
-	int port;
-	ProMan::GetProfileManager()->Global()
-		->Read(GBL_CFG_PROXY_PORT, &port, 0);
+	long port;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_PROXY_PORT, &port, 0);
 	wxTextCtrl* proxyHttpPort = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_PORT, wxString::Format(_T("%d"), port));
 
 	wxBoxSizer* manualProxyPortSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1464,14 +1461,14 @@ void ProxyChoice::OnChangeServer(wxCommandEvent &event) {
 	if ( str == wxEmptyString ) {
 		// do nothing
 	} else {
-		ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_SERVER, str);
+		ProMan::GetProfileManager()->GlobalWrite(GBL_CFG_PROXY_SERVER, str);
 	}
 }
 
 void ProxyChoice::OnChangePort(wxCommandEvent &event) {
 	int port = event.GetInt();
 
-	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_PORT, port);
+	ProMan::GetProfileManager()->GlobalWrite(GBL_CFG_PROXY_PORT, static_cast<long>(port));
 }
 
 void ProxyChoice::OnProxyTypeChange(wxChoicebookEvent &event) {
@@ -1490,5 +1487,5 @@ void ProxyChoice::OnProxyTypeChange(wxChoicebookEvent &event) {
 			return;
 	}
 
-	ProMan::GetProfileManager()->Global()->Write(GBL_CFG_PROXY_TYPE, str);
+	ProMan::GetProfileManager()->GlobalWrite(GBL_CFG_PROXY_TYPE, str);
 }
