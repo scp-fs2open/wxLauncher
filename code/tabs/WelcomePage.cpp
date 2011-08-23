@@ -389,6 +389,11 @@ void WelcomePage::deleteProfile(wxChoice* combobox, ProMan* proman) {
 	wxString nametodelete = combobox->GetStringSelection();
 	
 	if ( proman->DoesProfileExist(nametodelete) ) {
+		if (nametodelete == ProMan::DEFAULT_PROFILE_NAME) {
+			wxLogWarning(_T("The default profile cannot be deleted."));
+			return;
+		}
+		
 		DeleteProfileDialog deleteDialog(this, nametodelete);
 		
 		if ( deleteDialog.ShowModal() == deleteDialog.GetAffirmativeId()) {
