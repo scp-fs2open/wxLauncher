@@ -449,10 +449,14 @@ bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
+			wxLogDebug(_T("adding entry %s with value %s to current profile"),
+				key.c_str(), value.c_str());
 			this->SetHasUnsavedChanges();
 		} else {
 			wxString oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
+					oldValue.c_str(), value.c_str(), key.c_str());
 				this->SetHasUnsavedChanges();
 			}
 		}
@@ -469,10 +473,14 @@ bool ProMan::ProfileWrite(const wxString& key, long value) {
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
+			wxLogDebug(_T("adding entry %s with value %d to current profile"),
+				key.c_str(), value);
 			this->SetHasUnsavedChanges();
 		} else {
 			long oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				wxLogDebug(_T("replacing old value %d with value %d for current profile entry %s"),
+					oldValue, value, key.c_str());
 				this->SetHasUnsavedChanges();
 			}
 		}
@@ -489,10 +497,16 @@ bool ProMan::ProfileWrite(const wxString& key, bool value) {
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
+			wxLogDebug(_T("adding entry %s with value %s to current profile"),
+				key.c_str(), value ? _T("true") : _T("false"));
 			this->SetHasUnsavedChanges();
 		} else {
 			bool oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
+					oldValue ? _T("true") : _T("false"),
+					value ? _T("true") : _T("false"),
+					key.c_str());
 				this->SetHasUnsavedChanges();
 			}
 		}
@@ -511,6 +525,8 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 		return false;
 	} else {
 		if (this-currentProfile->Exists(key)) {
+			wxLogDebug(_T("deleting key %s in profile"),
+				key.c_str());
 			this->SetHasUnsavedChanges();
 		}
 		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
