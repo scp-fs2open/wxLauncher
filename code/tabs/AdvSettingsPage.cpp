@@ -255,14 +255,16 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 							wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
 
 	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
-													 commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
-	
-	wxString flagLine =
-		wxString::Format(_T("%s%s"),
-						 flagFileFlags.c_str(),
-						 (customFlags->IsEmpty() ? wxEmptyString :
-						  wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
-	
+		commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
+
+	wxString flagLine(flagFileFlags);
+	if (!customFlags->IsEmpty()) {
+		if (!flagLine.IsEmpty()) {
+			flagLine.Append(_T(" "));
+		}
+		flagLine.Append(customFlags->GetValue());
+	}
+
 	ProMan::GetProfileManager()->Get()->
 		Write(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
