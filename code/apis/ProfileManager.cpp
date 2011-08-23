@@ -198,15 +198,15 @@ ProMan::ProMan() {
 /** Destructor. */
 ProMan::~ProMan() {
 	if ( this->globalProfile != NULL ) {
-		if ( this->isAutoSaving ) {
-			wxFileName file;
-			file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
-			wxFFileOutputStream globalProfileOutput(file.GetFullPath());
-			this->globalProfile->Save(globalProfileOutput);
-		} else {
-			wxLogWarning(_T("Profile Manager is being destroyed without saving changes."));
-		}
+		wxLogInfo(_T("saving global profile before exiting."));
+		wxFileName file;
+		file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
+		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
+		this->globalProfile->Save(globalProfileOutput);
+		
 		delete this->globalProfile;
+	} else {
+		wxLogWarning(_T("global profile is null, cannot save it"));
 	}
 
 	this->SaveCurrentProfile();
