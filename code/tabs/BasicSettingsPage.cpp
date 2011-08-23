@@ -999,7 +999,7 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* depth = dynamic_cast<wxChoice*>(
-		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
+		wxWindow::FindWindowById(ID_DEPTH_COMBO, this));
 	wxCHECK_RET( depth != NULL, _T("Unable to find depth choice box"));
 
 	ProMan::GetProfileManager()->ProfileWrite(
