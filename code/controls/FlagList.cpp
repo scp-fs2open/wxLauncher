@@ -684,6 +684,22 @@ wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
 	return arr;
 }
 
+/** sets all flags off. */
+void FlagListBox::ResetFlags() {
+	FlagCategoryList::const_iterator category =
+	this->allSupportedFlagsByCategory.begin();
+	while (category != this->allSupportedFlagsByCategory.end()) {
+		FlagList::const_iterator flag = (*category)->flags.begin();
+		while( flag != (*category)->flags.end() ) {
+			if ( (*flag)->checkbox != NULL) {
+				(*flag)->checkbox->SetValue(false);
+			}
+			flag++;
+		}
+		category++;
+	}
+}
+
 /** returns true when the FlagList will draw the the actual list,
 false when the FlagList is showing an error message. */
 bool FlagListBox::IsDrawOK() {

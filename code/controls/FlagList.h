@@ -87,6 +87,8 @@ public:
 	the flags in the flag set are real flags. */
 	bool SetFlagSet(wxString flagSet);
 	wxArrayString& GetFlagSets(wxArrayString &arr);
+	
+	void ResetFlags();
 
 	bool IsDrawOK();
 

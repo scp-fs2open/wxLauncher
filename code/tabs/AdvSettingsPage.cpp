@@ -39,6 +39,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
+	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent nullEvent;
 	this->OnExeChanged(nullEvent);	
 }
@@ -46,6 +47,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
+EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, AdvSettingsPage::OnDrawStatusChange)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnDrawStatusChange)
@@ -147,6 +149,15 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 }
 
 void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
+	this->RefreshFlags(false);
+	CmdLineManager::GenerateCmdLineChanged();
+}
+
+void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
+	this->RefreshFlags();
+}
+
+void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Cannot find custom flags box") );
@@ -154,6 +165,11 @@ void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 	wxString flagLine, customFlags;
 	ProMan::GetProfileManager()->Get()->
 		Read(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
+
+	if (resetFlagList) {
+		this->flagListBox->ResetFlags();
+	}
+
 	wxStringTokenizer tokenizer(flagLine, _T(" "));
 	while(tokenizer.HasMoreTokens()) {
 		wxString tok = tokenizer.GetNextToken();
@@ -167,7 +183,6 @@ void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 		}
 	}
 	customFlagsText->ChangeValue(customFlags);
-	CmdLineManager::GenerateCmdLineChanged();
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
