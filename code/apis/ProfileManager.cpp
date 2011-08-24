@@ -198,6 +198,18 @@ ProMan::ProMan() {
 
 /** Destructor. */
 ProMan::~ProMan() {
+	this->SaveProfilesBeforeExiting();
+
+	// don't leak the wxFileConfigs
+	ProfileMap::iterator iter = this->profiles.begin();
+	while ( iter != this->profiles.end() ) {
+		delete iter->second;
+		iter++;
+	}
+}
+
+/** Saves changes to profiles according to autosave profiles checkbox. */
+void ProMan::SaveProfilesBeforeExiting() {
 	if ( this->globalProfile != NULL ) {
 		wxLogInfo(_T("saving global profile before exiting."));
 		wxFileName file;
@@ -209,16 +221,38 @@ ProMan::~ProMan() {
 	} else {
 		wxLogWarning(_T("global profile is null, cannot save it"));
 	}
-
-	this->SaveCurrentProfile();
-
-	// don't leak the wxFileConfigs
-	ProfileMap::iterator iter = this->profiles.begin();
-	while ( iter != this->profiles.end() ) {
-		delete iter->second;
-		iter++;
+	
+	if (this->hasUnsavedChanges) {
+		if (this->isAutoSaving) {
+			wxLogInfo(_T("autosaving profile %s before exiting"),
+				this->GetCurrentName().c_str()),
+			this->SaveCurrentProfile();
+		} else {
+			int response = wxMessageBox(
+				wxEmptyString,
+				wxString::Format(
+#if IS_WIN32
+					_("Save changes to profile '%s' before exiting?"),
+#else
+					_("Save changes to profile '%s' before quitting?"),
+#endif
+					this->GetCurrentName().c_str()),
+				wxYES_NO);
+			if ( response == wxYES ) {
+				wxLogInfo(_T("saving profile %s before exiting"),
+					this->GetCurrentName().c_str());
+				this->SaveCurrentProfile();
+			} else {
+				wxLogWarning(_T("exiting without saving changes to profile %s"),
+					this->GetCurrentName().c_str());
+			}
+		}
+	} else {
+		wxLogInfo(_T("Current profile %s has no unsaved changes. Exiting."),
+			this->GetCurrentName().c_str());
 	}
 }
+
 /** Creates a new profile including the directory for it to go in, the entry
 in the profiles map. Returns true if creation was successful. */
 bool ProMan::CreateNewProfile(wxString newName) {
@@ -577,35 +611,31 @@ wxArrayString ProMan::GetAllProfileNames() {
 	return out;
 }
 
-/** Save the current profile to disk. Does not affect Global or anyother profile.
-We assume all profiles other than the current app profile does not have any 
-unsaved changes. So we only check the current profile. */
+/** Saves the current profile to disk, regardless of whether it has unsaved changes.
+ Does not affect the global profile or any other profile. */
 void ProMan::SaveCurrentProfile() {
 	wxConfigBase* configbase = wxFileConfig::Get(false);
 	if ( configbase == NULL ) {
-		wxLogWarning(_T("There is no global file config."));
+		wxLogError(_T("There is no global file config."));
 		return;
 	}
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
 	if ( config != NULL ) {
-		if ( this->isAutoSaving ) {
-			wxString profileFilename;
-			if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
-				wxLogWarning(_T("Current profile does not have a file name, and I am unable to auto save."));
-			} else {
-				wxFileName file;
-				file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
-				wxASSERT( file.IsOk() );
-				wxFFileOutputStream configOutput(file.GetFullPath());
-				config->Save(configOutput);
-				this->ResetHasUnsavedChanges();
-				wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
-			}
+		wxString profileFilename;
+		if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
+			wxLogError(_T("Current profile does not have a file name. Cannot save it."));
+			// FIXME maybe make a new file and save the current profile there
 		} else {
-			wxLogWarning(_T("Current Profile Manager is being destroyed without saving changes."));
+			wxFileName file;
+			file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
+			wxASSERT( file.IsOk() );
+			wxFFileOutputStream configOutput(file.GetFullPath());
+			config->Save(configOutput);
+			this->ResetHasUnsavedChanges();
+			wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
 		}
 	} else {
-		wxLogWarning(_T("Configbase is not a wxFileConfig."));
+		wxLogError(_T("Configbase is not a wxFileConfig."));
 	}
 }
 
@@ -617,6 +647,11 @@ bool ProMan::SwitchTo(wxString name) {
 	if ( this->profiles.find(name) == this->profiles.end() ) {
 		return false;
 	} else {
+		if (this->isAutoSaving && this->hasUnsavedChanges) {
+			wxLogDebug(_T("auto saving current profile %s before switching profiles"),
+				this->currentProfileName.c_str());
+			this->SaveCurrentProfile();
+		}
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);

@@ -35,7 +35,6 @@ public:
 	static bool Initialize();
 	static bool DeInitialize();
 	static ProMan* GetProfileManager();
-	static bool PrepareForAppShutdown();
 
 	virtual ~ProMan();
 	wxArrayString GetAllProfileNames();
@@ -73,9 +72,8 @@ public:
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
-	inline bool NeedToPromptToSave() { return !this->isAutoSaving; }
+	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->hasUnsavedChanges; }
 	void SetAutoSave(bool value) { this->isAutoSaving = value; }
-	inline bool HasUnsavedChanges() const { return this->hasUnsavedChanges; }
 
 	void AddEventHandler(wxEvtHandler *handler);
 	void RemoveEventHandler(wxEvtHandler *handler);
@@ -103,6 +101,8 @@ private:
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
 	
 	ProMan();
+	void SaveProfilesBeforeExiting();
+
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
