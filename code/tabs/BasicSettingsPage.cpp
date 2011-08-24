@@ -369,7 +369,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			speechVoiceCombo->GetSize().GetHeight()));
 		this->Layout();
 
-		int speechVoice;
+		long speechVoice;
 		int speechSystemVoice = SpeechMan::GetVoice();
 		if ( speechSystemVoice < 0 ) {
 			wxLogWarning(_T("Had problem retrieving the system voice, using voice 0"));
@@ -388,7 +388,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		}
 		speechVoiceCombo->SetSelection(speechVoice);
 
-		int speechVolume;
+		long speechVolume;
 		int speechSystemVolume = SpeechMan::GetVolume();
 		if (speechSystemVolume < 0) {
 			wxLogWarning(_T("Had problem in retrieving the system speech volume,")
