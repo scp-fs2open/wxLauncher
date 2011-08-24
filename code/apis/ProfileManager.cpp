@@ -460,6 +460,30 @@ bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
 	}
 }
 
+/** Writes a string for the given key to the current profile.
+ Returns true on success. */
+bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
+					 value, key.c_str());
+		return false;
+	} else {
+		if (!this->currentProfile->Exists(key)) {
+			wxLogDebug(_T("adding entry %s with value %s to current profile"),
+					   key.c_str(), value);
+			this->SetHasUnsavedChanges();
+		} else {
+			wxString oldValue;
+			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
+				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
+						   oldValue.c_str(), value, key.c_str());
+				this->SetHasUnsavedChanges();
+			}
+		}
+		return this->currentProfile->Write(key, value);
+	}
+}
+
 /** Writes a long for the given key to the current profile.
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, long value) {

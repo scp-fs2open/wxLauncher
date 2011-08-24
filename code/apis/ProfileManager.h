@@ -61,6 +61,7 @@ public:
 	bool ProfileRead(const wxString& key, long* l, long defaultVal) const;
 	
 	bool ProfileWrite(const wxString& key, const wxString& value);
+	bool ProfileWrite(const wxString& key, const wxChar* value);
 	bool ProfileWrite(const wxString& key, long value);
 	bool ProfileWrite(const wxString& key, bool value);
 	
