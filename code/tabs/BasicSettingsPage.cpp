@@ -230,7 +230,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	aaCombo->Append(_T(" 4x"));
 	aaCombo->Append(_T(" 8x"));
 	aaCombo->Append(_T("16x"));
-	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &antialias, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, 0);
 	switch(antialias) {
 		case 1:
 			antialias = 1;
