@@ -197,7 +197,7 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_VIDEO_RESOLUTION_HEIGHT		_T("/video/height")		//!< int
 #define CFG_RES_FORMAT_STRING				_T("%d x %d")
 #define PRO_CFG_VIDEO_BIT_DEPTH				_T("/video/depth")		//!< int
-#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anistropic")	//!< int
+#define PRO_CFG_VIDEO_ANISOTROPIC			_T("/video/anisotropic")//!< int
 #define PRO_CFG_VIDEO_ANTI_ALIAS			_T("/video/antialias")	//!< int
 #define PRO_CFG_VIDEO_TEXTURE_FILTER		_T("/video/texturefilter")	//!< string
 
