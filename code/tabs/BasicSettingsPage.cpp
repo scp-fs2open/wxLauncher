@@ -200,6 +200,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	anisotropicCombo->Append(_T("16x"));
 	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0);
 	switch(anisotropic) {
+		case 0:
+			anisotropic = 0;
+			break;
 		case 1:
 			anisotropic = 1;
 			break;
@@ -216,6 +219,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			anisotropic = 5;
 			break;
 		default:
+			wxLogWarning(_T("invalid anisotropic factor %d, setting to 0"),
+				anisotropic);
+			proman->ProfileWrite(PRO_CFG_VIDEO_ANISOTROPIC, static_cast<long>(0));
 			anisotropic = 0;
 	}
 	anisotropicCombo->SetSelection(anisotropic);
@@ -232,6 +238,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	aaCombo->Append(_T("16x"));
 	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, 0);
 	switch(antialias) {
+		case 0:
+			antialias = 0;
+			break;
 		case 1:
 			antialias = 1;
 			break;
@@ -248,6 +257,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			antialias = 5;
 			break;
 		default:
+			wxLogWarning(_T("invalid anti-aliasing factor %d, setting to 0"),
+				antialias);
+			proman->ProfileWrite(PRO_CFG_VIDEO_ANTI_ALIAS, static_cast<long>(0));
 			antialias = 0;
 	}
 	aaCombo->SetSelection(antialias);
@@ -604,7 +616,7 @@ EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectVideoResolution)
 EVT_CHOICE(ID_DEPTH_COMBO, BasicSettingsPage::OnSelectVideoDepth)
 EVT_CHOICE(ID_TEXTURE_FILTER_COMBO, BasicSettingsPage::OnSelectVideoTextureFilter)
-EVT_CHOICE(ID_ANISOTROPIC_COMBO, BasicSettingsPage::OnSelectVideoAnistropic)
+EVT_CHOICE(ID_ANISOTROPIC_COMBO, BasicSettingsPage::OnSelectVideoAnisotropic)
 EVT_CHOICE(ID_AA_COMBO, BasicSettingsPage::OnSelectVideoAntiAlias)
 
 // Speech Controls
@@ -1017,14 +1029,14 @@ void BasicSettingsPage::OnSelectVideoTextureFilter(wxCommandEvent &WXUNUSED(even
 		(tex->GetSelection() == 0) ? _T("Bilinear") : _T("Trilinear"));
 }
 
-void BasicSettingsPage::OnSelectVideoAnistropic(wxCommandEvent &WXUNUSED(event)) {
+void BasicSettingsPage::OnSelectVideoAnisotropic(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* as = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_ANISOTROPIC_COMBO, this));
 	wxCHECK_RET( as != NULL, _T("Unable to find anisotropic choice"));
 
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_ANISOTROPIC,
-		(as->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << as->GetSelection()));
+		(as->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << (as->GetSelection()-1)));
 }
 
 void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) {
@@ -1034,7 +1046,7 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) 
 
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_ANTI_ALIAS,
-		(aa->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << aa->GetSelection()));
+		(aa->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << (aa->GetSelection()-1)));
 
 }
 
