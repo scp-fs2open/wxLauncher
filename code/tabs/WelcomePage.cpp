@@ -285,10 +285,12 @@ void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
 	ProMan* proman = ProMan::GetProfileManager();
 
 	if ( event.IsChecked() ) {
+		proman->SetAutoSave(true);
 		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, true);
 		proman->SaveCurrentProfile();
 		wxLogStatus(_("Now autosaving profiles."));
 	} else {
+		proman->SetAutoSave(false);
 		proman->GlobalWrite(GBL_CFG_MAIN_AUTOSAVEPROFILES, false);
 		wxLogStatus(_("No longer autosaving profiles."));
 	}
