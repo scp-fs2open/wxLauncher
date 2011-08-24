@@ -34,7 +34,7 @@ public:
 	void OnSelectVideoResolution(wxCommandEvent &event);
 	void OnSelectGraphicsAPI(wxCommandEvent &event);
 	void OnSelectVideoDepth(wxCommandEvent &event);
-	void OnSelectVideoAnistropic(wxCommandEvent &event);
+	void OnSelectVideoAnisotropic(wxCommandEvent &event);
 	void OnSelectVideoAntiAlias(wxCommandEvent &event);
 	void OnSelectVideoTextureFilter(wxCommandEvent &event);
 	void OnSelectVideoGeneralSettings(wxCommandEvent &event);
