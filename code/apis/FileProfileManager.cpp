@@ -37,7 +37,7 @@ inline wxFileName GetPlatformDefaultConfigFilePath() {
 	path.AppendDir(_T("Library"));
 	path.AppendDir(_T("FS2_Open"));
 #elif IS_LINUX
-	path.AssignDir(_T("~")); // user home
+	path.AssignDir(wxFileName::GetHomeDir());
 	path.AppendDir(_T(".fs2_open"));
 #else
 # error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
