@@ -44,12 +44,13 @@ public:
 	bool GlobalExists(wxString& strName) const;
 	
 	bool GlobalRead(const wxString& key, bool* b) const;
-	bool GlobalRead(const wxString& key, bool* d, bool defaultVal) const;
+	bool GlobalRead(const wxString& key, bool* b, bool defaultVal) const;
 	bool GlobalRead(const wxString& key, wxString* str) const;
 	bool GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal) const;
 	bool GlobalRead(const wxString& key, long* l, long defaultVal) const;
 	
 	bool GlobalWrite(const wxString& key, const wxString& value);
+	bool GlobalWrite(const wxString& key, const wxChar* value);
 	bool GlobalWrite(const wxString& key, long value);
 	bool GlobalWrite(const wxString& key, bool value);
 	

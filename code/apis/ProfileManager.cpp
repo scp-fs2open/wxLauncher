@@ -376,6 +376,18 @@ bool ProMan::GlobalWrite(const wxString& key, const wxString& value) {
 	}
 }
 
+/** Writes a string for the given key to the global profile.
+ Returns true on success. */
+bool ProMan::GlobalWrite(const wxString& key, const wxChar* value) {
+	if (this->globalProfile == NULL) {
+		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
+					 value, key.c_str());
+		return false;
+	} else {
+		return this->globalProfile->Write(key, value);
+	}
+}
+
 /** Writes a long for the given key to the global profile.
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, long value) {
