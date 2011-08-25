@@ -66,6 +66,16 @@ public:
 	
 	bool ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty = true);
 	
+	enum SaveDialogTextContext {
+		ON_PROFILE_SWITCH,
+		ON_EXIT
+	};
+
+	static const wxString GetSaveDialogCaptionText(SaveDialogTextContext context,
+		const wxString& profileName);
+	static const wxString GetSaveDialogMessageText(SaveDialogTextContext context,
+		const wxString& profileName);
+
 	bool CreateNewProfile(wxString newName);
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);

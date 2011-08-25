@@ -229,14 +229,8 @@ void ProMan::SaveProfilesBeforeExiting() {
 			this->SaveCurrentProfile();
 		} else {
 			int response = wxMessageBox(
-				wxEmptyString,
-				wxString::Format(
-#if IS_WIN32
-					_("Save changes to profile '%s' before exiting?"),
-#else
-					_("Save changes to profile '%s' before quitting?"),
-#endif
-					this->GetCurrentName().c_str()),
+				GetSaveDialogMessageText(ProMan::ON_EXIT, this->GetCurrentName()),
+				GetSaveDialogCaptionText(ProMan::ON_EXIT, this->GetCurrentName()),
 				wxYES_NO);
 			if ( response == wxYES ) {
 				wxLogInfo(_T("saving profile %s before exiting"),
@@ -588,6 +582,64 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 			this->SetHasUnsavedChanges();
 		}
 		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
+	}
+}
+
+/** Returns the text to use in the "save changes?" dialog's caption (window title) */
+const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogTextContext context,
+												const wxString& profileName) {
+	switch (context) {
+		case ON_PROFILE_SWITCH:
+#if IS_APPLE
+			return wxString::Format(_T("Save changes to profile '%s'?"),
+				profileName.c_str());
+#else
+			return _T("Save changes before switching profiles?");
+#endif
+			break;
+
+		case ON_EXIT:
+#if IS_APPLE
+			return wxString::Format(_T("Save changes to profile '%s' before quitting?"),
+				profileName.c_str());
+#elif IS_WIN32
+			return _T("Save changes before exiting?");
+#else
+			return _T("Save changes before quitting?");
+#endif
+			break;
+
+		default:
+			wxCHECK_MSG(false, wxEmptyString, _T("ProMan::GetSaveDialogCaptionText: provided context is invalid"));
+			break;
+	}
+}
+
+/** Returns the text to use in the "save changes?" dialog's message (text area) */
+const wxString ProMan::GetSaveDialogMessageText(ProMan::SaveDialogTextContext context,
+												const wxString& profileName) {
+	switch (context) {
+		case ON_PROFILE_SWITCH:
+#if IS_APPLE
+			return wxEmptyString;
+#else
+			return wxString::Format(_T("Save changes to profile '%s'?"),
+				profileName.c_str());
+#endif
+			break;
+
+		case ON_EXIT:
+#if IS_APPLE
+			return wxEmptyString;
+#else
+			return wxString::Format(_T("Save changes to profile '%s'?"),
+				profileName.c_str());
+#endif
+			break;
+
+		default:
+			wxCHECK_MSG(false, wxEmptyString, _T("ProMan::GetSaveDialogMessageText: provided context is invalid"));
+			break;
 	}
 }
 
