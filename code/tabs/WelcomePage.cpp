@@ -308,10 +308,8 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 	if ( proman->DoesProfileExist(newProfile) ) {
 		if ( proman->NeedToPromptToSave() ) {
 			int response = wxMessageBox(
-				wxEmptyString,
-				wxString::Format(
-					_("Save changes to profile '%s'?"),
-					proman->GetCurrentName().c_str()),
+				ProMan::GetSaveDialogMessageText(ProMan::ON_PROFILE_SWITCH, proman->GetCurrentName()),
+				ProMan::GetSaveDialogCaptionText(ProMan::ON_PROFILE_SWITCH, proman->GetCurrentName()),
 				wxYES_NO|wxCANCEL, this);
 			if ( response == wxYES ) {
 				wxLogDebug(_T("saving profile %s before switching to profile %s"),
