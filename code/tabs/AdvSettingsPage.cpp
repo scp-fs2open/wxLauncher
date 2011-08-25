@@ -85,8 +85,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 #endif
 
-	wxStaticText* wikiLinkText =
-	new wxStaticText(this, wxID_ANY, _T("Double-click on a flag for its online documentation, if available."));
+	wxStaticText* wikiLinkText = new wxStaticText(this, ID_WIKI_LINK_TEXT,
+		_T("Double-click on a flag for its online documentation, if available."));
 	wxBoxSizer* wikiLinkSizer = new wxBoxSizer(wxVERTICAL);
 	wikiLinkSizer->Add(wikiLinkText, 0, wxALIGN_CENTER_HORIZONTAL);
 
@@ -150,6 +150,17 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 
 void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 	this->RefreshFlags(false);
+
+	wxStaticText* wikiLinkText = dynamic_cast<wxStaticText*>(
+		wxWindow::FindWindowById(ID_WIKI_LINK_TEXT, this));
+	wxCHECK_RET( wikiLinkText != NULL, _T("Cannot find wiki link text") );
+
+	if (this->flagListBox->IsDrawOK()) {
+		wikiLinkText->Show();
+	} else {
+		wikiLinkText->Hide();
+	}
+
 	CmdLineManager::GenerateCmdLineChanged();
 }
 
