@@ -124,26 +124,37 @@ button Enables.  The lines that are highligted red are new
 variables that CMake has found. 
 - Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
 source directory if it remains NOTFOUND.
-- Set PYTHON_EXECUTABLE to the python that you want to use (it may not show up. If it doesn't show up, don't worry about it, it means that cmake found it)
-- Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher.
- Make sure that it is unchecked if you plan on distributing the
-code as with this checked the launcher will only run on the dev 
-machine. This option changes where the launcher looks for files to display as the default interface.
+- Set PYTHON_EXECUTABLE to the python that you want to use (it may not show
+up. If it doesn't show up, don't worry about it, it means that cmake found it)
+- Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher. Make sure
+that it is unchecked if you plan on distributing the code as with this checked,
+the launcher will only run on the dev machine. This option changes where the
+launcher looks for files to display as the default interface.
 - Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those options compiled in.
-- If USE_OPENAL is check, OPENAL_INCLUDE_DIR will appear, this 
-should be set the include folder in the OpenAL SDK folder.
+- If USE_OPENAL is checked, OPENAL_INCLUDE_DIR will appear. Set it to the include
+folder in the OpenAL SDK folder.
 
-Building - Linux (Ubuntu)
+Building - Linux (has been tested on Ubuntu)
 =========================
-Commandline
+Command line
 -----------
 - Download the wxLauncher source
-- sudo apt-get install build-essential libopenal-dev libwxgtk2.8-dev libwxgtk2.8-dbg python-markdown
-- Download and install the cmake 2.8 .debs for your platform from: <https://launchpad.net/ubuntu/+source/cmake>.  You will need cmake-data, and cmake-2.8.0* for your platform, plus cmake-curses-gui or cmake-qt-gui
+- sudo apt-get install build-essential libopenal-dev libwxgtk2.8-dev
+libwxgtk2.8-dbg python-markdown
+- Download and install the cmake 2.8 .debs for your platform from:
+<https://launchpad.net/ubuntu/+source/cmake>.  You will need cmake-data, and
+cmake-2.8.0* for your platform, plus cmake-curses-gui or cmake-qt-gui
 - cd <source directory>
 - mkdir build
 - cd build
+To prevent error messages like "The launcher is expecting (/home/foo/bar) to
+contain the resource images." from occurring, either type:
+- cmake -DUSE_OPENAL=1 -DDEVELOPMENT_MODE=1 -DCMAKE_INSTALL_PREFIX=/usr/local ../
+- make
+Or instead type:
 - cmake -DUSE_OPENAL=1 -DCMAKE_INSTALL_PREFIX=/usr/local ../
+- make
+- make install (with root privileges)
 
 Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 ==============================
