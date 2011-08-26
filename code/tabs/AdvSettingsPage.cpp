@@ -173,7 +173,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Cannot find custom flags box") );
 
-	wxString flagLine, customFlags;
+	wxString flagLine, customFlags, lightingPreset;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 
 	if (resetFlagList) {
@@ -183,7 +183,13 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 	wxStringTokenizer tokenizer(flagLine, _T(" "));
 	while(tokenizer.HasMoreTokens()) {
 		wxString tok = tokenizer.GetNextToken();
-		if ( this->flagListBox->SetFlag(tok, true) ) {
+		if (tok == LightingPresets::GetFlagLineSeparator()) {
+			lightingPreset.Append(tokenizer.GetNextToken());
+			while (tokenizer.HasMoreTokens()) {
+				lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+			}
+			break;
+		} else if ( this->flagListBox->SetFlag(tok, true) ) {
 			continue;
 		} else {
 			if (!customFlags.IsEmpty()) {
@@ -191,6 +197,12 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 			}
 			customFlags += tok;
 		}
+	}
+	if (!lightingPreset.IsEmpty()) {
+		if (!customFlags.IsEmpty()) {
+			lightingPreset.Append(_T(" "));
+		}
+		customFlags.Prepend(lightingPreset);
 	}
 	customFlagsText->ChangeValue(customFlags);
 }

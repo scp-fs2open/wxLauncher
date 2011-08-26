@@ -32,6 +32,7 @@ Preset::Preset(const wxString& name, const int buttonId, const wxString& preset)
 }
 
 const int DEFAULT_PRESET_ID = ID_PRESETS_OFF;
+const wxString LightingPresets::FLAG_LINE_SEPARATOR = _T("|||");
 PresetHashMap LightingPresets::presets;
 
 LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
@@ -156,7 +157,7 @@ void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 	wxString flagLine;
 
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
-	flagLine.Append(_T(" ")).Append(PresetNameToPresetString(presetName));
+	flagLine.Append(_T(" ")).Append(GetFlagLineSeparator()).Append(_T(" ")).Append(PresetNameToPresetString(presetName));
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 	CmdLineManager::GenerateCustomFlagsChanged();
 
@@ -172,6 +173,10 @@ const wxString& LightingPresets::PresetNameToPresetString(const wxString& preset
 	
 	wxLogWarning(_T("PresetNameToPresetString: unknown preset name %s, returning default (off)"), presetName.c_str());
 	return presets[DEFAULT_PRESET_ID].GetPreset();
+}
+
+const wxString& LightingPresets::GetFlagLineSeparator() {
+	return FLAG_LINE_SEPARATOR;
 }
 	
 void LightingPresets::Initialize() {
