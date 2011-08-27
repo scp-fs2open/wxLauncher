@@ -701,13 +701,27 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( exeChoice != NULL, 
 		_T("Cannot find executable choice control"));
 
+	bool fredEnabled;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+
+	ExeChoice* fredChoice = NULL;
+	if (fredEnabled) {
+		fredChoice = dynamic_cast<ExeChoice*>(
+			wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
+		wxCHECK_RET( fredChoice != NULL, 
+			_T("Cannot find FRED executable choice control"));
+	}
+
 	wxTextCtrl* tcFolder = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_EXE_ROOT_FOLDER_BOX, this));
 	wxCHECK_RET( tcFolder != NULL, 
 		_T("Cannot find Text Control to show folder in."));
 
-	wxString tcPath, binaryName;
+	wxString tcPath, binaryName, fredBinaryName;
 	exeChoice->Clear();
+	if (fredEnabled) {
+		fredChoice->Clear();
+	}
 
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 		tcFolder->SetValue(tcPath);
@@ -715,11 +729,26 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
 		exeChoice->Enable();
 
+		if (fredEnabled) {
+			this->FillFredExecutableDropBox(fredChoice, wxFileName(tcPath, wxEmptyString));
+			fredChoice->Enable();
+		}
+
 		/* check to see if the exe listed in the profile actually does exist in
 		the list */
 		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
 		if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
 			ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+		}
+
+		if (fredEnabled) {
+			/* check to see if the FRED exe listed in the profile actually does exist in
+			the list */
+			bool profileHasFredBinary =
+				ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
+			if ( profileHasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
+				ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
+			}
 		}
 	}
 	this->GetSizer()->Layout();
