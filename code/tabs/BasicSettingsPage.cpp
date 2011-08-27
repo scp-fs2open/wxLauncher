@@ -163,10 +163,23 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
 	this->FillResolutionDropBox(resolutionCombo);
 	long width, height;
-	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 800);
-	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 600);
-	resolutionCombo->SetStringSelection(
-		wxString::Format(CFG_RES_FORMAT_STRING, width, height));
+	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 0);
+
+	if (width == 0 || height == 0) {
+		bool maxResFound = GetMaxSupportedResolution(*resolutionCombo, width, height);
+		wxCHECK_RET(maxResFound, _T("could not get max supported resolution"));
+	}
+
+	const wxString resString = wxString::Format(CFG_RES_FORMAT_STRING, width, height);
+	bool resFound = resolutionCombo->SetStringSelection(resString);
+
+	if (!resFound) {
+		wxLogWarning(_T("resolution %s not found, resetting to maximum supported resolution"),
+			resString.c_str());
+		bool maxResFound = GetMaxSupportedResolution(*resolutionCombo, width, height);
+		wxCHECK_RET(maxResFound, _T("could not get max supported resolution"));
+	}
 
 	wxStaticText* depthText = 
 		new wxStaticText(this, wxID_ANY, _("Depth:"));
@@ -174,7 +187,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	long bitDepth;
 	depthCombo->Append(_("16 bit"));
 	depthCombo->Append(_("32 bit"));
-	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 16);
+	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 32);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 #if !IS_WIN32 // TF/AF/AA don't yet work on Windows
@@ -1012,6 +1025,37 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 		 it != end; ++it) {
 		resChoice->Append((*it)->GetResString(), *it);
 	}
+}
+
+bool BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height) {
+	int maxResIndex = -1;
+	int maxResProduct = 0;
+	Resolution* res;
+
+	for (unsigned int i = 0; i < resChoice.GetCount(); ++i) {
+		res = dynamic_cast<Resolution*>(resChoice.GetClientObject(i));
+		wxCHECK_MSG( res != NULL, false,
+			wxString::Format(_T("choice does not have Resolution object at index %d"), i));
+		// FIXME could be clever and only read the highest resolution in each aspect ratio group
+		if (!res->IsHeader()) {
+			int resProduct = res->GetWidth() * res->GetHeight();
+			if (resProduct > maxResProduct) {
+				maxResIndex = i;
+				maxResProduct = resProduct;
+			}
+		}
+	}
+	
+	wxCHECK_MSG(maxResIndex > -1, false, _T("maximum Resolution was not found"));
+	
+	res = dynamic_cast<Resolution*>(resChoice.GetClientObject(maxResIndex));
+	wxCHECK_MSG( res != NULL, false, _T("Choice is missing max Resolution object"));
+	width = res->GetWidth();
+	height = res->GetHeight();
+	
+	wxLogDebug(_T("Found max resolution of %s at index %d"),
+		res->GetResString().c_str(), maxResIndex);
+	return true;
 }
 
 void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event)) {
