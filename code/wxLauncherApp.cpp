@@ -79,7 +79,12 @@ bool wxLauncher::OnInit() {
 #endif
 		wxYield();
 	} else {
-		wxFileName expectedDir(::wxGetCwd(), _T(RESOURCES_PATH));
+		wxFileName expectedDir;
+		if (wxFileName(_T(RESOURCES_PATH)).IsAbsolute()) {
+			expectedDir = wxFileName(_T(RESOURCES_PATH));
+		} else {
+			expectedDir = wxFileName(::wxGetCwd(), _T(RESOURCES_PATH));	
+		}
 		wxLogFatalError(wxString::Format(
 			_T("Unable to load splash image. ")
 			_T("This normally means that you are running the Launcher from a folder")
