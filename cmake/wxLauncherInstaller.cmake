@@ -167,7 +167,7 @@ endif()
 
 if(IS_WIN32)
   install(DIRECTORY resources/ DESTINATION resources)
-  install(FILES ${helphtblocation} DESTINATION .)
+  install(FILES ${helphtblocation} DESTINATION resources)
 elseif(IS_APPLE)
   install(FILES ${PROJECT_SOURCE_DIR}/License.txt DESTINATION .)
   install(FILES ${PROJECT_SOURCE_DIR}/GPLv2.txt DESTINATION .)
