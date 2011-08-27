@@ -71,7 +71,8 @@ private:
 	static void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillFredExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes);
-	static void FillResolutionDropBox(wxChoice* exeChoice);
+	static void FillResolutionDropBox(wxChoice* resChoice);
+	static bool GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
