@@ -69,9 +69,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTCSizer->AddSpacer(10);
 		noTCSizer->Add(noTC, 0, wxEXPAND| wxALL | wxCENTER);
 		noTCSizer->AddStretchSpacer(1);
-		noTCSizer->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
-		this->SetSizerAndFit(noTCSizer);
+		this->SetSizer(noTCSizer);
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
 			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings tab."),
@@ -92,10 +91,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTCSizer->AddSpacer(10);
 		invalidTCSizer->Add(invalidTC, 0, wxEXPAND| wxALL | wxCENTER);
 		invalidTCSizer->AddStretchSpacer(1);
-		
-		invalidTCSizer->SetMinSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 
-		this->SetSizerAndFit(invalidTCSizer);
+		this->SetSizer(invalidTCSizer);
 	} else {
 #if 0
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
@@ -112,6 +109,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 		sizer->Add(modGrid, wxSizerFlags().Center().Border(wxALL,5));
 
+		this->SetMaxSize(wxSize(TAB_AREA_WIDTH, TAB_AREA_HEIGHT));
 		this->SetSizer(sizer);
 	}
 	this->Layout();
