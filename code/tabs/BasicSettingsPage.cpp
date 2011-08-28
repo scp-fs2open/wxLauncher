@@ -315,7 +315,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	// Speech
 	wxStaticBox* speechBox = new wxStaticBox(this, wxID_ANY, _("Speech"));
 	wxTextCtrl* speechTestText = new wxTextCtrl(this, ID_SPEECH_TEST_TEXT,
-		_("Press play to test this string"),
+		_("Press play to test this string."),
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE);
 	wxChoice* speechVoiceCombo = new wxChoice(this, ID_SPEECH_VOICE_COMBO);

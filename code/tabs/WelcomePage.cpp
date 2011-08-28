@@ -183,7 +183,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Automatically retrieve highlights at startup"));
-	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the hard-light.net highlights the next time it runs"));
+	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the Hard Light Productions highlights the next time it runs"));
 	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
 	this->needToUpdateNews = true;
 
@@ -505,17 +505,17 @@ bool WelcomePage::getOrPromptUpdateNews() {
 #if 0
 		wxStaticText* updateNewsText1 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("wxLauncher has the built-in capability of retrieving and displaying the Hard-Light.net highlights on the Welcome tab of the launcher."),
+				_("wxLauncher has the built-in capability of retrieving and displaying the Hard Light Productions highlights on the Welcome page of the launcher."),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 #endif
 		wxStaticText* updateNewsText2 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("Would you like wxLauncher to retrieve the highlights from hard-light.net automatically?"),
+				_("Would you like wxLauncher to retrieve the highlights from Hard Light Productions automatically?"),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		
 		wxStaticText* updateNewsText3 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY,
-				_("You can change this setting on the Welcome tab."),
+				_("You can change this setting on the Welcome page."),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
 		wxButton* allowNewsUpdate = 

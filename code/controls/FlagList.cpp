@@ -469,13 +469,13 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 		wxString msg;
 		switch(this->drawStatus) {
 			case MISSING_TC:
-				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings tab.");
+				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
 				break;
 			case MISSING_EXE:
-				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings tab.");
+				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings page.");
 				break;
 			case INVALID_BINARY:
-				msg = _("Selected executable does not exist.\nSelect another on the Basic Settings tab.");
+				msg = _("Selected executable does not exist.\nSelect another on the Basic Settings page.");
 				break;
 			case WAITING_FOR_FLAGFILE:
 				msg = _("Waiting for flag file to be produced and parsed.");
