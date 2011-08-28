@@ -194,6 +194,7 @@ ProMan::ProMan() {
 	this->hasUnsavedChanges = false;
 	this->isAutoSaving = true;
 	this->currentProfile = NULL;
+	// FIXME TODO initialize private copy pointer to NULL
 }
 
 /** Destructor. */
@@ -222,7 +223,7 @@ void ProMan::SaveProfilesBeforeExiting() {
 		wxLogWarning(_T("global profile is null, cannot save it"));
 	}
 	
-	if (this->hasUnsavedChanges) {
+	if (this->hasUnsavedChanges) { // FIXME the private copy check would replace this line
 		if (this->isAutoSaving) {
 			wxLogInfo(_T("autosaving profile %s before exiting"),
 				this->GetCurrentName().c_str()),
@@ -488,6 +489,7 @@ bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
 			value.c_str(), key.c_str());
 		return false;
 	} else {
+		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 				key.c_str(), value.c_str());
@@ -512,6 +514,7 @@ bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
 					 value, key.c_str());
 		return false;
 	} else {
+		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 					   key.c_str(), value);
@@ -536,6 +539,7 @@ bool ProMan::ProfileWrite(const wxString& key, long value) {
 			value, key.c_str());
 		return false;
 	} else {
+		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %d to current profile"),
 				key.c_str(), value);
@@ -560,6 +564,7 @@ bool ProMan::ProfileWrite(const wxString& key, bool value) {
 			value ? _T("true") : _T("false"), key.c_str());
 		return false;
 	} else {
+		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 				key.c_str(), value ? _T("true") : _T("false"));
@@ -711,16 +716,20 @@ bool ProMan::SwitchTo(wxString name) {
 	if ( this->profiles.find(name) == this->profiles.end() ) {
 		return false;
 	} else {
-		if (this->isAutoSaving && this->hasUnsavedChanges) {
+		if (this->isAutoSaving && this->hasUnsavedChanges) { // FIXME would check private copy here
 			wxLogDebug(_T("auto saving current profile %s before switching profiles"),
 				this->currentProfileName.c_str());
 			this->SaveCurrentProfile();
 		}
+		// FIXME if not autosaving, has unsaved changes, and user chose not to save them,
+		// clear the profile's config and copy the private copy's contents to it
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
 		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
+		// FIXME clear private copy and copy newly loaded profile's config into it
 		this->ResetHasUnsavedChanges();
+//		TestConfigFunctions(*(this->currentProfile)); // FIXME TEMP (test on all platforms before removing)
 		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}
@@ -743,14 +752,9 @@ bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
 	wxFileConfig* config = this->profiles[copyName];
 	wxCHECK_MSG( config != NULL, false, _T("Create returned true but did not create profile"));
 
-	wxString str;
-	long cookie;
-	bool cont = config->GetFirstEntry(str, cookie);
-	while ( cont ) {
-		wxLogDebug(_T("  Got: %s"), str.c_str());
+	// FIXME TODO clone profile configs (but first finish GUI support)
+	// and don't copy profile name or profile filename (anything else that shouldn't be copied?)
 
-		cont = config->GetNextEntry(str, cookie);
-	}
 	this->GenerateChangeEvent();
 	return true;
 }
@@ -797,6 +801,319 @@ bool ProMan::DeleteProfile(wxString name) {
 		wxLogWarning(_("Profile %s does not exist. Cannot delete."), name.c_str());
 	}
 	return false;
+}
+
+// the config manipulation functions are adapted from CopyEntriesRecursive and CopyEntry
+// from http://audacity.googlecode.com/svn/audacity-src/trunk/src/Prefs.cpp SVN r11245
+/** copies the contents of one wxConfigBase to another wxConfigBase.
+ The wxWindows group is not copied, if it exists. */
+void ProMan::CopyConfig(wxConfigBase& src,
+						wxConfigBase& dest,
+						const wxString path) {
+	wxString entryName;
+	long entryIndex;
+	bool entryKeepGoing;
+	
+	entryKeepGoing = src.GetFirstEntry(entryName, entryIndex);
+	while (entryKeepGoing) {
+		CopyConfigEntry(src, dest, path, entryName);
+		entryKeepGoing = src.GetNextEntry(entryName, entryIndex);
+	}
+	
+	wxString groupName;
+	long groupIndex;
+	bool groupKeepGoing;
+	
+	groupKeepGoing = src.GetFirstGroup(groupName, groupIndex);
+	while (groupKeepGoing) {
+		if (groupName != _T("wxWindows")) { // skip wxWindows group
+			wxString subPath = path + groupName + _T("/");
+			src.SetPath(subPath);
+			CopyConfig(src, dest, subPath);
+			src.SetPath(path);
+		}
+		groupKeepGoing = src.GetNextGroup(groupName, groupIndex);
+	}
+}
+
+// assumed that cfg1's path is already at path
+// and that cfg1 has an entry at /path/entry
+/** Helper function for CopyConfig(). Copies a single config entry. */
+void ProMan::CopyConfigEntry(const wxConfigBase& src,
+							 wxConfigBase& dest,
+							 const wxString path,
+							 const wxString entry) {
+	switch(src.GetEntryType(entry)) {
+		case wxConfigBase::Type_Unknown:
+		case wxConfigBase::Type_String: {
+			wxString value = src.Read(entry, wxEmptyString);
+			dest.Write(path + entry, value);
+			break;
+		}
+		case wxConfigBase::Type_Boolean: {
+			bool value = false;
+			src.Read(entry, &value, value);
+			dest.Write(path + entry, value);
+			break;
+		}
+		case wxConfigBase::Type_Integer: {
+			long value = false;
+			src.Read(entry, &value, value);
+			dest.Write(path + entry, value);
+			break;
+		}
+		case wxConfigBase::Type_Float: {
+			double value = false;
+			src.Read(entry, &value, value);
+			dest.Write(path + entry, value);
+			break;
+		}
+	}
+}
+
+/** Clears the contents of the provided config. */
+void ProMan::ClearConfig(wxConfigBase& cfg) {
+	wxString entryName;
+	long entryIndex;
+	bool entryKeepGoing;
+	
+	wxArrayString entries, groups;
+	
+	entryKeepGoing = cfg.GetFirstEntry(entryName, entryIndex);
+	while (entryKeepGoing) {
+		entries.Add(entryName);
+		entryKeepGoing = cfg.GetNextEntry(entryName, entryIndex);
+	}
+	
+	wxString groupName;
+	long groupIndex;
+	bool groupKeepGoing;
+	
+	groupKeepGoing = cfg.GetFirstGroup(groupName, groupIndex);
+	while (groupKeepGoing) {
+		groups.Add(groupName);
+		groupKeepGoing = cfg.GetNextGroup(groupName, groupIndex);
+	}
+	
+	for (int i = 0, n = entries.GetCount(); i < n; ++i) {
+		cfg.DeleteEntry(entries.Item(i));
+	}
+	
+	for (int i = 0, n = groups.GetCount(); i < n; ++i) {
+		cfg.DeleteGroup(groups.Item(i));
+	}
+}
+
+/** Tests whether two configs are equal, where two configs are defined as 
+ equal if they have the same entries and groups with the same values,
+ except that the wxWindows group is ignored, if it exists. */
+bool ProMan::AreConfigsEqual(wxConfigBase& cfg1, wxConfigBase& cfg2) {
+	return IsConfigSubset(cfg1, cfg2) && IsConfigSubset(cfg2, cfg1);
+}
+
+/** Tests whether the first config is a subset of the second, where subset
+ means that the first config's entries and groups appear in the second config
+ in the same structure and with the same values, with the exception
+ that the wxWindows group is ignored if it exists.*/
+bool ProMan::IsConfigSubset(wxConfigBase& cfg1,
+							 wxConfigBase& cfg2,
+							 const wxString path) {
+	wxString entryName;
+	long entryIndex;
+	bool entryKeepGoing;
+	
+	entryKeepGoing = cfg1.GetFirstEntry(entryName, entryIndex);
+	while (entryKeepGoing) {
+		if (!AreEntriesEqual(cfg1, cfg2, path, entryName)) {
+			return false;
+		}
+		entryKeepGoing = cfg1.GetNextEntry(entryName, entryIndex);
+	}
+	
+	wxString groupName;
+	long groupIndex;
+	bool groupKeepGoing;
+	
+	groupKeepGoing = cfg1.GetFirstGroup(groupName, groupIndex);
+	while (groupKeepGoing) {
+		if (groupName != _T("wxWindows")) {
+			wxString subPath = path + groupName + _T("/");
+			cfg1.SetPath(subPath);
+			if (!IsConfigSubset(cfg1, cfg2, subPath)) {
+				cfg1.SetPath(path); // fix the path before returning
+				return false;
+			}
+			cfg1.SetPath(path);
+		}
+		groupKeepGoing = cfg1.GetNextGroup(groupName, groupIndex);
+	}
+	return true;
+}
+
+// assumed that cfg1's path is already at path
+/** Helper function for AreConfigsEqual().
+ Tests whether an entry exists in two configs and if so,
+ whether the value stored at the entry in each is equal.*/
+bool ProMan::AreEntriesEqual(const wxConfigBase& cfg1,
+							 const wxConfigBase& cfg2,
+							 const wxString path,
+							 const wxString entry) {
+	switch(cfg1.GetEntryType(entry)) {
+		case wxConfigBase::Type_Unknown:
+		case wxConfigBase::Type_String: {
+			wxString value1, value2;
+			if ((!cfg1.Read(entry, &value1)) || (!cfg2.Read(path + entry, &value2))) {
+				return false;
+			} else {
+				return value1 == value2;
+			}
+			break;
+		}
+		case wxConfigBase::Type_Boolean: {
+			bool value1, value2;
+			if ((!cfg1.Read(entry, &value1)) || (!cfg2.Read(path + entry, &value2))) {
+				return false;
+			} else {
+				return value1 == value2;
+			}
+			break;
+		}
+		case wxConfigBase::Type_Integer: {
+			long value1, value2;
+			if ((!cfg1.Read(entry, &value1)) || (!cfg2.Read(path + entry, &value2))) {
+				return false;
+			} else {
+				return value1 == value2;
+			}
+			break;
+		}
+		case wxConfigBase::Type_Float: {
+			double value1, value2;
+			if ((!cfg1.Read(entry, &value1)) || (!cfg2.Read(path + entry, &value2))) {
+				return false;
+			} else {
+				return value1 == value2;
+			}
+			break;
+		}
+		default:
+			wxLogWarning(_T("unknown entry type %s"), cfg1.GetEntryType(entry));
+			return false;
+		break;
+	}
+	wxCHECK_MSG(false, false, _T("escaped switch statement in ProMan::AreEntriesEqual"));
+}
+
+/** Debugging function that prints contents of provided config to log. */
+void ProMan::LogConfigContents(wxConfigBase& cfg, const wxString path, const bool includeWxWindows) {
+	wxString entryName;
+	long entryIndex;
+	bool entryKeepGoing;
+	
+	entryKeepGoing = cfg.GetFirstEntry(entryName, entryIndex);
+	while (entryKeepGoing) {
+		wxLogDebug(_T("  %s%s = %s"),
+			path.c_str(), entryName.c_str(), cfg.Read(entryName, _T("ENTRY_NOT_FOUND")).c_str());
+		entryKeepGoing = cfg.GetNextEntry(entryName, entryIndex);
+	}
+	
+	wxString groupName;
+	long groupIndex;
+	bool groupKeepGoing;
+	
+	groupKeepGoing = cfg.GetFirstGroup(groupName, groupIndex);
+	while (groupKeepGoing) {
+		if (includeWxWindows) {
+			wxString subPath = path + groupName + _T("/");
+			cfg.SetPath(subPath);
+			LogConfigContents(cfg, subPath);
+			cfg.SetPath(path);
+		} else if (groupName != _T("wxWindows")) {
+			wxString subPath = path + groupName + _T("/");
+			cfg.SetPath(subPath);
+			LogConfigContents(cfg, subPath);
+			cfg.SetPath(path);
+		}
+		groupKeepGoing = cfg.GetNextGroup(groupName, groupIndex);
+	}
+}
+
+/** Start of a test case for config manipulation functions */
+void ProMan::TestConfigFunctions(wxConfigBase& src) {
+	wxLogDebug(_T("contents of source config:"));
+	LogConfigContents(src);
+
+	wxString tempFileName = wxFileName::CreateTempFileName(_T("wxLtest"));
+	wxLogDebug(_T("created temp file '%s'"), tempFileName.c_str());
+	wxFFileInputStream instream(tempFileName);
+	wxFileConfig* dest = new wxFileConfig(instream);
+	
+	wxLogDebug(_T("initial contents of dest config:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("is src a subset of dest? %s"), IsConfigSubset(src, *dest) ? _T("true") : _T("false"));
+	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
+	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
+
+	wxLogDebug(_T("copying source config to dest config"));
+	CopyConfig(src, *dest);
+	
+	wxLogDebug(_T("contents of dest config after copying:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("is src a subset of dest? %s"), IsConfigSubset(src, *dest) ? _T("true") : _T("false"));
+	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
+	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
+	
+	wxLogDebug(_T("deleting entry %s from dest"), PRO_CFG_LIGHTING_PRESET);
+	dest->DeleteEntry(PRO_CFG_LIGHTING_PRESET, true);
+	
+	wxLogDebug(_T("contents of dest config after entry deletion:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("is src a subset of dest? %s"), IsConfigSubset(src, *dest) ? _T("true") : _T("false"));
+	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
+	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
+	
+	wxLogDebug(_T("clearing dest config"));
+	wxLogDebug(_T("before clearing, dest has %d entries and %d groups"),
+		dest->GetNumberOfEntries(true), dest->GetNumberOfGroups(true));
+
+	ClearConfig(*dest);
+	
+	wxLogDebug(_T("contents of dest config after clearing:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("after clearing, dest has %d entries and %d groups"),
+		dest->GetNumberOfEntries(true), dest->GetNumberOfGroups(true));
+	
+	wxLogDebug(_T("recopying src to dest"));
+	
+	CopyConfig(src, *dest);
+	
+	wxLogDebug(_T("contents of dest config after second copying:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("is src a subset of dest? %s"), IsConfigSubset(src, *dest) ? _T("true") : _T("false"));
+	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
+	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
+	
+	const wxString FAKE_ENTRY = _T("/foo/bar");
+	const wxString FAKE_VALUE = _T("blah");
+	
+	wxLogDebug(_T("adding entry %s to dest"), FAKE_ENTRY.c_str());
+	dest->Write(FAKE_ENTRY, FAKE_VALUE);
+	
+	wxLogDebug(_T("contents of dest config after entry addition:"));
+	LogConfigContents(*dest);
+	
+	wxLogDebug(_T("is src a subset of dest? %s"), IsConfigSubset(src, *dest) ? _T("true") : _T("false"));
+	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
+	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
+
+	delete dest;
+	
+	wxLogDebug(_T("config test complete."));
 }
 
 /** Applies the current profile to the registry where 
