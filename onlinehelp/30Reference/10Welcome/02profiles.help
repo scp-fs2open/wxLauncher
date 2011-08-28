@@ -15,15 +15,15 @@ Click this button to delete the selected profile. You will be asked to confirm t
 **Note**: You can't delete the "Default" profile.
 
 ### Save
-Click this button to manually save the current profile. <!-- If a profile contains unsaved changes, the launcher will ask you on exit if you want to save your changes. -->
+Click this button to manually save the current profile. If the "Automatically save profiles" checkbox is unchecked and the current profile contains unsaved changes, the launcher will ask you on a profile switch and on exit if you want to save your changes.
 
 <!-- **Note**: an unsaved profile is denoted with an \* in the titlebar
 
 - - title bar with unsaved profile marked screenshot - -
 -->
 
-### Always save default profile <!-- TODO really? is that what it does? -->
-If checked, the Default profile (that is, the profile named "Default") will always be saved on launcher exit and/or profile switch. 
+### Automatically save profiles
+If checked, any changes made to the current profile will be automatically saved on launcher exit and/or profile switch. 
 
 **Tip**: If you don't want to use profiles, check this box and select the Default profile, at which point wxLauncher will act like the standard Windows launcher, remembering your changes automatically.
 

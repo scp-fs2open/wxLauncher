@@ -3,7 +3,7 @@
 [TOC]
 
 # What is wxLauncher?
-wxLauncher aims to be a multi-language multiplatform multipurpose launcher/updater application intended to make life easier for fans of FreeSpace 2 and of total conversions using FSO **FIXME link to FSO or something**.
+wxLauncher aims to be a multi-language multiplatform multipurpose launcher/updater application intended to make life easier for fans of FreeSpace 2 and of total conversions using [FSO][]![][li].
 
 # What can wxLauncher do?
 
@@ -38,11 +38,11 @@ If you've found a bug, please do the following:
 * If the issue you are experiencing is not reported in the [issues page][issues]![][le], please contact one of the [project owners][people]![][le] or any [developer][people]![][le] with all the relevant details (what were you doing when the issue happened, logs, screenshots, launcher version, FSO version, etc.). We'll analyze the details and may ask you for some more information in order to track down the problem and fix it.
 
 # I have a suggestion, what should I do?
-Suggestions are always welcome. Contact one of the [project owners or developers][people]![][le] with it. If it's worth implementing it, we'll do so.
+Suggestions are always welcome. Contact one of the [project owners or developers][people]![][le]. If it's worth implementing it, we'll do so.
 
-# I want to join the project, what should I do?
-Simply contact one of the [project owners][people]![][le]. We're not looking for any particular skills at the moment, but that doesn't mean that we're not accepting people into the team.
-<!-- **TODO we should think seriously about what we put here.** -->
+<!-- # I want to join the project, what should I do? -->
+<!-- Simply contact one of the [project owners][people]![][le]. We're not looking for any particular skills at the moment, but that doesn't mean that we're not accepting people into the team.
+ **TODO we should think seriously about what we put here.** -->
 
 <!-- # This launcher sucks!
 While this is not a question, we will accept your criticism if you can tell us in detail why you think the application is not worth using. Please contact one of the [project owners][people]![][le] with the information. --> <!-- is there a more professional, neutral way of saying this? -->

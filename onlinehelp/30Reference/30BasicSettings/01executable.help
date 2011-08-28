@@ -2,7 +2,7 @@
 <meta name="control" content="ID_EXE_ROOT_FOLDER_BOX" />
 <title>TC root folder and executable</title>
 
-#TC root folder and executable
+# TC root folder and executable
 
 In order to be able to launch [FSO][]![][li], the launcher needs to know two things:
 
@@ -11,13 +11,13 @@ In order to be able to launch [FSO][]![][li], the launcher needs to know two thi
 
 ### TC root folder
 
-**TODO try to get rid of the "You must" -- too demanding.**
+<!-- **TODO try to get rid of the "You must" -- too demanding.** -->
 
 You must select a [TC][tc]![][li] root folder is needed before you can select an FSO executable (or [mod][mod]![][li] on the [mods page][modpage]![][li]) to use.
 
 <!-- -- Compound image  of the root folder selection boxa nd button with the"browse for folder" dialog -- -->
  
-To select the TC root folder, click **Browse...** and browse to the correct folder (the one containing the FSO executables) and click **Choose** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
+To select the TC root folder, click **Browse...** and browse to the folder containing the FSO executables, then click **Choose** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
 
 ### FreeSpace 2 Open (FS2 Open) executable selection
 

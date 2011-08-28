@@ -12,7 +12,7 @@ While you cannot directly copy settings from one profile to another, when creati
 **Tip**: You can use this feature to rename a profile. Simply click the new profile button, choose the profile you want to rename and type in the new name. Click "OK" to create the new profile and then delete the old one. --> <!-- copying profiles not yet supported -->
 
 ### What data is saved
-A profile contains the following data: **TODO verify that this information is correct**
+A profile contains the following data:
 
 * The selected mod.
 * Status of all the options from the [Basic Settings][basic]![][li] page.

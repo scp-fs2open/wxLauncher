@@ -1,12 +1,12 @@
-<title>Page and Controls Reference</title>
-#Reference
+<title>Page and controls reference</title>
+# Reference
 
 This section explains the various controls and functions of the launcher:
 
-* [Welcome tab][welcome]![][li]
-* [Mods tab][mods]![][li]
-* [Basic Settings tab][basic]![][li]
-* [Advanced Settings tab][advanced]![][li]
+* [Welcome page][welcome]![][li]
+* [Mods page][mods]![][li]
+* [Basic Settings page][basic]![][li]
+* [Advanced Settings page][advanced]![][li]
 
 [li]: /images/li.png
 [welcome]: 10Welcome/index.help
