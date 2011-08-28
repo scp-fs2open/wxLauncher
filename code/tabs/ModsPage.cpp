@@ -70,7 +70,11 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTCSizer->Add(noTC, 0, wxEXPAND| wxALL | wxCENTER);
 		noTCSizer->AddStretchSpacer(1);
 
+#if IS_LINUX
+		this->SetSizerAndFit(noTCSizer);
+#else
 		this->SetSizer(noTCSizer);
+#endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
 			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),
@@ -92,7 +96,11 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTCSizer->Add(invalidTC, 0, wxEXPAND| wxALL | wxCENTER);
 		invalidTCSizer->AddStretchSpacer(1);
 
+#if IS_LINUX
+		this->SetSizerAndFit(invalidTCSizer);
+#else
 		this->SetSizer(invalidTCSizer);
+#endif
 	} else {
 #if 0
 		wxStaticText* header = new wxStaticText(this, wxID_ANY,
