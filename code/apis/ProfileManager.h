@@ -81,8 +81,11 @@ public:
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
+	// FIXME maybe SwitchTo will take an extra bool (default is false) that will swap in private copy if auto saving is off.
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
+	// FIXME add "bool hasUnsavedChanges();" which compares the current profile to the private copy
+	// FIXME Adjust below to call this->HasUnsavedChanges() instead of this->hasUnsavedChanges
 	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->hasUnsavedChanges; }
 	void SetAutoSave(bool value) { this->isAutoSaving = value; }
 
@@ -110,6 +113,18 @@ private:
 	wxString currentProfileName;
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
+
+	static void CopyConfig(wxConfigBase& src, wxConfigBase &dest, const wxString path = _T("/"));
+	static void CopyConfigEntry(const wxConfigBase& src, wxConfigBase& dest, const wxString path, const wxString entry);
+
+	static void ClearConfig(wxConfigBase& cfg);
+	
+	static bool AreConfigsEqual(wxConfigBase& cfg1, wxConfigBase& cfg2);
+	static bool IsConfigSubset(wxConfigBase& cfg1, wxConfigBase& cfg2, const wxString path = _T("/"));
+	static bool AreEntriesEqual(const wxConfigBase& cfg1, const wxConfigBase& cfg2, const wxString path, const wxString entry);
+
+	static void LogConfigContents(wxConfigBase& cfg, const wxString path = _T("/"), const bool includeWxWindows = false);
+	static void TestConfigFunctions(wxConfigBase& src);
 	
 	ProMan();
 	void SaveProfilesBeforeExiting();
@@ -117,9 +132,9 @@ private:
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
 	bool isAutoSaving; //!< Are we auto saving the profiles?
-	bool hasUnsavedChanges; //!< Does current profile have unsaved changes?
-	inline void SetHasUnsavedChanges() { this->hasUnsavedChanges = true; }
-	inline void ResetHasUnsavedChanges() { this->hasUnsavedChanges = false; }
+	bool hasUnsavedChanges; //!< Does current profile have unsaved changes? // FIXME remove
+	inline void SetHasUnsavedChanges() { this->hasUnsavedChanges = true; }  // FIXME remove
+	inline void ResetHasUnsavedChanges() { this->hasUnsavedChanges = false; }  // FIXME maybe keep. but not inline. would initialize private copy
 	void GenerateChangeEvent();
 	void GenerateCurrentProfileChangedEvent();
 
