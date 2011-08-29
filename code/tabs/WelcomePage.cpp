@@ -479,18 +479,13 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxASSERT(updateNewsQuestionIcon.IsOk());
 
 		updateNewsQuestion->SetIcon(updateNewsQuestionIcon);
-#if 0
+
 		wxStaticText* updateNewsText1 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("wxLauncher has the built-in capability of retrieving and displaying the Hard Light Productions highlights on the Welcome page of the launcher."),
-				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-#endif
-		wxStaticText* updateNewsText2 = 
-			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("Would you like wxLauncher to retrieve the highlights from Hard Light Productions automatically?"),
+				_("Should wxLauncher automatically retrieve the highlights from Hard Light Productions?"),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		
-		wxStaticText* updateNewsText3 = 
+		wxStaticText* updateNewsText2 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY,
 				_("You can change this setting on the Welcome page."),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
@@ -523,27 +518,18 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxStaticBitmap* questionImage = 
 			new wxStaticBitmap(updateNewsQuestion, wxID_ANY, questionMark);
 
-		choiceSizer->AddStretchSpacer(1);
-		choiceSizer->Add(allowNewsUpdate);
-		choiceSizer->AddSpacer(10);
+		choiceSizer->Add(allowNewsUpdate, wxSizerFlags().Border(wxRIGHT, 5));
 		choiceSizer->Add(denyNewsUpdate);
 #if 0
-		choiceSizer->AddSpacer(15);
-		choiceSizer->Add(helpButton);
+		choiceSizer->Add(helpButton, wxSizerFlags().Border(wxLEFT, 15));
 #endif
-		choiceSizer->AddStretchSpacer(1);
 
-#if 0
-		bodySizer->Add(updateNewsText1, wxSizerFlags().Expand().Center());
-#endif
-		bodySizer->Add(updateNewsText2, wxSizerFlags().Expand().Center().Border(wxTOP, 5));
-		bodySizer->Add(updateNewsText3, wxSizerFlags().Expand().Center().Border(wxBOTTOM, 10));
-		bodySizer->Add(choiceSizer, wxSizerFlags().Expand().Center());
-		bodySizer->AddSpacer(5);
+		bodySizer->Add(updateNewsText1, wxSizerFlags().Center());
+		bodySizer->Add(updateNewsText2, wxSizerFlags().Center().Border(wxBOTTOM, 10));
+		bodySizer->Add(choiceSizer, wxSizerFlags().Center());
 
-		updateNewsSizer->Add(questionImage,0, wxALL | wxCENTER, 5);
-		updateNewsSizer->Add(bodySizer, wxSizerFlags().Expand().Center());
-		updateNewsSizer->AddSpacer(5);
+		updateNewsSizer->Add(questionImage, wxSizerFlags().Center().Border(wxTOP|wxLEFT|wxBOTTOM, 5));
+		updateNewsSizer->Add(bodySizer, wxSizerFlags().Center().Border(wxALL, 5));
 		
 		updateNewsQuestion->SetSizerAndFit(updateNewsSizer);
 		updateNewsQuestion->Centre(wxBOTH | wxCENTRE_ON_SCREEN);
