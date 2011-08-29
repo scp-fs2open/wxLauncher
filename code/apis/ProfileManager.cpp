@@ -191,10 +191,12 @@ to setup class, then call GetProfileManager() to get a pointer to the instance.
 */
 ProMan::ProMan() {
 	this->globalProfile = NULL;
-	this->hasUnsavedChanges = false;
 	this->isAutoSaving = true;
 	this->currentProfile = NULL;
-	// FIXME TODO initialize private copy pointer to NULL
+	
+	this->privateCopyFilename = wxFileName::CreateTempFileName(_T("wxLtest"));
+	wxFFileInputStream instream(this->privateCopyFilename);
+	this->privateCopy = new wxFileConfig(instream);
 }
 
 /** Destructor. */
@@ -207,6 +209,10 @@ ProMan::~ProMan() {
 		delete iter->second;
 		iter++;
 	}
+	
+	delete this->privateCopy;
+	privateCopy = NULL;
+	::wxRemoveFile(this->privateCopyFilename);
 }
 
 /** Saves changes to profiles according to autosave profiles checkbox. */
@@ -223,7 +229,7 @@ void ProMan::SaveProfilesBeforeExiting() {
 		wxLogWarning(_T("global profile is null, cannot save it"));
 	}
 	
-	if (this->hasUnsavedChanges) { // FIXME the private copy check would replace this line
+	if (this->HasUnsavedChanges()) {
 		if (this->isAutoSaving) {
 			wxLogInfo(_T("autosaving profile %s before exiting"),
 				this->GetCurrentName().c_str()),
@@ -246,6 +252,14 @@ void ProMan::SaveProfilesBeforeExiting() {
 		wxLogInfo(_T("Current profile %s has no unsaved changes. Exiting."),
 			this->GetCurrentName().c_str());
 	}
+}
+
+/** Resets the private copy so that it contains a copy
+ of the current profile's contents. */
+void ProMan::ResetPrivateCopy() {
+	wxCHECK_RET(this->currentProfile != NULL, _T("ResetPrivateCopy called with null current profile!"));
+	ClearConfig(*(this->privateCopy));
+	CopyConfig(*(this->currentProfile), *(this->privateCopy));
 }
 
 /** Creates a new profile including the directory for it to go in, the entry
@@ -489,17 +503,14 @@ bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
 			value.c_str(), key.c_str());
 		return false;
 	} else {
-		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 				key.c_str(), value.c_str());
-			this->SetHasUnsavedChanges();
 		} else {
 			wxString oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
 				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
 					oldValue.c_str(), value.c_str(), key.c_str());
-				this->SetHasUnsavedChanges();
 			}
 		}
 		return this->currentProfile->Write(key, value);
@@ -514,17 +525,14 @@ bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
 					 value, key.c_str());
 		return false;
 	} else {
-		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 					   key.c_str(), value);
-			this->SetHasUnsavedChanges();
 		} else {
 			wxString oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
 				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
 						   oldValue.c_str(), value, key.c_str());
-				this->SetHasUnsavedChanges();
 			}
 		}
 		return this->currentProfile->Write(key, value);
@@ -539,17 +547,14 @@ bool ProMan::ProfileWrite(const wxString& key, long value) {
 			value, key.c_str());
 		return false;
 	} else {
-		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %d to current profile"),
 				key.c_str(), value);
-			this->SetHasUnsavedChanges();
 		} else {
 			long oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
 				wxLogDebug(_T("replacing old value %d with value %d for current profile entry %s"),
 					oldValue, value, key.c_str());
-				this->SetHasUnsavedChanges();
 			}
 		}
 		return this->currentProfile->Write(key, value);
@@ -564,11 +569,9 @@ bool ProMan::ProfileWrite(const wxString& key, bool value) {
 			value ? _T("true") : _T("false"), key.c_str());
 		return false;
 	} else {
-		// FIXME either remove this block or keep in some form for debugging output
 		if (!this->currentProfile->Exists(key)) {
 			wxLogDebug(_T("adding entry %s with value %s to current profile"),
 				key.c_str(), value ? _T("true") : _T("false"));
-			this->SetHasUnsavedChanges();
 		} else {
 			bool oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
@@ -576,7 +579,6 @@ bool ProMan::ProfileWrite(const wxString& key, bool value) {
 					oldValue ? _T("true") : _T("false"),
 					value ? _T("true") : _T("false"),
 					key.c_str());
-				this->SetHasUnsavedChanges();
 			}
 		}
 		
@@ -596,7 +598,6 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 		if (this-currentProfile->Exists(key)) {
 			wxLogDebug(_T("deleting key %s in profile"),
 				key.c_str());
-			this->SetHasUnsavedChanges();
 		}
 		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
 	}
@@ -700,12 +701,17 @@ void ProMan::SaveCurrentProfile() {
 			wxASSERT( file.IsOk() );
 			wxFFileOutputStream configOutput(file.GetFullPath());
 			config->Save(configOutput);
-			this->ResetHasUnsavedChanges();
+			this->ResetPrivateCopy();
+			wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());
 			wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
 		}
 	} else {
 		wxLogError(_T("Configbase is not a wxFileConfig."));
 	}
+}
+
+bool ProMan::HasUnsavedChanges() {
+	return !AreConfigsEqual(*(this->currentProfile), *(this->privateCopy));
 }
 
 wxString ProMan::GetCurrentName() {
@@ -716,20 +722,23 @@ bool ProMan::SwitchTo(wxString name) {
 	if ( this->profiles.find(name) == this->profiles.end() ) {
 		return false;
 	} else {
-		if (this->isAutoSaving && this->hasUnsavedChanges) { // FIXME would check private copy here
-			wxLogDebug(_T("auto saving current profile %s before switching profiles"),
-				this->currentProfileName.c_str());
-			this->SaveCurrentProfile();
+		if (this->currentProfile != NULL && this->HasUnsavedChanges()) {
+			if (this->isAutoSaving) {
+				wxLogDebug(_T("auto saving current profile %s before switching profiles"),
+					this->currentProfileName.c_str());
+				this->SaveCurrentProfile();
+			} else {
+				wxLogDebug(_T("clearing unsaved changes to profile %s before switching"),
+					this->currentProfileName.c_str());
+				ClearConfig(*(this->currentProfile));
+				CopyConfig(*(this->privateCopy), *(this->currentProfile));
+			}
 		}
-		// FIXME if not autosaving, has unsaved changes, and user chose not to save them,
-		// clear the profile's config and copy the private copy's contents to it
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
 		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
-		// FIXME clear private copy and copy newly loaded profile's config into it
-		this->ResetHasUnsavedChanges();
-//		TestConfigFunctions(*(this->currentProfile)); // FIXME TEMP (test on all platforms before removing)
+		this->ResetPrivateCopy();
 		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}

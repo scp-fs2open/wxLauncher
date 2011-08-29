@@ -319,7 +319,7 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 				wxLogInfo(_T("Cancelled switch to profile %s."), newProfile.c_str());
 				profileCombo->SetSelection(profileCombo->FindString(proman->GetCurrentName()));
 				return;
-			} else { // FIXME if not saving changes, swap private copy into profiles
+			} else {
 				wxLogWarning(_T("switching from profile %s to profile %s without saving changes"),
 					proman->GetCurrentName().c_str(), newProfile.c_str());
 			}
