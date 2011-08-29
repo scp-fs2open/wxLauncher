@@ -38,10 +38,14 @@ public:
 	CloneProfileDialog(wxWindow* parent);
 	const wxString GetSourceProfileName();
 	const wxString& GetNewProfileName();
+	bool UseProfileCloning() const { return useProfileCloning; }
 	void OnUpdateText(wxCommandEvent& event);
 	void OnPressEnterKey(wxCommandEvent& event);
+	void OnClickCloneCheckbox(wxCommandEvent& event);
 private:
+	bool useProfileCloning;
 	wxString newProfileName;
+	wxStaticText *cloneFromText;
 	wxButton *createButton;
 	wxChoice *cloneFrom;
 	
@@ -104,6 +108,7 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(CloneProfileDialog, wxDialog)
 EVT_TEXT(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnUpdateText)
 EVT_TEXT_ENTER(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnPressEnterKey)
+EVT_CHECKBOX(ID_CLONE_PROFILE_CHECKBOX, CloneProfileDialog::OnClickCloneCheckbox)
 END_EVENT_TABLE()
 
 WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
@@ -337,26 +342,30 @@ void WelcomePage::cloneNewProfile(wxChoice* profileCombo, ProMan* proman) {
 	CloneProfileDialog cloneDialog(this);
 
 	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
-//		wxLogDebug(_T("User clicked clone"));
-		wxLogDebug(_T("User clicked create"));
+		wxLogDebug(_T("User clicked %s"), cloneDialog.UseProfileCloning() ? _T("clone") : _T("create")); 
 		if ( proman->CloneProfile(
 			cloneDialog.GetSourceProfileName(),
 			cloneDialog.GetNewProfileName()) ) {
-//				wxLogStatus(_("Cloned profile '%s' from '%s'"),
-//					cloneDialog.GetNewProfileName().c_str()
-//					cloneDialog.GetSourceProfileName().c_str());
+			if (cloneDialog.UseProfileCloning()) {
+				wxLogStatus(_("Cloned profile '%s' from '%s'"),
+					cloneDialog.GetNewProfileName().c_str(),
+					cloneDialog.GetSourceProfileName().c_str());
+			} else {
 				wxLogStatus(_("Created profile '%s'"),
 					cloneDialog.GetNewProfileName().c_str());
+			}
 				proman->SwitchTo(cloneDialog.GetNewProfileName());
 		} else {
-//				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
-//					cloneDialog.GetNewProfileName().c_str(),
-//					cloneDialog.GetSourceProfileName().c_str());
+			if (cloneDialog.UseProfileCloning()) {
+				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
+					cloneDialog.GetNewProfileName().c_str(),
+					cloneDialog.GetSourceProfileName().c_str());
+			} else {
 				wxLogError(_("Unable to create profile '%s'. See log for details."),
-					cloneDialog.GetNewProfileName().c_str());
+					cloneDialog.GetNewProfileName().c_str());	
+			}
 		}
 	} else {
-//		wxLogStatus(_("Profile clone aborted"));
 		wxLogStatus(_("Profile creation aborted"));
 	}
 }
@@ -561,24 +570,23 @@ void WelcomePage::OnUpdateNewsHelp(wxCommandEvent &WXUNUSED(event)) {
 ///////////////////////////////////////////////////////////////////////////////
 ///// DIALOGS ///
 CloneProfileDialog::CloneProfileDialog(wxWindow* parent):
-wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition, wxDefaultSize) {
+wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Create new profile"), wxDefaultPosition, wxDefaultSize) {
 	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New profile name:"));
 	wxTextCtrl *newName = new wxTextCtrl(this, ID_CLONE_PROFILE_NEWNAME, wxEmptyString,
 										 wxDefaultPosition, wxSize(200,-1), wxTE_PROCESS_ENTER);
 	
-	wxSizer* nameSizer = new wxFlexGridSizer(2);
+	wxSizer* nameSizer = new wxFlexGridSizer(3);
+	nameSizer->AddStretchSpacer(1);
 	nameSizer->Add(newNameText, wxSizerFlags().Border(wxRIGHT, 5));
-	nameSizer->Add(newName);
+	nameSizer->Add(newName, wxSizerFlags().Expand());
 
-	wxStaticText *cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
+	wxCheckBox* cloneFromCheckbox = new wxCheckBox(this, ID_CLONE_PROFILE_CHECKBOX, wxEmptyString);
+	this->cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
 	cloneFrom = new wxChoice(this, wxID_ANY);
-#if 0
+
+	nameSizer->Add(cloneFromCheckbox);
 	nameSizer->Add(cloneFromText, wxSizerFlags().Border(wxRIGHT, 5));
-	nameSizer->Add(cloneFrom);
-#endif
-	// well, if we can't easily get rid of the clone components, let's get them off the screen
-	cloneFromText->Hide();
-	cloneFrom->Hide();
+	nameSizer->Add(cloneFrom, wxSizerFlags().Expand());
 	
 	this->createButton = new wxButton(this, wxID_OK, _("Create"));
 	wxCommandEvent initDialogEvent;
@@ -598,6 +606,10 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 	cloneFrom->Append(ProMan::GetProfileManager()->GetAllProfileNames());
 	cloneFrom->SetStringSelection(ProMan::GetProfileManager()->GetCurrentName());
 
+	wxCommandEvent initEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_CLONE_PROFILE_CHECKBOX);
+	initEvent.SetInt(0); // will initialize checkbox to unchecked
+	this->OnClickCloneCheckbox(initEvent);
+	
 	this->SetSizerAndFit(sizer);
 	this->Layout();
 	this->Center();
@@ -609,7 +621,8 @@ const wxString& CloneProfileDialog::GetNewProfileName() {
 }
 
 const wxString CloneProfileDialog::GetSourceProfileName() {
-	return cloneFrom->GetStringSelection(); // can't return wxString& since this is a temporary var
+	// can't return wxString& since cloneFrom returns a temporary var
+	return this->UseProfileCloning() ? cloneFrom->GetStringSelection() : wxString(wxEmptyString);
 }
 
 void CloneProfileDialog::OnUpdateText(wxCommandEvent& event) {
@@ -623,10 +636,24 @@ void CloneProfileDialog::OnPressEnterKey(wxCommandEvent& event) {
 	}
 }
 
+void CloneProfileDialog::OnClickCloneCheckbox(wxCommandEvent& event) {
+	if (event.IsChecked()) {
+		this->useProfileCloning = true;
+		this->createButton->SetLabel(_("Clone"));
+		this->cloneFrom->Enable();
+		this->cloneFromText->SetForegroundColour(*wxBLACK);
+	} else {
+		this->useProfileCloning = false;
+		this->createButton->SetLabel(_("Create"));		
+		this->cloneFrom->Disable();
+		this->cloneFromText->SetForegroundColour(*wxLIGHT_GREY);
+	}
+}
+
 // a valid name is non-empty and does not consist purely of whitespace
 bool CloneProfileDialog::NewNameIsValid() {
 	wxTextCtrl* newName = dynamic_cast<wxTextCtrl*>(wxWindow::FindWindowById(ID_CLONE_PROFILE_NEWNAME, this));
-	wxASSERT_MSG(newName != NULL, _T("can't find the clone profile new name text ctrl"));
+	wxCHECK_MSG(newName != NULL, false, _T("can't find the clone profile new name text ctrl"));
 	return !(newName->GetValue().Trim().IsEmpty());
 }
 
