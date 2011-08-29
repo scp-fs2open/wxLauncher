@@ -626,8 +626,8 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 	wxButton *closeButton = new wxButton(this, wxID_CANCEL, _("Cancel"));
 
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	buttonSizer->Add(createButton, wxSizerFlags().Border(wxALL, 5));
-	buttonSizer->Add(closeButton, wxSizerFlags().Border(wxALL, 5));
+	buttonSizer->Add(createButton, wxSizerFlags().Border(wxRIGHT, 5));
+	buttonSizer->Add(closeButton, wxSizerFlags());
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(nameSizer, wxSizerFlags().Expand().Border(wxALL, 5));
@@ -682,8 +682,8 @@ wxDialog(parent, ID_DELETE_PROFILE_DIALOG, _("Delete profile?"), wxDefaultPositi
 	wxButton *cancelButton = new wxButton(this, wxID_ANY, _("Cancel"));
 
 	wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	buttonSizer->Add(deleteButton, wxSizerFlags().Border(wxALL, 5));
-	buttonSizer->Add(cancelButton, wxSizerFlags().Border(wxALL, 5));
+	buttonSizer->Add(deleteButton, wxSizerFlags().Border(wxRIGHT, 5));
+	buttonSizer->Add(cancelButton, wxSizerFlags());
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(text, wxSizerFlags().Expand().Border(wxALL, 5));
