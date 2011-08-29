@@ -81,12 +81,10 @@ public:
 	bool CloneProfile(wxString orignalName, wxString copyName);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
-	// FIXME maybe SwitchTo will take an extra bool (default is false) that will swap in private copy if auto saving is off.
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
-	// FIXME add "bool hasUnsavedChanges();" which compares the current profile to the private copy
-	// FIXME Adjust below to call this->HasUnsavedChanges() instead of this->hasUnsavedChanges
-	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->hasUnsavedChanges; }
+	bool HasUnsavedChanges();
+	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->HasUnsavedChanges(); }
 	void SetAutoSave(bool value) { this->isAutoSaving = value; }
 
 	void AddEventHandler(wxEvtHandler *handler);
@@ -131,10 +129,10 @@ private:
 
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
+	wxString privateCopyFilename; //!< Name of file used for private copy
+	wxFileConfig* privateCopy; //!< Private copy, used in determining whether current profile has unsaved changes
+	void ResetPrivateCopy();
 	bool isAutoSaving; //!< Are we auto saving the profiles?
-	bool hasUnsavedChanges; //!< Does current profile have unsaved changes? // FIXME remove
-	inline void SetHasUnsavedChanges() { this->hasUnsavedChanges = true; }  // FIXME remove
-	inline void ResetHasUnsavedChanges() { this->hasUnsavedChanges = false; }  // FIXME maybe keep. but not inline. would initialize private copy
 	void GenerateChangeEvent();
 	void GenerateCurrentProfileChangedEvent();
 
