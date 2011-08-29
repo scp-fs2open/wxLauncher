@@ -745,11 +745,13 @@ bool ProMan::SwitchTo(wxString name) {
 }
 
 bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
+#if 0
 	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName.c_str(), copyName.c_str());
 	if ( !this->DoesProfileExist(originalName) ) {
 		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName.c_str());
 		return false;
 	}
+#endif
 	if ( this->DoesProfileExist(copyName) ) {
 		wxLogWarning(_("Target profile '%s' already exists!"), copyName.c_str());
 		return false;
