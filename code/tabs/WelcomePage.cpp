@@ -577,15 +577,15 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Create new profile"), wxDefaultPosi
 	
 	wxSizer* nameSizer = new wxFlexGridSizer(3);
 	nameSizer->AddStretchSpacer(1);
-	nameSizer->Add(newNameText, wxSizerFlags().Border(wxRIGHT, 5));
+	nameSizer->Add(newNameText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	nameSizer->Add(newName, wxSizerFlags().Expand());
 
 	wxCheckBox* cloneFromCheckbox = new wxCheckBox(this, ID_CLONE_PROFILE_CHECKBOX, wxEmptyString);
 	this->cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
 	cloneFrom = new wxChoice(this, wxID_ANY);
 
-	nameSizer->Add(cloneFromCheckbox);
-	nameSizer->Add(cloneFromText, wxSizerFlags().Border(wxRIGHT, 5));
+	nameSizer->Add(cloneFromCheckbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	nameSizer->Add(cloneFromText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	nameSizer->Add(cloneFrom, wxSizerFlags().Expand());
 	
 	this->createButton = new wxButton(this, wxID_OK, _("Create"));
@@ -642,11 +642,15 @@ void CloneProfileDialog::OnClickCloneCheckbox(wxCommandEvent& event) {
 		this->createButton->SetLabel(_("Clone"));
 		this->cloneFrom->Enable();
 		this->cloneFromText->SetForegroundColour(*wxBLACK);
+		this->Refresh();
+		this->Update();
 	} else {
 		this->useProfileCloning = false;
 		this->createButton->SetLabel(_("Create"));		
 		this->cloneFrom->Disable();
 		this->cloneFromText->SetForegroundColour(*wxLIGHT_GREY);
+		this->Refresh();
+		this->Update();
 	}
 }
 
