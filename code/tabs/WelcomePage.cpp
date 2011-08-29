@@ -35,14 +35,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class CloneProfileDialog: public wxDialog {
 public:
-	CloneProfileDialog(wxWindow* parent, wxString orignalname, wxString desinationName);
-	wxString GetOriginalName();
-	wxString GetTargetName();
+	CloneProfileDialog(wxWindow* parent);
+	const wxString GetSourceProfileName();
+	const wxString& GetNewProfileName();
 	void OnUpdateText(wxCommandEvent& event);
 	void OnPressEnterKey(wxCommandEvent& event);
 private:
-	wxString target;
-	int fromNumber;
+	wxString newProfileName;
 	wxButton *createButton;
 	wxChoice *cloneFrom;
 	
@@ -335,48 +334,26 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void WelcomePage::cloneNewProfile(wxChoice* profileCombo, ProMan* proman) {
-	wxString originalName;
-	wxString targetName;
-
-	/* If the user has edited the profileCombo we will put the text that they 
-	editied into the new name box in the dialog and then they would only have
-	to choose the profile to choose from. The default from target would be
-	the currently active profile.
-
-	If the current value of the profileCombo is a valid profile name then we will
-	use that as the profile to clone from, leaving the newname blank.
-	*/
-	wxLogDebug(_T("Combo's text box contains '%s'."), profileCombo->GetStringSelection().c_str());
-	if ( proman->DoesProfileExist(profileCombo->GetStringSelection()) ) {
-		// is a vaild profile
-		originalName = profileCombo->GetStringSelection();
-		wxLogDebug(_T("  Which is an existing profile."));
-	} else {
-		targetName = profileCombo->GetStringSelection();
-		originalName = proman->GetCurrentName();
-		wxLogDebug(_T("  Which is not an existing profile."));
-	}
-
-	CloneProfileDialog cloneDialog(this, originalName, targetName);
+	CloneProfileDialog cloneDialog(this);
 
 	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
 //		wxLogDebug(_T("User clicked clone"));
 		wxLogDebug(_T("User clicked create"));
 		if ( proman->CloneProfile(
-			cloneDialog.GetOriginalName(),
-			cloneDialog.GetTargetName()) ) {
+			cloneDialog.GetSourceProfileName(),
+			cloneDialog.GetNewProfileName()) ) {
 //				wxLogStatus(_("Cloned profile '%s' from '%s'"),
-//					cloneDialog.GetOriginalName().c_str(),
-//					cloneDialog.GetTargetName().c_str());
+//					cloneDialog.GetNewProfileName().c_str()
+//					cloneDialog.GetSourceProfileName().c_str());
 				wxLogStatus(_("Created profile '%s'"),
-						cloneDialog.GetTargetName().c_str());
-				proman->SwitchTo(cloneDialog.GetTargetName());
+					cloneDialog.GetNewProfileName().c_str());
+				proman->SwitchTo(cloneDialog.GetNewProfileName());
 		} else {
 //				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
-//					cloneDialog.GetOriginalName().c_str(),
-//					cloneDialog.GetTargetName().c_str());
+//					cloneDialog.GetNewProfileName().c_str(),
+//					cloneDialog.GetSourceProfileName().c_str());
 				wxLogError(_("Unable to create profile '%s'. See log for details."),
-					cloneDialog.GetTargetName().c_str());
+					cloneDialog.GetNewProfileName().c_str());
 		}
 	} else {
 //		wxLogStatus(_("Profile clone aborted"));
@@ -597,14 +574,11 @@ void WelcomePage::OnUpdateNewsHelp(wxCommandEvent &WXUNUSED(event)) {
 
 ///////////////////////////////////////////////////////////////////////////////
 ///// DIALOGS ///
-CloneProfileDialog::CloneProfileDialog(wxWindow* parent, wxString orignalName, wxString destName):
+CloneProfileDialog::CloneProfileDialog(wxWindow* parent):
 wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition, wxDefaultSize) {
-	this->target = destName;
-
 	wxStaticText *newNameText = new wxStaticText(this, wxID_ANY, _("New profile name:"));
-	wxTextCtrl *newName = new wxTextCtrl(this, ID_CLONE_PROFILE_NEWNAME,
-										 this->target, wxDefaultPosition, wxSize(200,-1),
-										 wxTE_PROCESS_ENTER);
+	wxTextCtrl *newName = new wxTextCtrl(this, ID_CLONE_PROFILE_NEWNAME, wxEmptyString,
+										 wxDefaultPosition, wxSize(200,-1), wxTE_PROCESS_ENTER);
 	
 	wxSizer* nameSizer = new wxFlexGridSizer(2);
 	nameSizer->Add(newNameText, wxSizerFlags().Border(wxRIGHT, 5));
@@ -633,26 +607,23 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("New profile..."), wxDefaultPosition
 	sizer->Add(nameSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 	sizer->Add(buttonSizer, wxSizerFlags().Right().Border(wxALL, 5));
 
-	this->SetSizerAndFit(sizer);
-
-	newName->SetValidator(wxTextValidator(wxFILTER_NONE, &(this->target)));
-	cloneFrom->SetValidator(wxGenericValidator(&(this->fromNumber)));
+	newName->SetValidator(wxTextValidator(wxFILTER_NONE, &(this->newProfileName)));
 
 	cloneFrom->Append(ProMan::GetProfileManager()->GetAllProfileNames());
-	cloneFrom->SetStringSelection(orignalName);
+	cloneFrom->SetStringSelection(ProMan::GetProfileManager()->GetCurrentName());
 
-	this->Fit();
+	this->SetSizerAndFit(sizer);
 	this->Layout();
 	this->Center();
 	wxLogDebug(_T("Clone Profile Dialog Created"));
 }
 
-wxString CloneProfileDialog::GetTargetName() {
-	return this->target.Trim(true).Trim(false); // strip trailing/leading whitespace
+const wxString& CloneProfileDialog::GetNewProfileName() {
+	return this->newProfileName.Trim(true).Trim(false); // strip trailing/leading whitespace
 }
 
-wxString CloneProfileDialog::GetOriginalName() {
-	return cloneFrom->GetStringSelection();
+const wxString CloneProfileDialog::GetSourceProfileName() {
+	return cloneFrom->GetStringSelection(); // can't return wxString& since this is a temporary var
 }
 
 void CloneProfileDialog::OnUpdateText(wxCommandEvent& event) {
