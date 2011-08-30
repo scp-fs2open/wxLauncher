@@ -231,9 +231,8 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
 	
-#if IS_APPLE // the OS X FSO binary likes having this line at the top.
+	// places all fs2_open.ini entries in the Default group
 	outFileStream.Write("[Default]\n", 10);
-#endif
 
 	outConfig.Save(outFileStream);
 
