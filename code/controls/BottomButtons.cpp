@@ -38,7 +38,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 #endif
 		this->help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
 		if ( showFred ) {
-			this->fred = new wxButton(this, ID_FRED_BUTTON, _("Fred"));
+			this->fred = new wxButton(this, ID_FRED_BUTTON, _("FRED"));
 		} else {
 			this->fred = NULL;
 		}
@@ -110,7 +110,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	} else if ( wxFileName(tc, fredBinary).FileExists() ) {
 		this->fred->Enable();
 	} else {
-		wxLogWarning(_("Fred executable %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
+		wxLogWarning(_("FRED executable %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
 		this->fred->Disable();
 	}
 }

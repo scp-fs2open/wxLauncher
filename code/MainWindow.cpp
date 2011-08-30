@@ -127,7 +127,7 @@ void MainWindow::OnStartFred(wxCommandEvent& WXUNUSED(event)) {
 	if ( fredEnabled ) {
 		wxButton* fred = dynamic_cast<wxButton*>(
 			wxWindow::FindWindowById(ID_FRED_BUTTON, this));
-		wxCHECK_RET(fred != NULL, _T("Unable to find fred button"));
+		wxCHECK_RET(fred != NULL, _T("Unable to find FRED button"));
 
 		if (this->FRED2_pid == 0) {
 			this->OnStart(fred, true);
@@ -154,7 +154,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	button->SetLabel(_("Starting"));
 	button->Disable();
 
-	const wxString defaultButtonValue((startFred)?_("Fred"):_("Play"));
+	const wxString defaultButtonValue((startFred)?_("FRED"):_("Play"));
 	const wxString cfgBinaryPath((startFred)? PRO_CFG_TC_CURRENT_FRED : PRO_CFG_TC_CURRENT_BINARY);
 	
 	ProMan* p = ProMan::GetProfileManager();
@@ -253,7 +253,7 @@ void MainWindow::OnKill(wxButton* button, bool killFred) {
 	int ret = ::wxKill((killFred)?this->FRED2_pid:this->FS2_pid, wxSIGKILL);
 	if ( ret != wxKILL_OK ) {
 		wxLogError(_T("Got KillError %d"), ret);
-		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED2"):_T("FS2"));
+		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED 2 Open"):_T("FreeSpace 2 Open"));
 	}
 }
 
@@ -305,7 +305,7 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 	
 	wxButton* fred = dynamic_cast<wxButton*>(
 		wxWindow::FindWindowById(ID_FRED_BUTTON, this));
-	wxCHECK_RET(fred != NULL, _T("Unable to find Fred button"));
-	fred->SetLabel(_T("Fred"));
+	wxCHECK_RET(fred != NULL, _T("Unable to find FRED button"));
+	fred->SetLabel(_T("FRED"));
 	fred->Enable();
 }

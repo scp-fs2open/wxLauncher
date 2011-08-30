@@ -162,7 +162,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			if ( first == _T("fs2") ) {
 				ver.binaryname = _T("FreeSpace 2 Open");
 			} else {
-				ver.binaryname = _T("Fred 2 Open");
+				ver.binaryname = _T("FRED 2 Open");
 			}
 		} else {
 			wxLogWarning(_T("was expecting 'open'; got %s in executable %s"), first1.c_str(), binaryname.c_str());
@@ -285,15 +285,15 @@ is normally encoded into the executable's file name into a long string that
 more user friendly. 
 
 The resulting string looks something like this: \verbatim
-Freespace 2 Open Antipodes #4 Debug Inferno SSE2
-Freespace 2 Open 3.6.10 Release Inferno SSE
-Fred 2 Open 3.6.11 Debug
+FreeSpace 2 Open Antipodes #4 Debug Inferno SSE2
+FreeSpace 2 Open 3.6.10 Release Inferno SSE
+FRED 2 Open 3.6.11 Debug
 \endverbatim
 */
 wxString FSOExecutable::MakeVersionStringFromVersion(FSOExecutable ver) {
 	bool hasfullversion = (ver.major != 0 && ver.minor != 0 && ver.revision != 0);
 	return wxString::Format(_T("%s %s%s%s %s%s%s"),
-		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname.c_str(), // Freespace 2 Open
+		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname.c_str(), // FreeSpace 2 Open
 		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision).c_str() : wxEmptyString,
 		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build).c_str(),
 		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string.c_str()).c_str(),

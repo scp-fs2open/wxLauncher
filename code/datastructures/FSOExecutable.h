@@ -48,7 +48,7 @@ protected:
 	bool debug;
 	int build;
 	wxString string;
-	wxString binaryname; //!< fs2_open or fred
+	wxString binaryname; //!< FS2 Open or FRED
 	wxString executablename; //!< the actual name of the binary
 	wxByte buildCaps;
 private:
