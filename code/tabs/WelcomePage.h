@@ -32,7 +32,7 @@ public:
 	void LinkHover(wxHtmlCellEvent& event);
 	void OnMouseOut(wxMouseEvent& event);
 	void ProfileButtonClicked(wxCommandEvent& event);
-	void SaveDefaultChecked(wxCommandEvent& event);
+	void AutoSaveProfilesChecked(wxCommandEvent& event);
 	void ProfileChanged(wxCommandEvent& event);
 	void ProfileCountChanged(wxCommandEvent& event);
 	void UpdateNews(wxIdleEvent& event);
