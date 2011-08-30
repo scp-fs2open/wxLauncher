@@ -466,8 +466,8 @@ wxBitmap* SkinSystem::VerifyTabIcon(wxString currentTC, wxString shortmodname,
 		wxImage image(filename.GetFullPath());
 		
 		if ( image.IsOk() ) {
-			if ( image.GetWidth() != SkinSystem::TabIconWidth
-				|| image.GetHeight() != SkinSystem::TabIconHeight ) {
+			if ( image.GetWidth() != static_cast<int>(SkinSystem::TabIconWidth)
+				|| image.GetHeight() != static_cast<int>(SkinSystem::TabIconHeight) ) {
 					wxLogDebug(_T("   Resizing image from %dx%d"), 
 						image.GetWidth(), image.GetHeight());
 
@@ -495,8 +495,8 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 		  wxImage image(filename.GetFullPath());
 
 		  if ( image.IsOk() ) {
-			  if ( image.GetWidth() == SkinSystem::IdealIconWidth 
-				  && image.GetHeight() == SkinSystem::IdealIconHeight ) { 
+			  if ( image.GetWidth() == static_cast<int>(SkinSystem::IdealIconWidth)
+				  && image.GetHeight() == static_cast<int>(SkinSystem::IdealIconHeight) ) { 
 					  return new wxBitmap(image);
 			  } else {
 				  wxLogDebug(_T("   Icon is incorrect size. Got (%d,%d); Need (%d,%d)"),
@@ -573,8 +573,8 @@ wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
 		SkinSystem::ModsListImageHeight,
 		wxIMAGE_QUALITY_HIGH);
 	wxBitmap outimg = wxBitmap(temp1);
-	wxASSERT( outimg.GetWidth() == SkinSystem::ModsListImageWidth);
-	wxASSERT( outimg.GetHeight() == SkinSystem::ModsListImageHeight);
+	wxASSERT( outimg.GetWidth() == static_cast<int>(SkinSystem::ModsListImageWidth));
+	wxASSERT( outimg.GetHeight() == static_cast<int>(SkinSystem::ModsListImageHeight));
 	return outimg;
 }
 
