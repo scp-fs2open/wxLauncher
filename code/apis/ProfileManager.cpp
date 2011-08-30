@@ -371,7 +371,7 @@ bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defa
 bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal) const {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read long for key %s with default value %d from null global profile"),
+			_T("attempt to read long for key %s with default value %ld from null global profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
@@ -407,7 +407,7 @@ bool ProMan::GlobalWrite(const wxString& key, const wxChar* value) {
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, long value) {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to write %d to %s in null global profile"),
+		wxLogWarning(_T("attempt to write %ld to %s in null global profile"),
 			value, key.c_str());
 		return false;
 	} else {
@@ -487,7 +487,7 @@ bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& def
 bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal) const {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read long for key %s with default value %d from null current profile"),
+			_T("attempt to read long for key %s with default value %ld from null current profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
@@ -543,17 +543,17 @@ bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, long value) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to write %d to %s in null current profile"),
+		wxLogWarning(_T("attempt to write %ld to %s in null current profile"),
 			value, key.c_str());
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
-			wxLogDebug(_T("adding entry %s with value %d to current profile"),
+			wxLogDebug(_T("adding entry %s with value %ld to current profile"),
 				key.c_str(), value);
 		} else {
 			long oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
-				wxLogDebug(_T("replacing old value %d with value %d for current profile entry %s"),
+				wxLogDebug(_T("replacing old value %ld with value %ld for current profile entry %s"),
 					oldValue, value, key.c_str());
 			}
 		}
@@ -1008,7 +1008,7 @@ bool ProMan::AreEntriesEqual(const wxConfigBase& cfg1,
 			break;
 		}
 		default:
-			wxLogWarning(_T("unknown entry type %s"), cfg1.GetEntryType(entry));
+			wxLogWarning(_T("unknown entry type %d"), cfg1.GetEntryType(entry));
 			return false;
 		break;
 	}
