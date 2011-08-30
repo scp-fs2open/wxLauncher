@@ -67,22 +67,23 @@ public:
 	
 	bool ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty = true);
 	
-	enum SaveDialogTextContext {
+	enum SaveDialogContext {
 		ON_PROFILE_SWITCH,
+		ON_PROFILE_CREATE,
 		ON_EXIT
 	};
 
-	static const wxString GetSaveDialogCaptionText(SaveDialogTextContext context,
+	static const wxString GetSaveDialogCaptionText(SaveDialogContext context,
 		const wxString& profileName);
-	static const wxString GetSaveDialogMessageText(SaveDialogTextContext context,
+	static const wxString GetSaveDialogMessageText(SaveDialogContext context,
 		const wxString& profileName);
 
-	bool CreateNewProfile(wxString newName);
-	bool CloneProfile(wxString orignalName, wxString copyName);
+	bool CreateProfile(const wxString& newProfileName, const wxString& cloneFromProfileName = wxEmptyString);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
 	void SaveCurrentProfile();
+	void RevertCurrentProfile();
 	bool HasUnsavedChanges();
 	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->HasUnsavedChanges(); }
 	void SetAutoSave(bool value) { this->isAutoSaving = value; }
@@ -109,10 +110,12 @@ private:
 	static bool isInitialized;
 	wxFileConfig* currentProfile;
 	wxString currentProfileName;
+	bool CreateNewProfile(wxString newName);
+
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
 
-	static void CopyConfig(wxConfigBase& src, wxConfigBase &dest, const wxString path = _T("/"));
+	static void CopyConfig(wxConfigBase& src, wxConfigBase &dest, const bool includeMainGroup = true, const wxString path = _T("/"));
 	static void CopyConfigEntry(const wxConfigBase& src, wxConfigBase& dest, const wxString path, const wxString entry);
 
 	static void ClearConfig(wxConfigBase& cfg);

@@ -339,13 +339,32 @@ void WelcomePage::ProfileChanged(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void WelcomePage::cloneNewProfile(wxChoice* profileCombo, ProMan* proman) {
+	if ( proman->NeedToPromptToSave() ) {
+		int response = wxMessageBox(
+			ProMan::GetSaveDialogMessageText(ProMan::ON_PROFILE_CREATE, proman->GetCurrentName()),
+			ProMan::GetSaveDialogCaptionText(ProMan::ON_PROFILE_CREATE, proman->GetCurrentName()),
+			wxYES_NO|wxCANCEL, this);
+		if ( response == wxYES ) {
+			wxLogDebug(_T("Saving current profile %s before opening create profile dialog."),
+				proman->GetCurrentName().c_str());
+			proman->SaveCurrentProfile();
+		} else if ( response == wxCANCEL ) {
+			wxLogInfo(_T("Cancelled opening create profile dialog."));
+			return;
+		} else {
+			wxLogWarning(_T("Reverting unsaved changes to current profile %s before opening create profile dialog"),
+				proman->GetCurrentName().c_str());
+			proman->RevertCurrentProfile();
+		}
+	}
+	
 	CloneProfileDialog cloneDialog(this);
 
 	if ( cloneDialog.ShowModal() == cloneDialog.GetAffirmativeId() ) {
 		wxLogDebug(_T("User clicked %s"), cloneDialog.UseProfileCloning() ? _T("clone") : _T("create")); 
-		if ( proman->CloneProfile(
-			cloneDialog.GetSourceProfileName(),
-			cloneDialog.GetNewProfileName()) ) {
+		if ( proman->CreateProfile(
+				cloneDialog.GetNewProfileName(),
+				cloneDialog.GetSourceProfileName()) ) {
 			if (cloneDialog.UseProfileCloning()) {
 				wxLogStatus(_("Cloned profile '%s' from '%s'"),
 					cloneDialog.GetNewProfileName().c_str(),
@@ -355,7 +374,7 @@ void WelcomePage::cloneNewProfile(wxChoice* profileCombo, ProMan* proman) {
 					cloneDialog.GetNewProfileName().c_str());
 			}
 				proman->SwitchTo(cloneDialog.GetNewProfileName());
-		} else {
+		} else { // profile creation was unsuccessful
 			if (cloneDialog.UseProfileCloning()) {
 				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
 					cloneDialog.GetNewProfileName().c_str(),
