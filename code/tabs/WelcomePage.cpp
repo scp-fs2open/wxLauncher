@@ -97,7 +97,7 @@ EVT_COMMAND( wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, WelcomePage::ProfileCountCh
 EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_DELETE_PROFILE, WelcomePage::ProfileButtonClicked)
 EVT_BUTTON(ID_SAVE_PROFILE, WelcomePage::ProfileButtonClicked)
-EVT_CHECKBOX(ID_SAVE_DEFAULT_CHECK, WelcomePage::SaveDefaultChecked)
+EVT_CHECKBOX(ID_SAVE_DEFAULT_CHECK, WelcomePage::AutoSaveProfilesChecked)
 EVT_CHOICE(ID_PROFILE_COMBO, WelcomePage::ProfileChanged)
 
 EVT_CHECKBOX(ID_NET_DOWNLOAD_NEWS, WelcomePage::OnDownloadNewsCheck)
@@ -161,21 +161,21 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 
-	wxCheckBox* saveDefaultCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
+	wxCheckBox* autoSaveProfilesCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
 	proman->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
-	saveDefaultCheck->SetValue(autosave);
+	autoSaveProfilesCheck->SetValue(autosave);
 
 	wxCommandEvent autoSaveEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_SAVE_DEFAULT_CHECK);
 	autoSaveEvent.SetInt(autosave);
-	this->SaveDefaultChecked(autoSaveEvent);
+	this->AutoSaveProfilesChecked(autoSaveEvent);
 
 	wxBoxSizer* profileButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
 	profileButtonsSizer->Add(newButton);
 	profileButtonsSizer->Add(deleteButton);
 	profileButtonsSizer->Add(saveButton);
 	profileButtonsSizer->AddStretchSpacer(1);
-	profileButtonsSizer->Add(saveDefaultCheck, 0, wxALIGN_CENTER_VERTICAL);
+	profileButtonsSizer->Add(autoSaveProfilesCheck, 0, wxALIGN_CENTER_VERTICAL);
 
 	wxStaticBoxSizer* profileVerticalSizer = new wxStaticBoxSizer(profileBox, wxVERTICAL);
 	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 4);
@@ -285,7 +285,7 @@ void WelcomePage::ProfileButtonClicked(wxCommandEvent& event) {
 	}
 }
 
-void WelcomePage::SaveDefaultChecked(wxCommandEvent& event) {
+void WelcomePage::AutoSaveProfilesChecked(wxCommandEvent& event) {
 	ProMan* proman = ProMan::GetProfileManager();
 
 	if ( event.IsChecked() ) {
