@@ -801,7 +801,7 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 	ExeChoice* choice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
 	wxCHECK_RET( choice != NULL, 
-		_T("OnSelectExecutable: cannot find choice drop box"));
+		_T("OnSelectExecutable: cannot find FS2 Open choice drop down box"));
 
 	FSOExecutable* ver = dynamic_cast<FSOExecutable*>(
 		choice->GetClientObject(choice->GetSelection()));
@@ -817,7 +817,7 @@ void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) 
 	ExeChoice* choice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
 	wxCHECK_RET( choice != NULL, 
-		_T("OnSelectExecutable: cannot find fred choice drop box"));
+		_T("OnSelectExecutable: cannot find FRED choice drop down box"));
 
 	FSOExecutable* ver = dynamic_cast<FSOExecutable*>(
 		choice->GetClientObject(choice->GetSelection()));

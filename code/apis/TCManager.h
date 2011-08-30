@@ -29,7 +29,7 @@ DECLARE_EVENT_TYPE(EVT_TC_CHANGED, wxID_ANY);
 DECLARE_EVENT_TYPE(EVT_TC_BINARY_CHANGED, wxID_ANY);
 /** Selected mod has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_SELECTED_MOD_CHANGED, wxID_ANY);
-/** Selected Fred binary has changed. */
+/** Selected FRED binary has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED, wxID_ANY);
 
 WX_DECLARE_LIST(wxEvtHandler, TCEventHandlers);
