@@ -604,27 +604,21 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 }
 
 /** Returns the text to use in the "save changes?" dialog's caption (window title) */
-const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogTextContext context,
+const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext context,
 												const wxString& profileName) {
+	// currently, the same text is used on all platforms, although it doesn't have to be that way
+	// NOTE: don't attempt to collapse the cases by removing break statements! it's asking for trouble
 	switch (context) {
 		case ON_PROFILE_SWITCH:
-#if IS_APPLE
-			return wxString::Format(_T("Save changes to profile '%s'?"),
-				profileName.c_str());
-#else
-			return _T("Save changes before switching profiles?");
-#endif
+			return _T("Save changes to current profile?");
 			break;
-
+			
+		case ON_PROFILE_CREATE:
+			return _T("Save changes to current profile?");
+			break;
+			
 		case ON_EXIT:
-#if IS_APPLE
-			return wxString::Format(_T("Save changes to profile '%s' before quitting?"),
-				profileName.c_str());
-#elif IS_WIN32
-			return _T("Save changes before exiting?");
-#else
-			return _T("Save changes before quitting?");
-#endif
+			return _T("Save changes to current profile?");
 			break;
 
 		default:
@@ -634,27 +628,29 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogTextContext co
 }
 
 /** Returns the text to use in the "save changes?" dialog's message (text area) */
-const wxString ProMan::GetSaveDialogMessageText(ProMan::SaveDialogTextContext context,
+const wxString ProMan::GetSaveDialogMessageText(ProMan::SaveDialogContext context,
 												const wxString& profileName) {
 	switch (context) {
 		case ON_PROFILE_SWITCH:
-#if IS_APPLE
-			return wxEmptyString;
-#else
-			return wxString::Format(_T("Save changes to profile '%s'?"),
+			return wxString::Format(_T("Save changes to profile '%s' before switching profiles?"),
 				profileName.c_str());
-#endif
 			break;
-
+			
+		case ON_PROFILE_CREATE:
+			return wxString::Format(_T("Save changes to profile '%s' before creating a new profile?"),
+				profileName.c_str());
+			break;
+			
 		case ON_EXIT:
-#if IS_APPLE
-			return wxEmptyString;
+#if IS_WIN32
+			return wxString::Format(_T("Save changes to profile '%s' before exiting?"),
+				profileName.c_str());
 #else
-			return wxString::Format(_T("Save changes to profile '%s'?"),
+			return wxString::Format(_T("Save changes to profile '%s' before quitting?"),
 				profileName.c_str());
 #endif
 			break;
-
+			
 		default:
 			wxCHECK_MSG(false, wxEmptyString, _T("ProMan::GetSaveDialogMessageText: provided context is invalid"));
 			break;
@@ -710,6 +706,12 @@ void ProMan::SaveCurrentProfile() {
 	}
 }
 
+/** Reverts any unsaved changes to the current profile. */
+void ProMan::RevertCurrentProfile() {
+	ClearConfig(*(this->currentProfile));
+	CopyConfig(*(this->privateCopy), *(this->currentProfile));
+}
+
 bool ProMan::HasUnsavedChanges() {
 	return !AreConfigsEqual(*(this->currentProfile), *(this->privateCopy));
 }
@@ -724,14 +726,13 @@ bool ProMan::SwitchTo(wxString name) {
 	} else {
 		if (this->currentProfile != NULL && this->HasUnsavedChanges()) {
 			if (this->isAutoSaving) {
-				wxLogDebug(_T("auto saving current profile %s before switching profiles"),
+				wxLogDebug(_T("Auto saving current profile %s before switching profiles"),
 					this->currentProfileName.c_str());
 				this->SaveCurrentProfile();
 			} else {
-				wxLogDebug(_T("clearing unsaved changes to profile %s before switching"),
+				wxLogDebug(_T("Reverting unsaved changes to current profile %s before switching"),
 					this->currentProfileName.c_str());
-				ClearConfig(*(this->currentProfile));
-				CopyConfig(*(this->privateCopy), *(this->currentProfile));
+				this->RevertCurrentProfile();
 			}
 		}
 		this->currentProfileName = name;
@@ -739,33 +740,59 @@ bool ProMan::SwitchTo(wxString name) {
 		wxFileConfig::Set(this->currentProfile);
 		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
 		this->ResetPrivateCopy();
+//		TestConfigFunctions(*this->currentProfile); // remove after testing on all platforms
 		this->GenerateCurrentProfileChangedEvent();
 		return true;
 	}
 }
 
-bool ProMan::CloneProfile(wxString originalName, wxString copyName) {
-#if 0
-	wxLogDebug(_T("Cloning original profile (%s) to %s"), originalName.c_str(), copyName.c_str());
-	if ( !this->DoesProfileExist(originalName) ) {
-		wxLogWarning(_("Original Profile '%s' does not exist!"), originalName.c_str());
-		return false;
+/** Creates a profile. If the second argument is non-empty and is the name
+ of an existing profile, its settings/flags will be copied over to the new profile.
+ Returns true on success. */
+bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& cloneFromProfileName) {
+	const bool useCloning = !cloneFromProfileName.IsEmpty();
+	
+	if (useCloning) {
+		wxLogDebug(_T("Cloning original profile (%s) to %s"),
+			cloneFromProfileName.c_str(), newProfileName.c_str());
+	} else {
+		wxLogDebug(_T("Creating blank profile %s"), newProfileName.c_str());
 	}
-#endif
-	if ( this->DoesProfileExist(copyName) ) {
-		wxLogWarning(_("Target profile '%s' already exists!"), copyName.c_str());
-		return false;
-	}
-	if ( !this->CreateNewProfile(copyName) ) {
+	
+	if ( useCloning && !this->DoesProfileExist(cloneFromProfileName) ) {
+		wxLogWarning(_("Profile to clone from '%s' does not exist!"), cloneFromProfileName.c_str());
 		return false;
 	}
 
-	wxFileConfig* config = this->profiles[copyName];
-	wxCHECK_MSG( config != NULL, false, _T("Create returned true but did not create profile"));
+	if ( this->DoesProfileExist(newProfileName) ) {
+		wxLogWarning(_("New profile '%s' already exists!"), newProfileName.c_str());
+		return false;
+	}
+	if ( !this->CreateNewProfile(newProfileName) ) {
+		wxLogWarning(_T("New profile creation failed."));
+		return false;
+	}
 
-	// FIXME TODO clone profile configs (but first finish GUI support)
-	// and don't copy profile name or profile filename (anything else that shouldn't be copied?)
+	if (useCloning) {
+		wxFileConfig* newProfileConfig = this->profiles[newProfileName];
+		wxCHECK_MSG( newProfileConfig != NULL, false, _T("Create returned true but did not create profile"));
+		wxFileConfig* cloneFromProfileConfig = this->profiles[cloneFromProfileName];
+		wxCHECK_MSG( cloneFromProfileConfig != NULL, false,
+			wxString::Format(_T("Cannot find profile '%s' from which to clone"),
+				cloneFromProfileName.c_str()) );
 
+		// FIXME remove after testing on all platforms
+//		wxLogDebug(_T("contents of new profile '%s' before clone:"), newProfileName.c_str());
+//		LogConfigContents(*newProfileConfig);
+		
+		CopyConfig(*cloneFromProfileConfig, *newProfileConfig, false);
+
+		// FIXME remove after testing on all platforms
+//		wxLogDebug(_T("contents of new profile '%s' after clone:"), newProfileName.c_str());
+//		LogConfigContents(*newProfileConfig);
+//		wxLogDebug(_T("contents of cloned from profile '%s' after clone:"), cloneFromProfileName.c_str());
+//		LogConfigContents(*cloneFromProfileConfig);
+	}
 	this->GenerateChangeEvent();
 	return true;
 }
@@ -817,9 +844,12 @@ bool ProMan::DeleteProfile(wxString name) {
 // the config manipulation functions are adapted from CopyEntriesRecursive and CopyEntry
 // from http://audacity.googlecode.com/svn/audacity-src/trunk/src/Prefs.cpp SVN r11245
 /** copies the contents of one wxConfigBase to another wxConfigBase.
- The wxWindows group is not copied, if it exists. */
+ The wxWindows group is not copied, if it exists. If includeMainGroup is true, then
+ the contents of the "main" group (profile-specific information, such as name and filename)
+ are copied as well, otherwise they are not copied. */
 void ProMan::CopyConfig(wxConfigBase& src,
 						wxConfigBase& dest,
+						const bool includeMainGroup,
 						const wxString path) {
 	wxString entryName;
 	long entryIndex;
@@ -837,10 +867,10 @@ void ProMan::CopyConfig(wxConfigBase& src,
 	
 	groupKeepGoing = src.GetFirstGroup(groupName, groupIndex);
 	while (groupKeepGoing) {
-		if (groupName != _T("wxWindows")) { // skip wxWindows group
+		if (groupName != _T("wxWindows") && (includeMainGroup || groupName != _T("main"))) {
 			wxString subPath = path + groupName + _T("/");
 			src.SetPath(subPath);
-			CopyConfig(src, dest, subPath);
+			CopyConfig(src, dest, includeMainGroup, subPath);
 			src.SetPath(path);
 		}
 		groupKeepGoing = src.GetNextGroup(groupName, groupIndex);
