@@ -171,7 +171,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxCHECK_RET(maxResFound, _T("could not get max supported resolution"));
 	}
 
-	const wxString resString = wxString::Format(CFG_RES_FORMAT_STRING, width, height);
+	const wxString resString = wxString::Format(CFG_RES_FORMAT_STRING,
+		static_cast<int>(width), static_cast<int>(height));
 	bool resFound = resolutionCombo->SetStringSelection(resString);
 
 	if (!resFound) {
@@ -232,7 +233,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			anisotropic = 5;
 			break;
 		default:
-			wxLogWarning(_T("invalid anisotropic factor %d, setting to 0"),
+			wxLogWarning(_T("invalid anisotropic factor %ld, setting to 0"),
 				anisotropic);
 			proman->ProfileWrite(PRO_CFG_VIDEO_ANISOTROPIC, static_cast<long>(0));
 			anisotropic = 0;
@@ -270,7 +271,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			antialias = 5;
 			break;
 		default:
-			wxLogWarning(_T("invalid anti-aliasing factor %d, setting to 0"),
+			wxLogWarning(_T("invalid anti-aliasing factor %ld, setting to 0"),
 				antialias);
 			proman->ProfileWrite(PRO_CFG_VIDEO_ANTI_ALIAS, static_cast<long>(0));
 			antialias = 0;
@@ -473,7 +474,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	long port;
 	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, 0);
 	if (port != 0) {
-		networkPort->SetValue(wxString::Format(_T("%d"), port));
+		networkPort->SetValue(wxString::Format(_T("%ld"), port));
 	}
 	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
@@ -1489,7 +1490,7 @@ ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
 
 	long port;
 	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_PROXY_PORT, &port, 0);
-	wxTextCtrl* proxyHttpPort = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_PORT, wxString::Format(_T("%d"), port));
+	wxTextCtrl* proxyHttpPort = new wxTextCtrl(manualProxyPanel, ID_PROXY_HTTP_PORT, wxString::Format(_T("%ld"), port));
 
 	wxBoxSizer* manualProxyPortSizer = new wxBoxSizer(wxHORIZONTAL);
 	manualProxyPortSizer->Add(proxyHttpPortText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
