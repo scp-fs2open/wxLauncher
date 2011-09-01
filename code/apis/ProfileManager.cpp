@@ -142,8 +142,9 @@ bool ProMan::Initialize() {
 			// Create a default profile
 			wxLogInfo(_T(" Default profile does not exist! Creating..."));
 			ProMan::proman->CreateNewProfile(ProMan::DEFAULT_PROFILE_NAME);
-			wxLogInfo(_T(" Priming profile..."));
-			PullProfile(ProMan::proman->profiles[ProMan::DEFAULT_PROFILE_NAME]);
+			// FIXME figure out how PullProfile is corrupting default profile (esp. on Windows)
+//			wxLogInfo(_T(" Priming profile..."));
+//			PullProfile(ProMan::proman->profiles[ProMan::DEFAULT_PROFILE_NAME]);
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
 		ProMan::proman->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, ProMan::DEFAULT_PROFILE_NAME);
