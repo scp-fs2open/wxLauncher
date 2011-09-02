@@ -15,5 +15,7 @@ Note that any links in the html files should be relative such that if you were t
 
 Both html and markdown image links are allowed in the .help source.  If the image will be outside of the online help archive, the file is copied to a random name within the archive and the image tag changed so that it will work correctly.  For the wiki output the all tags are changed so that they will load correctly on the wiki.
 
-The online help compiler also recongizes meta tags that have a key "name" with a value of "control".  These tags are recongized as anchors from the file for to the control for the context help system.  The tag is also required to have key called "content" with a value that is the name of the ID of a control in the launcher proper.  When a tag is encountered the help system will generate a link between the control that has an ID by that name.  
-NOTE: the correctness of the ID name given is not check by the complier of the online help, it is only checked by the c++ compiler when the interface file is compiled into the launcher itself.  This also means that the only way to get the ID name to add more per control documentation is to look in the c++ code, or ask a developer of the launcher.
+The online help compiler also recongizes meta tags that have a key "name" with a value of "control".  These tags are recongized as anchors from the file for to the control for the context help system.  The tag is also required to have key called "content" with a value that is the name of the ID of a control in the launcher proper.  When a tag is encountered the help system will generate a link between the control that has an ID by that name.
+
+NOTE: The correctness of the ID name given is not checked by the complier of the online help. The names given are only checked by the c++ compiler when the interface file is compiled into the launcher itself.
+NOTE: The list of valid names is found in ids.h, in the enum WindowIDS.
