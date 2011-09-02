@@ -241,12 +241,11 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), &(item->forcedoff));
 
 		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
-#if 0 // what's the user supposed to do about this?
+		// Log the warning for any mod authors
 		if ( config->Exists(_T("/multimod/secondrylist")) ) {
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
-#endif
 		readIniFileString(config, _T("/multimod/secondrylist"), &(item->secondarylist));
 		readIniFileString(config, _T("/multimod/secondarylist"), &(item->secondarylist));
 
