@@ -209,7 +209,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_flag)"), sizeof(easy_flag), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
-		wxString flag(easy_flag, wxConvUTF8, sizeof(easy_flag));
+		wxString flag(easy_flag, wxConvUTF8, strlen(easy_flag));
 		this->easyflags.Add(flag);
 	}
 
