@@ -107,7 +107,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	if ( hastcfolder ) {
-		BasicSettingsPage::FillExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
+		BasicSettingsPage::FillFSOExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
 		useExeChoice->FindAndSetSelectionWithClientData(binary);
 	} else {
 		useExeChoice->Disable();
@@ -740,7 +740,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 		tcFolder->SetValue(tcPath);
 
-		this->FillExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
+		this->FillFSOExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
 		exeChoice->Enable();
 
 		if (fredEnabled) {
@@ -776,7 +776,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 into the Executable DropBox.  This function does nothing else to the choice
 control, not even clearing the drop box (call the Clear function if you don't
 want the old items to stay. */
-void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
+void BasicSettingsPage::FillFSOExecutableDropBox(wxChoice* exeChoice, wxFileName path) {
 	BasicSettingsPage::FillExecutableDropBox(exeChoice, FSOExecutable::GetBinariesFromRootFolder(path));
 }
 
