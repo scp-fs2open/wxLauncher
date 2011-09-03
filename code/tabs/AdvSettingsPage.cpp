@@ -224,14 +224,7 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		// and can thus potentially confuse users
 
 		flagSetsArray.Remove(_T("Custom"));
-
-		// workaround for removing "All features on", since the flag set names other than Custom seem
-		// to end in some kind of weird unprintable char(s), which is then messing up string comparison.
-		for (int i = flagSetsArray.GetCount() - 1; i >= 0; --i) {
-			if (flagSetsArray[i].StartsWith(_T("All features on"))) {
-				flagSetsArray.RemoveAt(i);
-			}
-		}
+		flagSetsArray.Remove(_T("All features on"));
 
 		flagSetChoice->Append(flagSetsArray);
 
