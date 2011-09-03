@@ -68,7 +68,7 @@ public:
 	void ProfileChanged(wxCommandEvent& event);
 
 private:
-	static void FillExecutableDropBox(wxChoice* exeChoice, wxFileName path);
+	static void FillFSOExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillFredExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes);
 	static void FillResolutionDropBox(wxChoice* resChoice);
