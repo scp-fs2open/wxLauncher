@@ -430,6 +430,28 @@ bool ProMan::GlobalWrite(const wxString& key, bool value) {
 
 // current profile access functions
 
+/** Tests whether the key strName is in the current profile. */
+bool ProMan::ProfileExists(wxString& strName) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to check existence of key %s in null current profile"),
+			strName.c_str());
+		return false;
+	} else {
+		return this->currentProfile->Exists(strName);
+	}
+}
+
+/** Tests whether the key strName is in the current profile. */
+bool ProMan::ProfileExists(const wxChar* strName) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(_T("attempt to check existence of key %s in null current profile"),
+			strName);
+		return false;
+	} else {
+		return this->currentProfile->Exists(strName);
+	}
+}
+
 /** Reads a bool from the current profile. Returns true on success. */
 bool ProMan::ProfileRead(const wxString& key, bool* b) const {
 	if (this->currentProfile == NULL) {

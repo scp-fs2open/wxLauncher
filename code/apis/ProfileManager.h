@@ -54,6 +54,9 @@ public:
 	bool GlobalWrite(const wxString& key, long value);
 	bool GlobalWrite(const wxString& key, bool value);
 	
+	bool ProfileExists(const wxChar* strName) const;
+	bool ProfileExists(wxString& strName) const;
+	
 	bool ProfileRead(const wxString& key, bool* b) const;
 	bool ProfileRead(const wxString& key, bool* d, bool defaultVal) const;
 	bool ProfileRead(const wxString& key, wxString* str) const;
