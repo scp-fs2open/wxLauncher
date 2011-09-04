@@ -34,11 +34,12 @@ Xcode, KDevelop, and of course autotools.
 Requirements shortlist:
 All platforms:
  - CMake 2.8
- - wxWidgets
- - Python
+ - wxWidgets 2.8.10+ (but not 2.9.x)
+ - Python 2.6+ (but not 3.x)
  - Markdown in Python
 Windows
  - Platform SDK
+ - Nullsoft Scriptable Install System (NSIS)
 Linux
  - SDL 1.2
 OS X
@@ -69,7 +70,7 @@ Python homepage:
 	
 Markdown in Python is required in order to build the 
 integrated help system. 
-Python Markdown homepage:
+Markdown in Python homepage:
 	http://www.freewisdom.org/projects/python-markdown/
 On debian-based systems:
 	apt-get install python-markdown
@@ -88,6 +89,12 @@ The Microsoft Windows SDK (formerly the Platform SDK) is
 required to build both this application and wxWidgets when
  on Windows.  Note that only the Windows SDK for Windows
 Vista and Windows 7 have been tested with this application.
+
+The Nullsoft Scriptable Install System (NSIS) is required on Windows to build
+the installer. The latest version at the time of writing is 2.46. Be sure to
+either install NSIS before running CMake or re-run CMake after installing NSIS.
+NSIS homepage:
+	http://nsis.sourceforge.net/
 
 wxLauncher has only been built with Microsoft's Visual Studio
 2008 Express edition.  Other VS2008 versions should work, as
