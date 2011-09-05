@@ -106,50 +106,59 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
+	wxButton* exeChoiceRefreshButton = new wxButton(this, ID_EXE_CHOICE_REFRESH_BUTTON, _("Refresh"));
 	if ( hastcfolder ) {
 		BasicSettingsPage::FillFSOExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
 		useExeChoice->FindAndSetSelectionWithClientData(binary);
 	} else {
 		useExeChoice->Disable();
+		exeChoiceRefreshButton->Disable();
 	}
 
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
+	wxButton* exeFredChoiceRefreshButton = NULL;
 	if ( fredEnabled ) {
 		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable:"));
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
+		exeFredChoiceRefreshButton = new wxButton(this, ID_EXE_FRED_CHOICE_REFRESH_BUTTON, _("Refresh"));
 
 		if ( hastcfolder ) {
 			BasicSettingsPage::FillFredExecutableDropBox(useFredChoice, wxFileName(tcfolder, wxEmptyString));
 			useFredChoice->FindAndSetSelectionWithClientData(fredBinary);
 		} else {
 			useFredChoice->Disable();
+			exeFredChoiceRefreshButton->Disable();
 		}
 	}
 
+	// FIXME hiding the refresh buttons until their functionality is complete
+	exeChoiceRefreshButton->Hide();
+	exeFredChoiceRefreshButton->Hide();
+	
 	// new sizer layout that should line things up nicely
 	// inspired by the thread http://markmail.org/message/rlgv6y6xbw5dkvyy#query:+page:1+mid:5cqagz2jbygwqt2x+state:results
 	// or "RE: [wxPython-users] wx.FlexGridSizer..." Mar 31, 2005 in com.googlegroups.wxpython-users
 	// this idea could also work on, say, the video box, if you needed, for Windows
-	wxBoxSizer* rootFolderSizer = new wxBoxSizer(wxHORIZONTAL);
-	rootFolderSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1).Expand());
-	rootFolderSizer->Add(selectButton, wxSizerFlags().Border(wxLEFT, 5));
-
 	wxFlexGridSizer* exeInsideSizer;
 	if (useFredText != NULL && useFredChoice != NULL) {
-		exeInsideSizer = new wxFlexGridSizer(3,2,0,0);
+		exeInsideSizer = new wxFlexGridSizer(3,3,0,0);
 	} else {
-		exeInsideSizer = new wxFlexGridSizer(2,2,0,0);
+		exeInsideSizer = new wxFlexGridSizer(2,3,0,0);
 	}
 	exeInsideSizer->AddGrowableCol(1);
 
 	exeInsideSizer->Add(rootFolderText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	exeInsideSizer->Add(rootFolderSizer, wxSizerFlags().Proportion(1).Expand());
+	exeInsideSizer->Add(rootFolderBox, wxSizerFlags().Proportion(1).Expand());
+	exeInsideSizer->Add(selectButton, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	exeInsideSizer->Add(useExeText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	exeInsideSizer->Add(useExeChoice, wxSizerFlags().Proportion(1).Expand());
-	if (useFredText != NULL && useFredChoice != NULL) {
+	exeInsideSizer->Add(exeChoiceRefreshButton, wxSizerFlags().Expand().Border(wxLEFT, 5));
+
+	if ((useFredText != NULL) && (useFredChoice != NULL) && (exeFredChoiceRefreshButton != NULL)) {
 		exeInsideSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 		exeInsideSizer->Add(useFredChoice, wxSizerFlags().Proportion(1).Expand());
+		exeInsideSizer->Add(exeFredChoiceRefreshButton, wxSizerFlags().Expand().Border(wxLEFT, 5));
 	}
 
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxHORIZONTAL);
@@ -623,7 +632,9 @@ BasicSettingsPage::~BasicSettingsPage() {
 BEGIN_EVENT_TABLE(BasicSettingsPage, wxPanel)
 EVT_BUTTON(ID_EXE_SELECT_ROOT_BUTTON, BasicSettingsPage::OnSelectTC)
 EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
+EVT_BUTTON(ID_EXE_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressExecutableChoiceRefreshButton)
 EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
+EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton)
 EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 
 // Video controls
@@ -710,20 +721,31 @@ specified in the profile does not exist in the TC.
 \note Emits a EVT_TC_BINARY_CHANGED in any case.*/
 void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
-	ExeChoice *exeChoice = dynamic_cast<ExeChoice*>(
+	ExeChoice* exeChoice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
 	wxCHECK_RET( exeChoice != NULL, 
 		_T("Cannot find executable choice control"));
 
+	wxButton* exeChoiceRefreshButton = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_EXE_CHOICE_REFRESH_BUTTON, this));
+	wxCHECK_RET( exeChoiceRefreshButton != NULL,
+		_T("Cannot find executable choice refresh button"));
+	
 	bool fredEnabled;
 	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 
 	ExeChoice* fredChoice = NULL;
+	wxButton* fredChoiceRefreshButton = NULL;
 	if (fredEnabled) {
 		fredChoice = dynamic_cast<ExeChoice*>(
 			wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
 		wxCHECK_RET( fredChoice != NULL, 
 			_T("Cannot find FRED executable choice control"));
+		
+		fredChoiceRefreshButton = dynamic_cast<wxButton*>(
+			wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, this));
+		wxCHECK_RET( fredChoiceRefreshButton != NULL,
+			_T("Cannot find FRED executable choice refresh button"));
 	}
 
 	wxTextCtrl* tcFolder = dynamic_cast<wxTextCtrl*>(
@@ -742,10 +764,12 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 		this->FillFSOExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
 		exeChoice->Enable();
+		exeChoiceRefreshButton->Enable();
 
 		if (fredEnabled) {
 			this->FillFredExecutableDropBox(fredChoice, wxFileName(tcPath, wxEmptyString));
 			fredChoice->Enable();
+			fredChoiceRefreshButton->Enable();
 		}
 
 		/* check to see if the exe listed in the profile actually does exist in
@@ -764,7 +788,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 				ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
 			}
 		}
-	}
+	} // FIXME if the root folder is somehow invalid, disable the exe/FRED choice controls
 	this->GetSizer()->Layout();
 
 	// TCManager::CurrentProfileChanged() (which calls TCManager::GenerateTCChanged())
@@ -814,6 +838,12 @@ void BasicSettingsPage::OnSelectExecutable(wxCommandEvent &WXUNUSED(event)) {
 	TCManager::GenerateTCBinaryChanged();
 }
 
+// FIXME figure out how to refactor the OnPress*ExecutableChoiceRefreshButton()
+// functions and BasicSettingsPage::OnTCChanged() so that they can share code cleanly.
+void BasicSettingsPage::OnPressExecutableChoiceRefreshButton(wxCommandEvent &WXUNUSED(event)) {
+	// TODO
+}
+
 void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) {
 	ExeChoice* choice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
@@ -828,6 +858,14 @@ void BasicSettingsPage::OnSelectFredExecutable(wxCommandEvent &WXUNUSED(event)) 
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FRED, ver->GetExecutableName());
 	TCManager::GenerateTCFredBinaryChanged();
+}
+
+void BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton(wxCommandEvent &WXUNUSED(event)) {
+	bool fredEnabled;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	
+	wxCHECK_RET(fredEnabled, _T("OnPressFredExecutableChoiceRefreshButton called when fredEnabled is false"));
+	// TODO finish
 }
 
 class Resolution: public wxClientData {

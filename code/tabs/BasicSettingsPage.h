@@ -30,7 +30,10 @@ public:
 	void OnTCChanged(wxCommandEvent &event);
 
 	void OnSelectExecutable(wxCommandEvent &event);
+	void OnPressExecutableChoiceRefreshButton(wxCommandEvent &event);
 	void OnSelectFredExecutable(wxCommandEvent &event);
+	void OnPressFredExecutableChoiceRefreshButton(wxCommandEvent &event);
+
 	void OnSelectVideoResolution(wxCommandEvent &event);
 	void OnSelectGraphicsAPI(wxCommandEvent &event);
 	void OnSelectVideoDepth(wxCommandEvent &event);
