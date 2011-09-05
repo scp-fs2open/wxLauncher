@@ -134,7 +134,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	// FIXME hiding the refresh buttons until their functionality is complete
 	exeChoiceRefreshButton->Hide();
-	exeFredChoiceRefreshButton->Hide();
+	if (fredEnabled) {
+		exeFredChoiceRefreshButton->Hide();		
+	}
+
 	
 	// new sizer layout that should line things up nicely
 	// inspired by the thread http://markmail.org/message/rlgv6y6xbw5dkvyy#query:+page:1+mid:5cqagz2jbygwqt2x+state:results
