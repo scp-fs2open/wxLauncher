@@ -175,10 +175,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
 	this->FillResolutionDropBox(resolutionCombo);
 	long width, height;
-	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 0);
-	proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 0);
+	bool hasResWidth = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width);
+	bool hasResHeight = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height);
 
-	if (width == 0 || height == 0) {
+	if ((!hasResWidth) || (!hasResHeight)) {
+		wxLogDebug(_T("initializing resolution to maximum supported resolution"));
 		bool maxResFound = GetMaxSupportedResolution(*resolutionCombo, width, height);
 		wxCHECK_RET(maxResFound, _T("could not get max supported resolution"));
 	}
@@ -192,6 +193,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 			resString.c_str());
 		bool maxResFound = GetMaxSupportedResolution(*resolutionCombo, width, height);
 		wxCHECK_RET(maxResFound, _T("could not get max supported resolution"));
+	}
+
+	if ((!hasResWidth) || (!hasResHeight)) {
+		proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_WIDTH, width);
+		proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, height);
 	}
 
 	wxStaticText* depthText = 
