@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 #include "controls/FlagList.h"
+#include "datastructures/FSOExecutable.h"
 #include "tabs/AdvSettingsPage.h"
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
@@ -86,7 +87,17 @@ void FlagListBox::Initialize() {
 		this->drawStatus = MISSING_TC;
 		return;
 	}
+
+	if (!wxFileName::DirExists(tcPath)) {
+		this->drawStatus = NONEXISTENT_TC;
+		return;
+	}
 	
+	if (FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty()) {
+		this->drawStatus = INVALID_TC;
+		return;
+	}
+
 	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
 		this->drawStatus = MISSING_EXE;
 		return;
@@ -470,6 +481,13 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 		switch(this->drawStatus) {
 			case MISSING_TC:
 				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
+				break;
+			case NONEXISTENT_TC:
+				msg = _("The specified FreeSpace 2 installation or total conversion root folder does not exist.\nSelect a different FreeSpace 2 installation or total conversion\non the Basic Settings page.");
+				break;
+			case INVALID_TC:
+				msg = wxString(_("The specified FreeSpace 2 installation or total conversion root folder has no FreeSpace 2 Open executables.\n")) +
+					_("Either add FS2 Open executables to the root folder and refresh the list of executables on the Basic Settings page, or select a different FreeSpace 2 installation or total conversion on the Basic Settings page.");
 				break;
 			case MISSING_EXE:
 				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings page.");

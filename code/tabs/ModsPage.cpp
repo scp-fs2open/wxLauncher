@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/SkinManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
+#include "datastructures/FSOExecutable.h"
 #include "generated/configure_launcher.h"
 
 
@@ -76,19 +77,45 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->SetSizer(noTCSizer);
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
-		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),
-												   wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
+			_("The currently specified root folder for a FreeSpace 2 installation or a total conversion does not exist.\nSelect a valid root folder on the Basic Settings page."),
+			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		invalidTC->SetFont(messageFont);
-		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-		invalidTC->Wrap(TAB_AREA_WIDTH-50);
+		nonexistentTC->SetFont(messageFont);
+		nonexistentTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+		nonexistentTC->Wrap(TAB_AREA_WIDTH-50);
 
 		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
 		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(warningIcon.IsOk());
 		wxStaticBitmap* warningImage = new wxStaticBitmap(this, wxID_ANY, warningIcon);
 
+		wxBoxSizer* nonexistentTCSizer = new wxBoxSizer(wxVERTICAL);
+		nonexistentTCSizer->AddStretchSpacer(1);
+		nonexistentTCSizer->Add(warningImage,0, wxALL | wxCENTER);
+		nonexistentTCSizer->AddSpacer(10);
+		nonexistentTCSizer->Add(nonexistentTC, 0, wxEXPAND| wxALL | wxCENTER);
+		nonexistentTCSizer->AddStretchSpacer(1);
+
+#if IS_LINUX
+		this->SetSizerAndFit(nonexistentTCSizer);
+#else
+		this->SetSizer(nonexistentTCSizer);
+#endif
+	} else if ( FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty() ) {
+		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
+			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),
+			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		invalidTC->SetFont(messageFont);
+		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
+		invalidTC->Wrap(TAB_AREA_WIDTH-50);
+		
+		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
+		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
+		wxASSERT(warningIcon.IsOk());
+		wxStaticBitmap* warningImage = new wxStaticBitmap(this, wxID_ANY, warningIcon);
+		
 		wxBoxSizer* invalidTCSizer = new wxBoxSizer(wxVERTICAL);
 		invalidTCSizer->AddStretchSpacer(1);
 		invalidTCSizer->Add(warningImage,0, wxALL | wxCENTER);
