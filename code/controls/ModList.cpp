@@ -241,8 +241,12 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), &(item->forcedoff));
 
 		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
-		// Log the warning for any mod authors
-		if ( config->Exists(_T("/multimod/secondrylist")) ) {
+		// Log the warning for any mod authors, specifically for those who indicate
+		// that they are mod authors by their having FRED launching enabled
+		bool fredEnabled;
+		ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+		
+		if ( config->Exists(_T("/multimod/secondrylist")) && fredEnabled) {
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
