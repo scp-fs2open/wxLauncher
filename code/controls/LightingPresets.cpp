@@ -181,13 +181,11 @@ const wxString& LightingPresets::GetFlagLineSeparator() {
 	
 void LightingPresets::Initialize() {
 	wxString presetName;
-	int presetButtonId;
-	
-	if (ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName)) {
-		presetButtonId = PresetNameToPresetButtonId(presetName);
-	} else {
-		presetButtonId = DEFAULT_PRESET_ID;
-	}
+
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName,
+		PresetButtonIdToPresetName(DEFAULT_PRESET_ID));
+
+	int presetButtonId = PresetNameToPresetButtonId(presetName);
 
 	wxRadioButton *selectedPresetButton =
 		dynamic_cast<wxRadioButton*>(wxWindow::FindWindowById(presetButtonId, this));
