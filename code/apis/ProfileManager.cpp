@@ -504,6 +504,18 @@ bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& def
 	}
 }
 
+/** Reads a long from the current profile. Returns true on success. */
+bool ProMan::ProfileRead(const wxString& key, long* l) const {
+	if (this->currentProfile == NULL) {
+		wxLogWarning(
+			_T("attempt to read long for key %s from null current profile"),
+			key.c_str());
+		return false;
+	} else {
+		return this->currentProfile->Read(key, l);
+	}
+}
+
 /** Reads a long from the current profile,
  using the default value if the key is not present.
  Returns true on success. */
