@@ -107,7 +107,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	wxButton* exeChoiceRefreshButton = new wxButton(this, ID_EXE_CHOICE_REFRESH_BUTTON, _("Refresh"));
-	if ( hastcfolder ) {
+	if ( hastcfolder && wxFileName::DirExists(tcfolder) ) {
 		BasicSettingsPage::FillFSOExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
 		useExeChoice->FindAndSetSelectionWithClientData(binary);
 	} else {
@@ -123,7 +123,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
 		exeFredChoiceRefreshButton = new wxButton(this, ID_EXE_FRED_CHOICE_REFRESH_BUTTON, _("Refresh"));
 
-		if ( hastcfolder ) {
+		if ( hastcfolder && wxFileName::DirExists(tcfolder) ) {
 			BasicSettingsPage::FillFredExecutableDropBox(useFredChoice, wxFileName(tcfolder, wxEmptyString));
 			useFredChoice->FindAndSetSelectionWithClientData(fredBinary);
 		} else {
