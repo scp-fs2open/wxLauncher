@@ -76,6 +76,13 @@ private:
 	static void FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes);
 	static void FillResolutionDropBox(wxChoice* resChoice);
 	static bool GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height);
+	
+	enum ReasonForExecutableDisabling {
+		NONEXISTENT_TC,
+		INVALID_TC
+	};
+	
+	void DisableExecutableChoiceControls(ReasonForExecutableDisabling reason);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
