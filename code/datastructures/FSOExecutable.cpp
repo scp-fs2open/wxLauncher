@@ -52,7 +52,7 @@ bool FSOExecutable::SupportsOpenAL() {
 }
 
 
-bool FSOExecutable::CheckRootFolder(wxFileName path) {
+bool FSOExecutable::CheckRootFolder(const wxFileName& path) {
 	if ( !path.IsOk() ) {
 		wxLogError(_T(" New root folder %s is not OK"), path.GetFullPath().c_str());
 		return false;
@@ -61,12 +61,15 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 		wxLogError(_T(" root folder %s is empty"), path.GetFullPath().c_str());
 		return false;
 	}
-	wxArrayString files = FSOExecutable::GetBinariesFromRootFolder(path);
-	if ( files.Count() > 0 ) {
-		return true;
-	} else {
-		return false;
-	}
+	return HasFSOExecutables(path);
+}
+
+bool FSOExecutable::HasFSOExecutables(const wxFileName& path) {
+	wxCHECK_MSG(path.IsOk(), false,
+		wxString::Format(_T("provided path %s to HasFSOExecutables is invalid"),
+			path.GetFullPath().c_str()));
+	
+	return !FSOExecutable::GetBinariesFromRootFolder(path, true).IsEmpty(); 
 }
 
 #if IS_WIN32
@@ -82,15 +85,16 @@ bool FSOExecutable::CheckRootFolder(wxFileName path) {
 #error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
 #endif
 
-wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path) {
-	return FSOExecutable::GetBinariesFromRootFolder(path, EXECUTABLE_GLOB_PATTERN);
+// quiet is for when you just want to check whether there are FSO/FRED binaries
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, bool quiet) {
+	return FSOExecutable::GetBinariesFromRootFolder(path, EXECUTABLE_GLOB_PATTERN, quiet);
 }
 
-wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(const wxFileName& path) {
-	return FSOExecutable::GetBinariesFromRootFolder(path, FRED_EXECUTABLE_GLOB_PATTERN);
+wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(const wxFileName& path, bool quiet) {
+	return FSOExecutable::GetBinariesFromRootFolder(path, FRED_EXECUTABLE_GLOB_PATTERN, quiet);
 }
 
-wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, const wxString& globPattern) {
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, const wxString& globPattern, bool quiet) {
 	wxArrayString files;
 	wxDir folder(path.GetPath());
 	wxString filename;
@@ -134,12 +138,16 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	}
 #endif
 	
-	wxLogInfo(_T(" Found %d FreeSpace 2 Open executables in '%s'"), files.Count(), path.GetPath().c_str());
-
-	for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
-		wxLogDebug(_T("Found executable: %s"), files.Item(i).c_str());
+	if (!quiet) {
+		wxString execType = globPattern.Lower().Find(_T("fred")) == wxNOT_FOUND ? _T("FS2") : _T("FRED2");
+		wxLogInfo(_T(" Found %d %s Open executables in '%s'"),
+			files.GetCount(), execType.c_str(), path.GetPath().c_str());
+		
+		for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
+			wxLogDebug(_T("Found executable: %s"), files.Item(i).c_str());
+		}
 	}
-	
+
 	return files;
 }
 

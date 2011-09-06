@@ -779,7 +779,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		// "refresh list of FSO execs" button being pressed
 		if (!wxFileName::DirExists(tcPath)) {
 			this->DisableExecutableChoiceControls(NONEXISTENT_TC);
-		} else if (FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty()) {
+		} else if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
 			this->DisableExecutableChoiceControls(INVALID_TC);
 		} else { // the root folder is valid
 
