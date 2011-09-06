@@ -79,6 +79,10 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
+	// must call TCManager::CurrentProfileChanged() manually on startup,
+	// since initial profile switch takes place before TCManager has been initialized
+	wxCommandEvent tcMgrInitEvent;
+	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 }
 
 void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
@@ -771,33 +775,42 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 		tcFolder->SetValue(tcPath);
 
-		this->FillFSOExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
-		exeChoice->Enable();
-		exeChoiceRefreshButton->Enable();
+		// note that disabling the controls is necessary if we reached this code from the
+		// "refresh list of FSO execs" button being pressed
+		if (!wxFileName::DirExists(tcPath)) {
+			this->DisableExecutableChoiceControls(NONEXISTENT_TC);
+		} else if (FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty()) {
+			this->DisableExecutableChoiceControls(INVALID_TC);
+		} else { // the root folder is valid
 
-		if (fredEnabled) {
-			this->FillFredExecutableDropBox(fredChoice, wxFileName(tcPath, wxEmptyString));
-			fredChoice->Enable();
-			fredChoiceRefreshButton->Enable();
-		}
+			this->FillFSOExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
+			exeChoice->Enable();
+			exeChoiceRefreshButton->Enable();
 
-		/* check to see if the exe listed in the profile actually does exist in
-		the list */
-		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
-		if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
-			ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
-		}
+			if (fredEnabled) {
+				this->FillFredExecutableDropBox(fredChoice, wxFileName(tcPath, wxEmptyString));
+				fredChoice->Enable();
+				fredChoiceRefreshButton->Enable();
+			}
 
-		if (fredEnabled) {
-			/* check to see if the FRED exe listed in the profile actually does exist in
+			/* check to see if the exe listed in the profile actually does exist in
 			the list */
-			bool profileHasFredBinary =
-				ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
-			if ( profileHasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
-				ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
+			ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
+			if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
+				ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+			}
+
+			if (fredEnabled) {
+				/* check to see if the FRED exe listed in the profile actually does exist in
+				the list */
+				bool profileHasFredBinary =
+					ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
+				if ( profileHasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
+					ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
+				}
 			}
 		}
-	} // FIXME if the root folder is somehow invalid, disable the exe/FRED choice controls
+	}
 	this->GetSizer()->Layout();
 
 	// TCManager::CurrentProfileChanged() (which calls TCManager::GenerateTCChanged())
@@ -875,6 +888,63 @@ void BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton(wxCommandEvent 
 	
 	wxCHECK_RET(fredEnabled, _T("OnPressFredExecutableChoiceRefreshButton called when fredEnabled is false"));
 	// TODO finish
+}
+
+/** Disables the executable choice and refresh button controls, such as would occur
+ if the currently loaded TC root folder doesn't exist or has no FSO executables. */
+void BasicSettingsPage::DisableExecutableChoiceControls(ReasonForExecutableDisabling reason) {
+
+	wxString tcFolderPath;
+	bool hasTcPath = ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcFolderPath);
+	wxCHECK_RET(hasTcPath,
+		_T("DisableExecutableChoiceControls called with profile having no TC root folder entry"));
+	
+	switch (reason) {
+		case NONEXISTENT_TC:
+			wxLogWarning(_("Selected root folder does not exist."));
+			break;
+		case INVALID_TC:
+			wxLogWarning(_("Selected root folder has no FS2 Open executables"));
+			break;
+		default:
+			wxCHECK_RET(false, _T("DisableExecutableChoiceControls called with invalid reason"));
+			break;
+	}
+	
+	ExeChoice *exeChoice = dynamic_cast<ExeChoice*>(
+		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
+	wxCHECK_RET( exeChoice != NULL, 
+		_T("Cannot find executable choice control"));
+	
+	wxButton* exeChoiceRefreshButton = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_EXE_CHOICE_REFRESH_BUTTON, this));
+	wxCHECK_RET( exeChoiceRefreshButton != NULL,
+		_T("Cannot find executable choice refresh button"));
+	
+	exeChoice->Clear();
+	exeChoice->Disable();
+	if (reason == NONEXISTENT_TC) {
+		exeChoiceRefreshButton->Disable();		
+	}
+	
+	bool fredEnabled;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	
+	if (fredEnabled) {
+		ExeChoice* fredChoice = dynamic_cast<ExeChoice*>(
+			wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
+		wxCHECK_RET( fredChoice != NULL, 
+			_T("Cannot find FRED executable choice control"));
+		
+		wxButton* fredChoiceRefreshButton = dynamic_cast<wxButton*>(
+			wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, this));
+		wxCHECK_RET( fredChoiceRefreshButton != NULL,
+			_T("Cannot find FRED executable choice refresh button"));
+		
+		fredChoice->Clear();
+		fredChoice->Disable();
+		fredChoiceRefreshButton->Disable();
+	}
 }
 
 class Resolution: public wxClientData {
