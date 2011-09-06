@@ -93,12 +93,8 @@ void FlagListBox::Initialize() {
 		return;
 	}
 	
-	if (FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty()) {
+	if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
 		this->drawStatus = INVALID_TC;
-		// repeating this line from BasicSettingsPage::DisableExecutableChoiceControls is a bit
-		// of a hack to ensure that this line appears in the status bar, instead of
-		// "Found 0 FreeSpace 2 Open executables in" etc etc.
-		wxLogWarning(_("Selected root folder has no FS2 Open executables"));
 		return;
 	}
 

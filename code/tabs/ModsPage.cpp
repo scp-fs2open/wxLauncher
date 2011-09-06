@@ -102,7 +102,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #else
 		this->SetSizer(nonexistentTCSizer);
 #endif
-	} else if ( FSOExecutable::GetBinariesFromRootFolder(wxFileName(tcPath, wxEmptyString)).IsEmpty() ) {
+	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
 			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);

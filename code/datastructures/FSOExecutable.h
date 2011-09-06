@@ -32,10 +32,11 @@ public:
 	inline bool ExecutableNameEqualTo(const wxString& str) const;
 	inline const wxString& GetExecutableName() const;
 
-	static bool CheckRootFolder(wxFileName path);
-	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path);
-	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, const wxString &globPattern);
-	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path);
+	static bool CheckRootFolder(const wxFileName& path);
+	static bool HasFSOExecutables(const wxFileName& path);
+
+	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
+	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
 	static wxString MakeVersionStringFromVersion(FSOExecutable version);
 	wxString MakeVersionStringFromVersion();
@@ -53,6 +54,7 @@ protected:
 	wxByte buildCaps;
 private:
 	FSOExecutable();
+	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, const wxString &globPattern, bool quiet);
 };
 
 inline bool FSOExecutable::ExecutableNameEqualTo(const wxString& str) const {
