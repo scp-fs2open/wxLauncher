@@ -111,6 +111,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	wxButton* exeChoiceRefreshButton = new wxButton(this, ID_EXE_CHOICE_REFRESH_BUTTON, _("Refresh"));
+	// FIXME maybe filling the executable drop down boxes and determining whether the controls should be enabled
+	//       should be left to OnTCChanged()? Otherwise, it's done both here and there.
 	if ( hastcfolder && wxFileName::DirExists(tcfolder) ) {
 		BasicSettingsPage::FillFSOExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
 		useExeChoice->FindAndSetSelectionWithClientData(binary);
@@ -733,7 +735,6 @@ specified in the profile does not exist in the TC.
 \note clearing the selected executable disables the play button.
 \note Emits a EVT_TC_BINARY_CHANGED in any case.*/
 void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
-
 	ExeChoice* exeChoice = dynamic_cast<ExeChoice*>(
 		wxWindow::FindWindowById(ID_EXE_CHOICE_BOX, this));
 	wxCHECK_RET( exeChoice != NULL, 
@@ -778,10 +779,13 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		// note that disabling the controls is necessary if we reached this code from the
 		// "refresh list of FSO execs" button being pressed
 		if (!wxFileName::DirExists(tcPath)) {
+			this->isTcRootFolderValid = false;
 			this->DisableExecutableChoiceControls(NONEXISTENT_TC);
 		} else if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
+			this->isTcRootFolderValid = false;
 			this->DisableExecutableChoiceControls(INVALID_TC);
 		} else { // the root folder is valid
+			this->isTcRootFolderValid = true;
 
 			this->FillFSOExecutableDropBox(exeChoice, wxFileName(tcPath, wxEmptyString));
 			exeChoice->Enable();
@@ -810,6 +814,10 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 				}
 			}
 		}
+		wxLogDebug(_T("The current root folder is %s."), this->isTcRootFolderValid ? _T("valid") : _T("invalid"));
+	} else {
+		wxLogDebug(_T("The current profile has no entry for root folder."));
+		this->isTcRootFolderValid = false;
 	}
 	this->GetSizer()->Layout();
 
