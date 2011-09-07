@@ -758,10 +758,10 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		// "refresh list of FSO execs" button being pressed
 		if (!wxFileName::DirExists(tcPath)) {
 			this->isTcRootFolderValid = false;
-			this->DisableExecutableChoiceControls(NONEXISTENT_TC);
+			this->DisableExecutableChoiceControls(NONEXISTENT_TC_ROOT_FOLDER);
 		} else if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
 			this->isTcRootFolderValid = false;
-			this->DisableExecutableChoiceControls(INVALID_TC);
+			this->DisableExecutableChoiceControls(INVALID_TC_ROOT_FOLDER);
 		} else { // the root folder is valid
 			this->isTcRootFolderValid = true;
 
@@ -797,6 +797,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	} else {
 		wxLogDebug(_T("The current profile has no entry for root folder."));
 		this->isTcRootFolderValid = false;
+		this->DisableExecutableChoiceControls(MISSING_TC_ROOT_FOLDER);
 	}
 	this->GetSizer()->Layout();
 
@@ -879,18 +880,24 @@ void BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton(wxCommandEvent 
 
 /** Disables the executable choice and refresh button controls, such as would occur
  if the currently loaded TC root folder doesn't exist or has no FSO executables. */
-void BasicSettingsPage::DisableExecutableChoiceControls(ReasonForExecutableDisabling reason) {
+void BasicSettingsPage::DisableExecutableChoiceControls(const ReasonForExecutableDisabling reason) {
 
 	wxString tcFolderPath;
 	bool hasTcPath = ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcFolderPath);
-	wxCHECK_RET(hasTcPath,
-		_T("DisableExecutableChoiceControls called with profile having no TC root folder entry"));
+	wxCHECK_RET(hasTcPath || (reason == MISSING_TC_ROOT_FOLDER),
+		_T("DisableChoiceExecutableControls: profile has no root folder entry, but reason is not a missing root folder"));
+	wxCHECK_RET((!hasTcPath) || (reason != MISSING_TC_ROOT_FOLDER),
+		_T("DisableChoiceExecutableControls: reason is a missing root folder, but profile has a root folder entry"));
 	
 	switch (reason) {
-		case NONEXISTENT_TC:
+		case MISSING_TC_ROOT_FOLDER:
+			// no user-facing message needed, since this is not an error state
+			wxLogDebug(_T("disabling executable controls, since root folder entry is missing"));
+			break;
+		case NONEXISTENT_TC_ROOT_FOLDER:
 			wxLogWarning(_("Selected root folder does not exist."));
 			break;
-		case INVALID_TC:
+		case INVALID_TC_ROOT_FOLDER:
 			wxLogWarning(_("Selected root folder has no FS2 Open executables"));
 			break;
 		default:
@@ -910,7 +917,7 @@ void BasicSettingsPage::DisableExecutableChoiceControls(ReasonForExecutableDisab
 	
 	exeChoice->Clear();
 	exeChoice->Disable();
-	if (reason == NONEXISTENT_TC) {
+	if (reason == NONEXISTENT_TC_ROOT_FOLDER || reason == MISSING_TC_ROOT_FOLDER) {
 		exeChoiceRefreshButton->Disable();		
 	}
 	

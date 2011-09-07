@@ -78,11 +78,12 @@ private:
 	static bool GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height);
 	
 	enum ReasonForExecutableDisabling {
-		NONEXISTENT_TC,
-		INVALID_TC
+		MISSING_TC_ROOT_FOLDER,
+		NONEXISTENT_TC_ROOT_FOLDER,
+		INVALID_TC_ROOT_FOLDER
 	};
 	
-	void DisableExecutableChoiceControls(ReasonForExecutableDisabling reason);
+	void DisableExecutableChoiceControls(const ReasonForExecutableDisabling reason);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
