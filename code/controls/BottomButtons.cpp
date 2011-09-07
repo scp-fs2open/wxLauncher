@@ -96,7 +96,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	} else {
 #if IS_APPLE
 		wxLogWarning(_("Executable %s does not exist"),
-					 wxFileName(tc + wxFileName::GetPathSeparator() + binary).GetFullName().c_str());
+			wxFileName(tc + wxFileName::GetPathSeparator() + binary).GetFullName().c_str());
 #else
 		wxLogWarning(_("Executable %s does not exist"), wxFileName(tc, binary).GetFullName().c_str());
 #endif
@@ -107,10 +107,19 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 		// do nothing, no button to manipulate
 	} else if ( tc.IsEmpty() || fredBinary.IsEmpty() ) {
 		this->fred->Disable();
+#if IS_APPLE
+	} else if ( wxFileName(tc + wxFileName::GetPathSeparator() + fredBinary).FileExists() ) {
+#else
 	} else if ( wxFileName(tc, fredBinary).FileExists() ) {
+#endif
 		this->fred->Enable();
 	} else {
+#if IS_APPLE
+		wxLogWarning(_("FRED executable %s does not exist"),
+			wxFileName(tc + wxFileName::GetPathSeparator() + fredBinary).GetFullName().c_str());
+#else
 		wxLogWarning(_("FRED executable %s does not exist"), wxFileName(tc, fredBinary).GetFullName().c_str());
+#endif
 		this->fred->Disable();
 	}
 }
