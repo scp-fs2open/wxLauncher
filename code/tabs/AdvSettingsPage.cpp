@@ -147,6 +147,16 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	this->Layout();
 
 	this->OnDrawStatusChange(event);
+
+	bool isProfileInitialized;
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_MAIN_INITIALIZED, &isProfileInitialized, false);
+
+	if (!isProfileInitialized) {
+		wxLogDebug(_T("autosaving newly initialized profile '%s'"),
+			ProMan::GetProfileManager()->GetCurrentName().c_str());
+		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_MAIN_INITIALIZED, true);
+		ProMan::GetProfileManager()->SaveCurrentProfile(true);
+	}
 }
 
 void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
