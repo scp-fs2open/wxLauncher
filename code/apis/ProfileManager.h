@@ -44,10 +44,10 @@ public:
 	bool GlobalExists(wxString& strName) const;
 	
 	bool GlobalRead(const wxString& key, bool* b) const;
-	bool GlobalRead(const wxString& key, bool* b, bool defaultVal) const;
+	bool GlobalRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent = false);
 	bool GlobalRead(const wxString& key, wxString* str) const;
-	bool GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal) const;
-	bool GlobalRead(const wxString& key, long* l, long defaultVal) const;
+	bool GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent = false);
+	bool GlobalRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent = false);
 	
 	bool GlobalWrite(const wxString& key, const wxString& value);
 	bool GlobalWrite(const wxString& key, const wxChar* value);
@@ -58,11 +58,11 @@ public:
 	bool ProfileExists(wxString& strName) const;
 	
 	bool ProfileRead(const wxString& key, bool* b) const;
-	bool ProfileRead(const wxString& key, bool* d, bool defaultVal) const;
+	bool ProfileRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent = false);
 	bool ProfileRead(const wxString& key, wxString* str) const;
-	bool ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal) const;
+	bool ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent = false);
 	bool ProfileRead(const wxString& key, long* l) const;
-	bool ProfileRead(const wxString& key, long* l, long defaultVal) const;
+	bool ProfileRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent = false);
 	
 	bool ProfileWrite(const wxString& key, const wxString& value);
 	bool ProfileWrite(const wxString& key, const wxChar* value);
