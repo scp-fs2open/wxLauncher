@@ -328,15 +328,23 @@ bool ProMan::GlobalRead(const wxString& key, bool* b) const {
 
 /** Reads a bool from the global profile,
  using the default value if the key is not present.
+ If the entry is not present in the global profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the global profile.
  Returns true on success. */
-bool ProMan::GlobalRead(const wxString& key, bool* b, bool defaultVal) const {
+bool ProMan::GlobalRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read bool for key %s with default value %s from null global profile"),
 			key.c_str(), defaultVal ? _T("true") : _T("false"));
 		return false;
 	} else {
-		return this->globalProfile->Read(key, b, defaultVal);
+		bool readSuccess = this->globalProfile->Read(key, b, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in global profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal ? _T("true") : _T("false"));
+			this->globalProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
@@ -354,29 +362,45 @@ bool ProMan::GlobalRead(const wxString& key, wxString* str) const {
 
 /** Reads a string from the global profile,
  using the default value if the key is not present.
+ If the entry is not present in the global profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the global profile.
 Returns true on success. */
-bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal) const {
+bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read string for key %s with default value %s from null global profile"),
 			key.c_str(), defaultVal.c_str());
 		return false;
 	} else {
-		return this->globalProfile->Read(key, str, defaultVal);
+		bool readSuccess = this->globalProfile->Read(key, str, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in global profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal.c_str());
+			this->globalProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
 /** Reads a long from the global profile,
  using the default value if the key is not present.
+ If the entry is not present in the global profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the global profile.
  Returns true on success. */
-bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal) const {
+bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read long for key %s with default value %ld from null global profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
-		return this->globalProfile->Read(key, l, defaultVal);
+		bool readSuccess = this->globalProfile->Read(key, l, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in global profile is absent. writing default value %ld to it."),
+				key.c_str(), defaultVal);
+			this->globalProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
@@ -466,15 +490,23 @@ bool ProMan::ProfileRead(const wxString& key, bool* b) const {
 
 /** Reads a bool from the current profile,
  using the default value if the key is not present.
+ If the entry is not present in the current profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the current profile.
  Returns true on success. */
-bool ProMan::ProfileRead(const wxString& key, bool* b, bool defaultVal) const {
+bool ProMan::ProfileRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read bool for key %s with default value %s from null current profile"),
 			key.c_str(), defaultVal ? _T("true") : _T("false"));
 		return false;
 	} else {
-		return this->currentProfile->Read(key, b, defaultVal);
+		bool readSuccess = this->currentProfile->Read(key, b, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in current profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal ? _T("true") : _T("false"));
+			this->currentProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
@@ -492,15 +524,23 @@ bool ProMan::ProfileRead(const wxString& key, wxString* str) const {
 
 /** Reads a string from the current profile,
  using the default value if the key is not present.
+ If the entry is not present in the current profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the current profile.
  Returns true on success. */
-bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal) const {
+bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read string for key %s with default value %s from null current profile"),
 			key.c_str(), defaultVal.c_str());
 		return false;
 	} else {
-		return this->currentProfile->Read(key, str, defaultVal);
+		bool readSuccess = this->currentProfile->Read(key, str, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in current profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal.c_str());
+			this->currentProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
@@ -518,15 +558,23 @@ bool ProMan::ProfileRead(const wxString& key, long* l) const {
 
 /** Reads a long from the current profile,
  using the default value if the key is not present.
+ If the entry is not present in the current profile and writeBackIfAbsent is set to true,
+ then the default value is written back to the current profile.
  Returns true on success. */
-bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal) const {
+bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
 			_T("attempt to read long for key %s with default value %ld from null current profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
-		return this->currentProfile->Read(key, l, defaultVal);
+		bool readSuccess = this->currentProfile->Read(key, l, defaultVal);
+		if (!readSuccess && writeBackIfAbsent) {
+			wxLogDebug(_T("entry %s in current profile is absent. writing default value %ld to it."),
+				key.c_str(), defaultVal);
+			this->currentProfile->Write(key, defaultVal);
+		}
+		return readSuccess;
 	}
 }
 
