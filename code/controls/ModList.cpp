@@ -538,7 +538,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	wxString activeMod;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod, true);
 	wxBrush b;
 	wxRect selectedRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
 	wxRect activeRect(selectedRect.x+3, selectedRect.y+3, selectedRect.width-7, selectedRect.height-7);
