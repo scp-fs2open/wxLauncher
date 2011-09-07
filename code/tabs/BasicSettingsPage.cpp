@@ -1524,7 +1524,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	wxCHECK_RET( joynumber != NULL,
 		_T("JoyNumber is not joystickSelected's client data"));
 
-#if IS_WIN32 // calibration and force feedback don't work on OS X at the moment
+#if IS_WIN32 // calibration and force feedback don't work on OS X or Linux at the moment
 	if ( JoyMan::HasCalibrateTool(joynumber->GetNumber()) ) {
 		this->joystickCalibrateButton->Enable();
 	} else {
