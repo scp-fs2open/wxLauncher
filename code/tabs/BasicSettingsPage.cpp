@@ -190,7 +190,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	long bitDepth;
 	depthCombo->Append(_("16 bit"));
 	depthCombo->Append(_("32 bit"));
-	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 32);
+	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 32, true);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 #if !IS_WIN32 // TF/AF/AA don't yet work on Windows
@@ -200,7 +200,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
 	textureFilterCombo->Append(_("Trilinear"));
-	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"));
+	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"), true);
 	filter.MakeLower();
 	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
@@ -214,7 +214,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	anisotropicCombo->Append(_T(" 4x"));
 	anisotropicCombo->Append(_T(" 8x"));
 	anisotropicCombo->Append(_T("16x"));
-	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0, true);
 	switch(anisotropic) {
 		case 0:
 			anisotropic = 0;
@@ -252,7 +252,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	aaCombo->Append(_T(" 4x"));
 	aaCombo->Append(_T(" 8x"));
 	aaCombo->Append(_T("16x"));
-	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, 0);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, 0, true);
 	switch(antialias) {
 		case 0:
 			antialias = 0;
@@ -393,7 +393,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		}
 		// set the voice to what is in the profile, if not set in profile use
 		// system settings
-		proman->ProfileRead(PRO_CFG_SPEECH_VOICE, &speechVoice, speechSystemVoice);
+		proman->ProfileRead(PRO_CFG_SPEECH_VOICE, &speechVoice, speechSystemVoice, true);
 		// there should not be more than MAX_INT voices installed on a system so
 		// the cast of an unsigned int to a signed int should not result in a 
 		// loss of data.
@@ -411,7 +411,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 				_T(" setting to 50"));
 			speechSystemVolume = 50;
 		}
-		proman->ProfileRead(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume);
+		proman->ProfileRead(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume, true);
 		if ( speechVolume < 0 || speechVolume > 100 ) {
 			wxLogWarning(_T("Speech Volume recorded in profile is out of range,")
 				_T(" resetting to 50"));
@@ -421,19 +421,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 
 		bool speechInTechroom;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true, true);
 		speechInTechroomCheck->SetValue(speechInTechroom);
 
 		bool speechInBriefings;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true, true);
 		speechInBriefingCheck->SetValue(speechInBriefings);
 
 		bool speechInGame;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true, true);
 		speechInGameCheck->SetValue(speechInGame);
 
 		bool speechInMulti;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true);
+		proman->ProfileRead(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true, true);
 		speechInMultiCheck->SetValue(speechInMulti);
 	} else {
 		speechBox->Disable();
@@ -458,7 +458,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkType->Append(_T("Dialup"));
 	networkType->Append(_T("LAN/Direct Connection"));
 	wxString type;
-	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type, _T("None"));
+	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type, _T("None"), true);
 	networkType->SetStringSelection(type);
 	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
 	networkSpeed->Append(_T("None"));
@@ -468,13 +468,13 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	networkSpeed->Append(_T("Cable"));
 	networkSpeed->Append(_T("Fast"));
 	wxString speed;
-	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed, _T("None"));
+	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed, _T("None"), true);
 	networkSpeed->SetStringSelection(speed);
 
 	wxTextCtrl* networkPort = 
 		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
 	long port;
-	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, 0);
+	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, 0, true);
 	if (port != 0) {
 		networkPort->SetValue(wxString::Format(_T("%ld"), port));
 	}
@@ -482,7 +482,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
-	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, _T(""));
+	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, _T(""), true);
 	networkIP->SetValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
@@ -1500,7 +1500,8 @@ void BasicSettingsPage::SetupJoystickSection() {
 			ProMan::GetProfileManager()->
 				ProfileRead(PRO_CFG_JOYSTICK_ID,
 					&profileJoystick,
-					JOYMAN_INVALID_JOYSTICK);
+					JOYMAN_INVALID_JOYSTICK,
+					true);
 			// set current joystick
 			for ( i = 0; i < this->joystickSelected->GetCount(); i++ ) {
 				JoyNumber* data = dynamic_cast<JoyNumber*>(
@@ -1543,8 +1544,8 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 
 	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
 		bool ff, direct;
-		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false);
-		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false);
+		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false, true);
+		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false, true);
 		this->joystickDirectionalHit->SetValue(direct);
 		this->joystickForceFeedback->SetValue(ff);
 
@@ -1595,7 +1596,7 @@ void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
 //////////// ProxyChoice
 ProxyChoice::ProxyChoice(wxWindow *parent, wxWindowID id)
 :wxChoicebook(parent, id) {
-	wxString type;
+	wxString type; // NOTE: not adding writeBackIfAbsent to GlobalRead calls, since proxy box not in GUI
 	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_PROXY_TYPE, &type, _T("none"));
 
 	wxPanel* noneProxyPanel = new wxPanel(this);

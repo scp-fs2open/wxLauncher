@@ -163,7 +163,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 
 	wxCheckBox* autoSaveProfilesCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
 	bool autosave;
-	proman->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true);
+	proman->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true, true);
 	autoSaveProfilesCheck->SetValue(autosave);
 
 	wxCommandEvent autoSaveEvent(wxEVT_COMMAND_CHECKBOX_CLICKED, ID_SAVE_DEFAULT_CHECK);

@@ -183,7 +183,7 @@ void LightingPresets::Initialize() {
 	wxString presetName;
 
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName,
-		PresetButtonIdToPresetName(DEFAULT_PRESET_ID));
+		PresetButtonIdToPresetName(DEFAULT_PRESET_ID), true);
 
 	int presetButtonId = PresetNameToPresetButtonId(presetName);
 
