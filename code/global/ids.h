@@ -189,6 +189,7 @@ enum ProfileDialogReturnValues {
 /** @{*/
 #define PRO_CFG_MAIN_NAME					_T("/main/name")		//!< string, name of profile
 #define PRO_CFG_MAIN_FILENAME				_T("/main/filename")	//!< string, full path to profile
+#define PRO_CFG_MAIN_INITIALIZED			_T("/main/initialized")	//!< bool, indicates whether profile has been saved with initial GUI values
 
 #define PRO_CFG_TC_ROOT_FOLDER				_T("/tc/folder")		//!< string, absolute path
 #define PRO_CFG_TC_CURRENT_BINARY			_T("/tc/currentbinary")	//!< string, binary name
