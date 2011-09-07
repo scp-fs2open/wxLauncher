@@ -92,18 +92,13 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	ProMan* proman = ProMan::GetProfileManager();
 	// exe Selection
-	wxString tcfolder, binary;
-	bool hastcfolder = proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcfolder, _T(""));
-	proman->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binary, _T(""));
-	wxString fredBinary;
 	bool fredEnabled;
 	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
-	proman->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinary, _T(""));
-	
+
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 or TC root folder:"));
-	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX, tcfolder);
+	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
 	rootFolderBox->SetEditable(false);
@@ -111,15 +106,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* useExeText = new wxStaticText(this, wxID_ANY, _("FS2 Open executable:"));
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	wxButton* exeChoiceRefreshButton = new wxButton(this, ID_EXE_CHOICE_REFRESH_BUTTON, _("Refresh"));
-	// FIXME maybe filling the executable drop down boxes and determining whether the controls should be enabled
-	//       should be left to OnTCChanged()? Otherwise, it's done both here and there.
-	if ( hastcfolder && wxFileName::DirExists(tcfolder) ) {
-		BasicSettingsPage::FillFSOExecutableDropBox(useExeChoice, wxFileName(tcfolder, wxEmptyString));
-		useExeChoice->FindAndSetSelectionWithClientData(binary);
-	} else {
-		useExeChoice->Disable();
-		exeChoiceRefreshButton->Disable();
-	}
 
 	wxStaticText* useFredText = NULL;
 	ExeChoice* useFredChoice = NULL;
@@ -128,14 +114,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable:"));
 		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
 		exeFredChoiceRefreshButton = new wxButton(this, ID_EXE_FRED_CHOICE_REFRESH_BUTTON, _("Refresh"));
-
-		if ( hastcfolder && wxFileName::DirExists(tcfolder) ) {
-			BasicSettingsPage::FillFredExecutableDropBox(useFredChoice, wxFileName(tcfolder, wxEmptyString));
-			useFredChoice->FindAndSetSelectionWithClientData(fredBinary);
-		} else {
-			useFredChoice->Disable();
-			exeFredChoiceRefreshButton->Disable();
-		}
 	}
 
 	// FIXME hiding the refresh buttons until their functionality is complete
