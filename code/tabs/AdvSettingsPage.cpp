@@ -121,6 +121,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	
 	wxStaticBox* customFlagsBox = new wxStaticBox(this, wxID_ANY, _("Custom flags"));
 	wxTextCtrl* customFlagsText = new wxTextCtrl(this, ID_CUSTOM_FLAGS_TEXT);
+	customFlagsText->SetEditable(false); // will be made editable if flag file retrieval/parsing succeeds
 	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
 	customFlagsSizer->Add(customFlagsText, wxSizerFlags().Expand());
 	
@@ -180,31 +181,37 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		this->flagListBox->ResetFlags();
 	}
 
-	wxStringTokenizer tokenizer(flagLine, _T(" "));
-	while(tokenizer.HasMoreTokens()) {
-		wxString tok = tokenizer.GetNextToken();
-		if (tok == LightingPresets::GetFlagLineSeparator()) {
-			lightingPreset.Append(tokenizer.GetNextToken());
-			while (tokenizer.HasMoreTokens()) {
-				lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+	if (this->flagListBox->IsDrawOK()) {
+		wxStringTokenizer tokenizer(flagLine, _T(" "));
+		while(tokenizer.HasMoreTokens()) {
+			wxString tok = tokenizer.GetNextToken();
+			if (tok == LightingPresets::GetFlagLineSeparator()) {
+				lightingPreset.Append(tokenizer.GetNextToken());
+				while (tokenizer.HasMoreTokens()) {
+					lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+				}
+				break;
+			} else if ( this->flagListBox->SetFlag(tok, true) ) {
+				continue;
+			} else {
+				if (!customFlags.IsEmpty()) {
+					customFlags += _T(" ");
+				}
+				customFlags += tok;
 			}
-			break;
-		} else if ( this->flagListBox->SetFlag(tok, true) ) {
-			continue;
-		} else {
+		}
+		if (!lightingPreset.IsEmpty()) {
 			if (!customFlags.IsEmpty()) {
-				customFlags += _T(" ");
+				lightingPreset.Append(_T(" "));
 			}
-			customFlags += tok;
+			customFlags.Prepend(lightingPreset);
 		}
+		customFlagsText->ChangeValue(customFlags);
+		customFlagsText->SetEditable(true);
+	} else {
+		customFlagsText->ChangeValue(wxEmptyString);
+		customFlagsText->SetEditable(false);
 	}
-	if (!lightingPreset.IsEmpty()) {
-		if (!customFlags.IsEmpty()) {
-			lightingPreset.Append(_T(" "));
-		}
-		customFlags.Prepend(lightingPreset);
-	}
-	customFlagsText->ChangeValue(customFlags);
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
