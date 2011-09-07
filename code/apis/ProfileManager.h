@@ -86,7 +86,7 @@ public:
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);
-	void SaveCurrentProfile();
+	void SaveCurrentProfile(bool quiet = false);
 	void RevertCurrentProfile();
 	bool HasUnsavedChanges();
 	inline bool NeedToPromptToSave() { return (!this->isAutoSaving) && this->HasUnsavedChanges(); }
