@@ -107,6 +107,7 @@ private:
 	wxButton* joystickCalibrateButton;
 	wxButton* joystickDetectButton;
 #endif
+	bool isTcRootFolderValid;
 };
 
 #endif
