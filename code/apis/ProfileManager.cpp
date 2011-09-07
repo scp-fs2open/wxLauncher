@@ -762,7 +762,7 @@ wxArrayString ProMan::GetAllProfileNames() {
 
 /** Saves the current profile to disk, regardless of whether it has unsaved changes.
  Does not affect the global profile or any other profile. */
-void ProMan::SaveCurrentProfile() {
+void ProMan::SaveCurrentProfile(bool quiet) {
 	wxConfigBase* configbase = wxFileConfig::Get(false);
 	if ( configbase == NULL ) {
 		wxLogError(_T("There is no global file config."));
@@ -781,8 +781,11 @@ void ProMan::SaveCurrentProfile() {
 			wxFFileOutputStream configOutput(file.GetFullPath());
 			config->Save(configOutput);
 			this->ResetPrivateCopy();
-			wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());
-			wxLogDebug(_T("Current config saved (%s)."), file.GetFullPath().c_str());
+			if (!quiet) {
+				wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());				
+			}
+			wxLogDebug(_T("Current config%s saved (%s)."),
+				quiet ? _T(" quietly") : wxEmptyString, file.GetFullPath().c_str());
 		}
 	} else {
 		wxLogError(_T("Configbase is not a wxFileConfig."));
