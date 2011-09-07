@@ -1406,6 +1406,16 @@ void BasicSettingsPage::SetupOpenALSection() {
 				soundDeviceCombo->SetSelection(0);
 			}
 		}
+		// update current profile if necessary
+		ProMan* proman = ProMan::GetProfileManager();
+		wxString openALDevice;
+		if (!proman->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openALDevice) ||
+			(openALDevice != this->soundDeviceCombo->GetStringSelection())) {
+			wxLogDebug(_T("updating OpenAL sound device profile entry to \"%s\""),
+				soundDeviceCombo->GetStringSelection().c_str());
+			proman->ProfileWrite(PRO_CFG_OPENAL_DEVICE, this->soundDeviceCombo->GetStringSelection());
+		}
+
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
 		this->openALVersion->Hide();
