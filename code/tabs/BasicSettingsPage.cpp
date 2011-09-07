@@ -811,6 +811,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 					ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
 				if ( profileHasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
 					ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
+					TCManager::GenerateTCFredBinaryChanged();
 				}
 			}
 		}
