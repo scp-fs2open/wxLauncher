@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include "global/ids.h"
 #include "controls/BottomButtons.h"
+#include "datastructures/FSOExecutable.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 
@@ -105,7 +106,8 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);
 	if ( this->fred == NULL ) {
 		// do nothing, no button to manipulate
-	} else if ( tc.IsEmpty() || fredBinary.IsEmpty() ) {
+	} else if ( tc.IsEmpty() || fredBinary.IsEmpty() || (!wxFileName::DirExists(tc)) ||
+		(!FSOExecutable::HasFSOExecutables(wxFileName(tc, wxEmptyString))) ) {
 		this->fred->Disable();
 #if IS_APPLE
 	} else if ( wxFileName(tc + wxFileName::GetPathSeparator() + fredBinary).FileExists() ) {
