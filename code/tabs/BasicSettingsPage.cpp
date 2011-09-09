@@ -752,6 +752,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
+		wxLogInfo(_T("The current FS2/TC root folder is %s"), tcPath.c_str());
 		tcFolder->SetValue(tcPath);
 
 		// note that disabling the controls is necessary if we reached this code from the
