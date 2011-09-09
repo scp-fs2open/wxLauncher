@@ -692,7 +692,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		if ( !path.IsOk() ) {
 			wxLogWarning(_T("Folder is not valid"));
 			continue;
-		} else if ( FSOExecutable::CheckRootFolder(path) ) {
+		} else if ( FSOExecutable::IsRootFolderValid(path) ) {
 			break;
 		} else {
 			wxLogWarning(_T("Folder does not have any supported executables"));

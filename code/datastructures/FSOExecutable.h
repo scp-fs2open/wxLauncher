@@ -32,7 +32,7 @@ public:
 	inline bool ExecutableNameEqualTo(const wxString& str) const;
 	inline const wxString& GetExecutableName() const;
 
-	static bool CheckRootFolder(const wxFileName& path);
+	static bool IsRootFolderValid(const wxFileName& path, bool quiet = false);
 	static bool HasFSOExecutables(const wxFileName& path);
 
 	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
