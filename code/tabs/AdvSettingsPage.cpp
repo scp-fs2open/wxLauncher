@@ -34,14 +34,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
+	this->flagListBox = NULL;
 
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
-	wxCommandEvent nullEvent;
-	this->OnExeChanged(nullEvent);	
+	// must call TCManager::CurrentProfileChanged() manually on startup,
+	// since initial profile switch takes place before TCManager has been initialized
+	// calling it here to ensure that AdvSettingsPage is set up by the time events are triggered
+	// TODO once InstallPage is ready, might need to move the CurrentProfileChanged() call there
+	wxCommandEvent tcMgrInitEvent;
+	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 }
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
@@ -225,7 +230,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
-	if ( !this->flagListBox->IsDrawOK() ) {
+	if ( (this->flagListBox == NULL) || !this->flagListBox->IsDrawOK() ) {
 		// The control I need to update does not exist, do nothing
 		return;
 	}

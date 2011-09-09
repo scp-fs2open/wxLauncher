@@ -79,10 +79,6 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
-	// must call TCManager::CurrentProfileChanged() manually on startup,
-	// since initial profile switch takes place before TCManager has been initialized
-	wxCommandEvent tcMgrInitEvent;
-	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 }
 
 void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
