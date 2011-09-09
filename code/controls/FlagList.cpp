@@ -483,17 +483,17 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 				msg = _("No FreeSpace 2 installation or total conversion has been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
 				break;
 			case NONEXISTENT_TC:
-				msg = _("The specified FreeSpace 2 installation or total conversion root folder does not exist.\nSelect a different FreeSpace 2 installation or total conversion\non the Basic Settings page.");
+				msg = _("The selected FreeSpace 2 installation or total conversion root folder does not exist.\nSelect a different FreeSpace 2 installation or total conversion\non the Basic Settings page.");
 				break;
 			case INVALID_TC:
-				msg = wxString(_("The specified FreeSpace 2 installation or total conversion root folder has no FreeSpace 2 Open executables.\n")) +
+				msg = wxString(_("The selected FreeSpace 2 installation or total conversion root folder has no FreeSpace 2 Open executables.\n")) +
 					_("Either add FS2 Open executables to the root folder and refresh the list of executables on the Basic Settings page, or select a different FreeSpace 2 installation or total conversion on the Basic Settings page.");
 				break;
 			case MISSING_EXE:
 				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings page.");
 				break;
 			case INVALID_BINARY:
-				msg = _("Selected executable does not exist.\nSelect another on the Basic Settings page.");
+				msg = _("The selected FreeSpace 2 Open executable does not exist.\nSelect another on the Basic Settings page.");
 				break;
 			case WAITING_FOR_FLAGFILE:
 				msg = _("Waiting for flag file to be produced and parsed.");

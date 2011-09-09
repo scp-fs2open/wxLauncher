@@ -104,7 +104,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently selected root folder does not contain a valid FreeSpace 2 installation or total conversion.\nSelect a valid root folder on the Basic Settings page."),
+			_("The currently selected root folder does not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
