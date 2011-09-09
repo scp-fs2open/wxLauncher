@@ -52,13 +52,17 @@ bool FSOExecutable::SupportsOpenAL() {
 }
 
 
-bool FSOExecutable::CheckRootFolder(const wxFileName& path) {
+bool FSOExecutable::IsRootFolderValid(const wxFileName& path, bool quiet) {
 	if ( !path.IsOk() ) {
-		wxLogError(_T(" New root folder %s is not OK"), path.GetFullPath().c_str());
+		if (!quiet) {
+			wxLogError(_T(" New root folder %s is not OK"), path.GetFullPath().c_str());			
+		}
 		return false;
 	}
 	if ( path.GetPath().IsEmpty() ) {
-		wxLogError(_T(" root folder %s is empty"), path.GetFullPath().c_str());
+		if (!quiet) {
+			wxLogError(_T(" Root folder %s is empty"), path.GetFullPath().c_str());
+		}
 		return false;
 	}
 	return HasFSOExecutables(path);
