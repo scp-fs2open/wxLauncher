@@ -704,7 +704,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 }
 
 /** Handles TCChanged events from TCManager.
-
+//FIXME rewrite OnTCChanged() documentation once revisions are complete
 Currently function only changes the executable dropbox control (clearing, and 
 filling in the executables that are in the new TC folder) and removes the
 currently select executable from the active profile only if the executable
@@ -805,6 +805,11 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	// TCManager::CurrentProfileChanged() (which calls TCManager::GenerateTCChanged())
 	// assumes that TCManager::GenerateTCBinaryChanged() is called here unconditionally
 	TCManager::GenerateTCBinaryChanged();
+	// TCManager::CurrentProfileChanged() also assumes that TCManager::GenerateTCFredBinaryChanged()
+	// is called here unconditionally if FRED launching is enabled
+	if (fredEnabled) {
+		TCManager::GenerateTCFredBinaryChanged();
+	}
 }
 
 /** Puts the pretty description of all of the executables in the TCs folder
