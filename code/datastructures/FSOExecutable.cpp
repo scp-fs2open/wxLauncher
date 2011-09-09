@@ -129,15 +129,13 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	}
 	
 #if IS_APPLE
-	// find actual executable inside .app bundle and call that the "executable"
+	// find actual (Unix) executable inside .app bundle and call the path to it the "executable"
 	for (wxArrayString::iterator it = files.begin(), end = files.end(); it != end; ++it) {
 		wxString pathToBin = 
 			wxDir::FindFirst(path.GetPath(wxPATH_GET_SEPARATOR) + *it + _T("/Contents/MacOS"),
 							 _T("*"),
 							 wxDIR_FILES);
-		wxLogDebug(_T("full path to Unix executable: %s"), pathToBin.c_str());
 		pathToBin.Replace(path.GetPath(wxPATH_GET_SEPARATOR), _T(""));
-		wxLogDebug(_T("relative path to Unix executable: %s"), pathToBin.c_str());
 		*it = pathToBin;
 	}
 #endif
