@@ -188,12 +188,16 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		token.MakeLower();
 		wxString temp;
 
-		if ( token.StartsWith(_T("exe")) ) {
+		if (token.IsEmpty()) { // can happen in OS X nightly debug builds
+			// do nothing
+		} else if ( token.StartsWith(_T("exe")) ) {
 			; // do nothing
 #if IS_APPLE
 		} else if (token.StartsWith(_T("app"))) {
 			break; // we've reached the end of the app name
 #endif
+		} else if ( token.IsNumber() && token.size() == 8 ) {
+			// must be a date from a nightly build; just ignore it
 		} else if ( token.IsNumber() && ver.major == 0 ) {
 			// must be major version number
 			long version = 0;
@@ -251,9 +255,6 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Token ending in 'r' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
-		} else if ( token.IsNumber() && token.size() == 8 ) {
-			// must be a date from SirKnightly's builds
-			// just ignore it the date
 		} else if ( token.StartsWith(_T("r"), &temp) && temp.IsNumber() ) {
 			// must be a revision number from SirKnightly's builds
 			long version = 0;
