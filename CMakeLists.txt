@@ -68,6 +68,7 @@ else(DEVELOPMENT_MODE)
   set(HELP_HTB_LOCATION ${RESOURCES_PATH}/onlinehelp.htb)
 endif(DEVELOPMENT_MODE)
 
+option(PROFILE_DEBUGGING "Extra verbose debug logs that include snapshots of profile contents at important steps while auto-save is off" OFF)
 option(USE_SPEECH "Build launcher with speech support?" OFF)
 option(USE_JOYSTICK "Build launcher with joystick support?" ON)
 option(USE_OPENAL "Build launcher with OpenAL support?" ON)
