@@ -40,9 +40,6 @@ public:
 	void OnSelectVideoAnisotropic(wxCommandEvent &event);
 	void OnSelectVideoAntiAlias(wxCommandEvent &event);
 	void OnSelectVideoTextureFilter(wxCommandEvent &event);
-	void OnSelectVideoGeneralSettings(wxCommandEvent &event);
-	void OnToggleVideoUseLargeTexture(wxCommandEvent &event);
-	void OnToggleVideoFixFontDistortion(wxCommandEvent &event);
 
 	void OnSelectSpeechVoice(wxCommandEvent &event);
 	void OnChangeSpeechVolume(wxCommandEvent &event);
