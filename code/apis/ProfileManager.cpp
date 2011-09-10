@@ -691,16 +691,37 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext contex
 												const wxString& profileName) {
 	// currently, the same text is used on all platforms, although it doesn't have to be that way
 	// NOTE: don't attempt to collapse the cases by removing break statements! it's asking for trouble
+#if PROFILE_DEBUGGING
+	ProMan* proman = ProMan::GetProfileManager();
+#endif
 	switch (context) {
 		case ON_PROFILE_SWITCH:
+#if PROFILE_DEBUGGING
+			wxLogDebug(_T("contents of private copy at save prompt on profile switch:"));
+			LogConfigContents(*proman->privateCopy);
+			wxLogDebug(_T("contents of current profile at save prompt on profile switch:"));
+			LogConfigContents(*proman->currentProfile);
+#endif
 			return _T("Save changes to current profile?");
 			break;
-			
+
 		case ON_PROFILE_CREATE:
+#if PROFILE_DEBUGGING
+			wxLogDebug(_T("contents of private copy at save prompt on profile create:"));
+			LogConfigContents(*proman->privateCopy);
+			wxLogDebug(_T("contents of current profile at save prompt on profile create:"));
+			LogConfigContents(*proman->currentProfile);
+#endif
 			return _T("Save changes to current profile?");
 			break;
-			
+
 		case ON_EXIT:
+#if PROFILE_DEBUGGING
+			wxLogDebug(_T("contents of private copy at save prompt on exit:"));
+			LogConfigContents(*proman->privateCopy);
+			wxLogDebug(_T("contents of current profile at save prompt on exit:"));
+			LogConfigContents(*proman->currentProfile);
+#endif
 			return _T("Save changes to current profile?");
 			break;
 
