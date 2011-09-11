@@ -68,7 +68,8 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 	this->drawStatus = DRAW_OK;
-	this->errorText = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	this->errorText =
+		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 
 	this->Initialize();
 
@@ -520,6 +521,7 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 
 		this->errorText->SetSize(rect, wxSIZE_FORCE);
 		this->errorText->Wrap(rect.width);
+		this->errorText->Center();
 	}
 }
 
