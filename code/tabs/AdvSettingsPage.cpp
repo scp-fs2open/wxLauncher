@@ -60,6 +60,17 @@ EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
 
+// FIXME HACK for now, hard-code flag list box height (sigh)
+#if IS_WIN32
+const int FLAG_LIST_BOX_HEIGHT = 410;
+#elif IS_LINUX
+const int FLAG_LIST_BOX_HEIGHT = 390;
+#elif IS_APPLE
+const int FLAG_LIST_BOX_HEIGHT = 363;
+#else
+#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	if (this->GetSizer() != NULL) {
 		this->GetSizer()->Clear(true);
@@ -70,17 +81,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 #if 0 // doesn't do anything
 	wxHtmlWindow* description = new wxHtmlWindow(this);
 	description->SetPage(_T("<p></p>"));
-#endif
-
-// FIXME HACK for now, hard-code flag list box height (sigh)
-#if IS_WIN32
-	const int FLAG_LIST_BOX_HEIGHT = 410;
-#elif IS_LINUX
-	const int FLAG_LIST_BOX_HEIGHT = 390;
-#elif IS_APPLE
-	const int FLAG_LIST_BOX_HEIGHT = 363;
-#else
-#error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
 #endif
 
 	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -99,7 +99,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
 #endif
-	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, wxID_ANY, _T("Flag sets:"));
+	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, ID_SELECT_FLAG_SET_LABEL, _T("Flag sets:"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -124,13 +124,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	flagsetNotesSizer->Add(flagsetNotes, wxSizerFlags().Expand());
 #endif
 	
-	wxStaticBox* customFlagsBox = new wxStaticBox(this, wxID_ANY, _("Custom flags"));
+	wxStaticBox* customFlagsBox = new wxStaticBox(this, ID_CUSTOM_FLAGS_BOX, _("Custom flags"));
 	wxTextCtrl* customFlagsText = new wxTextCtrl(this, ID_CUSTOM_FLAGS_TEXT);
-	customFlagsText->SetEditable(false); // will be made editable if flag file retrieval/parsing succeeds
 	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
 	customFlagsSizer->Add(customFlagsText, wxSizerFlags().Expand());
 	
-	wxStaticBox* commandLineLabel = new wxStaticBox(this, wxID_ANY, _("Current command line"));
+	wxStaticBox* commandLineLabel = new wxStaticBox(this, ID_COMMAND_LINE_BOX, _("Current command line"));
 	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
 		wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE|wxTE_READONLY);
@@ -167,16 +166,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
 	this->RefreshFlags(false);
 
-	wxStaticText* wikiLinkText = dynamic_cast<wxStaticText*>(
-		wxWindow::FindWindowById(ID_WIKI_LINK_TEXT, this));
-	wxCHECK_RET( wikiLinkText != NULL, _T("Cannot find wiki link text") );
-
-	if (this->flagListBox->IsDrawOK()) {
-		wikiLinkText->Show();
-	} else {
-		wikiLinkText->Hide();
-	}
-
 	CmdLineManager::GenerateCmdLineChanged();
 }
 
@@ -185,10 +174,34 @@ void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
+	wxStaticText* wikiLinkText = dynamic_cast<wxStaticText*>(
+		wxWindow::FindWindowById(ID_WIKI_LINK_TEXT, this));
+	wxCHECK_RET( wikiLinkText != NULL, _T("Cannot find wiki link text") );
+
+	wxStaticText* flagSetChoiceLabel = dynamic_cast<wxStaticText*>(
+		wxWindow::FindWindowById(ID_SELECT_FLAG_SET_LABEL, this));
+	wxCHECK_RET( flagSetChoiceLabel != NULL, _T("Cannot find flag set choice label") );
+	
+	wxChoice* flagSetChoice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
+	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flag set choice control") );
+	
+	wxStaticBox* customFlagsBox = dynamic_cast<wxStaticBox*>(
+		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_BOX, this));
+	wxCHECK_RET( customFlagsBox != NULL, _T("Cannot find custom flags box") );
+	
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
-	wxCHECK_RET( customFlagsText != NULL, _T("Cannot find custom flags box") );
-
+	wxCHECK_RET( customFlagsText != NULL, _T("Unable to find the custom flags text ctrl"));
+	
+	wxStaticBox* commandLineBox = dynamic_cast<wxStaticBox*>(
+		wxWindow::FindWindowById(ID_COMMAND_LINE_BOX, this));
+	wxCHECK_RET( commandLineBox != NULL, _T("Unable to find the command line view box") );
+	
+	wxTextCtrl* commandLineText = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
+	wxCHECK_RET( commandLineText != NULL, _T("Unable to find the command line view text control") );
+	
 	wxString flagLine, customFlags, lightingPreset;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 
@@ -221,11 +234,26 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 			}
 			customFlags.Prepend(lightingPreset);
 		}
+		wikiLinkText->Show();
+		flagSetChoiceLabel->Show();
+		flagSetChoice->Show();
+		customFlagsBox->Show();
+		customFlagsText->Show();
+		commandLineBox->Show();
+		commandLineText->Show();
 		customFlagsText->ChangeValue(customFlags);
-		customFlagsText->SetEditable(true);
+		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
+		this->Layout();
 	} else {
-		customFlagsText->ChangeValue(wxEmptyString);
-		customFlagsText->SetEditable(false);
+		wikiLinkText->Hide();
+		flagSetChoiceLabel->Hide();
+		flagSetChoice->Hide();
+		customFlagsBox->Hide();
+		customFlagsText->Hide();
+		commandLineBox->Hide();
+		commandLineText->Hide();
+		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
+		this->Layout();
 	}
 }
 
@@ -271,10 +299,10 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
-	wxCHECK_RET( commandLine != NULL, _T("Unable to find the text control") );
+	wxCHECK_RET( commandLine != NULL, _T("Unable to find the command line view text control") );
 	wxTextCtrl* customFlags = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
-	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flag box"));
+	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flags text control"));
 
 	wxString tcPath, exeName, modline;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
