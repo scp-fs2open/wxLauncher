@@ -52,7 +52,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion.\n You can do that on the Basic Settings page."),
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion\non the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
@@ -78,7 +78,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
-			_("The currently specified root folder for a FreeSpace 2 installation or a total conversion does not exist.\nSelect a valid root folder on the Basic Settings page."),
+			_("The selected root folder does not exist.\nSelect a valid root folder for a FreeSpace 2 installation\nor a total conversion on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		nonexistentTC->SetFont(messageFont);
@@ -104,7 +104,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The currently selected root folder does not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
+			_("The selected root folder\ndoes not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder,\nor add FS2 Open executables to the selected root folder\nand press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
