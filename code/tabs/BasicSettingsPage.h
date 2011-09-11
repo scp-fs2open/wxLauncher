@@ -81,6 +81,8 @@ private:
 	};
 	
 	void DisableExecutableChoiceControls(const ReasonForExecutableDisabling reason);
+	void OnCurrentBinaryChanged(wxCommandEvent& event);
+	void OnCurrentFredBinaryChanged(wxCommandEvent& event);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
@@ -106,6 +108,8 @@ private:
 	wxButton* joystickDetectButton;
 #endif
 	bool isTcRootFolderValid;
+	bool isCurrentBinaryValid;
+	bool isCurrentFredBinaryValid;
 };
 
 #endif

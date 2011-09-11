@@ -76,6 +76,8 @@ public:
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	TCManager::Initialize();
 	TCManager::RegisterTCChanged(this);
+	TCManager::RegisterTCBinaryChanged(this);
+	TCManager::RegisterTCFredBinaryChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
@@ -624,7 +626,9 @@ EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
 EVT_BUTTON(ID_EXE_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressExecutableChoiceRefreshButton)
 EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton)
-EVT_COMMAND( wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinaryChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
 
 // Video controls
 EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectVideoResolution)
@@ -772,21 +776,23 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 				fredChoiceRefreshButton->Enable();
 			}
 
-			/* check to see if the exe listed in the profile actually does exist in
-			the list */
-			ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
-			if ( !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
-				ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_BINARY);
+			// set selection to profile entry for current binary if there is one, noting if selected binary can't be found
+			bool hasBinary = ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
+			if ( hasBinary && !exeChoice->FindAndSetSelectionWithClientData(binaryName) ) {
+				// no need for a warning, since classes handling the EVT_TC_BINARY_CHANGED will issue warnings
+				wxLogDebug(_T("BasicSettingsPage::OnTCChanged(): couldn't find selected FSO executable %s in list of executables"),
+					binaryName.c_str());
 			}
 
 			if (fredEnabled) {
-				/* check to see if the FRED exe listed in the profile actually does exist in
-				the list */
-				bool profileHasFredBinary =
+				// set selection to profile entry for current FRED binary if there is one,
+				// noting if the FRED binary can't be found
+				bool hasFredBinary =
 					ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
-				if ( profileHasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
-					ProMan::GetProfileManager()->ProfileDeleteEntry(PRO_CFG_TC_CURRENT_FRED);
-					TCManager::GenerateTCFredBinaryChanged();
+				if ( hasFredBinary && !fredChoice->FindAndSetSelectionWithClientData(fredBinaryName) ) {
+					// no need for a warning, since classes handling the EVT_TC_FRED_BINARY_CHANGED will issue warnings
+					wxLogDebug(_T("BasicSettingsPage::OnTCChanged(): couldn't find selected FRED executable %s in list of executables"),
+						fredBinaryName.c_str());
 				}
 			}
 		}
@@ -940,6 +946,64 @@ void BasicSettingsPage::DisableExecutableChoiceControls(const ReasonForExecutabl
 		fredChoice->Clear();
 		fredChoice->Disable();
 		fredChoiceRefreshButton->Disable();
+	}
+}
+
+/** Updates the status of whether the currently selected FSO binary is valid. */
+void BasicSettingsPage::OnCurrentBinaryChanged(wxCommandEvent& event) {
+	wxString tcPath, binaryName;
+
+	if (!ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath)) {
+		this->isCurrentBinaryValid = false;
+		return;
+	}
+	
+	if ((!FSOExecutable::IsRootFolderValid(wxFileName(tcPath, wxEmptyString), true)) && this->isTcRootFolderValid) {
+		TCManager::GenerateTCChanged();
+		return;
+	}
+	
+	bool hasBinary = ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binaryName);
+	this->isCurrentBinaryValid =
+		this->isTcRootFolderValid && hasBinary && wxFileName::FileExists(tcPath + wxFileName::GetPathSeparator() + binaryName);
+
+	if (hasBinary) {
+		wxLogDebug(_T("The current profile's listed FSO executable '%s' is %s."),
+			binaryName.c_str(),
+			this->isCurrentBinaryValid ? _T("valid") : _T("invalid"));	
+	} else {
+		wxLogDebug(_T("The current profile has no FSO executable listed."));
+	}
+}
+
+/** Updates the status of whether the currently selected FRED binary is valid. */
+void BasicSettingsPage::OnCurrentFredBinaryChanged(wxCommandEvent& event) {
+	bool fredEnabled;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	wxCHECK_RET(fredEnabled, _T("OnCurrentFredBinaryChanged called while fredEnabled is false"));
+
+	wxString tcPath, fredBinaryName;
+
+	if (!ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath)) {
+		this->isCurrentFredBinaryValid = false;
+		return;
+	}
+	
+	if ((!FSOExecutable::IsRootFolderValid(wxFileName(tcPath, wxEmptyString), true)) && this->isTcRootFolderValid) {
+		TCManager::GenerateTCChanged();
+		return;
+	}
+
+	bool hasFredBinary = ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinaryName);
+	this->isCurrentFredBinaryValid =
+		this->isTcRootFolderValid && hasFredBinary && wxFileName::FileExists(tcPath + wxFileName::GetPathSeparator() + fredBinaryName);
+
+	if (hasFredBinary) {
+		wxLogDebug(_T("The current profile's listed FRED executable '%s' is %s."),
+			fredBinaryName.c_str(),
+			this->isCurrentFredBinaryValid ? _T("valid") : _T("invalid"));
+	} else {
+		wxLogDebug(_T("The current profile has no FRED executable listed."));					
 	}
 }
 
