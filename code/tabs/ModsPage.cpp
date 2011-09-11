@@ -68,7 +68,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTCSizer->AddStretchSpacer(1);
 		noTCSizer->Add(infoImage,0, wxALL | wxCENTER);
 		noTCSizer->AddSpacer(10);
-		noTCSizer->Add(noTC, 0, wxEXPAND| wxALL | wxCENTER);
+		noTCSizer->Add(noTC, 0, wxALL | wxCENTER);
 		noTCSizer->AddStretchSpacer(1);
 
 #if IS_LINUX
@@ -94,7 +94,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		nonexistentTCSizer->AddStretchSpacer(1);
 		nonexistentTCSizer->Add(warningImage,0, wxALL | wxCENTER);
 		nonexistentTCSizer->AddSpacer(10);
-		nonexistentTCSizer->Add(nonexistentTC, 0, wxEXPAND| wxALL | wxCENTER);
+		nonexistentTCSizer->Add(nonexistentTC, 0, wxALL | wxCENTER);
 		nonexistentTCSizer->AddStretchSpacer(1);
 
 #if IS_LINUX
@@ -120,7 +120,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTCSizer->AddStretchSpacer(1);
 		invalidTCSizer->Add(warningImage,0, wxALL | wxCENTER);
 		invalidTCSizer->AddSpacer(10);
-		invalidTCSizer->Add(invalidTC, 0, wxEXPAND| wxALL | wxCENTER);
+		invalidTCSizer->Add(invalidTC, 0, wxALL | wxCENTER);
 		invalidTCSizer->AddStretchSpacer(1);
 
 #if IS_LINUX
