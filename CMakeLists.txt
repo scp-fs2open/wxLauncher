@@ -193,6 +193,8 @@ source_group("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
 set(API_CODE_FILES
   code/apis/CmdLineManager.h
   code/apis/CmdLineManager.cpp
+  code/apis/FlagListManager.h
+  code/apis/FlagListManager.cpp
   code/apis/HelpManager.h
   code/apis/HelpManager.cpp
   code/apis/JoystickManager.h
