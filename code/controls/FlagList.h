@@ -89,13 +89,15 @@ public:
 	wxArrayString& GetFlagSets(wxArrayString &arr);
 	
 	void ResetFlags();
-
-	bool IsDrawOK();
+	/** returns true when the FlagList will draw the the actual list,
+	 false when the FlagList is showing an error message. */
+	inline bool IsDrawOK() const { return (this->drawStatus == DRAW_OK); }
 
 private:
 	SkinSystem* skin;
 	enum DrawStatus {
 		DRAW_OK = 0,
+		INITIAL_STATUS,
 		MISSING_TC,
 		NONEXISTENT_TC,
 		INVALID_TC,

@@ -67,14 +67,14 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,ID_FLAGLISTBOX) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
-	this->drawStatus = DRAW_OK;
+	this->drawStatus = INITIAL_STATUS;
 	this->errorText =
 		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 
 	this->Initialize();
 
-	if ( this->drawStatus != DRAW_OK ) {
-		this->SetItemCount(1);
+	if ( !this->IsDrawOK() ) {
+		this->SetItemCount(1); // for the errorText
 	}
 }
 
@@ -398,7 +398,7 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	dc.SetFont(font);
 #endif
 
-	if ( this->drawStatus == DRAW_OK ) {
+	if ( this->IsDrawOK() ) {
 		this->errorText->Hide();
 		Flag* item = NULL;
 		this->FindFlagAt(n, &item, NULL);		
@@ -444,7 +444,7 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 }
 
 wxCoord FlagListBox::OnMeasureItem(size_t n) const {
-	if ( this->drawStatus == DRAW_OK ) {
+	if ( this->IsDrawOK() ) {
 		return SkinSystem::IdealIconHeight;
 	} else {
 		return this->GetSize().y;
@@ -475,7 +475,7 @@ void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const
 
 void FlagListBox::OnSize(wxSizeEvent &event) {
 	wxVListBox::OnSize(event); // call parents onSize
-	if ( this->drawStatus != DRAW_OK ) {
+	if ( !this->IsDrawOK() ) {
 		wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
 
 		wxString msg;
@@ -718,13 +718,6 @@ void FlagListBox::ResetFlags() {
 	}
 }
 
-/** returns true when the FlagList will draw the the actual list,
-false when the FlagList is showing an error message. */
-bool FlagListBox::IsDrawOK() {
-	return (this->drawStatus == DRAW_OK);
-}
-
-
 FlagListBox::FlagProcess::FlagProcess(
 							FlagListBox *target,
 							FlagFileArray flagFileLocations)
@@ -757,7 +750,7 @@ void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 	}
 
 	target->drawStatus = target->ParseFlagFile(flagfile);
-	if ( target->drawStatus == DRAW_OK ) {
+	if ( target->IsDrawOK() ) {
 		::wxRemoveFile(flagfile.GetFullPath());
 		
 		size_t itemCount = 0;
