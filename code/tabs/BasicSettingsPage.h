@@ -83,6 +83,7 @@ private:
 	void DisableExecutableChoiceControls(const ReasonForExecutableDisabling reason);
 	void OnCurrentBinaryChanged(wxCommandEvent& event);
 	void OnCurrentFredBinaryChanged(wxCommandEvent& event);
+	void OnFlagListBoxDrawStatusChanged(wxCommandEvent &event);
 	void OpenNonSCPWebSite(wxString url);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
