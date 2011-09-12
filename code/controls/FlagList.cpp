@@ -67,7 +67,7 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 :wxVListBox(parent,ID_FLAGLISTBOX) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
-	this->drawStatus = INITIAL_STATUS;
+	this->SetDrawStatus(INITIAL_STATUS);
 	this->errorText =
 		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 
@@ -85,22 +85,22 @@ void FlagListBox::Initialize() {
 	wxLogDebug(_T("Initializing FlagList"));
 
 	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
-		this->drawStatus = MISSING_TC;
+		this->SetDrawStatus(MISSING_TC);
 		return;
 	}
 
 	if (!wxFileName::DirExists(tcPath)) {
-		this->drawStatus = NONEXISTENT_TC;
+		this->SetDrawStatus(NONEXISTENT_TC);
 		return;
 	}
 	
 	if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
-		this->drawStatus = INVALID_TC;
+		this->SetDrawStatus(INVALID_TC);
 		return;
 	}
 
 	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
-		this->drawStatus = MISSING_EXE;
+		this->SetDrawStatus(MISSING_EXE);
 		return;
 	}
 
@@ -114,7 +114,7 @@ void FlagListBox::Initialize() {
 	wxLogDebug(_T("exeFilename: ") + exeFilename.GetFullPath());
 	
 	if (!exeFilename.FileExists()) {
-		this->drawStatus = INVALID_BINARY;
+		this->SetDrawStatus(INVALID_BINARY);
 		return;
 	}
 	// Make sure that the directory that I am going to change to exists
@@ -126,7 +126,7 @@ void FlagListBox::Initialize() {
 
 		wxLogError(_T("Unable to create flag folder at %s"),
 			tempExecutionLocation.GetFullPath().c_str());
-		this->drawStatus = CANNOT_CREATE_FLAGFILE_FOLDER;
+		this->SetDrawStatus(CANNOT_CREATE_FLAGFILE_FOLDER);
 		return;
 	}
 
@@ -150,7 +150,7 @@ void FlagListBox::Initialize() {
 	if ( !::wxSetWorkingDirectory(tempExecutionLocation.GetFullPath()) ) {
 		wxLogError(_T("Unable to change working directory to %s"),
 			tempExecutionLocation.GetFullPath().c_str());
-		this->drawStatus = CANNOT_CHANGE_WORKING_FOLDER;
+		this->SetDrawStatus(CANNOT_CHANGE_WORKING_FOLDER);
 		return;
 	}
 
@@ -171,11 +171,11 @@ void FlagListBox::Initialize() {
 	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
 		wxLogError(_T("Unable to change back to working directory %s"),
 			previousWorkingDir.c_str());
-		this->drawStatus = CANNOT_CHANGE_WORKING_FOLDER;
+		this->SetDrawStatus(CANNOT_CHANGE_WORKING_FOLDER);
 		return;
 	}
 
-	this->drawStatus = WAITING_FOR_FLAGFILE;
+	this->SetDrawStatus(WAITING_FOR_FLAGFILE);
 }
 
 FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
@@ -343,6 +343,11 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 	return DRAW_OK;
 }
 
+void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
+	this->drawStatus = drawStatus;
+	// FIXME TODO generate event!
+}
+
 FlagListBox::~FlagListBox() {
 	FlagCategoryList::iterator catIter = this->allSupportedFlagsByCategory.begin();
 	while ( catIter != this->allSupportedFlagsByCategory.end() ) {
@@ -479,7 +484,7 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 		wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
 
 		wxString msg;
-		switch(this->drawStatus) {
+		switch(this->GetDrawStatus()) {
 			case MISSING_TC:
 				msg = _("No FreeSpace 2 installation or total conversion\nhas been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
 				break;
@@ -511,7 +516,7 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 			default:
 				msg = wxString::Format(
 					_("Unknown error occurred while obtaining the flag file\nfrom the FreeSpace 2 Open executable (%d)"),
-					this->drawStatus);
+					this->GetDrawStatus());
 				break;
 		}
 		this->errorText->Show();
@@ -744,12 +749,12 @@ void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 
 
 	if ( !flagfile.FileExists() ) {
-		target->drawStatus = FLAG_FILE_NOT_GENERATED;
+		target->SetDrawStatus(FLAG_FILE_NOT_GENERATED);
 		wxLogError(_T(" FreeSpace 2 Open did not generate a flag file."));
 		return;
 	}
 
-	target->drawStatus = target->ParseFlagFile(flagfile);
+	target->SetDrawStatus(target->ParseFlagFile(flagfile));
 	if ( target->IsDrawOK() ) {
 		::wxRemoveFile(flagfile.GetFullPath());
 		

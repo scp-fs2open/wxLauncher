@@ -114,6 +114,9 @@ private:
 	DrawStatus drawStatus; //!< are the draw methods allowed to draw.
 	DrawStatus ParseFlagFile(wxFileName &flagfile);
 
+	void SetDrawStatus(const DrawStatus& drawStatus);
+	inline const DrawStatus& GetDrawStatus() const { return this->drawStatus; }
+
 	wxArrayString easyflags;
 	FlagSetsList flagSets;
 	void generateFlagSets();
