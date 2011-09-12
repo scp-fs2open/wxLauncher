@@ -1516,14 +1516,18 @@ void BasicSettingsPage::OnDetectOpenAL(wxCommandEvent& WXUNUSED(event)) {
 void BasicSettingsPage::SetupOpenALSection() {
 	if ( !OpenALMan::WasCompliedIn() ) {
 		wxLogWarning(_T("Launcher was not compiled to support OpenAL"));
-		this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
+		if (this->openALVersion != NULL) {
+			this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
+		}
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
 		this->downloadOpenALButton->Disable();
 		this->detectOpenALButton->Disable();
 	} else if ( !OpenALMan::Initialize() ) {
 		wxLogError(_T("Unable to initialize OpenAL"));
-		this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));
+		if (this->openALVersion != NULL) {
+			this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));			
+		}
 		this->soundDeviceText->Disable();
 		this->soundDeviceCombo->Disable();
 		this->detectOpenALButton->SetLabel(_("Redetect OpenAL"));
@@ -1534,8 +1538,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		wxASSERT_MSG(soundDeviceCombo->GetCount() > 0, _T("sound device combo box is empty!"));
 		wxString openaldevice;
 		if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
-				soundDeviceCombo->SetStringSelection(
-					openaldevice);
+			soundDeviceCombo->SetStringSelection(openaldevice);
 		} else {
 			wxString defaultSoundDevice(OpenALMan::SystemDefaultDevice());
 			wxLogDebug(_T("Reported default sound device: %s"), defaultSoundDevice.c_str());
@@ -1555,20 +1558,27 @@ void BasicSettingsPage::SetupOpenALSection() {
 				soundDeviceCombo->GetStringSelection().c_str());
 			proman->ProfileWrite(PRO_CFG_OPENAL_DEVICE, this->soundDeviceCombo->GetStringSelection());
 		}
-
+		
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
-		this->openALVersion->Hide();
-		wxLogInfo(_T("%s"), OpenALMan::GetCurrentVersion().c_str());
-				
+		if (this->openALVersion != NULL) {
+			this->audioNonButtonsSizer->Detach(this->openALVersion);
+			this->openALVersion->Hide();
+			delete this->openALVersion;
+			this->openALVersion = NULL;
+		}
+		
+		wxLogInfo(OpenALMan::GetCurrentVersion());
+		
 		this->downloadOpenALButton->Disable();
 		this->downloadOpenALButton->Hide();
 		this->detectOpenALButton->Disable();
 		this->detectOpenALButton->Hide();
-
-		this->audioSizer->Remove(audioButtonsSizer);
-		this->audioSizer->Detach(audioNonButtonsSizer);
-		this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+		
+		this->audioSizer->Remove(this->audioButtonsSizer);
+		this->audioSizer->Detach(this->audioNonButtonsSizer);
+		this->audioSizer->Add(this->audioNonButtonsSizer,
+			wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 		this->Layout();
 	}
 }
