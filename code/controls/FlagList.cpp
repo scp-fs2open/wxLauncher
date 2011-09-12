@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/FlagList.h"
 #include "datastructures/FSOExecutable.h"
 #include "tabs/AdvSettingsPage.h"
+#include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
 
@@ -345,7 +346,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
 	this->drawStatus = drawStatus;
-	// FIXME TODO generate event!
+	FlagListManager::GenerateFlagListBoxDrawStatusChanged(this->IsDrawOK());
 }
 
 FlagListBox::~FlagListBox() {
@@ -730,8 +731,6 @@ FlagListBox::FlagProcess::FlagProcess(
 target(target), flagFileLocations(flagFileLocations) {
 }
 
-DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE);
-
 void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 	wxLogDebug(_T(" FreeSpace 2 Open returned %d when polled for the flags"), status);
 
@@ -768,8 +767,7 @@ void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 		target->SetItemCount(itemCount);
 	}
 
-	wxCommandEvent evt(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, wxID_NONE);
-	this->target->AddPendingEvent(evt);
+	FlagListManager::GenerateFlagListBoxDrawStatusChanged(target->IsDrawOK());
 
 	delete this;
 }

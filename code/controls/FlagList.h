@@ -62,8 +62,6 @@ WX_DECLARE_LIST(FlagSet, FlagSetsList);
 
 WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 
-DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, wxID_ANY);
-
 class FlagListBox: public wxVListBox {
 public:
 	FlagListBox(wxWindow* parent, SkinSystem* skin);

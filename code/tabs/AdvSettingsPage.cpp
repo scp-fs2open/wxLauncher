@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "tabs/AdvSettingsPage.h"
 
 #include "apis/CmdLineManager.h"
+#include "apis/FlagListManager.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 #include "controls/LightingPresets.h"
@@ -38,6 +39,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
+	FlagListManager::RegisterFlagListBoxDrawStatusChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
@@ -53,9 +55,9 @@ BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
-EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGE, AdvSettingsPage::OnDrawStatusChange)
+EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, AdvSettingsPage::OnDrawStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
-EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnDrawStatusChange)
+EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnDrawStatusChanged)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
@@ -150,7 +152,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	this->SetSizer(sizer);
 	this->Layout();
 
-	this->OnDrawStatusChange(event);
+	this->OnDrawStatusChanged(event);
 
 	bool isProfileInitialized;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_MAIN_INITIALIZED, &isProfileInitialized, false);
@@ -163,7 +165,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	}
 }
 
-void AdvSettingsPage::OnDrawStatusChange(wxCommandEvent &event) {
+void AdvSettingsPage::OnDrawStatusChanged(wxCommandEvent &event) {
 	this->RefreshFlags(false);
 
 	CmdLineManager::GenerateCmdLineChanged();
