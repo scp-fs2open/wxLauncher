@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "tabs/BasicSettingsPage.h"
 #include "global/ids.h"
+#include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/SpeechManager.h"
@@ -40,6 +41,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "datastructures/FSOExecutable.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
+
+/** The index in the basic settings page's sizer where the settings sizer is located. */
+const size_t SETTINGS_SIZER_INDEX = 1;
 
 class ProxyChoice: public wxChoicebook {
 public:
@@ -78,6 +82,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	TCManager::RegisterTCChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCFredBinaryChanged(this);
+	FlagListManager::RegisterFlagListBoxDrawStatusChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
@@ -620,6 +625,7 @@ EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
 EVT_BUTTON(ID_EXE_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressExecutableChoiceRefreshButton)
 EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton)
+EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, BasicSettingsPage::OnFlagListBoxDrawStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
@@ -1079,6 +1085,16 @@ void BasicSettingsPage::OnCurrentFredBinaryChanged(wxCommandEvent& event) {
 	} else {
 		wxLogDebug(_T("The current profile has no FRED executable listed."));					
 	}
+}
+
+/** Hides or shows the settings based on whether the flag list box draw status is DRAW_OK. */
+void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
+	if (event.IsChecked()) {
+		this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
+	} else {
+		this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
+	}
+	this->Layout();
 }
 
 class Resolution: public wxClientData {
