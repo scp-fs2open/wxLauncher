@@ -33,6 +33,12 @@ enum FieldIDs {
 	SB_FIELD_MAX,
 };
 
+#if IS_APPLE
+const int ICON_FIELD_WIDTH = 18;
+#else
+const int ICON_FIELD_WIDTH = 25;
+#endif
+
 BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
 EVT_SIZE(StatusBar::OnSize)
 END_EVENT_TABLE()
@@ -68,7 +74,7 @@ StatusBar::StatusBar(wxWindow *parent)
 #endif
 	// eliminate (by zeroing the width) the fields we're currently not using
 	// FIXME and when we start using those fields, add the width back!
-	int widths[] = { 25, -1, 0, 0 };
+	int widths[] = { ICON_FIELD_WIDTH, -1, 0, 0 };
 
 	wxASSERT_MSG( sizeof(widths)/sizeof(int) == SB_FIELD_MAX,
 		wxString::Format(
