@@ -1508,7 +1508,7 @@ void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(networkType != NULL, _T("Unable to find Network type choice"));
 
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_SPEED, networkType->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_TYPE, networkType->GetStringSelection());
 }
 
 void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
