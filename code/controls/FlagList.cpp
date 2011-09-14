@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/FlagList.h"
 #include "datastructures/FSOExecutable.h"
 #include "tabs/AdvSettingsPage.h"
-#include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
 
@@ -346,7 +345,18 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
 	this->drawStatus = drawStatus;
-	FlagListManager::GenerateFlagListBoxDrawStatusChanged(this->IsDrawOK());
+	FlagListManager::GenerateFlagListBoxDrawStatusChanged(this->GetFlagListBoxStatus());
+}
+
+FlagListManager::FlagListBoxStatus FlagListBox::GetFlagListBoxStatus() const {
+	const DrawStatus& drawStatus = this->GetDrawStatus();
+	if (drawStatus == DRAW_OK) {
+		return FlagListManager::OK;
+	} else if (drawStatus == INITIAL_STATUS || drawStatus == WAITING_FOR_FLAGFILE) {
+		return FlagListManager::WAITING;
+	} else {
+		return FlagListManager::ERROR;
+	}
 }
 
 FlagListBox::~FlagListBox() {
@@ -767,7 +777,7 @@ void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 		target->SetItemCount(itemCount);
 	}
 
-	FlagListManager::GenerateFlagListBoxDrawStatusChanged(target->IsDrawOK());
+	FlagListManager::GenerateFlagListBoxDrawStatusChanged(target->GetFlagListBoxStatus());
 
 	delete this;
 }

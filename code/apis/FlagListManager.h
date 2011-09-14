@@ -22,7 +22,7 @@
 #include <wx/wx.h>
 
 /** Flag list box's draw status has changed.
- Whether the event IsChecked() indicates whether draw status is DRAW_OK. */
+ The event's int value indicates the flag list box's FlagListBoxStatus. */
 DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, wxID_ANY);
 
 WX_DECLARE_LIST(wxEvtHandler, FlagListEventHandlers);
@@ -33,9 +33,15 @@ private:
 	~FlagListManager();
 
 public:
+	enum FlagListBoxStatus {
+		OK = 0,
+		WAITING,
+		ERROR
+	};
+
 	static void RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
 	static void UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
-	static void GenerateFlagListBoxDrawStatusChanged(bool isDrawOK);
+	static void GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status);
 private:
 	static FlagListEventHandlers FlagListBoxDrawStatusChangedHandlers;
 };
