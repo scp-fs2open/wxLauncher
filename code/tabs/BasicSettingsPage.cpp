@@ -1091,9 +1091,9 @@ void BasicSettingsPage::OnCurrentFredBinaryChanged(wxCommandEvent& event) {
 void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
 	const FlagListManager::FlagListBoxStatus status = FlagListManager::FlagListBoxStatus(event.GetInt());
 
-	if (status == FlagListManager::OK) {
+	if (status == FlagListManager::FLAGLISTBOX_OK) {
 		this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
-	} else if (status == FlagListManager::WAITING) {
+	} else if (status == FlagListManager::FLAGLISTBOX_WAITING) {
 		// do nothing
 	} else { // the flag list box is in an error state
 		this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);

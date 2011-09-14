@@ -351,11 +351,11 @@ void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
 FlagListManager::FlagListBoxStatus FlagListBox::GetFlagListBoxStatus() const {
 	const DrawStatus& drawStatus = this->GetDrawStatus();
 	if (drawStatus == DRAW_OK) {
-		return FlagListManager::OK;
+		return FlagListManager::FLAGLISTBOX_OK;
 	} else if (drawStatus == INITIAL_STATUS || drawStatus == WAITING_FOR_FLAGFILE) {
-		return FlagListManager::WAITING;
+		return FlagListManager::FLAGLISTBOX_WAITING;
 	} else {
-		return FlagListManager::ERROR;
+		return FlagListManager::FLAGLISTBOX_ERROR;
 	}
 }
 
