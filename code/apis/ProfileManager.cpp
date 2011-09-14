@@ -169,6 +169,8 @@ bool ProMan::DeInitialize() {
 	if ( ProMan::isInitialized ) {
 		ProMan::isInitialized = false;
 
+		ProMan::proman->SaveProfilesBeforeExiting();
+		
 		delete ProMan::proman;
 		ProMan::proman = NULL;
 		
@@ -202,8 +204,6 @@ ProMan::ProMan() {
 
 /** Destructor. */
 ProMan::~ProMan() {
-	this->SaveProfilesBeforeExiting();
-
 	// don't leak the wxFileConfigs
 	ProfileMap::iterator iter = this->profiles.begin();
 	while ( iter != this->profiles.end() ) {
@@ -691,16 +691,13 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext contex
 												const wxString& profileName) {
 	// currently, the same text is used on all platforms, although it doesn't have to be that way
 	// NOTE: don't attempt to collapse the cases by removing break statements! it's asking for trouble
-#if PROFILE_DEBUGGING
-	ProMan* proman = ProMan::GetProfileManager();
-#endif
 	switch (context) {
 		case ON_PROFILE_SWITCH:
 #if PROFILE_DEBUGGING
 			wxLogDebug(_T("contents of private copy at save prompt on profile switch:"));
-			LogConfigContents(*proman->privateCopy);
+			LogConfigContents(*ProMan::proman->privateCopy);
 			wxLogDebug(_T("contents of current profile at save prompt on profile switch:"));
-			LogConfigContents(*proman->currentProfile);
+			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
 			return _T("Save changes to current profile?");
 			break;
@@ -708,9 +705,9 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext contex
 		case ON_PROFILE_CREATE:
 #if PROFILE_DEBUGGING
 			wxLogDebug(_T("contents of private copy at save prompt on profile create:"));
-			LogConfigContents(*proman->privateCopy);
+			LogConfigContents(*ProMan::proman->privateCopy);
 			wxLogDebug(_T("contents of current profile at save prompt on profile create:"));
-			LogConfigContents(*proman->currentProfile);
+			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
 			return _T("Save changes to current profile?");
 			break;
@@ -718,9 +715,9 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext contex
 		case ON_EXIT:
 #if PROFILE_DEBUGGING
 			wxLogDebug(_T("contents of private copy at save prompt on exit:"));
-			LogConfigContents(*proman->privateCopy);
+			LogConfigContents(*ProMan::proman->privateCopy);
 			wxLogDebug(_T("contents of current profile at save prompt on exit:"));
-			LogConfigContents(*proman->currentProfile);
+			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
 			return _T("Save changes to current profile?");
 			break;
