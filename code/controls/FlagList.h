@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/vlbox.h>
 #include <wx/process.h>
 
+#include "apis/FlagListManager.h"
 #include "apis/SkinManager.h"
 
 class Flag {
@@ -114,6 +115,7 @@ private:
 
 	void SetDrawStatus(const DrawStatus& drawStatus);
 	inline const DrawStatus& GetDrawStatus() const { return this->drawStatus; }
+	FlagListManager::FlagListBoxStatus GetFlagListBoxStatus() const;
 
 	wxArrayString easyflags;
 	FlagSetsList flagSets;

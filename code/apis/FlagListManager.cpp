@@ -37,9 +37,10 @@ void FlagListManager::UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handl
 	FlagListBoxDrawStatusChangedHandlers.DeleteObject(handler);
 }
 
-void FlagListManager::GenerateFlagListBoxDrawStatusChanged(bool isDrawOK) {
+void FlagListManager::GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status) {
 	wxCommandEvent event(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, wxID_NONE);
-	event.SetInt(isDrawOK);
+	event.SetInt(status);
+
 	wxLogDebug(_T("Generating EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED event"));
 	for (FlagListEventHandlers::iterator iter = FlagListBoxDrawStatusChangedHandlers.begin(),
 		 end = FlagListBoxDrawStatusChangedHandlers.end(); iter != end; ++iter) {

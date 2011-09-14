@@ -1087,13 +1087,18 @@ void BasicSettingsPage::OnCurrentFredBinaryChanged(wxCommandEvent& event) {
 	}
 }
 
-/** Hides or shows the settings based on whether the flag list box draw status is DRAW_OK. */
+/** Hides or shows the settings based on the flag list box's status. */
 void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
-	if (event.IsChecked()) {
+	const FlagListManager::FlagListBoxStatus status = FlagListManager::FlagListBoxStatus(event.GetInt());
+
+	if (status == FlagListManager::OK) {
 		this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
-	} else {
+	} else if (status == FlagListManager::WAITING) {
+		// do nothing
+	} else { // the flag list box is in an error state
 		this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
 	}
+
 	this->Layout();
 }
 
