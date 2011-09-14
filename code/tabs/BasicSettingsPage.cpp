@@ -1092,14 +1092,16 @@ void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
 	const FlagListManager::FlagListBoxStatus status = FlagListManager::FlagListBoxStatus(event.GetInt());
 
 	if (status == FlagListManager::FLAGLISTBOX_OK) {
-		this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
+		if (!this->GetSizer()->GetItem(SETTINGS_SIZER_INDEX)->IsShown()) {
+			this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
+			this->Layout();
+		}
 	} else if (status == FlagListManager::FLAGLISTBOX_WAITING) {
 		// do nothing
 	} else { // the flag list box is in an error state
 		this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
+		this->Layout();
 	}
-
-	this->Layout();
 }
 
 class Resolution: public wxClientData {
