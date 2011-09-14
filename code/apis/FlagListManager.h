@@ -34,9 +34,9 @@ private:
 
 public:
 	enum FlagListBoxStatus {
-		OK = 0,
-		WAITING,
-		ERROR
+		FLAGLISTBOX_OK = 0,
+		FLAGLISTBOX_WAITING,
+		FLAGLISTBOX_ERROR
 	};
 
 	static void RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
