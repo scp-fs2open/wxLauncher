@@ -92,6 +92,11 @@ void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
 	
 	wxRect iconrect;
 	this->GetFieldRect(SB_FIELD_ICON, iconrect);
+	// OS X-only hack to keep the icon from being clipped off
+#if IS_APPLE
+	iconrect.SetX(-3);
+	iconrect.SetY(-2);
+#endif
 	icon->SetSize(iconrect);
 
 #if 0 // this progress bar doesn't need to be here
