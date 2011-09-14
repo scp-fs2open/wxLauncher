@@ -66,7 +66,9 @@ StatusBar::StatusBar(wxWindow *parent)
 #if 0 // this progress bar doesn't need to be here
 	new wxGauge(this, ID_STATUSBAR_PROGRESS_BAR, 100);
 #endif
-	int widths[] = { 25, -1, 100, 200 };
+	// eliminate (by zeroing the width) the fields we're currently not using
+	// FIXME and when we start using those fields, add the width back!
+	int widths[] = { 25, -1, 0, 0 };
 
 	wxASSERT_MSG( sizeof(widths)/sizeof(int) == SB_FIELD_MAX,
 		wxString::Format(
