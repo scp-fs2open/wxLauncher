@@ -187,6 +187,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		wxString token = tok.GetNextToken();
 		token.MakeLower();
 		wxString temp;
+		long tempVersion;
 
 		if (token.IsEmpty()) { // can happen in OS X nightly debug builds
 			// do nothing
@@ -196,73 +197,61 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		} else if (token.StartsWith(_T("app"))) {
 			break; // we've reached the end of the app name
 #endif
-		} else if ( token.IsNumber() && token.size() == 8 ) {
+		} else if ( token.ToLong(&tempVersion) && token.size() == 8 ) {
 			// must be a date from a nightly build; just ignore it
-		} else if ( token.IsNumber() && ver.major == 0 ) {
+		} else if ( token.ToLong(&tempVersion) && ver.major == 0 ) {
 			// must be major version number
-			long version = 0;
-			bool ok = token.ToLong(&version);
-			if ( ok && version < 1000 && version > 0 ) {
-				ver.major = (int)version;
+			if ( tempVersion < 1000 && tempVersion > 0 ) {
+				ver.major = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("major version number out of range (%ld) in executable %s"), version, binaryname.c_str());
+				wxLogWarning(_T("major version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
-		} else if ( token.IsNumber() && ver.minor == 0 ) {
+		} else if ( token.ToLong(&tempVersion) && ver.minor == 0 ) {
 			// must be minor version number
-			long version = 0;
-			bool ok = token.ToLong(&version);
-			if ( ok && version < 1000 && version > 0 ) {
-				ver.minor = (int)version;
+			if ( tempVersion < 1000 && tempVersion > 0 ) {
+				ver.minor = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("minor version number out of range (%ld) in executable %s"), version, binaryname.c_str());
+				wxLogWarning(_T("minor version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
-		} else if ( token.IsNumber() && ver.revision == 0) {
+		} else if ( token.ToLong(&tempVersion) && ver.revision == 0) {
 			// must be revision version number
-			long version = 0;
-			bool ok = token.ToLong(&version);
-			if ( ok && version < 1000 && version > 0 ) {
-				ver.revision = (int)version;
+			if ( tempVersion < 1000 && tempVersion > 0 ) {
+				ver.revision = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), version, binaryname.c_str());
+				wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
 		} else if ( token.StartsWith(_T("d")) && token.size() == 1 ) {
 			ver.debug = true;
 		} else if ( token.EndsWith(_T("d"), &temp) ) {
-			if ( temp.IsNumber() ) {
+			if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
-				long version = 0;
-				bool ok = temp.ToLong(&version);
-				if ( ok && version < 1000 && version > 0 ) {
-					ver.revision = (int)version;
+				if ( tempVersion < 1000 && tempVersion > 0 ) {
+					ver.revision = (int)tempVersion;
 					ver.debug = true;
 				} else {
-					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), version, binaryname.c_str());
+					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 				}
 			} else {
 				wxLogWarning(_T("Token ending in 'd' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
 		} else if ( token.EndsWith(_T("r"), &temp) ) {
-			if ( temp.IsNumber() ) {
+			if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
-				long version = 0;
-				bool ok = temp.ToLong(&version);
-				if ( ok && version < 1000 && version > 0 ) {
-					ver.revision = (int)version;
+				if ( tempVersion < 1000 && tempVersion > 0 ) {
+					ver.revision = (int)tempVersion;
 					ver.debug = false;
 				} else {
-					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), version, binaryname.c_str());
+					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 				}
 			} else {
 				wxLogWarning(_T("Token ending in 'r' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
-		} else if ( token.StartsWith(_T("r"), &temp) && temp.IsNumber() ) {
+		} else if ( token.StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
 			// must be a revision number from SirKnightly's builds
-			long version = 0;
-			bool ok = temp.ToLong(&version);
-			if ( ok && version > 0 ) {
-				ver.build = (int)version;
+			if ( tempVersion > 0 ) {
+				ver.build = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("SirKnightly build number out of range (%ld) in executable %s"), version, binaryname.c_str());
+				wxLogWarning(_T("SirKnightly build number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
 		} else if ( token.StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
