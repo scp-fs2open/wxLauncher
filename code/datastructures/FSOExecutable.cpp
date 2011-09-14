@@ -235,7 +235,9 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				wxLogWarning(_T("Token ending in 'd' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
 		} else if ( token.EndsWith(_T("r"), &temp) ) {
-			if ( temp.ToLong(&tempVersion) ) {
+			if (temp.IsEmpty()) {
+				// do nothing, the 'r' wasn't preceded by a number
+			} else if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
 				if ( tempVersion < 1000 && tempVersion > 0 ) {
 					ver.revision = (int)tempVersion;
