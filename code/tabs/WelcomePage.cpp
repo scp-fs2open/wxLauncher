@@ -45,7 +45,6 @@ public:
 private:
 	bool useProfileCloning;
 	wxString newProfileName;
-	wxStaticText *cloneFromText;
 	wxButton *createButton;
 	wxChoice *cloneFrom;
 	
@@ -600,7 +599,7 @@ wxDialog(parent, ID_CLONE_PROFILE_DIALOG, _("Create new profile"), wxDefaultPosi
 	nameSizer->Add(newName, wxSizerFlags().Expand());
 
 	wxCheckBox* cloneFromCheckbox = new wxCheckBox(this, ID_CLONE_PROFILE_CHECKBOX, wxEmptyString);
-	this->cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
+	wxStaticText* cloneFromText = new wxStaticText(this, wxID_ANY, _("Clone settings from:"));
 	cloneFrom = new wxChoice(this, wxID_ANY);
 
 	nameSizer->Add(cloneFromCheckbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -660,14 +659,12 @@ void CloneProfileDialog::OnClickCloneCheckbox(wxCommandEvent& event) {
 		this->useProfileCloning = true;
 		this->createButton->SetLabel(_("Clone"));
 		this->cloneFrom->Enable();
-		this->cloneFromText->SetForegroundColour(*wxBLACK);
 		this->Refresh();
 		this->Update();
 	} else {
 		this->useProfileCloning = false;
 		this->createButton->SetLabel(_("Create"));		
 		this->cloneFrom->Disable();
-		this->cloneFromText->SetForegroundColour(*wxLIGHT_GREY);
 		this->Refresh();
 		this->Update();
 	}
