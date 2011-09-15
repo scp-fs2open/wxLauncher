@@ -1099,8 +1099,10 @@ void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
 	} else if (status == FlagListManager::FLAGLISTBOX_WAITING) {
 		// do nothing
 	} else { // the flag list box is in an error state
-		this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
-		this->Layout();
+		if (this->GetSizer()->GetItem(SETTINGS_SIZER_INDEX)->IsShown()) {
+			this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
+			this->Layout();	
+		}
 	}
 }
 
