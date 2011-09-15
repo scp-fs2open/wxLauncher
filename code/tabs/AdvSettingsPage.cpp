@@ -158,6 +158,12 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_MAIN_INITIALIZED, &isProfileInitialized, false);
 
 	if (!isProfileInitialized) {
+		// FIXME SHORT-TERM HACK adding blank entry for /tc/flags if it doesn't exist,
+		// to prevent appearance of unsaved changes when the user hasn't done anything
+		if (!ProMan::GetProfileManager()->ProfileExists(PRO_CFG_TC_CURRENT_FLAG_LINE)) {
+			ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, wxEmptyString);
+		}
+		
 		wxLogDebug(_T("autosaving newly initialized profile '%s'"),
 			ProMan::GetProfileManager()->GetCurrentName().c_str());
 		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_MAIN_INITIALIZED, true);
