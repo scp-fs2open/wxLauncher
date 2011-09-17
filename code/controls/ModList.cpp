@@ -216,11 +216,19 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 		readIniFileString(config, _T("/launcher/modname"), &(item->name));
 
+		// TODO allow TC authors to specify a specific directory to load this image from,
+		// in case the TC author doesn't want the TC root folder to be cluttered
+		// with the images that they specify for the skin
 		wxString *smallimagepath = NULL;
 		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
 		if ( smallimagepath != NULL ) {
-			item->image = SkinSystem::VerifySmallImage(tcPath, shortname,
-				*smallimagepath);
+			if (shortname == this->stringNoMod) {
+				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
+					*smallimagepath);				
+			} else {
+				item->image = SkinSystem::VerifySmallImage(tcPath, shortname,
+					*smallimagepath);
+			}
 			delete smallimagepath;
 		}
 		
