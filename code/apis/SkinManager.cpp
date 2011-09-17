@@ -435,8 +435,14 @@ wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 passed paths.  Filename is returned via the param filename. */
 bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
 							wxString shortmodname, wxString filepath) {
-	filename->Assign(
-		wxString::Format(_T("%s/%s"), shortmodname.c_str(), filepath.c_str()));
+	if (shortmodname.IsEmpty()) { // indicates that the mod is (No mod)
+		filename->Assign(
+			wxString::Format(_T("%s"), filepath.c_str()));
+	} else {
+		filename->Assign(
+			wxString::Format(_T("%s/%s"), shortmodname.c_str(), filepath.c_str()));
+	}
+
 	if ( filename->Normalize(wxPATH_NORM_ALL, currentTC, wxPATH_UNIX) ) {
 		if ( filename->IsOk() ) {
 			if ( filename->FileExists() ) {
