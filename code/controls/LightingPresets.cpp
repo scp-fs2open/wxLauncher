@@ -171,7 +171,8 @@ const wxString& LightingPresets::PresetNameToPresetString(const wxString& preset
 		}
 	}
 	
-	wxLogWarning(_T("PresetNameToPresetString: unknown preset name %s, returning default (off)"), presetName.c_str());
+	wxLogWarning(_T("PresetNameToPresetString: unknown preset name %s, returning default (%s)"),
+		presetName.c_str(), presets[DEFAULT_PRESET_ID].GetName().c_str());
 	return presets[DEFAULT_PRESET_ID].GetPreset();
 }
 
@@ -213,7 +214,8 @@ int LightingPresets::PresetNameToPresetButtonId(const wxString& presetName) {
 		}
 	}
 	
-	wxLogWarning(_T("PresetNameToPresetButtonId: unknown preset name %s, returning default (off)"), presetName.c_str());
+	wxLogWarning(_T("PresetNameToPresetButtonId: unknown preset name %s, returning default (%s)"),
+		presetName.c_str(), presets[DEFAULT_PRESET_ID].GetName().c_str());
 	return DEFAULT_PRESET_ID;
 }
 
