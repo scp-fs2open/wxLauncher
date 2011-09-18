@@ -284,6 +284,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	}
 	if ( ver.string.StartsWith(_T("ant")) ) {
 		// is an antipodes builds
+		ver.build = 0; // do not display build number if it exists (mostly for OS X)
 		ver.string = wxString::Format(_T("Antipodes%s"),
 			(ver.major == 0) ? _T("") : wxString::Format(_T(" %d"), ver.major).c_str());
 	}
