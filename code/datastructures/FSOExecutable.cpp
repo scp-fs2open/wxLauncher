@@ -257,6 +257,14 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			}
 		} else if ( token.StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
+
+			// in case the token is of the format, e.g., "Ant8"
+			wxString tokenCopy(token);
+			long antNumber;
+			tokenCopy.Replace(_T("ant"), wxEmptyString);
+			if (tokenCopy.ToLong(&antNumber) && ver.major == 0) {
+				ver.major = antNumber;
+			}
 		} else if ( token.StartsWith(_T("sse2")) ) {
 			ver.sse = 2;
 		} else if ( token.StartsWith(_T("sse")) ) {
@@ -277,7 +285,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	if ( ver.string.StartsWith(_T("ant")) ) {
 		// is an antipodes builds
 		ver.string = wxString::Format(_T("Antipodes%s"),
-			(ver.revision == 0) ? _T("") : wxString::Format(_T(" #%d"), ver.revision).c_str());
+			(ver.major == 0) ? _T("") : wxString::Format(_T(" %d"), ver.major).c_str());
 	}
 	return ver;
 }
@@ -287,7 +295,7 @@ is normally encoded into the executable's file name into a long string that
 more user friendly. 
 
 The resulting string looks something like this: \verbatim
-FreeSpace 2 Open Antipodes #4 Debug Inferno SSE2
+FreeSpace 2 Open Antipodes 4 Debug Inferno SSE2
 FreeSpace 2 Open 3.6.10 Release Inferno SSE
 FRED 2 Open 3.6.11 Debug
 \endverbatim
