@@ -88,6 +88,8 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 }
 
 void LightingPresets::InitializePresets() {
+	wxASSERT_MSG(presets.size() == 0, _T("presets have already been initialized"));
+
 	presets[ID_PRESETS_OFF] = Preset(_T("Off"), ID_PRESETS_OFF, wxEmptyString);
 	presets[ID_PRESET_BASELINE] =
 		Preset(_T("BaselineRecommended"), ID_PRESET_BASELINE,
@@ -145,6 +147,8 @@ void LightingPresets::OnSelectLightingPreset(wxCommandEvent &event) {
 }
 
 void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
+	wxASSERT_MSG(presets.size() != 0, _T("presets have not been initialized"));
+
 	wxString presetName;
 	wxCHECK_RET(ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName),
 				_T("copy lighting preset button pressed with no preset stored in profile"));
@@ -165,6 +169,10 @@ void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 }
 
 const wxString& LightingPresets::PresetNameToPresetString(const wxString& presetName) {
+	if (presets.size() == 0) { // for registry_helper, so that it can write cmdline_fso.cfg
+		InitializePresets();
+	}
+
 	for (PresetHashMap::iterator it = presets.begin(), end = presets.end(); it != end; ++it) {
 		if (it->second.GetName() == presetName) {
 			return it->second.GetPreset();
@@ -208,6 +216,8 @@ void LightingPresets::Reset() {
 }
 
 int LightingPresets::PresetNameToPresetButtonId(const wxString& presetName) {
+	wxASSERT_MSG(presets.size() != 0, _T("presets have not been initialized"));
+
 	for (PresetHashMap::iterator it = presets.begin(), end = presets.end(); it != end; ++it) {
 		if (it->second.GetName() == presetName) {
 			return it->second.GetButtonId();
@@ -220,6 +230,8 @@ int LightingPresets::PresetNameToPresetButtonId(const wxString& presetName) {
 }
 
 const wxString& LightingPresets::PresetButtonIdToPresetName(int buttonId) {
+	wxASSERT_MSG(presets.size() != 0, _T("presets have not been initialized"));
+
 	PresetHashMap::iterator it = presets.find(buttonId);
 	
 	wxCHECK_MSG(it != presets.end(), presets[DEFAULT_PRESET_ID].GetName(),
