@@ -193,7 +193,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->Add(headlinesView, 
 		wxSizerFlags().Expand().Center().Proportion(1));
-	headlines->Add(updateNewsCheck, wxSizerFlags().Right().Border(wxTOP,5));
+	headlines->Add(updateNewsCheck, wxSizerFlags().Right().Border(wxTOP|wxRIGHT|wxBOTTOM,5));
 
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
