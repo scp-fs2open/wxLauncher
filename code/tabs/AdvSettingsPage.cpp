@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
 const size_t WIKI_LINK_SIZER_INDEX = 1;
+const size_t IDEAL_FLAGS_ROW_SIZER_INDEX = 2;
 const size_t BOTTOM_SIZER_INDEX = 3; // FIXME Update as needed
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
@@ -115,7 +116,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
 	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
 #endif
-	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, ID_SELECT_FLAG_SET_LABEL, _T("Flag sets:"));
+	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, wxID_ANY, _T("Flag sets:"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -209,14 +210,6 @@ void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
-	wxStaticText* flagSetChoiceLabel = dynamic_cast<wxStaticText*>(
-		wxWindow::FindWindowById(ID_SELECT_FLAG_SET_LABEL, this));
-	wxCHECK_RET( flagSetChoiceLabel != NULL, _T("Cannot find flag set choice label") );
-	
-	wxChoice* flagSetChoice = dynamic_cast<wxChoice*>(
-		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
-	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flag set choice control") );
-	
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Unable to find the custom flags text ctrl"));
@@ -254,16 +247,14 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 			customFlags.Prepend(lightingPreset);
 		}
 		this->GetSizer()->Show(WIKI_LINK_SIZER_INDEX);
-		flagSetChoiceLabel->Show();
-		flagSetChoice->Show();
+		this->GetSizer()->Show(IDEAL_FLAGS_ROW_SIZER_INDEX);
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
 		customFlagsText->ChangeValue(customFlags);
 		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
 		this->Layout();
 	} else {
 		this->GetSizer()->Hide(WIKI_LINK_SIZER_INDEX);
-		flagSetChoiceLabel->Hide();
-		flagSetChoice->Hide();
+		this->GetSizer()->Hide(IDEAL_FLAGS_ROW_SIZER_INDEX);
 		this->GetSizer()->Hide(BOTTOM_SIZER_INDEX);
 		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
 		this->Layout();
