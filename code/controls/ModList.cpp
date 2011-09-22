@@ -287,7 +287,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 				counter++;
 			} while ( !done );
 		} else {
+#if 0 // preprocessing out until this functionality is complete
 			wxLogDebug(_T("  Does Not Contain An idealflagset Section."));
+#endif
 		}
 
 		// skin
@@ -366,7 +368,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			}
 
 		} else {
+#if 0 // preprocessing out until this functionality is complete
 			wxLogDebug(_T("  Does Not Contain An skin Section."));
+#endif
 		}
 
 		// langauges
@@ -526,8 +530,10 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 			&((*trans)->infotext));
 
 	} else {
+#if 0 // preprocessing out until this functionality is complete
 		wxLogDebug( 
 			wxString::Format(_T("  Section '%s' does not exist."), langaugename.c_str()));
+#endif
 	}
 }
 
