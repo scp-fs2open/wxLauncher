@@ -40,6 +40,7 @@ public:
 	void OnExeChanged(wxCommandEvent& event);
 	void OnSelectFlagSet(wxCommandEvent& event);
 	void OnDrawStatusChanged(wxCommandEvent& event);
+	void OnCustomFlagsChanged(wxCommandEvent& event);
 	void OnCurrentProfileChanged(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
