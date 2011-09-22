@@ -57,7 +57,7 @@ EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdat
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, AdvSettingsPage::OnDrawStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
-EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnDrawStatusChanged)
+EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnCustomFlagsChanged)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
@@ -170,11 +170,23 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 }
 
 void AdvSettingsPage::OnDrawStatusChanged(wxCommandEvent &event) {
+	wxASSERT((this->flagListBox != NULL) &&
+		(event.GetEventType() ==
+			EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED)); // ensures that the status check is safe
+
 	this->RefreshFlags(false);
 
 	if (FlagListManager::FlagListBoxStatus(event.GetInt()) == FlagListManager::FLAGLISTBOX_OK) {
 		CmdLineManager::GenerateCmdLineChanged();	
 	}
+}
+
+void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
+	wxASSERT((this->flagListBox != NULL) &&
+		this->flagListBox->IsDrawOK());
+	
+	this->RefreshFlags(false);
+	CmdLineManager::GenerateCmdLineChanged();
 }
 
 void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
