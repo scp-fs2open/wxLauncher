@@ -174,7 +174,9 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 void AdvSettingsPage::OnDrawStatusChanged(wxCommandEvent &event) {
 	this->RefreshFlags(false);
 
-	CmdLineManager::GenerateCmdLineChanged();
+	if (FlagListManager::FlagListBoxStatus(event.GetInt()) == FlagListManager::FLAGLISTBOX_OK) {
+		CmdLineManager::GenerateCmdLineChanged();	
+	}
 }
 
 void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
