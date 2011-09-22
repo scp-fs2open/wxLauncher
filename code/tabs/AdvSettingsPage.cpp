@@ -33,7 +33,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
-const size_t BOTTOM_SIZER_INDEX = 1;
+const size_t WIKI_LINK_SIZER_INDEX = 1;
+const size_t BOTTOM_SIZER_INDEX = 3; // FIXME Update as needed
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
@@ -94,10 +95,21 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
 #endif
 
-	wxStaticText* wikiLinkText = new wxStaticText(this, ID_WIKI_LINK_TEXT,
+#if IS_WIN32
+	wxStaticText* wikiLinkText1 = new wxStaticText(this, wxID_ANY,
 		_T("Double-click on a flag for its online documentation, if available."));
+#else
+	wxStaticText* wikiLinkText1 = new wxStaticText(this, wxID_ANY,
+		_T("Double-click on a flag"));
+	wxStaticText* wikiLinkText2 = new wxStaticText(this, wxID_ANY,
+		_T("for its online documentation, if available."));
+#endif
+	
 	wxBoxSizer* wikiLinkSizer = new wxBoxSizer(wxVERTICAL);
-	wikiLinkSizer->Add(wikiLinkText, 0, wxALIGN_CENTER_HORIZONTAL);
+	wikiLinkSizer->Add(wikiLinkText1, 0, wxALIGN_CENTER_HORIZONTAL);
+#if !IS_WIN32
+	wikiLinkSizer->Add(wikiLinkText2, 0, wxALIGN_CENTER_HORIZONTAL);
+#endif
 
 #if 0
 	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
@@ -197,10 +209,6 @@ void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
-	wxStaticText* wikiLinkText = dynamic_cast<wxStaticText*>(
-		wxWindow::FindWindowById(ID_WIKI_LINK_TEXT, this));
-	wxCHECK_RET( wikiLinkText != NULL, _T("Cannot find wiki link text") );
-
 	wxStaticText* flagSetChoiceLabel = dynamic_cast<wxStaticText*>(
 		wxWindow::FindWindowById(ID_SELECT_FLAG_SET_LABEL, this));
 	wxCHECK_RET( flagSetChoiceLabel != NULL, _T("Cannot find flag set choice label") );
@@ -245,7 +253,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 			}
 			customFlags.Prepend(lightingPreset);
 		}
-		wikiLinkText->Show();
+		this->GetSizer()->Show(WIKI_LINK_SIZER_INDEX);
 		flagSetChoiceLabel->Show();
 		flagSetChoice->Show();
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
@@ -253,7 +261,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
 		this->Layout();
 	} else {
-		wikiLinkText->Hide();
+		this->GetSizer()->Hide(WIKI_LINK_SIZER_INDEX);
 		flagSetChoiceLabel->Hide();
 		flagSetChoice->Hide();
 		this->GetSizer()->Hide(BOTTOM_SIZER_INDEX);
