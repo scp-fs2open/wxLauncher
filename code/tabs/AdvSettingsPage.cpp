@@ -152,8 +152,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	this->SetSizer(sizer);
 	this->Layout();
 
-	this->OnDrawStatusChanged(event);
-
 	bool isProfileInitialized;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_MAIN_INITIALIZED, &isProfileInitialized, false);
 

@@ -778,7 +778,5 @@ void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
 		target->SetItemCount(itemCount);
 	}
 
-	FlagListManager::GenerateFlagListBoxDrawStatusChanged(target->GetFlagListBoxStatus());
-
 	delete this;
 }
