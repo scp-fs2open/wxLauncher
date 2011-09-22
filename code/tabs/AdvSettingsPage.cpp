@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+const size_t BOTTOM_SIZER_INDEX = 1;
+
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
 	this->flagListBox = NULL;
@@ -126,17 +128,19 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	flagsetNotesSizer->Add(flagsetNotes, wxSizerFlags().Expand());
 #endif
 	
-	wxStaticBox* customFlagsBox = new wxStaticBox(this, ID_CUSTOM_FLAGS_BOX, _("Custom flags"));
+	wxStaticText* customFlagsTextLabel = new wxStaticText(this, wxID_ANY, _("Custom flags:"));
 	wxTextCtrl* customFlagsText = new wxTextCtrl(this, ID_CUSTOM_FLAGS_TEXT);
-	wxStaticBoxSizer* customFlagsSizer = new wxStaticBoxSizer(customFlagsBox, wxVERTICAL);
-	customFlagsSizer->Add(customFlagsText, wxSizerFlags().Expand());
 	
-	wxStaticBox* commandLineLabel = new wxStaticBox(this, ID_COMMAND_LINE_BOX, _("Current command line"));
+	wxStaticText* commandLineTextLabel = new wxStaticText(this, wxID_ANY, _("Current command line:"));
 	wxTextCtrl* commandLineText = new wxTextCtrl(this, ID_COMMAND_LINE_TEXT,
 		wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE|wxTE_READONLY);
-	wxStaticBoxSizer* commandLineSizer = new wxStaticBoxSizer(commandLineLabel, wxVERTICAL);
-	commandLineSizer->Add(commandLineText, wxSizerFlags().Expand().Proportion(1));
+
+	wxBoxSizer* bottomSizer = new wxBoxSizer(wxVERTICAL);
+	bottomSizer->Add(customFlagsTextLabel, wxSizerFlags().Left().Border(wxTOP|wxBOTTOM, 5));
+	bottomSizer->Add(customFlagsText, wxSizerFlags().Expand().Border(wxBOTTOM, 10));
+	bottomSizer->Add(commandLineTextLabel, wxSizerFlags().Left().Border(wxBOTTOM, 5));
+	bottomSizer->Add(commandLineText, wxSizerFlags().Proportion(1).Expand());
 
 	// final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
@@ -146,8 +150,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 #if 0
 	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 #endif
-	sizer->Add(customFlagsSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-	sizer->Add(commandLineSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	sizer->Add(bottomSizer, wxSizerFlags().Expand().Proportion(1).Border(wxALL, 5));
 
 	this->SetSizer(sizer);
 	this->Layout();
@@ -177,7 +180,7 @@ void AdvSettingsPage::OnDrawStatusChanged(wxCommandEvent &event) {
 	this->RefreshFlags(false);
 
 	if (FlagListManager::FlagListBoxStatus(event.GetInt()) == FlagListManager::FLAGLISTBOX_OK) {
-		CmdLineManager::GenerateCmdLineChanged();	
+		CmdLineManager::GenerateCmdLineChanged();
 	}
 }
 
@@ -206,21 +209,9 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
 	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flag set choice control") );
 	
-	wxStaticBox* customFlagsBox = dynamic_cast<wxStaticBox*>(
-		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_BOX, this));
-	wxCHECK_RET( customFlagsBox != NULL, _T("Cannot find custom flags box") );
-	
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Unable to find the custom flags text ctrl"));
-	
-	wxStaticBox* commandLineBox = dynamic_cast<wxStaticBox*>(
-		wxWindow::FindWindowById(ID_COMMAND_LINE_BOX, this));
-	wxCHECK_RET( commandLineBox != NULL, _T("Unable to find the command line view box") );
-	
-	wxTextCtrl* commandLineText = dynamic_cast<wxTextCtrl*>(
-		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
-	wxCHECK_RET( commandLineText != NULL, _T("Unable to find the command line view text control") );
 	
 	wxString flagLine, customFlags, lightingPreset;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
@@ -257,10 +248,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		wikiLinkText->Show();
 		flagSetChoiceLabel->Show();
 		flagSetChoice->Show();
-		customFlagsBox->Show();
-		customFlagsText->Show();
-		commandLineBox->Show();
-		commandLineText->Show();
+		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
 		customFlagsText->ChangeValue(customFlags);
 		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
 		this->Layout();
@@ -268,10 +256,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		wikiLinkText->Hide();
 		flagSetChoiceLabel->Hide();
 		flagSetChoice->Hide();
-		customFlagsBox->Hide();
-		customFlagsText->Hide();
-		commandLineBox->Hide();
-		commandLineText->Hide();
+		this->GetSizer()->Hide(BOTTOM_SIZER_INDEX);
 		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
 		this->Layout();
 	}
