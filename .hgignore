@@ -5,3 +5,5 @@ glob:generated
 glob:output
 glob:*.pyc
 glob:*~
+glob:*.orig
+glob:*.rej
