@@ -193,7 +193,12 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->Add(headlinesView, 
 		wxSizerFlags().Expand().Center().Proportion(1));
-	headlines->Add(updateNewsCheck, wxSizerFlags().Right().Border(wxTOP|wxRIGHT|wxBOTTOM,5));
+	headlines->Add(updateNewsCheck,
+#if IS_APPLE // helps ensure that all four highlights appear without having to scroll
+		wxSizerFlags().Right().Border(wxTOP|wxRIGHT,5));
+#else
+		wxSizerFlags().Right().Border(wxTOP|wxRIGHT|wxBOTTOM,5));
+#endif
 
 	// Final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
