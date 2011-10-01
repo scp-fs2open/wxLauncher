@@ -31,6 +31,13 @@ Preset::Preset(const wxString& name, const int buttonId, const wxString& preset)
 	name(name), buttonId(buttonId), preset(preset) {
 }
 
+// vertical spacing between radio buttons is platform-specific
+#if IS_WIN32
+const int RADIOBUTTON_SPACING = 20;
+#else
+const int RADIOBUTTON_SPACING = 10;
+#endif
+
 const int DEFAULT_PRESET_ID = ID_PRESETS_OFF;
 const wxString LightingPresets::FLAG_LINE_SEPARATOR = _T("|||");
 PresetHashMap LightingPresets::presets;
@@ -46,7 +53,7 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 		new wxHyperlinkCtrl(this, wxID_ANY, _T("Preset descriptions"),
 							_T("http://www.hard-light.net/wiki/index.php/Sample_Lighting_Settings"));
 	wxButton* customFlagsCopyButton =
-		new wxButton(this, ID_COPY_PRESET_BUTTON, _T("Copy selected preset's settings to custom flags"));
+		new wxButton(this, ID_COPY_PRESET_BUTTON, _T("Copy selected preset to custom flags"));
 	wxRadioButton* radioButton1 = new wxRadioButton (this, ID_PRESETS_OFF, _T("Presets off"),
 													 wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	wxRadioButton* radioButton2 = new wxRadioButton (this, ID_PRESET_BASELINE, _T("Baseline recommended"));
@@ -61,26 +68,18 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 
 	wxGridBagSizer* lightingInsideSizer = new wxGridBagSizer();
 	lightingInsideSizer->Add(presetDescsUrl, wxGBPosition(0,0), wxGBSpan(1,1),
-							 wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(customFlagsCopyButton, wxGBPosition(0,1), wxGBSpan(1,3),
-							 wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 10);
-	lightingInsideSizer->Add(radioButton1, wxGBPosition(1,0), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton2, wxGBPosition(2,0), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton3, wxGBPosition(1,1), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton4, wxGBPosition(2,1), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton5, wxGBPosition(1,2), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton6, wxGBPosition(2,2), wxGBSpan(1,1), 
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	lightingInsideSizer->Add(radioButton7, wxGBPosition(1,3), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL|wxBOTTOM, 5);
-	lightingInsideSizer->Add(radioButton8, wxGBPosition(2,3), wxGBSpan(1,1),
-							 wxEXPAND|wxALIGN_CENTER_VERTICAL);
-	
+		wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(customFlagsCopyButton, wxGBPosition(1,0), wxGBSpan(1,1),
+		wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, RADIOBUTTON_SPACING + 5);
+	lightingInsideSizer->Add(radioButton1, wxGBPosition(2,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton2, wxGBPosition(3,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton3, wxGBPosition(4,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton4, wxGBPosition(5,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton5, wxGBPosition(6,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton6, wxGBPosition(7,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton7, wxGBPosition(8,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton8, wxGBPosition(9,0), wxGBSpan(1,1));
+
 	wxStaticBoxSizer* lightingPresetsSizer = new wxStaticBoxSizer(lightingPresetsBox, wxHORIZONTAL);
 	lightingPresetsSizer->Add(lightingInsideSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 	
