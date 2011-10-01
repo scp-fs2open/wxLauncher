@@ -210,8 +210,11 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(headlines, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
-#if !IS_APPLE // needed for sizer to expand properly on Windows and Linux for some reason
+	// mildly hackish way of ensuring a minimum launcher window size on all platforms
+#if IS_WIN32
 	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-10, TAB_AREA_HEIGHT-5));
+#else // to accommodate larger fonts/widgets on OS X/Linux
+	sizer->SetMinSize(wxSize(TAB_AREA_WIDTH-10, TAB_AREA_HEIGHT+10));
 #endif
 
 	this->SetSizerAndFit(sizer);
