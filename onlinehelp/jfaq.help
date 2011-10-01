@@ -1,13 +1,13 @@
 <title>wxLauncher FAQ</title>
 
-[TOC]
+<!-- [TOC] --> <!-- Can't get TOC to work -->
 
 # What is wxLauncher?
-wxLauncher aims to be a multi-language multiplatform multipurpose launcher/updater application intended to make life easier for fans of FreeSpace 2 and of total conversions using [FSO][]![][li].
+wxLauncher aims to be a cross-platform launcher/updater for FreeSpace 2 and total conversions using the [FSO][]![][li] engine.
 
 # What can wxLauncher do?
 
-Currently, wxLauncher allows you to launch [FSO][]![][li] with your favorite mods and settings easily.
+Currently, wxLauncher allows you to launch [FSO][]![][li] with your favorite mods, settings, and flags.
 
 Starting with version 2.0, wxLauncher will also help you install new mods and keep your FreeSpace files and mods up-to-date.
 
@@ -19,7 +19,7 @@ The name was chosen because the launcher is built using the [wxWidgets][]![][le]
 [wxWidgets]: http://www.wxwidgets.org/
 
 # On what platforms does the launcher run?
-The launcher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X.
+The launcher runs on the same platforms as FSO: Windows, Linux and Mac OS X.
 
 # Who made wxLauncher?
 Check the [authors][]![][li] section for details.

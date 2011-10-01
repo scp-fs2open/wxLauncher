@@ -2,13 +2,14 @@
 
 #Highlights for this release
 
-###Version 0.8.2
+###Version 0.9.0
 
 * A brand-new cross-platform launcher.
 * [Profiles][]![][li].
 * The [highlights][]![][li] from [Hard Light Productions][hl]![][le] at your fingertips.
 * Mods displayed as a [single list][modmng]![][li].
 * Redesigned configuration pages - split into [basic][]![][li] and [advanced][]![][li] settings.
+* [Lighting presets][lighting]![][li] for you to try out and adjust to your taste.
 
 [le]: /images/le.png
 [li]: /images/li.png
@@ -17,6 +18,7 @@
 [highlights]: /30Reference/10Welcome/03news.help
 [modmng]: /30Reference/20MODs/index.help
 [basic]: /30Reference/30BasicSettings/index.help
+[lighting]: /30Reference/30BasicSettings/021lighting.help
 [advanced]: /30Reference/40AdvancedSettings/index.help
 [mod]: /50TechnicalStuff/02Terminology.help
 [TC]: /50TechnicalStuff/02Terminology.help
