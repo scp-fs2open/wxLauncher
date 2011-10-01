@@ -24,6 +24,8 @@
 #include "global/ids.h"
 #include "global/MemoryDebugging.h"
 
+#include "generated/configure_launcher.h"
+
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
 
