@@ -33,9 +33,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+const size_t TOP_SIZER_INDEX = 0;
+const size_t TOP_LEFT_SIZER_INDEX = 0;
 const size_t WIKI_LINK_SIZER_INDEX = 1;
-const size_t IDEAL_FLAGS_ROW_SIZER_INDEX = 2;
-const size_t BOTTOM_SIZER_INDEX = 3; // FIXME Update as needed
+const size_t TOP_RIGHT_SIZER_INDEX = 1;
+const size_t BOTTOM_SIZER_INDEX = 1;
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
@@ -82,6 +84,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 		this->GetSizer()->Clear(true);
 	}
 
+	// top left components
 	this->flagListBox = new FlagListBox(this, this->skin);
 
 #if 0 // doesn't do anything
@@ -89,12 +92,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	description->SetPage(_T("<p></p>"));
 #endif
 
-	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
-	topSizer->Add(this->flagListBox, wxSizerFlags().Proportion(1).Expand());
-	flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK
-#if 0
-	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
-#endif
 
 #if IS_WIN32
 	wxStaticText* wikiLinkText1 = new wxStaticText(this, wxID_ANY,
@@ -112,15 +109,37 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	wikiLinkSizer->Add(wikiLinkText2, 0, wxALIGN_CENTER_HORIZONTAL);
 #endif
 
-#if 0
-	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
-	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
-#endif
+	wxBoxSizer* topLeftSizer = new wxBoxSizer(wxVERTICAL);
+	topLeftSizer->Add(this->flagListBox, wxSizerFlags().Proportion(1).Expand());
+	topLeftSizer->Add(wikiLinkSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5);
+
+	// top right components
+	LightingPresets* lightingPresets = new LightingPresets(this);
+	
+	wxBoxSizer* lightingPresetsSizer = new wxBoxSizer(wxVERTICAL);
+	lightingPresetsSizer->Add(lightingPresets, wxSizerFlags().Proportion(1).Expand());
+
 	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, wxID_ANY, _T("Flag sets:"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
+	
+	wxBoxSizer* topRightSizer = new wxBoxSizer(wxVERTICAL);
+	topRightSizer->Add(lightingPresetsSizer, wxSizerFlags().Proportion(1).Border(wxBOTTOM, 5));
+	topRightSizer->Add(flagSetChoiceLabel, wxSizerFlags().Left().Border(wxBOTTOM, 5));
+	topRightSizer->Add(flagSetChoice, wxSizerFlags().Expand());
+	
+	// putting the top sizer together
+	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
+	topSizer->Add(topLeftSizer, wxSizerFlags().Proportion(1).Expand());
+	topSizer->Add(topRightSizer, wxSizerFlags().Expand().Border(wxLEFT, 5));
+#if 0
+	topSizer->Add(description, wxSizerFlags().Proportion(1).Expand());
+#endif
+
+#if 0 // related to functionality that isn't working yet
+	wxStaticBitmap* idealIcon = new wxStaticBitmap(this, wxID_ANY, this->skin->GetIdealIcon());
+	wxStaticText* idealLabel = new wxStaticText(this, wxID_ANY, _("= Recommended flag"));
 
 	wxBoxSizer* idealFlagsRowSizer = new wxBoxSizer(wxHORIZONTAL);
-#if 0
 	idealFlagsRowSizer->Add(idealIcon);
 	wxBoxSizer* idealLabelSizer = new wxBoxSizer(wxVERTICAL);
 	idealLabelSizer->AddStretchSpacer(1);
@@ -128,9 +147,6 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	idealLabelSizer->AddStretchSpacer(1);
 	idealFlagsRowSizer->Add(idealLabelSizer);
 #endif
-	idealFlagsRowSizer->AddStretchSpacer(1);
-	idealFlagsRowSizer->Add(flagSetChoiceLabel, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-	idealFlagsRowSizer->Add(flagSetChoice, wxSizerFlags().Right());
 
 #if 0 // doesn't do anything
 	wxStaticBox* flagsetNotesBox = new wxStaticBox(this, wxID_ANY, _("Flag set notes"));
@@ -158,9 +174,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	// final layout
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(topSizer, wxSizerFlags().Expand().Border(wxALL, 5));
-	sizer->Add(wikiLinkSizer, wxSizerFlags().Center().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 #if 0
+	sizer->Add(idealFlagsRowSizer, wxSizerFlags().Expand().Border(wxALL, 5));
 	sizer->Add(flagsetNotesSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 #endif
 	sizer->Add(bottomSizer, wxSizerFlags().Expand().Proportion(1).Border(wxALL, 5));
@@ -210,6 +225,12 @@ void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
+	wxSizer* topSizer = this->GetSizer()->GetItem(TOP_SIZER_INDEX)->GetSizer();
+	wxCHECK_RET(topSizer != NULL, _T("cannot find the top sizer"));
+	
+	wxSizer* topLeftSizer = topSizer->GetItem(TOP_LEFT_SIZER_INDEX)->GetSizer();
+	wxCHECK_RET(topLeftSizer != NULL, _T("cannot find the top left sizer"));
+	
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET( customFlagsText != NULL, _T("Unable to find the custom flags text ctrl"));
@@ -246,15 +267,15 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 			}
 			customFlags.Prepend(lightingPreset);
 		}
-		this->GetSizer()->Show(WIKI_LINK_SIZER_INDEX);
-		this->GetSizer()->Show(IDEAL_FLAGS_ROW_SIZER_INDEX);
+		topSizer->Show(TOP_RIGHT_SIZER_INDEX);
+		topLeftSizer->Show(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
 		customFlagsText->ChangeValue(customFlags);
 		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
 		this->Layout();
 	} else {
-		this->GetSizer()->Hide(WIKI_LINK_SIZER_INDEX);
-		this->GetSizer()->Hide(IDEAL_FLAGS_ROW_SIZER_INDEX);
+		topSizer->Hide(TOP_RIGHT_SIZER_INDEX);
+		topLeftSizer->Hide(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Hide(BOTTOM_SIZER_INDEX);
 		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
 		this->Layout();
