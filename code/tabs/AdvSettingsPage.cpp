@@ -72,7 +72,7 @@ END_EVENT_TABLE()
 #if IS_WIN32
 const int FLAG_LIST_BOX_HEIGHT = 410;
 #elif IS_LINUX
-const int FLAG_LIST_BOX_HEIGHT = 390;
+const int FLAG_LIST_BOX_HEIGHT = 363;
 #elif IS_APPLE
 const int FLAG_LIST_BOX_HEIGHT = 363;
 #else
