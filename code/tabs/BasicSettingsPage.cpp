@@ -37,7 +37,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/OpenALManager.h"
 #include "apis/JoystickManager.h"
 #include "apis/HelpManager.h"
-#include "controls/LightingPresets.h"
 #include "datastructures/FSOExecutable.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
@@ -304,12 +303,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizer->Add(videoSizerR, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	videoSizer->AddStretchSpacer(5);
 #endif
-	
-	// Lighting presets
-	LightingPresets* lightingPresets = new LightingPresets(this);
-
-	wxBoxSizer* lightingPresetsSizer = new wxBoxSizer(wxVERTICAL);
-	lightingPresetsSizer->Add(lightingPresets, wxSizerFlags().Proportion(1).Expand());
 
 #if IS_WIN32
 	// Speech
@@ -584,17 +577,15 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
 
 #if IS_WIN32
-	wxBoxSizer* videoLightingSizer = new wxBoxSizer(wxHORIZONTAL);
-	videoLightingSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxRIGHT, 10));
-	videoLightingSizer->Add(lightingPresetsSizer, wxSizerFlags().Proportion(1).Expand());
-	settingsSizer->Add(videoLightingSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+	wxBoxSizer* videoAudioSizer = new wxBoxSizer(wxHORIZONTAL);
+	videoAudioSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxRIGHT, 10));
+	videoAudioSizer->Add(audioSizer, wxSizerFlags().Proportion(1).Expand());
+	settingsSizer->Add(videoAudioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #else
 	settingsSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(lightingPresetsSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
