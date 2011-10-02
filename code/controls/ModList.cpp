@@ -658,12 +658,9 @@ void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 
 // comparison is case-insensitive, and mod names containing spaces are preserved
 bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
-	wxLogDebug(_T("mod: %s modlist: %s"), mod.c_str(), modlist.c_str());
 	wxString normalizedModName(mod);
-
 	normalizedModName.Trim(true).Trim(false).MakeLower();
 
-	wxLogDebug(_T("normalizedModName: %s"), normalizedModName.c_str());
 	wxStringTokenizer tokens(modlist, _T(","), wxTOKEN_STRTOK);
 	while ( tokens.HasMoreTokens() ) {
 		if ( tokens.GetNextToken().Trim(true).Trim(false).Lower() == normalizedModName ) {
