@@ -81,7 +81,6 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	TCManager::RegisterTCChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCFredBinaryChanged(this);
-	FlagListManager::RegisterFlagListBoxDrawStatusChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
@@ -616,7 +615,6 @@ EVT_CHOICE(ID_EXE_CHOICE_BOX, BasicSettingsPage::OnSelectExecutable)
 EVT_BUTTON(ID_EXE_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressExecutableChoiceRefreshButton)
 EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton)
-EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, BasicSettingsPage::OnFlagListBoxDrawStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
@@ -1026,10 +1024,13 @@ void BasicSettingsPage::OnCurrentBinaryChanged(wxCommandEvent& event) {
 
 	if (!ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath)) {
 		this->isCurrentBinaryValid = false;
+		this->ShowSettings(this->isCurrentBinaryValid);
 		return;
 	}
 	
 	if ((!FSOExecutable::IsRootFolderValid(wxFileName(tcPath, wxEmptyString), true)) && this->isTcRootFolderValid) {
+		this->isCurrentBinaryValid = false;
+		this->ShowSettings(this->isCurrentBinaryValid);
 		TCManager::GenerateTCChanged();
 		return;
 	}
@@ -1045,6 +1046,8 @@ void BasicSettingsPage::OnCurrentBinaryChanged(wxCommandEvent& event) {
 	} else {
 		wxLogDebug(_T("The current profile has no FSO executable listed."));
 	}
+	
+	this->ShowSettings(this->isCurrentBinaryValid);
 }
 
 /** Updates the status of whether the currently selected FRED binary is valid. */
@@ -1078,18 +1081,14 @@ void BasicSettingsPage::OnCurrentFredBinaryChanged(wxCommandEvent& event) {
 	}
 }
 
-/** Hides or shows the settings based on the flag list box's status. */
-void BasicSettingsPage::OnFlagListBoxDrawStatusChanged(wxCommandEvent &event) {
-	const FlagListManager::FlagListBoxStatus status = FlagListManager::FlagListBoxStatus(event.GetInt());
-
-	if (status == FlagListManager::FLAGLISTBOX_OK) {
+/** Hides or shows the settings. */
+void BasicSettingsPage::ShowSettings(const bool showSettings) {
+	if (showSettings) {
 		if (!this->GetSizer()->GetItem(SETTINGS_SIZER_INDEX)->IsShown()) {
 			this->GetSizer()->Show(SETTINGS_SIZER_INDEX);
 			this->Layout();
 		}
-	} else if (status == FlagListManager::FLAGLISTBOX_WAITING) {
-		// do nothing
-	} else { // the flag list box is in an error state
+	} else { // using else rather than else-if to make the code easier to read (indentation-wise)
 		if (this->GetSizer()->GetItem(SETTINGS_SIZER_INDEX)->IsShown()) {
 			this->GetSizer()->Hide(SETTINGS_SIZER_INDEX);
 			this->Layout();	
