@@ -183,8 +183,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		new wxStaticText(this, wxID_ANY, _("Depth:"));
 	wxChoice* depthCombo = new wxChoice(this, ID_DEPTH_COMBO);
 	long bitDepth;
-	depthCombo->Append(_("16 bit"));
-	depthCombo->Append(_("32 bit"));
+	depthCombo->Append(_("16-bit"));
+	depthCombo->Append(_("32-bit"));
 	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 32, true);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
