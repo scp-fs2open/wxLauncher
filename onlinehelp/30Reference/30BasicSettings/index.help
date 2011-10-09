@@ -1,6 +1,6 @@
-<title>Basic settings page</title>
+<title>Basic Settings page</title>
 
-# Basic settings page
+# Basic Settings page
 
 The basic settings are (basicaly) the settings that were configurable by the original FreeSpace 2 Launcher - the one provided by [Volition][=V=]![][le] and installed with the game - plus the new simulated speech feature and the [TC][tc]![][li] root folder and executable selection.
 
@@ -8,7 +8,6 @@ What you can set on this page:
 
 * [TC root folder and Executable][exe]![][li]
 * [Video options][video]![][li]
-* [Lighting presets][lighting]![][li]
 * [Audio device][audio]![][li]
 * [Speech settings][speech]![][li]
 * [Joystick selection][joystick]![][li]
@@ -20,7 +19,6 @@ What you can set on this page:
 [tc]: /50TechnicalStuff/02Terminology.help
 [exe]: 01executable.help
 [video]: 02video.help
-[lighting]: 021lighting.help
 [audio]: 03audio.help
 [speech]: 04speech.help
 [joystick]: 05joystick.help
