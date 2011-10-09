@@ -142,7 +142,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	generalSizer->Add(general, wxSizerFlags().Expand().Proportion(1));
 
 	// Profiles
-	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile"));
+	wxStaticBox* profileBox = new wxStaticBox(this, wxID_ANY, _("Profile management"));
 	wxChoice* profileCombo = new wxChoice(this, ID_PROFILE_COMBO,
 		wxDefaultPosition,
 		wxDefaultSize,
@@ -181,7 +181,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 4);
 
 	// Latest headlines
-	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from the front"));
+	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from Hard Light Productions"));
 	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
