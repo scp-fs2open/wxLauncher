@@ -177,8 +177,8 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	profileButtonsSizer->Add(autoSaveProfilesCheck, 0, wxALIGN_CENTER_VERTICAL);
 
 	wxStaticBoxSizer* profileVerticalSizer = new wxStaticBoxSizer(profileBox, wxVERTICAL);
-	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 4);
-	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 4);
+	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 5);
+	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 5);
 
 	// Latest headlines
 	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from Hard Light Productions"));
@@ -192,7 +192,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 
 	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
 	headlines->Add(headlinesView, 
-		wxSizerFlags().Expand().Center().Proportion(1));
+		wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT, 5));
 	headlines->Add(updateNewsCheck,
 #if IS_APPLE // helps ensure that all four highlights appear without having to scroll
 		wxSizerFlags().Right().Border(wxTOP|wxRIGHT,5));
