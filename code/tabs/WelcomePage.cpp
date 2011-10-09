@@ -194,10 +194,10 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	headlines->Add(headlinesView, 
 		wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT, 5));
 	headlines->Add(updateNewsCheck,
-#if IS_APPLE // helps ensure that all four highlights appear without having to scroll
-		wxSizerFlags().Right().Border(wxTOP|wxRIGHT,5));
-#else
+#if IS_WIN32
 		wxSizerFlags().Right().Border(wxTOP|wxRIGHT|wxBOTTOM,5));
+#else // helps ensure that all four highlights appear without having to scroll
+		wxSizerFlags().Right().Border(wxTOP|wxRIGHT,5));
 #endif
 
 	// Final layout
