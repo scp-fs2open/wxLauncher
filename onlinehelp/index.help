@@ -1,14 +1,16 @@
-<title>Welcome to wxLauncher</title>
+<title>Welcome</title>
 
 #Welcome to wxLauncher
 
 ![wxLauncher logo](images/header.png "wxLauncher")
 
-Welcome to wxLauncher, your one-stop shop for FreeSpace 2 and related content.
+<!-- Welcome to wxLauncher, your one-stop shop for FreeSpace 2 and related content. -->
+
+The [FAQ][]![][li] has basic information about wxLauncher, **TODO something about how to get started, overview of the guide's contents, etc could direct people based on what they're looking for (the possible reasons why they would've looked at the manual in the first place).** **TODO scale down header image to fit default width of viewing area**
 
 <!-- TODO come up with something to put here. -->
 <!-- You can find the [FAQ][]![][li], [Authors][1]![][li] -->
 
-<!-- [FAQ]:  jfaq.help -->
+[FAQ]:  jfaq.help
 <!-- [1]:    kauthors.help -->
-<!-- [li]: images/li.png -->
+[li]: images/li.png

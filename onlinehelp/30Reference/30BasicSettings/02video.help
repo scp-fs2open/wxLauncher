@@ -1,7 +1,7 @@
 <title>Video options</title>
 # Video options
 
-This is where you configure the basic settings of the graphics engine to best suit your needs (and to best fit your computer's graphic and processing power)
+This is where you configure the basic settings of the graphics engine to best suit your needs (and to best fit your computer's graphic and processing power).
 
 -- screenshot with the "video" section highlighted --
 
@@ -17,9 +17,9 @@ The number of pixels you see on the screen when playing the game. Chosing a bigg
 **TODO is this actually true about sluggishness? sounds iffy.**
 
 ### Depth
-Bit depth (AKA *color depth* and *screen depth*) describes the number of bits used to represent the color of a single pixel. In game terms, this means that a 32bit depth creates a more vivid image than a 16bit depth mode.
+Bit depth (also called *color depth* or *screen depth*) describes the number of bits used to represent the color of a single pixel. In game terms, this means that a 32-bit depth creates a more vivid image than a 16-bit depth mode.
 
-**Note**: Although a 32bit mode requires a bit more processing power than 16bit, this option should be set to the same value as your Windows bit depth (usually 32bit nowdays), as using a different bit depth can cause *major* slowdowns.  If your graphics card is having difficulty running FSO, the SCP suggests that you change other graphics settings and leave this one where it is now.
+**Note**: Although a 32-bit mode requires a bit more processing power than 16-bit, this option should be set to the same value as your Windows bit depth (usually 32-bit nowdays), as using a different bit depth can cause *major* slowdowns.  If your graphics card is having difficulty running FSO, the SCP suggests that you change other graphics settings and leave this one where it is now.
 
 ## Options currently supported on Linux and Mac OS X only
 

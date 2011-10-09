@@ -1,0 +1,13 @@
+<title>Lighting presets</title>
+
+# Lighting presets
+
+**TODO scribble: presets of lighting settings. provide link to fs wiki ., select radio button to have preset automatically included in your command line. if you'd like to edit one of the presets, select it, then click on the copy button to copy it to your custom flags, where you can edit it to your taste .**
+
+<!-- Note that we don't have the right to pull material from the wiki and make it GPLed. -->
+
+[li]: /images/li.png
+[le]: /images/le.png
+[fso]: /50TechnicalStuff/02Terminology.help
+[scp]: /50TechnicalStuff/02Terminology.help
+[presetdescs]: http://www.hard-light.net/wiki/index.php/Sample_Lighting_Settings
