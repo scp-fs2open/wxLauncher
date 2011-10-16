@@ -1,29 +1,30 @@
 <title>Profiles</title>
+
 # Profiles
 
-Profiles are one of the biggest features introduced by wxLauncher,  allowing you to save "snapshots" of the launcher settings. Think of them like the "save" feature commonly found in games: you can save your current settings and restore them later.
+Profiles are one of the biggest features introduced by wxLauncher, allowing you to save "snapshots" of the launcher settings. Think of them like the "save" feature commonly found in games: you can save your current settings and restore them later.
 
-### Why use profiles
+## Why use profiles
 Since most of the available [mods][mod]![][li]/[TCs][tc]![][li] use different settings to achieve the best experience for the player, the profiles feature was created in order to allow the player to quickly switch between settings for his/her mods instead of manually having to set the various options that [FSO][]![][li] supports when switching to another mod.
 
-<!-- ###Copying settings from one profile to another
-While you cannot directly copy settings from one profile to another, when creating a new profile you can choose on what existing profile the new profile will be based on, efectively copying the old profile under a new name
+## Copying settings from one profile to another
+While you can't directly copy settings from one profile to another, you can choose to base a new profile on an existing profile by cloning the existing profile's contents.
 
-**Tip**: You can use this feature to rename a profile. Simply click the new profile button, choose the profile you want to rename and type in the new name. Click "OK" to create the new profile and then delete the old one. --> <!-- copying profiles not yet supported -->
+**Tip**: You can use this feature to rename a profile. Simply click the new profile button, choose the profile you want to rename and type in the new name. Click "Clone" to create the new profile, and then delete the old profile.
 
-### What data is saved
+## What data is saved
 A profile contains the following data:
 
 * The selected mod.
 * Status of all the options from the [Basic Settings][basic]![][li] page.
-* Status of all the flags from the [Advanced Settings][advanced]![][li] page, including the custom flags.
+* Status of all the flags from the [Advanced Settings][advanced]![][li] page, including the [lighting presets][lighting]![][li] and [custom flags][custom]![][li].
 
 **What is not saved**: The option of whether to automatically retrieve the highlights from Hard Light Productions at launcher startup. <!-- and the proxy configuration -->
 
-### Using the launcher without using profiles
-While you cannot disable the profiles feature, you can avoid using them by just checking the "Automatically save profiles" box on the Welcome tab and then only using the default profile, which has the name "Default".
+## Using wxLauncher without using profiles
+Although you can't disable the profiles feature, you can avoid using them by checking the "Automatically save profiles" box on the Welcome page and then only using the default profile, which has the name "Default".
 
-This way, every change you make is automatically saved to the default profile, and wxLauncher will behave just as the standard Windows launcher does.
+This way, every change you make is automatically saved to the default profile when the launcher exits, and wxLauncher will behave just as the standard Windows launcher does.
 
 [li]: /images/li.png
 [mod]: /50TechnicalStuff/02Terminology.help
@@ -31,4 +32,6 @@ This way, every change you make is automatically saved to the default profile, a
 [fso]: /50TechnicalStuff/02Terminology.help
 [basic]: /30Reference/30BasicSettings/index.help
 [advanced]: /30Reference/40AdvancedSettings/index.help
+[lighting]: /30Reference/40AdvancedSettings/021lighting.help
+[custom]: /30Reference/40AdvancedSettings/10customflags.help
 [welcome]: /30Reference/10Welcome/index.help

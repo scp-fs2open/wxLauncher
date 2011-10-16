@@ -1,7 +1,7 @@
 <meta name="control" content="ID_SPEECH_MORE_VOICES_BUTTON" />
-<title>Speech settings</title>
+<title>Speech</title>
 
-# Speech settings (Windows only)
+# Speech (Windows only)
 
 Here you can set various aspects related to the speech engine. This is intended as an option while playing a user-made campaigns that lacks voice acting. While a simulated speech is of far inferior quality compared to a human voice, sometimes it is better than nothing.
 

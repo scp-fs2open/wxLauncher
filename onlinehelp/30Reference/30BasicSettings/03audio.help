@@ -1,5 +1,5 @@
-<title>Audio device</title>
-#Audio device
+<title>Audio</title>
+# Audio
 Here you set the device that [FSO][]![][li] will use to output the sound effects.
 
 -- screenshot with the "audio" section highlighted --

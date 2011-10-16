@@ -16,18 +16,18 @@ Starting with version 2.0, wxLauncher will also help you install new mods and ke
 ## Is wxLauncher free software?
 The launcher is published under the [GNU General Public License v2][gpl]![][le], making it free software, for you to use and modify. The source files are available on the project's [source page][source]![][le].
 
-## Why wxLauncher?
+## Why is it called wxLauncher?
 The name was chosen because the launcher is built using the [wxWidgets][]![][le] GUI toolkit, which allows it to run on multiple platforms.
 [wxWidgets]: http://www.wxwidgets.org/
 
-## On what platforms does the launcher run?
-The launcher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X.
+## On what platforms does wxLauncher run?
+wxLauncher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X.
 
 ## Who made wxLauncher?
 Check the [authors][]![][li] section for details.
 
 ## What about my privacy?
-The launcher does not send any data over the Internet, so your privacy is safe. You don't have to take our word for it, though: if you have the necessary technical knowledge, you can examine the [source code][source]![][le] and see for yourself. If you don't, but would like to know what happens when the launcher goes online, you can check the [privacy][privacy]![][li] page in the [Technical stuff][technical]![][li] section.
+wxLauncher does not send any data over the Internet, so your privacy is safe. You don't have to take our word for it, though: if you have the necessary technical knowledge, you can examine the [source code][source]![][le] and see for yourself. If you don't, but would like to know what happens when wxLauncher goes online, you can check the [privacy][privacy]![][li] page in the [Other information][technical]![][li] section.
 
 ## Are there any translations available?
 Not yet, although there will be for the official release of version 1.0.
@@ -46,8 +46,8 @@ Suggestions are always welcome. Contact one of the [project owners or developers
 <!-- Simply contact one of the [project owners][people]![][le]. We're not looking for any particular skills at the moment, but that doesn't mean that we're not accepting people into the team.
  **TODO we should think seriously about what we put here.** -->
 
-<!-- ## This launcher sucks!
-While this is not a question, we will accept your criticism if you can tell us in detail why you think the application is not worth using. Please contact one of the [project owners][people]![][le] with the information. --> <!-- is there a more professional, neutral way of saying this? -->
+<!-- ## This launcher sucks! -->
+<!-- While this is not a question, we will accept your criticism if you can tell us in detail what you think is wrong with wxLauncher *and how it can be made better*. Please contact one of the [project owners][people]![][le] with the information. --> <!-- This is indeed not a question. -->
 
 
 [li]: images/li.png

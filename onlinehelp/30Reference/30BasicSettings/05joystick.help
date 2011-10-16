@@ -1,19 +1,19 @@
-<title>Joystick selection</title>
-#Joystick selection
+<title>Joystick</title>
+# Joystick
 This is where you select and configure your joystick.
 
 -- screenshot of with the joystick area highlighted --
 
-## Joystick options supported on all platforms
+## Options supported on all platforms
 
 ### Select joystick
 This is a list if joysticks connected to your computer and recognized by the operating system. Choose the one you want to use.
 
 **Linux and Mac OS X note**: If you connect or disconnect a joystick while wxLauncher is running, you will need to restart wxLauncher for it to detect the changes.
 
-## Joystick options currently supported on Windows only
+## Options currently supported on Windows only
 
-**Compatibility note**: Your joystick must support force feedback for the "Force feedback" and "Directional hit" options to have any effect.
+**Note**: Your joystick must support force feedback for the "Force feedback" and "Directional hit" options to have any effect.
 
 ### Force feedback
 Force feedback, or *haptics* (from *Haptic Technology*) is a tactile feedback technology which takes advantage of a user's sense of touch by applying forces, vibrations, and/or motions upon the user. An example of this feature is the simulated automobile steering wheels that are programmed to provide a "feel" of the road. As the user makes a turn or accelerates, the steering wheel responds by resisting turns or slipping out of control.

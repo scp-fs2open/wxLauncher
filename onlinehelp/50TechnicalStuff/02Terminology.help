@@ -1,23 +1,25 @@
 <title>Terminology</title>
 
-#Terminology
+<!-- TODO Reorder alphabetically and add (not comprehensive list): Flags, Antipodes (with link to portej05's overview thread). Get anchors to work so that when people click on "mod" on some page, it'll take them to the mod entry, rather than the top of this page. -->
 
-###FSO
+# Terminology
+
+## FSO
 The **FreeSpace 2 Open** (also called FreeSpace Open) engine is an [open-source][os]![][le] modification project of the retail FreeSpace 2 engine started after the public release of the original source code in 2002. The community, under the direction of the Source Code Project (or SCP), made major upgrades to the engine and made it portable to multiple operating systems.
 
-###SCP
+## SCP
 The **FreeSpace 2 Source Code Project** (or FreeSpace Source Code Project or simply Source Code Project) is a central source to coordinate development of the FreeSpace 2 Open engine. It was created after the source code of the FreeSpace 2 game engine become public in order to prevent multiple diverging versions of the game from appearing. 
 
 * [SCP Homepage][scp]![][le]
 * [SCP Forums][forums]![][le] on Hard Light Productions
 
-###<a name="mod" />Mod
+## <a name="mod" />Mod
 
 A Mod (short from **mod**ification) is, as its title suggests, a collection of one or more additions to the original game. While some mods make relatively small changes to the game (like a highly detailed skin for a ship, a new beam graphic or an explosion sound) others can almost be considered TCs, adding a new and original story, new ship models, new characters and settings, providing a new game experience for the player.
 
 Check the [Mod Database][moddb]![][le] on the [FreeSpace Wiki][fswiki]![][le] for various mods (campaigns, effects, etc.).
 
-###<a name="tc" />TC
+## <a name="tc" />TC
 
 **TC** stands for **T**otal **C**onversion. This implies that all of the content shipped by the TC is original and does not contain any content from the original FreeSpace 2 game. A TC can stand alone and should stand alone from the normal FreeSpace 2 install location and does not require the player to purchase FreeSpace 2 to play.
 

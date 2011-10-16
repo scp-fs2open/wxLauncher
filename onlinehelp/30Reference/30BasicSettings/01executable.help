@@ -1,23 +1,23 @@
 <meta name="control" content="ID_EXE_ROOT_FOLDER_BOX_TEXT" />
 <meta name="control" content="ID_EXE_ROOT_FOLDER_BOX" />
-<title>TC root folder and executable</title>
+<title>FS2 or TC root folder and executable</title>
 
-# TC root folder and executable
+# FreeSpace 2 or total conversion root folder and executable
 
 In order to be able to launch [FSO][]![][li], the launcher needs to know two things:
 
 * In which folder are the FreeSpace 2 Open (and optionally, FRED 2 Open) executables located
 * Which executable it should use
 
-### TC root folder
+### FS2 or TC root folder
 
 <!-- **TODO try to get rid of the "You must" -- too demanding.** -->
 
-You must select a [TC][tc]![][li] root folder is needed before you can select an FSO executable (or [mod][mod]![][li] on the [mods page][modpage]![][li]) to use.
+You must select a FS2 or [TC][tc]![][li] root folder before you can select an FSO executable (or [mod][mod]![][li] on the [mods page][modpage]![][li]) to use.
 
 <!-- -- Compound image  of the root folder selection boxa nd button with the"browse for folder" dialog -- -->
  
-To select the TC root folder, click **Browse...** and browse to the folder containing the FSO executables, then click **Choose** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
+To select the FS2 or TC root folder, click **Browse...** and browse to the folder containing the FSO executables, then click **Choose** to confirm.  The "Browse for folder" dialog box won't close if the selected folder does not contain valid FSO executables.
 
 ### FreeSpace 2 Open (FS2 Open) executable selection
 
@@ -29,7 +29,14 @@ Once you have selected a valid TC root folder, the FS2 Open executable selection
 
 ### FRED 2 Open (FRED2 Open) executable selection
 
-**Compatibility note**: **TODO**
+**Compatibility note**: Although FRED executable selection is supported on all platforms, FRED is currently available on Windows only.
+
+**Note**: FRED launching is not enabled by default. To enable it, close wxLauncher if it's open, then open the file (on Windows) %AppData%\\wxlauncher\\global.ini in a text editor and add the following two lines to the end of the file:
+
+	[opt]
+	configfred=1
+
+The equivalent file on Linux is ~/.wxlauncher/global.ini and on OS X is /Users/[YourUsername]/Library/Application Support/wxlauncher/global.ini .]
 
 **TODO**
 
