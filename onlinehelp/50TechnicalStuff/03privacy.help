@@ -2,19 +2,19 @@
 <title>Privacy: the technical details</title>
 #Privacy: the technical details
 
-As noted in the [FAQs][faq]![][li], no information is ever sent out that could endanger your privacy. Actually, what information the launcher sends is nothing more than a simple page request. 
+As noted in the [FAQ][faq]![][li], no information is ever sent out that could endanger your privacy. Actually, what information wxLauncher sends is nothing more than a simple page request. <!-- **TODO which um kind of does endanger your privacy, at least a little bit, in that it notifies the server of your IP address.** -->
 
-To get the highlights, the launcher asks for a [special-crafted page][page]![][le] that returns a list of the current highlights in a custom format. It's like a newsfeed, but with no HTML or XML. Just plain text.
+To get the highlights, wxLauncher asks for a [specially crafted page][page]![][le] that returns a list of the current highlights in a custom format. It's like a news feed, but with no HTML or XML, just plain text.
 
 The result will look similar to this:
 
 	New Blue Planet beam piercing effects by Komet and Wanderer http://www.hard-light.net/forums/index.php?topic= 67663.0 http://www.hard-light.net/images/highlights/generic.png Ker.Soth has released a new mini-campaign for The Babylon Project. http://www.hard-light.net/forums/index.php?topic=67320.0 http://www.hard-light.net/images/highlights/tbp-highlight.png ReeNoiP has released his 9 mission minicampaign Uncharted Territory. http://www.hard-light.net/forums/index.php?topic=67327.0 http://www.hexellent.com/files/42/Uncharted.jpg Slasher puts us into contact with...  THE RELIC! http://www.hard-light.net/forums/index.php?topic=67113.0 http://www.hard-light.net/images/highlights/tbp-highlight.png
 	
-From that mumbo-jumbo, the launcher will extract the necessary information to nicely display the news for you.
+From that information, wxLauncher will extract the necessary information to nicely display the HLP highlights for you.
 
 That's it. A page request, nothing more. Your privacy is safe with us.
 
-Remember that you can always examine de source code to check for yourself how things happen inside the launcher. It's worth noting that this is something you can't do in most commercial software.
+Remember that you can always examine the source code to check for yourself how wxLauncher works. <!-- It's worth noting that this is something you can't do in most commercial software. -->
 
 [li]: /images/li.png
 [le]: /images/le.png

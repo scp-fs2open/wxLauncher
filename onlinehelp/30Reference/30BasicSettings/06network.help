@@ -1,14 +1,18 @@
-<title>Network configuration</title>
-# Network configuration
+<title>Network</title>
+# Network
 Here you can set several options regarding your network connection.
 
 <!-- --screenshot with the network area highlighted -->
+
+## Required information for playing multiplayer
 
 ### Connection type
 In order to play online, [FSO][]![][li] needs to know what kind of network configuration you have. Choose the appropriate value.
 
 ### Connection speed
 For a smooth experience, select the appropriate connection speed here.
+
+## Advanced options
 
 ### Force local port
 If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here. Most users will not need to use this setting, but some may need it to handle problems with older Network Address Translation (NAT) firewalls.

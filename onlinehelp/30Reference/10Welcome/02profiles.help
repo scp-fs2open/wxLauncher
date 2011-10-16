@@ -7,15 +7,19 @@ This set of controls allows you to to create and delete profiles. Check the [Pro
 <!-- -- profiles section screenshot -- -->
 
 ### New
-Click this button to create a new profile. <!-- To make things easily, you can base your new profile on an existing profile in order to speed up profile creation. That way, if you have a profile for, let's say [Derelict][derelict]![][le], and want to create a new profile for [Blue Planet][bp]![][le], you can base the new profile on the existing Derelict profile and modify just the selected mod and one or two options if needed, save the profile and have a Blue Planet profile with just a few clicks. --> <!-- sadly, profile cloning doesn't work yet. -->
+Creates a new profile.
+
+<!-- profile create dialog and screenshot -->
+
+You can either create a blank profile or clone an existing profile. Cloning allows you to quickly and easily make a new profile by making slight changes to a copy of one of your existing profiles.
 
 ### Delete
-Click this button to delete the selected profile. You will be asked to confirm the deletion.
+Deletes the selected profile. You will be asked to confirm the deletion.
 
 **Note**: You can't delete the "Default" profile.
 
 ### Save
-Click this button to manually save the current profile. If the "Automatically save profiles" checkbox is unchecked and the current profile contains unsaved changes, the launcher will ask you on a profile switch and on exit if you want to save your changes.
+Saves the current profile.
 
 <!-- **Note**: an unsaved profile is denoted with an \* in the titlebar
 
@@ -23,7 +27,9 @@ Click this button to manually save the current profile. If the "Automatically sa
 -->
 
 ### Automatically save profiles
-If checked, any changes made to the current profile will be automatically saved on launcher exit and/or profile switch. 
+If checked, any changes made to the current profile will be saved automatically on profile switch, profile creation, and launcher exit. 
+
+If unchecked and the current profile contains unsaved changes, the launcher will ask you if you want to save your changes when you switch profiles, create a new profile, or exit wxLauncher.
 
 **Tip**: If you don't want to use profiles, check this box and select the Default profile, at which point wxLauncher will act like the standard Windows launcher, remembering your changes automatically.
 
