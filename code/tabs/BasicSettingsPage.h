@@ -35,7 +35,6 @@ public:
 	void OnPressFredExecutableChoiceRefreshButton(wxCommandEvent &event);
 
 	void OnSelectVideoResolution(wxCommandEvent &event);
-	void OnSelectGraphicsAPI(wxCommandEvent &event);
 	void OnSelectVideoDepth(wxCommandEvent &event);
 	void OnSelectVideoAnisotropic(wxCommandEvent &event);
 	void OnSelectVideoAntiAlias(wxCommandEvent &event);
