@@ -311,7 +311,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE);
 	wxChoice* speechVoiceCombo = new wxChoice(this, ID_SPEECH_VOICE_COMBO);
-	wxStaticText* speechVolumeLabel = new wxStaticText(this, wxID_ANY, _T("Volume:"));
+	wxStaticText* speechVolumeLabel = new wxStaticText(this, wxID_ANY, _T("Volume"));
 	wxSlider* speechVoiceVolume = 
 		new wxSlider(this, ID_SPEECH_VOICE_VOLUME, 50, 0, 100);
 	wxButton* speechPlayButton = 
