@@ -197,7 +197,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
 	textureFilterCombo->Append(_("Trilinear"));
-	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("trilinear"), true);
+	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("Trilinear"), true);
+	// FIXME shouldn't need case folding. comparison should be case-sensitive:
+	//       either Bilinear or Trilinear.
+	//       although now we've created legacy texture filter values. hmm.
 	filter.MakeLower();
 	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
