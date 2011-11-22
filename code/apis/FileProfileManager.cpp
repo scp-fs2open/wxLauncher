@@ -174,7 +174,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	wxString filterMethod;
 	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
-	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear")))?1:0;
+	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
 
 	ret = outConfig.Write( L"TextureFilter", filterMethodValue);
 	ReturnChecker(ret, __LINE__);
