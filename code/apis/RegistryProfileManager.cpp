@@ -294,7 +294,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		sizeof(oglAntiAliasSample));
 
 	wxString filterMethod;
-	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Bilinear"));
+	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
 	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear")))?1:0;
 
 	ret = RegSetValueExW(
