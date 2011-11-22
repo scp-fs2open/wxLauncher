@@ -197,7 +197,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
 	textureFilterCombo->Append(_("Trilinear"));
-	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("bilinear"), true);
+	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("trilinear"), true);
 	filter.MakeLower();
 	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
