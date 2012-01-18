@@ -908,7 +908,9 @@ bool ProMan::DeleteProfile(wxString name) {
 		return false;
 	}
 	if ( name == this->currentProfileName ) {
-		wxLogInfo(_T("Deleting current profile. Switching current to 'Default' profile"));
+		wxLogInfo(
+			_T("Deleting current profile. Switching current to '%s' profile"),
+			ProMan::DEFAULT_PROFILE_NAME);
 		this->SwitchTo(ProMan::DEFAULT_PROFILE_NAME);
 	}
 	if ( this->DoesProfileExist(name) ) {
