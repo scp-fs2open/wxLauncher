@@ -380,7 +380,7 @@ void WelcomePage::cloneNewProfile(wxChoice* profileCombo, ProMan* proman) {
 				wxLogStatus(_("Created profile '%s'"),
 					cloneDialog.GetNewProfileName().c_str());
 			}
-				proman->SwitchTo(cloneDialog.GetNewProfileName());
+			proman->SwitchTo(cloneDialog.GetNewProfileName());
 		} else { // profile creation was unsuccessful
 			if (cloneDialog.UseProfileCloning()) {
 				wxLogError(_("Unable to clone profile '%s' from '%s'. See log for details."),
