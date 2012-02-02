@@ -156,8 +156,8 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	proman->GlobalRead(GBL_CFG_MAIN_LASTPROFILE, &lastselected, ProMan::DEFAULT_PROFILE_NAME);
 	profileCombo->SetStringSelection(lastselected);
 
-	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New"));
-	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete"));
+	wxButton* newButton = new wxButton(this, ID_NEW_PROFILE, _("New..."));
+	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete..."));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 
 	wxCheckBox* autoSaveProfilesCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
