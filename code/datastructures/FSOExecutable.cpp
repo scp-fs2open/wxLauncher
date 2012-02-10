@@ -172,7 +172,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			if ( first == _T("fs2") ) {
 				ver.binaryname = _T("FreeSpace 2 Open");
 			} else {
-				ver.binaryname = _T("FRED 2 Open");
+				ver.binaryname = _T("FRED2 Open");
 			}
 		} else {
 			wxLogWarning(_T("was expecting 'open'; got %s in executable %s"), first1.c_str(), binaryname.c_str());
@@ -298,7 +298,7 @@ more user friendly.
 The resulting string looks something like this: \verbatim
 FreeSpace 2 Open Antipodes 4 Debug Inferno SSE2
 FreeSpace 2 Open 3.6.10 Release Inferno SSE
-FRED 2 Open 3.6.11 Debug
+FRED2 Open 3.6.11 Debug
 \endverbatim
 */
 wxString FSOExecutable::MakeVersionStringFromVersion(FSOExecutable ver) {
