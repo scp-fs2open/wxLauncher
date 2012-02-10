@@ -231,7 +231,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	}
 	if ( startFred ) {
 		this->FRED2_pid = pid;
-		wxLogInfo(_T("FRED 2 Open is now running..."));
+		wxLogInfo(_T("FRED2 Open is now running..."));
 	} else {
 		this->FS2_pid = pid;
 		wxLogInfo(_T("FreeSpace 2 Open is now running..."));
@@ -253,7 +253,7 @@ void MainWindow::OnKill(wxButton* button, bool killFred) {
 	int ret = ::wxKill((killFred)?this->FRED2_pid:this->FS2_pid, wxSIGKILL);
 	if ( ret != wxKILL_OK ) {
 		wxLogError(_T("Got KillError %d"), ret);
-		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED 2 Open"):_T("FreeSpace 2 Open"));
+		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED2 Open"):_T("FreeSpace 2 Open"));
 	}
 }
 
@@ -297,7 +297,7 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 
 	int exitCode = event.GetExitCode();
 
-	wxLogInfo(_T("FRED 2 Open exited with a status of %d"), exitCode);
+	wxLogInfo(_T("FRED2 Open exited with a status of %d"), exitCode);
 
 	delete this->process;
 	this->process = NULL;
