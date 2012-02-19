@@ -82,8 +82,9 @@ EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BottomButtons::OnTCChanges)
 END_EVENT_TABLE()
 
+/** remove the text after ".app" in the executable name.
+ A no op on other platforms*/
 #if IS_APPLE
-/** remove the text after ".app" in the executable name. */
 wxString FixBinaryName(const wxString& binaryName) {
 	wxString fixedBinaryName(binaryName);
 	// the trailing / ensures that the .app indicates an extension
@@ -93,6 +94,8 @@ wxString FixBinaryName(const wxString& binaryName) {
 	}
 	return fixedBinaryName;
 }
+#else
+#define FixBinaryName(binaryName) binaryName
 #endif
 
 void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
@@ -101,18 +104,10 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
 	if ( tc.IsEmpty() || binary.IsEmpty() ) {
 		this->play->Disable();
-#if IS_APPLE
 	} else if ( wxFileName(tc + wxFileName::GetPathSeparator() + binary).FileExists() ) {
-#else
-	} else if ( wxFileName(tc, binary).FileExists() ) {
-#endif
 		this->play->Enable();
 	} else {
-#if IS_APPLE
 		wxLogWarning(_("Executable %s does not exist"), FixBinaryName(binary).c_str());
-#else
-		wxLogWarning(_("Executable %s does not exist"), binary.c_str());
-#endif
 		this->play->Disable();
 	}
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FRED, &fredBinary, wxEmptyString);
@@ -128,11 +123,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 #endif
 		this->fred->Enable();
 	} else {
-#if IS_APPLE
 		wxLogWarning(_("FRED executable %s does not exist"), FixBinaryName(fredBinary).c_str());
-#else
-		wxLogWarning(_("FRED executable %s does not exist"), fredBinary.c_str());
-#endif
 		this->fred->Disable();
 	}
 }
