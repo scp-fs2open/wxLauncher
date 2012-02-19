@@ -214,14 +214,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	} else {
 		command = path.GetFullPath();
 	}
-	
-	if ( startFred ) {
-		wxString fredModLine;
-		p->ProfileRead(PRO_CFG_TC_CURRENT_MODLINE, &fredModLine, wxEmptyString);
-		if ( !fredModLine.IsEmpty() ) {
-			command += wxString::Format(_T(" -mod %s"), fredModLine.c_str());
-		}
-	}
+
 	wxLogDebug(_T("Starting a process using '%s'"), command.c_str());
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, this->process);
 	if ( pid == 0 ) {
