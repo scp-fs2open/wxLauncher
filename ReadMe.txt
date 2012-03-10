@@ -71,7 +71,7 @@ Python homepage:
 Markdown in Python is required in order to build the 
 integrated help system. 
 Markdown in Python homepage:
-	http://www.freewisdom.org/projects/python-markdown/
+	http://freewisdom.org/projects/python-markdown/
 On debian-based systems:
 	apt-get install python-markdown
 
