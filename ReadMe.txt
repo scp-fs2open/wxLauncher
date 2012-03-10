@@ -114,7 +114,7 @@ or the TortoiseHG frontend (which includes Mercurial):
 
 Once Mercurial is installed, you can get a copy of the source
 by running the following command in a folder of your choice:
-	hg clone https://wxlauncher.googlecode.com/hg/ wxlauncher  
+	hg clone https://code.google.com/p/wxlauncher/
   
 Building - Windows
 ==================
