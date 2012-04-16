@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "datastructures/FSOExecutable.h"
 #include "tabs/AdvSettingsPage.h"
 #include "apis/ProfileManager.h"
+//#include "apis/ProfileProxy.h" // TODO uncomment once proxy is ready
 #include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
@@ -33,6 +34,26 @@ struct FlagInfo {
 #include "datastructures/FlagInfo.cpp"
 
 #define WIDTH_OF_CHECKBOX 16
+
+int FlagListCheckBox::flagIndexCounter = 0;
+
+FlagListCheckBox::FlagListCheckBox(
+	wxWindow* parent,
+	wxWindowID id,
+	const wxString& label,
+	const wxString& flagString)
+: wxCheckBox(parent, id, label), flagString(flagString), flagIndex(flagIndexCounter++) {
+}
+	
+void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
+	// FIXME the following line doesn't work yet because profile proxy isn't implemented
+//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
+	wxLogDebug(_T("flag %s with index %d is now %s"), flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
+
+	// FIXME temp until the proxy is working
+	wxCommandEvent fakeEvent;
+	dynamic_cast<AdvSettingsPage*>(this->GetParent()->GetParent())->OnNeedUpdateCommandLine(fakeEvent);
+}
 
 Flag::Flag()
 : checkbox(NULL), checkboxSizer(NULL) {
@@ -285,14 +306,6 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 		web_url[sizeof(web_url)-1] = _T('\0');
 
 		Flag* flag = new Flag();
-		flag->checkbox = new wxCheckBox(this, wxID_ANY, wxEmptyString);
-		flag->checkbox->Hide();
-		this->m_parent->Connect(flag->checkbox->GetId(),
-			wxEVT_COMMAND_CHECKBOX_CLICKED,
-			wxCommandEventHandler(AdvSettingsPage::OnNeedUpdateCommandLine));
-		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
-		flag->checkboxSizer->AddSpacer(ITEM_VERTICAL_OFFSET);
-		flag->checkboxSizer->Add(flag->checkbox);
 
 		flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
 		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
@@ -302,6 +315,18 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 
 		flag->easyDisable = easy_off_flags;
 		flag->easyEnable = easy_on_flags;
+		
+		flag->checkbox = new FlagListCheckBox(this, wxID_ANY, wxEmptyString, flag->flagString);
+		flag->checkbox->Hide();
+		
+		flag->checkbox->Connect(
+			flag->checkbox->GetId(),
+			wxEVT_COMMAND_CHECKBOX_CLICKED,
+			wxCommandEventHandler(FlagListCheckBox::OnClicked));
+		
+		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
+		flag->checkboxSizer->AddSpacer(ITEM_VERTICAL_OFFSET);
+		flag->checkboxSizer->Add(flag->checkbox);
 
 		FlagCategoryList::iterator iter = this->allSupportedFlagsByCategory.begin();
 		while ( iter != this->allSupportedFlagsByCategory.end() ) {

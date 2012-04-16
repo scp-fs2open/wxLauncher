@@ -26,6 +26,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/FlagListManager.h"
 #include "apis/SkinManager.h"
 
+class FlagListCheckBox: public wxCheckBox {
+public:
+	FlagListCheckBox(wxWindow* parent, wxWindowID id, const wxString& label, const wxString& flagString);
+	void OnClicked(wxCommandEvent &event);
+private:
+	wxString flagString;
+	int flagIndex; // index is needed so that proxy can keep flags ordered in flag list order
+	
+	static int flagIndexCounter; // used to generate the indexes
+};
+
 class Flag {
 public:
 	Flag();
@@ -33,11 +44,11 @@ public:
 	wxString shortDescription;
 	wxString fsoCatagory;
 	wxString webURL;
-	wxCheckBox *checkbox;
-	wxSizer* checkboxSizer;
 	bool isRecomendedFlag;
 	wxUint32 easyEnable;
 	wxUint32 easyDisable;
+	FlagListCheckBox* checkbox;
+	wxSizer* checkboxSizer;
 };
 
 WX_DECLARE_LIST(Flag, FlagList);
