@@ -572,7 +572,7 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 	int flagIndex = 0;
 
 	FlagCategoryList::const_iterator category =
-	this->allSupportedFlagsByCategory.begin();
+		this->allSupportedFlagsByCategory.begin();
 	while (category != this->allSupportedFlagsByCategory.end()) {
 		FlagList::const_iterator flag = (*category)->flags.begin();
 		while( flag != (*category)->flags.end() ) {
