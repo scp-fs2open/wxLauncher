@@ -588,10 +588,6 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 	}
 }
 
-void FlagListBox::OnCheckCategoryBox(wxCommandEvent &WXUNUSED(event)) {
-	this->RefreshRect(this->GetRect(), true);
-}
-
 wxString FlagListBox::GenerateStringList() {
 	wxString flagList;
 	FlagCategoryList::const_iterator cat =
@@ -676,10 +672,8 @@ void FlagListBox::generateFlagSets() {
 	// \todo include the flag sets of the mod.inis as well
 
 	// custom
-	{
-		FlagSet* flagSetCustom = new FlagSet(_("Custom"));
-		this->flagSets.Append(flagSetCustom);
-	}
+	this->flagSets.Append(new FlagSet(_("Custom")));
+
 	// the easy flags.
 	wxUint32 counter = 0;
 	wxArrayString::const_iterator easyIter =
