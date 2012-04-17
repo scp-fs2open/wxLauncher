@@ -22,19 +22,19 @@
  FlagListManager is used to notify controls that have registered with it
  that the flag list box's status has changed. */
 
-FlagListEventHandlers FlagListManager::FlagListBoxDrawStatusChangedHandlers;
-
 DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED);
 
 #include <wx/listimpl.cpp> // required magic incantation
 WX_DEFINE_LIST(FlagListEventHandlers);
 
+FlagListManager* FlagListManager::flagListManager = NULL;
+
 void FlagListManager::RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler) {
-	FlagListBoxDrawStatusChangedHandlers.Append(handler);
+	this->flagListBoxDrawStatusChangedHandlers.Append(handler);
 }
 
 void FlagListManager::UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler) {
-	FlagListBoxDrawStatusChangedHandlers.DeleteObject(handler);
+	this->flagListBoxDrawStatusChangedHandlers.DeleteObject(handler);
 }
 
 void FlagListManager::GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status) {
@@ -42,10 +42,45 @@ void FlagListManager::GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStat
 	event.SetInt(status);
 
 	wxLogDebug(_T("Generating EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED event"));
-	for (FlagListEventHandlers::iterator iter = FlagListBoxDrawStatusChangedHandlers.begin(),
-		 end = FlagListBoxDrawStatusChangedHandlers.end(); iter != end; ++iter) {
+	for (FlagListEventHandlers::iterator iter = this->flagListBoxDrawStatusChangedHandlers.begin(),
+		 end = this->flagListBoxDrawStatusChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED event to %p"), &(*iter));
 	}
+}
+
+bool FlagListManager::Initialize() {
+	wxASSERT(!FlagListManager::IsInitialized());
+	
+	FlagListManager::flagListManager = new FlagListManager();
+	return true;
+}
+
+void FlagListManager::DeInitialize() {
+	wxASSERT(FlagListManager::IsInitialized());
+	
+	FlagListManager* temp = FlagListManager::flagListManager;
+	FlagListManager::flagListManager = NULL;
+	delete temp;
+}
+
+bool FlagListManager::IsInitialized() {
+	return (FlagListManager::flagListManager != NULL); 
+}
+
+FlagListManager* FlagListManager::GetFlagListManager() {
+	wxCHECK_MSG(FlagListManager::IsInitialized(),
+		NULL,
+		_T("Attempt to get flag list manager when it has not been initialized."));
+	
+	return FlagListManager::flagListManager;
+}
+
+FlagListManager::FlagListManager() {
+	// nothing for now
+}
+
+FlagListManager::~FlagListManager() {
+	// nothing for now
 }

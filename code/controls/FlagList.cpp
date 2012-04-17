@@ -371,7 +371,7 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
 	this->drawStatus = drawStatus;
 	wxLogDebug(_T("current flag list box draw status: %d"), drawStatus);
-	FlagListManager::GenerateFlagListBoxDrawStatusChanged(this->GetFlagListBoxStatus());
+	FlagListManager::GetFlagListManager()->GenerateFlagListBoxDrawStatusChanged(this->GetFlagListBoxStatus());
 }
 
 FlagListManager::FlagListBoxStatus FlagListBox::GetFlagListBoxStatus() const {

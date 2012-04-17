@@ -28,21 +28,28 @@ DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, wxID_ANY);
 WX_DECLARE_LIST(wxEvtHandler, FlagListEventHandlers);
 
 class FlagListManager {
-private:
-	FlagListManager();
+public:
+	static bool Initialize();
+	static void DeInitialize();
+	static bool IsInitialized();
+	static FlagListManager* GetFlagListManager();
+
 	~FlagListManager();
 
-public:
 	enum FlagListBoxStatus {
 		FLAGLISTBOX_OK = 0,
 		FLAGLISTBOX_WAITING,
 		FLAGLISTBOX_ERROR
 	};
 
-	static void RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
-	static void UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
-	static void GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status);
+	void RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
+	void UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
+	void GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status);
 private:
-	static FlagListEventHandlers FlagListBoxDrawStatusChangedHandlers;
+	FlagListManager();
+	
+	static FlagListManager* flagListManager;
+	
+	FlagListEventHandlers flagListBoxDrawStatusChangedHandlers;
 };
 #endif

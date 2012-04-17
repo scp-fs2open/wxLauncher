@@ -45,7 +45,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
-	FlagListManager::RegisterFlagListBoxDrawStatusChanged(this);
+	FlagListManager::GetFlagListManager()->RegisterFlagListBoxDrawStatusChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
