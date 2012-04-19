@@ -45,7 +45,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
-	FlagListManager::GetFlagListManager()->RegisterFlagListBoxDrawStatusChanged(this);
+	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
@@ -61,7 +61,7 @@ BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
-EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, AdvSettingsPage::OnDrawStatusChanged)
+EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnCustomFlagsChanged)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
@@ -200,14 +200,15 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	}
 }
 
-void AdvSettingsPage::OnDrawStatusChanged(wxCommandEvent &event) {
+void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) &&
 		(event.GetEventType() ==
-			EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED)); // ensures that the status check is safe
+			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED)); // ensures that the status check is safe
 
 	this->RefreshFlags(false);
 
-	if (FlagListManager::FlagListBoxStatus(event.GetInt()) == FlagListManager::FLAGLISTBOX_OK) {
+	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
+		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		CmdLineManager::GenerateCmdLineChanged();
 	}
 }

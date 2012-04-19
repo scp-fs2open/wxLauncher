@@ -21,11 +21,11 @@
 
 #include <wx/wx.h>
 
-/** Flag list box's draw status has changed.
- The event's int value indicates the flag list box's FlagListBoxStatus. */
-DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_DRAW_STATUS_CHANGED, wxID_ANY);
+/** Flag file processing status has changed.
+ The event's int value indicates the FlagFileProcessingStatus. */
+DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
 
-WX_DECLARE_LIST(wxEvtHandler, FlagListEventHandlers);
+WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
 
 class FlagListManager {
 public:
@@ -36,20 +36,20 @@ public:
 
 	~FlagListManager();
 
-	enum FlagListBoxStatus {
-		FLAGLISTBOX_OK = 0,
-		FLAGLISTBOX_WAITING,
-		FLAGLISTBOX_ERROR
+	enum FlagFileProcessingStatus {
+		FLAG_FILE_PROCESSING_OK = 0,
+		FLAG_FILE_PROCESSING_WAITING,
+		FLAG_FILE_PROCESSING_ERROR
 	};
 
-	void RegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
-	void UnRegisterFlagListBoxDrawStatusChanged(wxEvtHandler *handler);
-	void GenerateFlagListBoxDrawStatusChanged(const FlagListBoxStatus& status);
+	void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
 private:
 	FlagListManager();
 	
 	static FlagListManager* flagListManager;
 	
-	FlagListEventHandlers flagListBoxDrawStatusChangedHandlers;
+	FlagFileProcessingEventHandlers flagFileProcessingStatusChangedHandlers;
 };
 #endif

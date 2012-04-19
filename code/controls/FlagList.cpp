@@ -371,17 +371,17 @@ FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
 void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
 	this->drawStatus = drawStatus;
 	wxLogDebug(_T("current flag list box draw status: %d"), drawStatus);
-	FlagListManager::GetFlagListManager()->GenerateFlagListBoxDrawStatusChanged(this->GetFlagListBoxStatus());
+	FlagListManager::GetFlagListManager()->GenerateFlagFileProcessingStatusChanged(this->GetFlagFileProcessingStatus());
 }
 
-FlagListManager::FlagListBoxStatus FlagListBox::GetFlagListBoxStatus() const {
+FlagListManager::FlagFileProcessingStatus FlagListBox::GetFlagFileProcessingStatus() const {
 	const DrawStatus& drawStatus = this->GetDrawStatus();
 	if (drawStatus == DRAW_OK) {
-		return FlagListManager::FLAGLISTBOX_OK;
+		return FlagListManager::FLAG_FILE_PROCESSING_OK;
 	} else if (drawStatus == INITIAL_STATUS || drawStatus == WAITING_FOR_FLAGFILE) {
-		return FlagListManager::FLAGLISTBOX_WAITING;
+		return FlagListManager::FLAG_FILE_PROCESSING_WAITING;
 	} else {
-		return FlagListManager::FLAGLISTBOX_ERROR;
+		return FlagListManager::FLAG_FILE_PROCESSING_ERROR;
 	}
 }
 
