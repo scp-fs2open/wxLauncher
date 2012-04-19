@@ -126,7 +126,7 @@ private:
 
 	void SetDrawStatus(const DrawStatus& drawStatus);
 	inline const DrawStatus& GetDrawStatus() const { return this->drawStatus; }
-	FlagListManager::FlagListBoxStatus GetFlagListBoxStatus() const;
+	FlagListManager::FlagFileProcessingStatus GetFlagFileProcessingStatus() const;
 
 	wxArrayString easyflags;
 	FlagSetsList flagSets;
