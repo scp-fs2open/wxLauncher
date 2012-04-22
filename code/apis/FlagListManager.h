@@ -23,118 +23,14 @@
 #include <wx/filename.h>
 #include <wx/process.h>
 
+#include "datastructures/FlagFileData.h"
+
 /** Flag file processing status has changed.
  The event's int value indicates the FlagFileProcessingStatus, and
  its extraLong value indicates the item count for the flag list. */
 DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
 
 WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
-
-// FIXME temporarily using "My" prefix to avoid name clashes with items in FlagList
-// TODO remove "My" prefix once refactoring is complete
-
-class MyFlagListCheckBox: public wxCheckBox {
-public:
-	MyFlagListCheckBox(wxWindow* parent,
-		const wxString& label,
-		const wxString& flagString,
-		int flagIndex);
-	void OnClicked(wxCommandEvent &event);
-private:
-	wxString flagString;
-	int flagIndex; // index is needed so that proxy can keep flags ordered in flag list order
-};
-
-class MyFlag {
-public:
-	MyFlag();
-	wxString flagString;
-	wxString shortDescription;
-	wxString fsoCatagory;
-	wxString webURL;
-	bool isRecomendedFlag;
-	wxUint32 easyEnable;
-	wxUint32 easyDisable;
-	MyFlagListCheckBox* checkbox;
-	wxSizer* checkboxSizer;
-	
-	int GetFlagIndex() const { return this->flagIndex; }
-private:
-	int flagIndex; // private because the proxy depends on it being correct, so nothing should mess it up
-	static int flagIndexCounter;
-};
-
-WX_DECLARE_LIST(MyFlag, MyFlagList);
-
-/** Contains all of the flags in a category. */
-class MyFlagCategory {
-public:
-	wxString categoryName;
-	MyFlagList flags;
-};
-
-WX_DECLARE_LIST(MyFlagCategory, MyFlagCategoryList);
-
-class MyFlagSet {
-public:
-	MyFlagSet(wxString name);
-	wxString name;
-	wxArrayString flagsToEnable;
-	wxArrayString flagsToDisable;
-};
-
-WX_DECLARE_LIST(MyFlagSet, MyFlagSetsList);
-
-/** Flag data needed by the profile proxy. */
-class ProxyFlagDataItem {
-public:
-	ProxyFlagDataItem(const wxString& flagString, int flagIndex);
-	const wxString& GetFlagString() const { return flagString; }
-	int getFlagIndex() const { return flagIndex; }
-private:
-	wxString flagString;
-	int flagIndex;
-};
-
-WX_DECLARE_LIST(ProxyFlagDataItem, ProxyFlagData);
-
-/** The data extracted from the flag file. */
-class FlagFileData {
-public:
-	FlagFileData();
-	~FlagFileData();
-	
-	/** Adds the name of an "easy setup" flag set. */
-	void AddEasyFlag(const wxString& easyFlag);
-	
-	void AddFlag(MyFlag* flag);
-	
-	/** Generates the "easy setup" flag sets.
-	 This function requires that at least one "easy setup" name has been added.
-	 Until support for the new mod.ini is added, this function should be called exactly once. */
-	void GenerateFlagSets();
-	
-	/** Generates flag checkboxes for display. verticalOffset is the distance in pixels 
-	 between the top of the checkbox and the top of the flag's entry in the FlagListBox entry. */
-	void GenerateCheckBoxes(wxWindow* parent, const int verticalOffset);
-	
-	/** Creates a version of the data suitable for use by the profile proxy. */
-	ProxyFlagData* GenerateProxyFlagData() const;
-	
-	/** Returns the total number of flags and flag category headers. */
-	size_t GetItemCount() const;
-	
-	MyFlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
-	MyFlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
-
-	MyFlagCategoryList::iterator end() { return this->allSupportedFlagsByCategory.end(); }
-	MyFlagCategoryList::const_iterator end() const { return this->allSupportedFlagsByCategory.end(); }
-private:
-	wxArrayString easyFlags;
-	MyFlagSetsList flagSets;
-	MyFlagCategoryList allSupportedFlagsByCategory;
-	bool isProxyDataGenerated;
-};
 
 WX_DECLARE_OBJARRAY(wxFileName, MyFlagFileArray);
 
