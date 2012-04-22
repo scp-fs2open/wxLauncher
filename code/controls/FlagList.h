@@ -26,6 +26,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/FlagListManager.h"
 #include "apis/SkinManager.h"
 
+/** Flag list box is ready for use. */
+DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY, wxID_ANY);
+
+WX_DECLARE_LIST(wxEvtHandler, FlagListBoxReadyEventHandlers);
+
 class FlagListCheckBox: public wxCheckBox {
 public:
 	FlagListCheckBox(wxWindow* parent, wxWindowID id, const wxString& label, const wxString& flagString);
@@ -79,6 +84,9 @@ public:
 	FlagListBox(wxWindow* parent, SkinSystem* skin);
 	~FlagListBox();
 	void Initialize();
+	
+	void RegisterFlagListBoxReady(wxEvtHandler *handler);
+	void UnRegisterFlagListBoxReady(wxEvtHandler *handler);
 
 	virtual void OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual void OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
@@ -104,6 +112,10 @@ public:
 	inline bool IsDrawOK() const { return (this->drawStatus == DRAW_OK); }
 
 private:
+	FlagListBoxReadyEventHandlers flagListBoxReadyHandlers;
+	void GenerateFlagListBoxReady();
+	bool isReadyEventGenerated;
+	
 	SkinSystem* skin;
 	enum DrawStatus {
 		DRAW_OK = 0,
