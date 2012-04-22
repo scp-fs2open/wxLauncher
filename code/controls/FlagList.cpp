@@ -26,6 +26,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h"
 
+DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
+
+#include <wx/listimpl.cpp> // required magic incantation
+WX_DEFINE_LIST(FlagListBoxReadyEventHandlers);
+
+void FlagListBox::RegisterFlagListBoxReady(wxEvtHandler *handler) {
+	this->flagListBoxReadyHandlers.Append(handler);
+}
+
+void FlagListBox::UnRegisterFlagListBoxReady(wxEvtHandler *handler) {
+	this->flagListBoxReadyHandlers.DeleteObject(handler);
+}
+
+void FlagListBox::GenerateFlagListBoxReady() {
+	wxASSERT_MSG(!this->isReadyEventGenerated,
+		_T("GenerateFlagListBoxReady() was called a second time."));
+	
+	wxCommandEvent event(EVT_FLAG_LIST_BOX_READY, wxID_NONE);
+	
+	wxLogDebug(_T("Generating EVT_FLAG_LIST_BOX_READY event"));
+	for (FlagListBoxReadyEventHandlers::iterator
+		 iter = this->flagListBoxReadyHandlers.begin(),
+		 end = this->flagListBoxReadyHandlers.end(); iter != end; ++iter) {
+		wxEvtHandler* current = *iter;
+		current->AddPendingEvent(event);
+		wxLogDebug(_T(" Sent EVT_FLAG_LIST_BOX_READY event to %p"), &(*iter));
+	}
+	
+	this->isReadyEventGenerated = true;
+}
+
 struct FlagInfo {
 	wxString flag;
 	wxString category;
@@ -85,7 +116,7 @@ const int VERTICAL_OFFSET_MULTIPLIER = 1; // in pixels
 #endif
 
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
-:wxVListBox(parent,ID_FLAGLISTBOX) {
+:wxVListBox(parent,ID_FLAGLISTBOX), isReadyEventGenerated(false) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 	this->SetDrawStatus(INITIAL_STATUS);
