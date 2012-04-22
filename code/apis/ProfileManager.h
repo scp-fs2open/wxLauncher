@@ -114,7 +114,9 @@ private:
 	static bool isInitialized;
 	wxFileConfig* currentProfile;
 	wxString currentProfileName;
+	
 	bool CreateNewProfile(wxString newName);
+	static wxString GenerateNewProfileFileName();
 
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
