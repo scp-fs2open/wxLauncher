@@ -16,6 +16,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <algorithm>
+#include <vector>
+
 #include <wx/wx.h>
 #include <wx/fileconf.h>
 #include <wx/stdpaths.h>
@@ -269,8 +272,10 @@ bool ProMan::CreateNewProfile(wxString newName) {
 	wxFileName profile;
 	profile.Assign(
 		GET_PROFILE_STORAGEFOLDER(),
-		wxString::Format(_T("pro%05d.ini"), this->profiles.size()));
+		this->GenerateNewProfileFileName());
 
+	wxLogInfo(_T("New profile will be written to %s"), profile.GetFullPath().c_str());
+	
 	wxASSERT_MSG( profile.IsOk(), _T("Profile filename is invalid"));
 
 	if ( !wxFileName::DirExists(profile.GetPath())
@@ -288,6 +293,50 @@ bool ProMan::CreateNewProfile(wxString newName) {
 
 	this->profiles[newName] = config;
 	return true;
+}
+
+/** Generates a filename for a new profile, where the name is of the form
+ pro#####.ini with ##### being the least 5-digit number not yet taken. */
+wxString ProMan::GenerateNewProfileFileName() {
+	wxArrayString profileFiles;
+	wxDir::GetAllFiles(GET_PROFILE_STORAGEFOLDER(), &profileFiles, _T("pro*.ini"), wxDIR_FILES);
+	
+	long l;
+	
+	std::vector<long> proNums;
+	
+	for (int i = 0, n = profileFiles.GetCount(); i < n; ++i) {
+		profileFiles[i] = profileFiles[i].AfterLast(_T('o')).BeforeLast(_T('.'));
+		profileFiles[i].ToLong(&l);
+		proNums.push_back(l);
+	}
+	
+	// just in case they're not already in sorted order
+	sort(proNums.begin(), proNums.end());
+	
+	proNums.insert(proNums.begin(), -1); // dummy value that allows for easily checking first element
+	
+	long proIndex = 0;
+	
+	int i;
+	const int n = proNums.size();
+	
+	for (i = 1; i < n; ++i) {
+		if (proNums[i] - proNums[i-1] > 1) { // if there's a gap in the numbering, try to fill it
+			proIndex = proNums[i-1] + 1;
+			break;
+		}
+	}
+	
+	if (i == n) { // there are no gaps, so increment from the last element
+		proIndex = proNums[n-1] + 1;
+	}
+
+	wxLogDebug(_T("new profile number: %ld"), proIndex);
+	
+	wxASSERT(proIndex <= 99999); // the maximum possible index given a 5-digit number
+	
+	return wxString::Format(_T("pro%05d.ini"), static_cast<int>(proIndex));
 }
 
 // global profile access functions
