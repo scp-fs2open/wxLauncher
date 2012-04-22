@@ -186,6 +186,8 @@ set(GLOBAL_CODE_FILES
 source_group(Global FILES ${GLOBAL_CODE_FILES})
 set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FlagInfo.cpp
+  code/datastructures/FlagFileData.h
+  code/datastructures/FlagFileData.cpp
   code/datastructures/FSOExecutable.h
   code/datastructures/FSOExecutable.cpp
   )
