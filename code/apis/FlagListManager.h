@@ -53,9 +53,6 @@ public:
 	void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	
-	// TODO move this function to private once the refactoring is complete
-	void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
-	
 	void BeginFlagFileProcessing();
 	
 	/** Returns true when the flag file processing has succeeded, false otherwise. */
@@ -79,6 +76,8 @@ private:
 	static FlagListManager* flagListManager;
 	
 	FlagFileProcessingEventHandlers flagFileProcessingStatusChangedHandlers;
+	
+	void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
 	
 	/** ProcessingStatus is a low-level description of the status of flag file processing. */
 	enum ProcessingStatus {
