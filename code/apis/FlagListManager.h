@@ -32,7 +32,7 @@ DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
 
 WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
 
-WX_DECLARE_OBJARRAY(wxFileName, MyFlagFileArray);
+WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 
 class FlagListManager {
 public:
@@ -109,10 +109,10 @@ private:
 	
 	class FlagProcess: public wxProcess {
 	public:
-		FlagProcess(MyFlagFileArray flagFileLocations);
+		FlagProcess(FlagFileArray flagFileLocations);
 		virtual void OnTerminate(int pid, int status);
 	private:
-		MyFlagFileArray flagFileLocations;
+		FlagFileArray flagFileLocations;
 	};
 };
 #endif

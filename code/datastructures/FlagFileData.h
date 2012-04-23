@@ -19,12 +19,9 @@
 #ifndef FLAGFILEDATA_H
 #define FLAGFILEDATA_H
 
-// FIXME temporarily using "My" prefix to avoid name clashes with items in FlagList
-// TODO remove "My" prefix once refactoring is complete
-
-class MyFlagListCheckBox: public wxCheckBox {
+class FlagListCheckBox: public wxCheckBox {
 public:
-	MyFlagListCheckBox(wxWindow* parent,
+	FlagListCheckBox(wxWindow* parent,
 		const wxString& label,
 		const wxString& flagString,
 		int flagIndex);
@@ -34,9 +31,9 @@ private:
 	int flagIndex; // index is needed so that proxy can keep flags ordered in flag list order
 };
 
-class MyFlag {
+class Flag {
 public:
-	MyFlag();
+	Flag();
 	wxString flagString;
 	wxString shortDescription;
 	wxString fsoCatagory;
@@ -44,7 +41,7 @@ public:
 	bool isRecomendedFlag;
 	wxUint32 easyEnable;
 	wxUint32 easyDisable;
-	MyFlagListCheckBox* checkbox;
+	FlagListCheckBox* checkbox;
 	wxSizer* checkboxSizer;
 	
 	int GetFlagIndex() const { return this->flagIndex; }
@@ -53,26 +50,26 @@ private:
 	static int flagIndexCounter;
 };
 
-WX_DECLARE_LIST(MyFlag, MyFlagList);
+WX_DECLARE_LIST(Flag, FlagList);
 
 /** Contains all of the flags in a category. */
-class MyFlagCategory {
+class FlagCategory {
 public:
 	wxString categoryName;
-	MyFlagList flags;
+	FlagList flags;
 };
 
-WX_DECLARE_LIST(MyFlagCategory, MyFlagCategoryList);
+WX_DECLARE_LIST(FlagCategory, FlagCategoryList);
 
-class MyFlagSet {
+class FlagSet {
 public:
-	MyFlagSet(wxString name);
+	FlagSet(wxString name);
 	wxString name;
 	wxArrayString flagsToEnable;
 	wxArrayString flagsToDisable;
 };
 
-WX_DECLARE_LIST(MyFlagSet, MyFlagSetsList);
+WX_DECLARE_LIST(FlagSet, FlagSetsList);
 
 /** Flag data needed by the profile proxy. */
 class ProxyFlagDataItem {
@@ -96,7 +93,7 @@ public:
 	/** Adds the name of an "easy setup" flag set. */
 	void AddEasyFlag(const wxString& easyFlag);
 	
-	void AddFlag(MyFlag* flag);
+	void AddFlag(Flag* flag);
 	
 	/** Generates the "easy setup" flag sets.
 	 This function requires that at least one "easy setup" name has been added.
@@ -113,16 +110,23 @@ public:
 	/** Returns the total number of flags and flag category headers. */
 	size_t GetItemCount() const;
 	
-	MyFlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
-	MyFlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
+	FlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
+	FlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
 	
-	MyFlagCategoryList::iterator end() { return this->allSupportedFlagsByCategory.end(); }
-	MyFlagCategoryList::const_iterator end() const { return this->allSupportedFlagsByCategory.end(); }
+	FlagCategoryList::iterator end() { return this->allSupportedFlagsByCategory.end(); }
+	FlagCategoryList::const_iterator end() const { return this->allSupportedFlagsByCategory.end(); }
+	
+	FlagSetsList::const_iterator FlagSetsBegin() const { return this->flagSets.begin(); }
+	FlagSetsList::const_iterator FlagSetsEnd() const { return this->flagSets.end(); }
+	
+	bool IsFlagSetsEmpty() const { return this->flagSets.IsEmpty(); }
+	
 private:
 	wxArrayString easyFlags;
-	MyFlagSetsList flagSets;
-	MyFlagCategoryList allSupportedFlagsByCategory;
+	FlagSetsList flagSets;
+	FlagCategoryList allSupportedFlagsByCategory;
 	bool isProxyDataGenerated;
+	bool areCheckBoxesGenerated;
 };
 
 #endif

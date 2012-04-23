@@ -23,26 +23,26 @@
 
 #include "global/MemoryDebugging.h"
 
-int MyFlag::flagIndexCounter = 0;
+int Flag::flagIndexCounter = 0;
 
-MyFlag::MyFlag()
+Flag::Flag()
 : checkbox(NULL), checkboxSizer(NULL), flagIndex(flagIndexCounter++) {
 }
 
 #include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(MyFlagList);
+WX_DEFINE_LIST(FlagList);
 
 #include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(MyFlagCategoryList);
+WX_DEFINE_LIST(FlagCategoryList);
 
-MyFlagSet::MyFlagSet(wxString name)
+FlagSet::FlagSet(wxString name)
 : name(name) {
 }
 
 #include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(MyFlagSetsList);
+WX_DEFINE_LIST(FlagSetsList);
 
-MyFlagListCheckBox::MyFlagListCheckBox(
+FlagListCheckBox::FlagListCheckBox(
 	wxWindow* parent,
 	const wxString& label,
 	const wxString& flagString,
@@ -50,7 +50,7 @@ MyFlagListCheckBox::MyFlagListCheckBox(
 : wxCheckBox(parent, wxID_ANY, label), flagString(flagString), flagIndex(flagIndex) {
 }
 
-void MyFlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
+void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
 	// FIXME the following line doesn't work yet because profile proxy isn't implemented
 	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
 	wxLogDebug(_T("flag %s with index %d is now %s"), flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
@@ -65,14 +65,14 @@ ProxyFlagDataItem::ProxyFlagDataItem(const wxString& flagString, int flagIndex)
 }
 
 FlagFileData::FlagFileData()
-: isProxyDataGenerated(false) {
+: isProxyDataGenerated(false), areCheckBoxesGenerated(false) {
 }
 
 FlagFileData::~FlagFileData() {
-	for ( MyFlagCategoryList::iterator catIter = this->begin(); catIter != this->end(); catIter++ ) {
-		MyFlagCategory* category = *catIter;
-		for ( MyFlagList::iterator iter = category->flags.begin(); iter != category->flags.end(); iter++ ) {
-			MyFlag *flag = *iter;
+	for ( FlagCategoryList::iterator catIter = this->begin(); catIter != this->end(); catIter++ ) {
+		FlagCategory* category = *catIter;
+		for ( FlagList::iterator iter = category->flags.begin(); iter != category->flags.end(); iter++ ) {
+			Flag *flag = *iter;
 			if ( flag->checkboxSizer != NULL ) {
 				delete flag->checkboxSizer;
 				flag->checkboxSizer = NULL;
@@ -85,7 +85,7 @@ FlagFileData::~FlagFileData() {
 	}
 	this->allSupportedFlagsByCategory.Clear();
 	
-	MyFlagSetsList::iterator flagSetIter = this->flagSets.begin();
+	FlagSetsList::iterator flagSetIter = this->flagSets.begin();
 	while ( flagSetIter != this->flagSets.end() ) {
 		delete *flagSetIter;
 		flagSetIter++;
@@ -101,10 +101,10 @@ void FlagFileData::AddEasyFlag(const wxString& easyFlag) {
 	this->easyFlags.Add(easyFlag);
 }
 
-void FlagFileData::AddFlag(MyFlag* flag) {
+void FlagFileData::AddFlag(Flag* flag) {
 	wxASSERT(flag != NULL);
 	
-	MyFlagCategoryList::iterator iter;
+	FlagCategoryList::iterator iter;
 	for (iter = this->begin(); iter != this->end(); iter++ ) {
 		if ( flag->fsoCatagory == (*iter)->categoryName ) {
 			break;
@@ -112,10 +112,10 @@ void FlagFileData::AddFlag(MyFlag* flag) {
 	}
 	if ( iter == this->end() ) {
 		// did not find the category, so add it
-		MyFlagCategory* flagCat = new MyFlagCategory();
+		FlagCategory* flagCat = new FlagCategory();
 		flagCat->categoryName = flag->fsoCatagory;
 		
-		MyFlag* headFlag = new MyFlag();
+		Flag* headFlag = new Flag();
 		headFlag->fsoCatagory = flag->fsoCatagory;
 		headFlag->checkbox = NULL;
 		headFlag->isRecomendedFlag = false;
@@ -137,7 +137,7 @@ void FlagFileData::GenerateFlagSets() {
 	// \todo include the flag sets of the mod.inis as well
 	
 	// custom
-	this->flagSets.Append(new MyFlagSet(_("Custom")));
+	this->flagSets.Append(new FlagSet(_("Custom")));
 	
 	// the easy flags.
 	wxUint32 counter = 0;
@@ -148,12 +148,12 @@ void FlagFileData::GenerateFlagSets() {
 		if ( easyFlag.StartsWith(_T("Custom")) ) {
 			// do nothing, we already have a custom
 		} else {
-			MyFlagSet* flagSet = new MyFlagSet(easyFlag);
-			for (MyFlagCategoryList::const_iterator catIter = this->begin(); catIter != this->end(); catIter++) {
-				for (MyFlagList::const_iterator flagIter = (*catIter)->flags.begin();
+			FlagSet* flagSet = new FlagSet(easyFlag);
+			for (FlagCategoryList::const_iterator catIter = this->begin(); catIter != this->end(); catIter++) {
+				for (FlagList::const_iterator flagIter = (*catIter)->flags.begin();
 					 flagIter != (*catIter)->flags.end(); flagIter++) {
 					
-					MyFlag* flag = *flagIter;
+					Flag* flag = *flagIter;
 					
 					if ( !flag->flagString.IsEmpty()
 						&& (flag->easyEnable & counter) > 0 ) {
@@ -187,23 +187,32 @@ void FlagFileData::GenerateCheckBoxes(wxWindow* parent, const int verticalOffset
 	wxASSERT(parent != NULL);
 	wxASSERT(!this->allSupportedFlagsByCategory.IsEmpty());
 	wxASSERT(verticalOffset >= 0);
+	wxASSERT_MSG(!this->areCheckBoxesGenerated,
+		_T("Attempted to generate checkboxes a second time."));
 	
-	for (MyFlagCategoryList::iterator catIter = this->begin(); catIter != this->end(); catIter++) {
-		for (MyFlagList::iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {
-			MyFlag* flag = *flagIter;
-			flag->checkbox = new MyFlagListCheckBox(parent, wxEmptyString, flag->flagString, flag->GetFlagIndex());
+	for (FlagCategoryList::iterator catIter = this->begin(); catIter != this->end(); catIter++) {
+		for (FlagList::iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {			
+			Flag* flag = *flagIter;
+			
+			if (flag->flagString.IsEmpty()) { // don't add a checkbox for flags serving as category headers
+				continue;
+			}
+			
+			flag->checkbox = new FlagListCheckBox(parent, wxEmptyString, flag->flagString, flag->GetFlagIndex());
 			flag->checkbox->Hide();
 			
 			flag->checkbox->Connect(
 				flag->checkbox->GetId(),
 				wxEVT_COMMAND_CHECKBOX_CLICKED,
-				wxCommandEventHandler(MyFlagListCheckBox::OnClicked));
+				wxCommandEventHandler(FlagListCheckBox::OnClicked));
 			
 			flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
 			flag->checkboxSizer->AddSpacer(verticalOffset);
 			flag->checkboxSizer->Add(flag->checkbox);
 		}
 	}
+	
+	this->areCheckBoxesGenerated = true;
 }
 
 ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {
@@ -213,9 +222,9 @@ ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {
 	
 	ProxyFlagData* proxyData = new ProxyFlagData();
 	
-	for (MyFlagCategoryList::const_iterator catIter = this->begin(); catIter != this->end(); catIter++) {
-		for (MyFlagList::const_iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {
-			MyFlag* flag = *flagIter;
+	for (FlagCategoryList::const_iterator catIter = this->begin(); catIter != this->end(); catIter++) {
+		for (FlagList::const_iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {
+			Flag* flag = *flagIter;
 			
 			proxyData->Append(new ProxyFlagDataItem(flag->flagString, flag->GetFlagIndex()));
 		}
@@ -230,7 +239,7 @@ ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {
 size_t FlagFileData::GetItemCount() const {
 	size_t itemCount = 0;
 	
-	for (MyFlagCategoryList::const_iterator iter = this->begin(); iter != this->end(); iter++) {
+	for (FlagCategoryList::const_iterator iter = this->begin(); iter != this->end(); iter++) {
 		itemCount += (*iter)->flags.GetCount();
 	}
 	

@@ -39,9 +39,9 @@ const size_t WIKI_LINK_SIZER_INDEX = 1;
 const size_t TOP_RIGHT_SIZER_INDEX = 1;
 const size_t BOTTOM_SIZER_INDEX = 1;
 
-AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
+AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY), flagListBox(NULL) {
+	wxASSERT(skin != NULL);
 	this->skin = skin;
-	this->flagListBox = NULL;
 
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
@@ -64,6 +64,7 @@ EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentPr
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnCustomFlagsChanged)
+EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_READY, AdvSettingsPage::OnFlagListBoxReady)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
@@ -86,6 +87,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 
 	// top left components
 	this->flagListBox = new FlagListBox(this, this->skin);
+	this->flagListBox->RegisterFlagListBoxReady(this);
+	FlagListManager::GetFlagListManager()->BeginFlagFileProcessing();
 
 #if 0 // doesn't do anything
 	wxHtmlWindow* description = new wxHtmlWindow(this);
@@ -203,22 +206,34 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) &&
 		(event.GetEventType() ==
-			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED)); // ensures that the status check is safe
-
+			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED));
+	
 	this->RefreshFlags(false);
-
+	
 	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
 		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
+		FlagFileData* flagData = FlagListManager::GetFlagListManager()->GetFlagFileData();
+		wxCHECK_RET(flagData != NULL,
+			_T("Flag file processing succeeded but could not retrieve extracted data."));
+		this->flagListBox->AcceptFlagData(flagData);
 		CmdLineManager::GenerateCmdLineChanged();
+	} else {
+		size_t itemCount = static_cast<size_t>(event.GetExtraLong());
+		wxLogDebug(_T("processing not OK, flag list item count to be set to %u."), itemCount);
+		this->flagListBox->SetItemCount(itemCount);
 	}
 }
 
 void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
-	wxASSERT((this->flagListBox != NULL) &&
-		this->flagListBox->IsDrawOK());
+	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
 	
 	this->RefreshFlags(false);
 	CmdLineManager::GenerateCmdLineChanged();
+}
+
+void AdvSettingsPage::OnFlagListBoxReady(wxCommandEvent &WXUNUSED(event)) {
+	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
+	this->RefreshFlags(false);
 }
 
 void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
@@ -239,34 +254,36 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 	wxString flagLine, customFlags, lightingPreset;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
 
-	if (resetFlagList) {
+	if (resetFlagList && this->flagListBox->IsReady()) {
 		this->flagListBox->ResetFlags();
 	}
 
-	if (this->flagListBox->IsDrawOK()) {
-		wxStringTokenizer tokenizer(flagLine, _T(" "));
-		while(tokenizer.HasMoreTokens()) {
-			wxString tok = tokenizer.GetNextToken();
-			if (tok == LightingPresets::GetFlagLineSeparator()) {
-				lightingPreset.Append(tokenizer.GetNextToken());
-				while (tokenizer.HasMoreTokens()) {
-					lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+	if (FlagListManager::GetFlagListManager()->IsProcessingOK()) {
+		if (this->flagListBox->IsReady()) {
+			wxStringTokenizer tokenizer(flagLine, _T(" "));
+			while(tokenizer.HasMoreTokens()) {
+				wxString tok = tokenizer.GetNextToken();
+				if (tok == LightingPresets::GetFlagLineSeparator()) {
+					lightingPreset.Append(tokenizer.GetNextToken());
+					while (tokenizer.HasMoreTokens()) {
+						lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+					}
+					break;
+				} else if ( this->flagListBox->SetFlag(tok, true) ) {
+					continue;
+				} else {
+					if (!customFlags.IsEmpty()) {
+						customFlags += _T(" ");
+					}
+					customFlags += tok;
 				}
-				break;
-			} else if ( this->flagListBox->SetFlag(tok, true) ) {
-				continue;
-			} else {
+			}
+			if (!lightingPreset.IsEmpty()) {
 				if (!customFlags.IsEmpty()) {
-					customFlags += _T(" ");
+					lightingPreset.Append(_T(" "));
 				}
-				customFlags += tok;
+				customFlags.Prepend(lightingPreset);
 			}
-		}
-		if (!lightingPreset.IsEmpty()) {
-			if (!customFlags.IsEmpty()) {
-				lightingPreset.Append(_T(" "));
-			}
-			customFlags.Prepend(lightingPreset);
 		}
 		topSizer->Show(TOP_RIGHT_SIZER_INDEX);
 		topLeftSizer->Show(WIKI_LINK_SIZER_INDEX);
@@ -284,7 +301,7 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
-	if ( (this->flagListBox == NULL) || !this->flagListBox->IsDrawOK() ) {
+	if ( (this->flagListBox == NULL) || !this->flagListBox->IsReady() ) {
 		// The control I need to update does not exist, do nothing
 		return;
 	}
