@@ -17,7 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "generated/configure_launcher.h"
-#include "controls/FlagList.h"
+#include "controls/FlagListBox.h"
 //#include "apis/ProfileProxy.h" // TODO uncomment once proxy is ready
 #include "global/ids.h"
 

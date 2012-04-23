@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef FLAGLIST_H
-#define FLAGLIST_H
+#ifndef FLAGLISTBOX_H
+#define FLAGLISTBOX_H
 
 #include <wx/wx.h>
 #include <wx/vlbox.h>
