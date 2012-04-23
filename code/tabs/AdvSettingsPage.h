@@ -41,6 +41,7 @@ public:
 	void OnSelectFlagSet(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
 	void OnCustomFlagsChanged(wxCommandEvent& event);
+	void OnFlagListBoxReady(wxCommandEvent& event);
 	void OnCurrentProfileChanged(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()

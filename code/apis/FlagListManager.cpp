@@ -16,6 +16,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include "generated/configure_launcher.h"
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "datastructures/FSOExecutable.h"
@@ -35,7 +36,7 @@ DEFINE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
 WX_DEFINE_LIST(FlagFileProcessingEventHandlers);
 
 #include <wx/arrimpl.cpp> // Magic Incantation
-WX_DEFINE_OBJARRAY(MyFlagFileArray);
+WX_DEFINE_OBJARRAY(FlagFileArray);
 
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
 	this->flagFileProcessingStatusChangedHandlers.Append(handler);
@@ -170,7 +171,7 @@ void FlagListManager::BeginFlagFileProcessing() {
 		return;
 	}
 	
-	MyFlagFileArray flagFileLocations;
+	FlagFileArray flagFileLocations;
 	flagFileLocations.Add(wxFileName(tcPath, _T("flags.lch")));
 	flagFileLocations.Add(wxFileName(tempExecutionLocation.GetFullPath(), _T("flags.lch")));
 	
@@ -396,7 +397,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		easy_catagory[sizeof(easy_catagory)-1] = _T('\0');
 		web_url[sizeof(web_url)-1] = _T('\0');
 		
-		MyFlag* flag = new MyFlag();
+		Flag* flag = new Flag();
 		
 		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
 		flag->shortDescription = wxString(description, wxConvUTF8, strlen(description));
@@ -449,7 +450,7 @@ FlagListManager::FlagFileProcessingStatus FlagListManager::GetFlagFileProcessing
 	}
 }
 
-FlagListManager::FlagProcess::FlagProcess(MyFlagFileArray flagFileLocations)
+FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
 : flagFileLocations(flagFileLocations) {
 }
 

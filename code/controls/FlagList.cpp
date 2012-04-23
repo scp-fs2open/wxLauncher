@@ -18,9 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 #include "controls/FlagList.h"
-#include "datastructures/FSOExecutable.h"
-#include "tabs/AdvSettingsPage.h"
-#include "apis/ProfileManager.h"
 //#include "apis/ProfileProxy.h" // TODO uncomment once proxy is ready
 #include "global/ids.h"
 
@@ -66,46 +63,6 @@ struct FlagInfo {
 
 #define WIDTH_OF_CHECKBOX 16
 
-int FlagListCheckBox::flagIndexCounter = 0;
-
-FlagListCheckBox::FlagListCheckBox(
-	wxWindow* parent,
-	wxWindowID id,
-	const wxString& label,
-	const wxString& flagString)
-: wxCheckBox(parent, id, label), flagString(flagString), flagIndex(flagIndexCounter++) {
-}
-	
-void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
-	// FIXME the following line doesn't work yet because profile proxy isn't implemented
-//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
-	wxLogDebug(_T("flag %s with index %d is now %s"), flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
-
-	// FIXME temp until the proxy is working
-	wxCommandEvent fakeEvent;
-	dynamic_cast<AdvSettingsPage*>(this->GetParent()->GetParent())->OnNeedUpdateCommandLine(fakeEvent);
-}
-
-Flag::Flag()
-: checkbox(NULL), checkboxSizer(NULL) {
-}
-
-#include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(FlagList);
-
-#include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(FlagCategoryList);
-
-FlagSet::FlagSet(wxString Name) {
-	this->Name = Name;
-}
-
-#include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(FlagSetsList);
-
-#include <wx/arrimpl.cpp> // Magic Incantation
-WX_DEFINE_OBJARRAY(FlagFileArray);
-
 // allows flag checkbox and text to be lined up, while avoiding
 // visual collisions with flag category lines
 const int ITEM_VERTICAL_OFFSET = 2; // in pixels
@@ -116,340 +73,44 @@ const int VERTICAL_OFFSET_MULTIPLIER = 1; // in pixels
 #endif
 
 FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
-:wxVListBox(parent,ID_FLAGLISTBOX), isReadyEventGenerated(false) {
+: wxVListBox(parent,ID_FLAGLISTBOX),
+  isReadyEventGenerated(false),
+  isReady(false),
+  flagData(NULL) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
-	this->SetDrawStatus(INITIAL_STATUS);
+	
 	this->errorText =
-		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-
-	this->Initialize();
-
-	if ( !this->IsDrawOK() ) {
-		this->SetItemCount(1); // for the errorText
-	}
+		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+			wxDefaultSize, wxALIGN_CENTER);
 }
 
-void FlagListBox::Initialize() {
-	wxString tcPath, exeName;
-	wxFileName exeFilename;
-
-	wxLogDebug(_T("Initializing FlagList"));
-
-	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
-		this->SetDrawStatus(MISSING_TC);
-		return;
-	}
-
-	if (!wxFileName::DirExists(tcPath)) {
-		this->SetDrawStatus(NONEXISTENT_TC);
-		return;
-	}
+void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
+	wxCHECK_RET(flagData != NULL, _T("AcceptFlagData(): flagData is null."));
+	wxCHECK_RET(this->flagData == NULL,
+		_T("AcceptFlagData(): flag list box given flag data twice."));
 	
-	if (!FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString))) {
-		this->SetDrawStatus(INVALID_TC);
-		return;
-	}
+	this->flagData = flagData;
+	this->flagData->GenerateCheckBoxes(this, ITEM_VERTICAL_OFFSET);
+	this->SetItemCount(flagData->GetItemCount());
 
-	if ( !ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName)) {
-		this->SetDrawStatus(MISSING_EXE);
-		return;
-	}
-
-#if IS_APPLE  // needed because on OSX exeName is a relative path from TC root dir
-	exeFilename.Assign(tcPath + wxFileName::GetPathSeparator() + exeName);
-#else
-	exeFilename.Assign(tcPath, exeName);
-#endif
-
-	wxLogDebug(_T("exeName: ") + exeName);
-	wxLogDebug(_T("exeFilename: ") + exeFilename.GetFullPath());
-	
-	if (!exeFilename.FileExists()) {
-		this->SetDrawStatus(INVALID_BINARY);
-		return;
-	}
-	// Make sure that the directory that I am going to change to exists
-	wxFileName tempExecutionLocation;
-	tempExecutionLocation.AssignDir(GET_PROFILE_STORAGEFOLDER());
-	tempExecutionLocation.AppendDir(_T("temp_flag_folder"));
-	if ( !tempExecutionLocation.DirExists() 
-		&& !tempExecutionLocation.Mkdir() ) {
-
-		wxLogError(_T("Unable to create flag folder at %s"),
-			tempExecutionLocation.GetFullPath().c_str());
-		this->SetDrawStatus(CANNOT_CREATE_FLAGFILE_FOLDER);
-		return;
-	}
-
-	FlagFileArray flagFileLocations;
-	flagFileLocations.Add(wxFileName(tcPath, _T("flags.lch")));
-	flagFileLocations.Add(wxFileName(tempExecutionLocation.GetFullPath(), _T("flags.lch")));
-
-	// remove potential flag files to eliminate any confusion.
-	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
-		bool exists = flagFileLocations[i].FileExists();
-		if (exists) {
-			::wxRemoveFile(flagFileLocations[i].GetFullPath());
-			wxLogDebug(_T(" Cleaned up %s ... %s"),
-				flagFileLocations[i].GetFullPath().c_str(),
-				(flagFileLocations[i].FileExists())? _T("Failed") : _T("Removed"));
-		}
-	}
-
-	wxString previousWorkingDir(::wxGetCwd());
-	// hopefully this doesn't goof anything up
-	if ( !::wxSetWorkingDirectory(tempExecutionLocation.GetFullPath()) ) {
-		wxLogError(_T("Unable to change working directory to %s"),
-			tempExecutionLocation.GetFullPath().c_str());
-		this->SetDrawStatus(CANNOT_CHANGE_WORKING_FOLDER);
-		return;
-	}
-
-	wxArrayString output;
-
-	wxString commandline;
-	// use "" to correct for spaces in path to exeFilename
-	if (exeFilename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
-		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -get_flags");
-	} else {
-		commandline = exeFilename.GetFullPath() + _T(" -get_flags");
-	}
-
-	wxLogDebug(_T(" Called FreeSpace 2 Open with command line '%s'."), commandline.c_str());
-	FlagProcess *process = new FlagProcess(this, flagFileLocations);
-	::wxExecute(commandline, wxEXEC_ASYNC, process);
-
-	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
-		wxLogError(_T("Unable to change back to working directory %s"),
-			previousWorkingDir.c_str());
-		this->SetDrawStatus(CANNOT_CHANGE_WORKING_FOLDER);
-		return;
-	}
-
-	this->SetDrawStatus(WAITING_FOR_FLAGFILE);
-}
-
-FlagListBox::DrawStatus FlagListBox::ParseFlagFile(wxFileName &flagfilename) {
-	wxCHECK_MSG(flagfilename.FileExists(), FLAG_FILE_NOT_GENERATED,
-		_T("The FreeSpace 2 Open executable did not generate a flag file."));
-
-	wxFile flagfile(flagfilename.GetFullPath());
-	wxLogDebug(_T("Reading flag file %s."), flagfilename.GetFullPath().c_str());
-	// Flagfile requires that we use 32 bit little-endian numbers
-	wxInt32 easy_flag_size, flag_size, num_easy_flags, num_flags;
-	size_t bytesRead;
-
-	bytesRead = flagfile.Read(&easy_flag_size, sizeof(easy_flag_size));
-	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag_size) ) {
-		wxLogError(_T(" Flag file is too short (failed to read easy_flag_size)"));
-		return FLAG_FILE_NOT_VALID;
-	}
-	if ( easy_flag_size != 32 ) {
-		wxLogError(_T("  Easy flag size (%d) is not supported"), easy_flag_size);
-		return FLAG_FILE_NOT_SUPPORTED;
-	}
-
-	bytesRead = flagfile.Read(&flag_size, sizeof(flag_size));
-	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_size) ) {
-		wxLogError(_T(" Flag file is too short (failed to read flag_size)"));
-		return FLAG_FILE_NOT_VALID;
-	}
-	if ( flag_size != 344 ) {
-		wxLogError(_T(" Exe flag structure (%d) size is not supported"), flag_size);
-		return FLAG_FILE_NOT_SUPPORTED;
-	}
-
-	bytesRead = flagfile.Read(&num_easy_flags, sizeof(num_easy_flags));
-	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(num_easy_flags) ) {
-		wxLogError(_T(" Flag file is too short (failed to read num_easy_flags)"));
-		return FLAG_FILE_NOT_VALID;
-	}
-
-	for ( int i = 0; i < num_easy_flags; i++ ) {
-		char easy_flag[32];
-		bytesRead = flagfile.Read(&easy_flag, sizeof(easy_flag));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_flag)"), sizeof(easy_flag), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-		wxString flag(easy_flag, wxConvUTF8, strlen(easy_flag));
-		this->easyflags.Add(flag);
-	}
-
-	bytesRead = flagfile.Read(&num_flags, sizeof(num_flags));
-	if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(num_flags) ) {
-		wxLogError(_T(" Flag file is too short (failed to read num_flags)"));
-		return FLAG_FILE_NOT_VALID;
-	}
-
-	for ( int i = 0; i < num_flags; i++ ) {
-		char flag_string[20];
-		char description[40];
-		wxInt32 fso_only, easy_on_flags, easy_off_flags;
-		char easy_catagory[16], web_url[256];
-
-		bytesRead = flagfile.Read(&flag_string, sizeof(flag_string));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_string) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (flag_string)"), sizeof(flag_string), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&description, sizeof(description));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(description) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (description)"), sizeof(description), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&fso_only, sizeof(fso_only));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(fso_only) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (fso_only)"), sizeof(fso_only), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&easy_on_flags, sizeof(easy_on_flags));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_on_flags) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_on_flags)"), sizeof(easy_on_flags), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&easy_off_flags, sizeof(easy_off_flags));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_off_flags) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_off_flags)"), sizeof(easy_off_flags), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&easy_catagory, sizeof(easy_catagory));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_catagory) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_category)"), sizeof(easy_catagory), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		bytesRead = flagfile.Read(&web_url, sizeof(web_url));
-		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(web_url) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (web_url)"), sizeof(web_url), bytesRead);
-			return FLAG_FILE_NOT_VALID;
-		}
-
-		flag_string[sizeof(flag_string)-1] = _T('\0');
-		description[sizeof(description)-1] = _T('\0');
-		easy_catagory[sizeof(easy_catagory)-1] = _T('\0');
-		web_url[sizeof(web_url)-1] = _T('\0');
-
-		Flag* flag = new Flag();
-
-		flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
-		flag->flagString = wxString(flag_string, wxConvUTF8, strlen(flag_string));
-		flag->shortDescription = wxString(description, wxConvUTF8, strlen(description));
-		flag->webURL = wxString(web_url, wxConvUTF8, strlen(web_url));
-		flag->fsoCatagory = wxString(easy_catagory, wxConvUTF8, strlen(easy_catagory));
-
-		flag->easyDisable = easy_off_flags;
-		flag->easyEnable = easy_on_flags;
-		
-		flag->checkbox = new FlagListCheckBox(this, wxID_ANY, wxEmptyString, flag->flagString);
-		flag->checkbox->Hide();
-		
-		flag->checkbox->Connect(
-			flag->checkbox->GetId(),
-			wxEVT_COMMAND_CHECKBOX_CLICKED,
-			wxCommandEventHandler(FlagListCheckBox::OnClicked));
-		
-		flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
-		flag->checkboxSizer->AddSpacer(ITEM_VERTICAL_OFFSET);
-		flag->checkboxSizer->Add(flag->checkbox);
-
-		FlagCategoryList::iterator iter = this->allSupportedFlagsByCategory.begin();
-		while ( iter != this->allSupportedFlagsByCategory.end() ) {
-			if ( flag->fsoCatagory == (*iter)->categoryName ) {
-				break;
-			}
-			iter++;
-		}
-		if ( iter == this->allSupportedFlagsByCategory.end() ) {
-			// did not find the category add it
-			FlagCategory* flagCat = new FlagCategory();
-			flagCat->categoryName = flag->fsoCatagory;
-
-			Flag* headFlag = new Flag();
-			headFlag->fsoCatagory = flag->fsoCatagory;
-			headFlag->checkbox = NULL;
-			headFlag->isRecomendedFlag = false;
-			flagCat->flags.Append(headFlag);
-			flagCat->flags.Append(flag);
-			this->allSupportedFlagsByCategory.Append(flagCat);
-		} else {
-			(*iter)->flags.Append(flag);
-		}
-	}		
-
-	wxLogDebug(_T(" easy_flag_size: %d, %d; flag_size: %d, %d; num_easy_flags: %d, %d; num_flags: %d, %d"),
-		easy_flag_size, sizeof(easy_flag_size),
-		flag_size, sizeof(flag_size),
-		num_easy_flags, sizeof(num_easy_flags),
-		num_flags, sizeof(num_flags));
-
-	wxByte buildCaps;
-	bytesRead = flagfile.Read(&buildCaps, sizeof(buildCaps));
-	if ( (size_t)wxInvalidOffset == bytesRead ) {
-		wxLogInfo(_T(" Old build that does not output its capabilities, must not support OpenAL"));
-		buildCaps = 0;
-	}
-
-	return DRAW_OK;
-}
-
-void FlagListBox::SetDrawStatus(const DrawStatus& drawStatus) {
-	this->drawStatus = drawStatus;
-	wxLogDebug(_T("current flag list box draw status: %d"), drawStatus);
-	FlagListManager::GetFlagListManager()->GenerateFlagFileProcessingStatusChanged(this->GetFlagFileProcessingStatus());
-}
-
-FlagListManager::FlagFileProcessingStatus FlagListBox::GetFlagFileProcessingStatus() const {
-	const DrawStatus& drawStatus = this->GetDrawStatus();
-	if (drawStatus == DRAW_OK) {
-		return FlagListManager::FLAG_FILE_PROCESSING_OK;
-	} else if (drawStatus == INITIAL_STATUS || drawStatus == WAITING_FOR_FLAGFILE) {
-		return FlagListManager::FLAG_FILE_PROCESSING_WAITING;
-	} else {
-		return FlagListManager::FLAG_FILE_PROCESSING_ERROR;
-	}
+	this->isReady = true;
+	this->GenerateFlagListBoxReady();
 }
 
 FlagListBox::~FlagListBox() {
-	FlagCategoryList::iterator catIter = this->allSupportedFlagsByCategory.begin();
-	while ( catIter != this->allSupportedFlagsByCategory.end() ) {
-		FlagCategory* category = *catIter;
-		FlagList::iterator iter = category->flags.begin();
-		while ( iter != category->flags.end() ) {
-			Flag *flag = *iter;
-			if ( flag->checkboxSizer != NULL ) {
-				delete flag->checkboxSizer;
-				flag->checkboxSizer = NULL;
-			}
-			delete flag;
-			iter++;
-		}
-		category->flags.Clear();
-
-		delete category;
-		catIter++;
-	}
-	this->allSupportedFlagsByCategory.Clear();
-
-	FlagSetsList::iterator flagSetIter = this->flagSets.begin();
-	while ( flagSetIter != this->flagSets.end() ) {
-		delete *flagSetIter;
-		flagSetIter++;
-	}
-	this->flagSets.clear();
+	FlagFileData* temp = this->flagData;
+	this->flagData = NULL;
+	delete temp;
 }
 
 void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
+	wxCHECK_RET(this->flagData != NULL,
+		_T("FindFlagAt(): flagData is null"));
+	
 	size_t index = n;
-	FlagCategoryList::const_iterator iter =
-		this->allSupportedFlagsByCategory.begin();
-	while ( iter != this->allSupportedFlagsByCategory.end() ) {
+	FlagCategoryList::const_iterator iter = this->flagData->begin();
+	while ( iter != this->flagData->end() ) {
 		FlagCategory* cat = *iter;
 		if ( cat->flags.GetCount() > index ) {
 			(*flag) = cat->flags.Item(index)->GetData();
@@ -471,7 +132,7 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	dc.SetFont(font);
 #endif
 
-	if ( this->IsDrawOK() ) {
+	if ( this->IsReady() ) {
 		this->errorText->Hide();
 		Flag* item = NULL;
 		this->FindFlagAt(n, &item, NULL);		
@@ -517,7 +178,7 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 }
 
 wxCoord FlagListBox::OnMeasureItem(size_t n) const {
-	if ( this->IsDrawOK() ) {
+	if ( this->IsReady()) {
 		return SkinSystem::IdealIconHeight;
 	} else {
 		return this->GetSize().y;
@@ -525,68 +186,38 @@ wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 }
 
 void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const {
-	Flag* item = NULL;
-	this->FindFlagAt(n, &item, NULL);
-	if ( item != NULL && item->flagString.IsEmpty() ) {
-		dc.DestroyClippingRegion();
-		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
-		wxBrush b(background);
-		dc.SetPen(wxPen(background));
-		dc.SetBrush(b);
-		dc.SetBackground(b);
-		dc.DrawRectangle(rect);
-	} else {
-		dc.DestroyClippingRegion();
-		wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
-		wxBrush b(background);
-		dc.SetPen(wxPen(background));
-		dc.SetBrush(b);
-		dc.SetBackground(b);
-		dc.DrawRectangle(rect);
+	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+	
+	if (this->flagData != NULL) {
+		Flag* item = NULL;
+		this->FindFlagAt(n, &item, NULL);
+		if ( item != NULL && item->flagString.IsEmpty() ) { // category header
+			background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+		}
 	}
+	
+	dc.DestroyClippingRegion();
+	wxBrush b(background);
+	dc.SetPen(wxPen(background));
+	dc.SetBrush(b);
+	dc.SetBackground(b);
+	dc.DrawRectangle(rect);
 }
 
 void FlagListBox::OnSize(wxSizeEvent &event) {
 	wxVListBox::OnSize(event); // call parents onSize
-	if ( !this->IsDrawOK() ) {
+	if (!this->IsReady()) {
 		wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
-
-		wxString msg;
-		switch(this->GetDrawStatus()) {
-			case MISSING_TC:
-				msg = _("No FreeSpace 2 installation or total conversion\nhas been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
-				break;
-			case NONEXISTENT_TC:
-				msg = _("The selected root folder does not exist.\nSelect a different FreeSpace 2 installation\nor total conversion on the Basic Settings page.");
-				break;
-			case INVALID_TC:
-				msg = wxString(_("The selected root folder\nhas no FreeSpace 2 Open executables.\n")) +
-					_("Either add FS2 Open executables to the root folder\nand refresh the list of executables\non the Basic Settings page,\nor select a different FreeSpace 2 installation\nor total conversion on the Basic Settings page.");
-				break;
-			case MISSING_EXE:
-				msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings page.");
-				break;
-			case INVALID_BINARY:
-				msg = _("The selected FreeSpace 2 Open executable does not exist.\nSelect another on the Basic Settings page.");
-				break;
-			case WAITING_FOR_FLAGFILE:
-				msg = _("Waiting for flag file to be produced and parsed.");
-				break;
-			case FLAG_FILE_NOT_GENERATED:
-				msg = _("The executable did not generate a flag file.\nMake sure that the executable\nis a FreeSpace 2 Open executable.");
-				break;
-			case FLAG_FILE_NOT_VALID:
-				msg = _("Generated flag file was not complete.\nPlease talk to a maintainer of this launcher,\nsince you probably found a bug.");
-				break;
-			case FLAG_FILE_NOT_SUPPORTED:
-				msg = _("Generated flag file is not supported.\nUpdate the launcher or talk to a maintainer of this launcher\nif you have the most recent version.");
-				break;
-			default:
-				msg = wxString::Format(
-					_("Unknown error occurred while obtaining the flag file\nfrom the FreeSpace 2 Open executable (%d)"),
-					this->GetDrawStatus());
-				break;
+		
+		wxString msg = wxEmptyString;
+		
+		if (!FlagListManager::GetFlagListManager()->IsProcessingOK()) {
+			msg = FlagListManager::GetFlagListManager()->GetStatusMessage();
+		} else {
+			msg = _("Waiting for extracted flag file data to be received.");
 		}
+		wxASSERT(!msg.IsEmpty());
+		
 		this->errorText->Show();
 		this->errorText->SetLabel(msg);
 		wxFont errorFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
@@ -602,9 +233,8 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 	int selected = this->GetSelection();
 	int flagIndex = 0;
 
-	FlagCategoryList::const_iterator category =
-		this->allSupportedFlagsByCategory.begin();
-	while (category != this->allSupportedFlagsByCategory.end()) {
+	FlagCategoryList::const_iterator category = this->flagData->begin();
+	while (category != this->flagData->end()) {
 		FlagList::const_iterator flag = (*category)->flags.begin();
 		while( flag != (*category)->flags.end() ) {
 			if ( flagIndex == selected
@@ -621,9 +251,8 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 
 wxString FlagListBox::GenerateStringList() {
 	wxString flagList;
-	FlagCategoryList::const_iterator cat =
-		this->allSupportedFlagsByCategory.begin();
-	while ( cat != this->allSupportedFlagsByCategory.end() ) {
+	FlagCategoryList::const_iterator cat = this->flagData->begin();
+	while ( cat != this->flagData->end() ) {
 		FlagList::const_iterator flags =
 			(*cat)->flags.begin();
 		while ( flags != (*cat)->flags.end() ) {
@@ -642,10 +271,9 @@ wxString FlagListBox::GenerateStringList() {
 	return flagList;
 }
 
-bool FlagListBox::SetFlag(wxString flagString, bool state) {
-	FlagCategoryList::const_iterator category =
-		this->allSupportedFlagsByCategory.begin();
-	while (category != this->allSupportedFlagsByCategory.end()) {
+bool FlagListBox::SetFlag(const wxString& flagString, bool state) {
+	FlagCategoryList::const_iterator category = this->flagData->begin();
+	while (category != this->flagData->end()) {
 		FlagList::const_iterator flag = (*category)->flags.begin();
 		while( flag != (*category)->flags.end() ) {
 			if ( !(*flag)->flagString.IsEmpty()
@@ -665,15 +293,20 @@ EVT_SIZE(FlagListBox::OnSize)
 EVT_LISTBOX_DCLICK(ID_FLAGLISTBOX, FlagListBox::OnDoubleClickFlag)
 END_EVENT_TABLE()
 
-bool FlagListBox::SetFlagSet(wxString setToFind) {
-	if ( this->flagSets.GetCount() == 0 ) {
-		this->generateFlagSets();
-	}
-	FlagSetsList::const_iterator flagSetsIter =
-		this->flagSets.begin();
+bool FlagListBox::SetFlagSet(const wxString& setToFind) {
+	wxASSERT(!setToFind.IsEmpty());
+	wxCHECK_MSG(this->flagData != NULL, false,
+		_T("SetFlagSet() called when flagData was null."));
+	wxCHECK_MSG(!this->flagData->IsFlagSetsEmpty(), false,
+		wxString::Format(
+			_T("Attempted to set flag set '%s' when there are no flag sets."),
+			setToFind.c_str()));
+	// TODO once new mod.ini supported, may need to rethink this assert, and possibly also regenerate flag sets
+	
+	FlagSetsList::const_iterator flagSetsIter = this->flagData->FlagSetsBegin();
 	FlagSet* sets = NULL; 
-	while(flagSetsIter != this->flagSets.end()) {
-		if ( (*flagSetsIter)->Name.StartsWith(setToFind) ) {
+	while(flagSetsIter != this->flagData->FlagSetsEnd()) {
+		if ( (*flagSetsIter)->name.StartsWith(setToFind) ) {
 			sets = *flagSetsIter;
 		}
 		flagSetsIter++;
@@ -684,86 +317,31 @@ bool FlagListBox::SetFlagSet(wxString setToFind) {
 	}
 
 	wxArrayString::const_iterator disableIter =
-		sets->FlagsToDisable.begin();
-	while ( disableIter != sets->FlagsToDisable.end() ) {
+		sets->flagsToDisable.begin();
+	while ( disableIter != sets->flagsToDisable.end() ) {
 		this->SetFlag(*disableIter, false);
 		disableIter++;
 	}
 	wxArrayString::const_iterator enableIter =
-		sets->FlagsToEnable.begin();
-	while ( enableIter != sets->FlagsToEnable.end() ) {
+		sets->flagsToEnable.begin();
+	while ( enableIter != sets->flagsToEnable.end() ) {
 		this->SetFlag(*enableIter, true);
 		enableIter++;
 	}
 	return true;
 }
 
-void FlagListBox::generateFlagSets() {
-	this->flagSets.clear();
-	// \todo include the flag sets of the mod.inis as well
-
-	// custom
-	this->flagSets.Append(new FlagSet(_("Custom")));
-
-	// the easy flags.
-	wxUint32 counter = 0;
-	wxArrayString::const_iterator easyIter =
-		this->easyflags.begin();
-	while ( easyIter != this->easyflags.end() ) {
-		wxString easyFlag = *easyIter;
-
-		if ( easyFlag.StartsWith(_T("Custom")) ) {
-			// do nothing, we already have a custom
-		} else {
-			FlagSet* flagSet = new FlagSet(easyFlag);
-			FlagCategoryList::const_iterator catIter =
-				this->allSupportedFlagsByCategory.begin();
-
-			while ( catIter != this->allSupportedFlagsByCategory.end() ) {
-				FlagList::const_iterator flagIter =
-					(*catIter)->flags.begin();
-
-				while ( flagIter != (*catIter)->flags.end() ) {
-					Flag* flag = *flagIter;
-
-					if ( !flag->flagString.IsEmpty()
-						&& (flag->easyEnable & counter) > 0 ) {
-						flagSet->FlagsToEnable.Add(flag->flagString);
-					}
-					if ( !flag->flagString.IsEmpty()
-						&& (flag->easyDisable & counter) > 0 ) {
-						flagSet->FlagsToDisable.Add(flag->flagString);
-					}
-					flagIter++;
-				}
-				catIter++;
-			}
-			this->flagSets.Append(flagSet);
-		}
-
-		if (counter < 1) {
-			counter = 2; // prime the counter so we can bitshift for the rest
-		} else {
-			counter = counter << 1;
-		}
-		if ( counter > (wxUint32)(1 << 31) ) {
-			// we have checked 31 bits of counter, this is too many easy flag sets
-			easyIter = this->easyflags.end();
-			wxLogError(_T("FreeSpace 2 Open executable has more than 31 easy flag categories"));
-		} else {
-			easyIter++;
-		}
-	}
-}
-
 wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
-	if ( this->flagSets.size() == 0 ) {
-		this->generateFlagSets();
-	}
-	FlagSetsList::const_iterator flagSetsIter =
-		this->flagSets.begin();
-	while ( flagSetsIter != this->flagSets.end() ) {
-		arr.Add((*flagSetsIter)->Name);
+	wxASSERT(arr.IsEmpty());
+	wxCHECK_MSG(this->flagData != NULL, arr,
+		_T("GetFlagSets() called when flagData was null."));
+	wxCHECK_MSG(!this->flagData->IsFlagSetsEmpty(), arr,
+		_T("Attempted to get flag sets when there are none."));
+	// TODO once new mod.ini supported, may need to rethink this assert, and possibly also regenerate flag sets
+	
+	FlagSetsList::const_iterator flagSetsIter = this->flagData->FlagSetsBegin();
+	while ( flagSetsIter != this->flagData->FlagSetsEnd() ) {
+		arr.Add((*flagSetsIter)->name);
 		flagSetsIter++;
 	}
 	return arr;
@@ -771,9 +349,10 @@ wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
 
 /** sets all flags off. */
 void FlagListBox::ResetFlags() {
-	FlagCategoryList::const_iterator category =
-	this->allSupportedFlagsByCategory.begin();
-	while (category != this->allSupportedFlagsByCategory.end()) {
+	wxCHECK_RET(this->IsReady(), _T("ResetFlags() called when flag list box isn't ready."));
+	
+	FlagCategoryList::const_iterator category = this->flagData->begin();
+	while (category != this->flagData->end()) {
 		FlagList::const_iterator flag = (*category)->flags.begin();
 		while( flag != (*category)->flags.end() ) {
 			if ( (*flag)->checkbox != NULL) {
@@ -783,50 +362,4 @@ void FlagListBox::ResetFlags() {
 		}
 		category++;
 	}
-}
-
-FlagListBox::FlagProcess::FlagProcess(
-							FlagListBox *target,
-							FlagFileArray flagFileLocations)
-							:
-target(target), flagFileLocations(flagFileLocations) {
-}
-
-void FlagListBox::FlagProcess::OnTerminate(int pid, int status) {
-	wxLogDebug(_T(" FreeSpace 2 Open returned %d when polled for the flags"), status);
-
-	// Find the flag file
-	wxFileName flagfile;
-	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
-		bool exists = flagFileLocations[i].FileExists();
-		if (exists) {
-			flagfile = flagFileLocations[i];
-			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
-				flagFileLocations[i].GetFullPath().c_str(),
-				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
-		}
-	}
-
-
-	if ( !flagfile.FileExists() ) {
-		target->SetDrawStatus(FLAG_FILE_NOT_GENERATED);
-		wxLogError(_T(" FreeSpace 2 Open did not generate a flag file."));
-		return;
-	}
-
-	target->SetDrawStatus(target->ParseFlagFile(flagfile));
-	if ( target->IsDrawOK() ) {
-		::wxRemoveFile(flagfile.GetFullPath());
-		
-		size_t itemCount = 0;
-		FlagCategoryList::iterator iter =
-			target->allSupportedFlagsByCategory.begin();
-		while ( iter != target->allSupportedFlagsByCategory.end() ) {
-			itemCount += (*iter)->flags.GetCount();
-			iter++;
-		}
-		target->SetItemCount(itemCount);
-	}
-
-	delete this;
 }
