@@ -162,8 +162,8 @@ source_group(Tabs FILES ${TAB_CODE_FILES})
 set(GUI_CONTROL_CODE_FILES
   code/controls/BottomButtons.h
   code/controls/BottomButtons.cpp
-  code/controls/FlagList.h
-  code/controls/FlagList.cpp
+  code/controls/FlagListBox.h
+  code/controls/FlagListBox.cpp
   code/controls/LightingPresets.h
   code/controls/LightingPresets.cpp
   code/controls/Logger.h
