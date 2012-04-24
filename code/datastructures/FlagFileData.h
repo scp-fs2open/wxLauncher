@@ -110,16 +110,20 @@ public:
 	/** Returns the total number of flags and flag category headers. */
 	size_t GetItemCount() const;
 	
+	/** Returns a FlagSet, given its name. Returns NULL if not found. */
+	const FlagSet* GetFlagSet(const wxString& flagSetName) const;
+	
+	/** Stores the names of the flag sets in the passed-in array. */
+	void GetFlagSetNames(wxArrayString& arr) const;
+	
+	/** Gets the nth flag's webURL (if it has one). */
+	const wxString* GetWebURL(int n) const;
+	
 	FlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
 	FlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
 	
 	FlagCategoryList::iterator end() { return this->allSupportedFlagsByCategory.end(); }
 	FlagCategoryList::const_iterator end() const { return this->allSupportedFlagsByCategory.end(); }
-	
-	FlagSetsList::const_iterator FlagSetsBegin() const { return this->flagSets.begin(); }
-	FlagSetsList::const_iterator FlagSetsEnd() const { return this->flagSets.end(); }
-	
-	bool IsFlagSetsEmpty() const { return this->flagSets.IsEmpty(); }
 	
 private:
 	wxArrayString easyFlags;
