@@ -208,7 +208,7 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		(event.GetEventType() ==
 			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED));
 	
-	this->RefreshFlags(false);
+	this->UpdateComponents(false);
 	
 	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
 		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
@@ -227,68 +227,35 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
 	
-	this->RefreshFlags(false);
+	this->UpdateComponents(false);
 	CmdLineManager::GenerateCmdLineChanged();
 }
 
 void AdvSettingsPage::OnFlagListBoxReady(wxCommandEvent &WXUNUSED(event)) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
-	this->RefreshFlags(false);
+	this->UpdateComponents(false);
 }
 
 void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
-	this->RefreshFlags();
+	this->UpdateComponents();
 }
 
-void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
+void AdvSettingsPage::UpdateComponents(const bool resetFlagList) {
 	wxSizer* topSizer = this->GetSizer()->GetItem(TOP_SIZER_INDEX)->GetSizer();
 	wxCHECK_RET(topSizer != NULL, _T("cannot find the top sizer"));
 	
 	wxSizer* topLeftSizer = topSizer->GetItem(TOP_LEFT_SIZER_INDEX)->GetSizer();
 	wxCHECK_RET(topLeftSizer != NULL, _T("cannot find the top left sizer"));
 	
-	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
-		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
-	wxCHECK_RET( customFlagsText != NULL, _T("Unable to find the custom flags text ctrl"));
+	wxCHECK_RET(this->flagListBox != NULL,
+		_T("UpdateComponents() called when flagListBox was null."));
 	
-	wxString flagLine, customFlags, lightingPreset;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
-
-	if (resetFlagList && this->flagListBox->IsReady()) {
-		this->flagListBox->ResetFlags();
-	}
-
-	if (FlagListManager::GetFlagListManager()->IsProcessingOK()) {
-		if (this->flagListBox->IsReady()) {
-			wxStringTokenizer tokenizer(flagLine, _T(" "));
-			while(tokenizer.HasMoreTokens()) {
-				wxString tok = tokenizer.GetNextToken();
-				if (tok == LightingPresets::GetFlagLineSeparator()) {
-					lightingPreset.Append(tokenizer.GetNextToken());
-					while (tokenizer.HasMoreTokens()) {
-						lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
-					}
-					break;
-				} else if ( this->flagListBox->SetFlag(tok, true) ) {
-					continue;
-				} else {
-					if (!customFlags.IsEmpty()) {
-						customFlags += _T(" ");
-					}
-					customFlags += tok;
-				}
-			}
-			if (!lightingPreset.IsEmpty()) {
-				if (!customFlags.IsEmpty()) {
-					lightingPreset.Append(_T(" "));
-				}
-				customFlags.Prepend(lightingPreset);
-			}
-		}
+	if (this->flagListBox->IsReady()) {
+		this->RefreshFlags(resetFlagList);
+		
 		topSizer->Show(TOP_RIGHT_SIZER_INDEX);
 		topLeftSizer->Show(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
-		customFlagsText->ChangeValue(customFlags);
 		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
 		this->Layout();
 	} else {
@@ -298,6 +265,52 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
 		this->Layout();
 	}
+}
+
+// TODO will need to rethink this function once the proxy is added.
+void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
+	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
+	wxCHECK_RET(customFlagsText != NULL,
+		_T("Unable to find the custom flags text ctrl"));
+	
+	wxString flagLine, customFlags, lightingPreset;
+	ProMan::GetProfileManager()->ProfileRead(
+		PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
+	
+	wxCHECK_RET(this->flagListBox != NULL,
+		_T("RefreshFlags() called when flagListBox was null."));
+	
+	if (resetFlagList) {
+		this->flagListBox->ResetFlags();
+	}
+	
+	wxStringTokenizer tokenizer(flagLine, _T(" "));
+	while(tokenizer.HasMoreTokens()) {
+		wxString tok = tokenizer.GetNextToken();
+		if (tok == LightingPresets::GetFlagLineSeparator()) {
+			lightingPreset.Append(tokenizer.GetNextToken());
+			while (tokenizer.HasMoreTokens()) {
+				lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
+			}
+			break;
+		} else if (this->flagListBox->SetFlag(tok, true)) {
+			continue;
+		} else {
+			if (!customFlags.IsEmpty()) {
+				customFlags += _T(" ");
+			}
+			customFlags += tok;
+		}
+	}
+	if (!lightingPreset.IsEmpty()) {
+		if (!customFlags.IsEmpty()) {
+			lightingPreset.Append(_T(" "));
+		}
+		customFlags.Prepend(lightingPreset);
+	}
+	
+	customFlagsText->ChangeValue(customFlags);
 }
 
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
