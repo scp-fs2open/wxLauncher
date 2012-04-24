@@ -230,22 +230,15 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 }
 
 void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
-	int selected = this->GetSelection();
-	int flagIndex = 0;
-
-	FlagCategoryList::const_iterator category = this->flagData->begin();
-	while (category != this->flagData->end()) {
-		FlagList::const_iterator flag = (*category)->flags.begin();
-		while( flag != (*category)->flags.end() ) {
-			if ( flagIndex == selected
-				&& !(*flag)->webURL.IsEmpty() ) {
-				wxLaunchDefaultBrowser((*flag)->webURL);
-				return;
-			}
-			flag++;
-			flagIndex++;
-		}
-		category++;
+	wxCHECK_RET(this->flagData != NULL,
+		_T("OnDoubleClickFlag() called when flag data was null."));
+	
+	const wxString* webURL = this->flagData->GetWebURL(this->GetSelection());
+	wxCHECK_RET(webURL != NULL,
+		_T("GetWebURL() returned NULL, which shouldn't happen."));
+	
+	if (!webURL->IsEmpty()) {
+		wxLaunchDefaultBrowser(*webURL);
 	}
 }
 
@@ -297,54 +290,34 @@ bool FlagListBox::SetFlagSet(const wxString& setToFind) {
 	wxASSERT(!setToFind.IsEmpty());
 	wxCHECK_MSG(this->flagData != NULL, false,
 		_T("SetFlagSet() called when flagData was null."));
-	wxCHECK_MSG(!this->flagData->IsFlagSetsEmpty(), false,
-		wxString::Format(
-			_T("Attempted to set flag set '%s' when there are no flag sets."),
-			setToFind.c_str()));
-	// TODO once new mod.ini supported, may need to rethink this assert, and possibly also regenerate flag sets
 	
-	FlagSetsList::const_iterator flagSetsIter = this->flagData->FlagSetsBegin();
-	FlagSet* sets = NULL; 
-	while(flagSetsIter != this->flagData->FlagSetsEnd()) {
-		if ( (*flagSetsIter)->name.StartsWith(setToFind) ) {
-			sets = *flagSetsIter;
-		}
-		flagSetsIter++;
-	}
-	if ( sets == NULL ) {
-		// never found the set
+	const FlagSet* flagSet = this->flagData->GetFlagSet(setToFind); 
+	
+	if ( flagSet == NULL ) {
 		return false;
 	}
 
 	wxArrayString::const_iterator disableIter =
-		sets->flagsToDisable.begin();
-	while ( disableIter != sets->flagsToDisable.end() ) {
+		flagSet->flagsToDisable.begin();
+	while ( disableIter != flagSet->flagsToDisable.end() ) {
 		this->SetFlag(*disableIter, false);
 		disableIter++;
 	}
 	wxArrayString::const_iterator enableIter =
-		sets->flagsToEnable.begin();
-	while ( enableIter != sets->flagsToEnable.end() ) {
+		flagSet->flagsToEnable.begin();
+	while ( enableIter != flagSet->flagsToEnable.end() ) {
 		this->SetFlag(*enableIter, true);
 		enableIter++;
 	}
 	return true;
 }
 
-wxArrayString& FlagListBox::GetFlagSets(wxArrayString &arr) {
+void FlagListBox::GetFlagSets(wxArrayString& arr) const {
 	wxASSERT(arr.IsEmpty());
-	wxCHECK_MSG(this->flagData != NULL, arr,
+	wxCHECK_RET(this->flagData != NULL,
 		_T("GetFlagSets() called when flagData was null."));
-	wxCHECK_MSG(!this->flagData->IsFlagSetsEmpty(), arr,
-		_T("Attempted to get flag sets when there are none."));
-	// TODO once new mod.ini supported, may need to rethink this assert, and possibly also regenerate flag sets
 	
-	FlagSetsList::const_iterator flagSetsIter = this->flagData->FlagSetsBegin();
-	while ( flagSetsIter != this->flagData->FlagSetsEnd() ) {
-		arr.Add((*flagSetsIter)->name);
-		flagSetsIter++;
-	}
-	return arr;
+	this->flagData->GetFlagSetNames(arr);
 }
 
 /** sets all flags off. */

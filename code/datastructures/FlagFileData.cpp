@@ -248,3 +248,60 @@ size_t FlagFileData::GetItemCount() const {
 
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(ProxyFlagData);
+
+const FlagSet* FlagFileData::GetFlagSet(const wxString& flagSetName) const {
+	wxCHECK_MSG(!this->flagSets.IsEmpty(), NULL,
+		wxString::Format(
+			_T("Attempted to set flag set '%s' when there are no flag sets."),
+			flagSetName.c_str()));
+	// TODO once new mod.ini supported, may need to rethink this assert,
+	//      and possibly also regenerate flag sets
+	
+	FlagSetsList::const_iterator flagSetsIter = this->flagSets.begin();
+	while(flagSetsIter != this->flagSets.end()) {
+		if ( (*flagSetsIter)->name.StartsWith(flagSetName) ) {
+			return *flagSetsIter;
+		}
+		flagSetsIter++;
+	}
+	wxLogWarning(_T("GetFlagSet(): could not find set %s"),
+		flagSetName.c_str());
+	return NULL;
+}
+
+void FlagFileData::GetFlagSetNames(wxArrayString& arr) const {
+	wxCHECK_RET(!this->flagSets.IsEmpty(),
+		_T("Attempted to get flag sets when there are none."));
+	// TODO once new mod.ini supported, may need to rethink this assert,
+	//      and possibly also regenerate flag sets
+	
+	FlagSetsList::const_iterator flagSetsIter = this->flagSets.begin();
+	while ( flagSetsIter != this->flagSets.end() ) {
+		arr.Add((*flagSetsIter)->name);
+		flagSetsIter++;
+	}
+}
+
+const wxString* FlagFileData::GetWebURL(const int n) const {
+	wxCHECK_MSG(n >= 0 && n < static_cast<int>(this->GetItemCount()),
+		NULL,
+		wxString::Format(_T("GetWebURL(): given invalid index %d"), n));
+	
+	int flagIndex = 0;
+	
+	FlagCategoryList::const_iterator category = this->begin();
+	while (category != this->end()) {
+		FlagList::const_iterator flag = (*category)->flags.begin();
+		while( flag != (*category)->flags.end() ) {
+			if (flagIndex == n) {
+				return &((*flag)->webURL);
+			}
+			flag++;
+			flagIndex++;
+		}
+		category++;
+	}
+	
+	wxFAIL_MSG(_T("GetWebURL(): should never reach here!"));
+	return NULL;
+}

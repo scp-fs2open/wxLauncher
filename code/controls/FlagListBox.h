@@ -56,7 +56,7 @@ public:
 	iff it cannot find the flagset.  That is, will return true if none of
 	the flags in the flag set are real flags. */
 	bool SetFlagSet(const wxString& flagSet);
-	wxArrayString& GetFlagSets(wxArrayString &arr);
+	void GetFlagSets(wxArrayString& arr) const;
 	
 	void ResetFlags();
 	
