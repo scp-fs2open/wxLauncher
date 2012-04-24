@@ -65,6 +65,7 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 	wxRadioButton* radioButton6 = new wxRadioButton (this, ID_PRESET_COLECAMPBELL666, _T("ColeCampbell666's"));
 	wxRadioButton* radioButton7 = new wxRadioButton (this, ID_PRESET_CASTOR, _T("Castor's"));
 	wxRadioButton* radioButton8 = new wxRadioButton (this, ID_PRESET_SPIDEY, _T("Spidey's"));
+	wxRadioButton* radioButton9 = new wxRadioButton (this, ID_PRESET_WOOLIE_WOOL, _T("Woolie Wool's"));
 
 	this->Initialize();
 
@@ -80,7 +81,8 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 	lightingInsideSizer->Add(radioButton5, wxGBPosition(6,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
 	lightingInsideSizer->Add(radioButton6, wxGBPosition(7,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
 	lightingInsideSizer->Add(radioButton7, wxGBPosition(8,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
-	lightingInsideSizer->Add(radioButton8, wxGBPosition(9,0), wxGBSpan(1,1));
+	lightingInsideSizer->Add(radioButton8, wxGBPosition(9,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton9, wxGBPosition(10,0), wxGBSpan(1,1));
 
 	wxStaticBoxSizer* lightingPresetsSizer = new wxStaticBoxSizer(lightingPresetsBox, wxHORIZONTAL);
 	lightingPresetsSizer->Add(lightingInsideSizer, wxSizerFlags().Expand().Border(wxALL, 5));
@@ -113,6 +115,9 @@ void LightingPresets::InitializePresets() {
 	presets[ID_PRESET_SPIDEY] =
 		Preset(_T("Spidey"), ID_PRESET_SPIDEY,
 			   _T("-ambient_factor 5 -spec_exp 15 -spec_point 1.2 -spec_static 1.7 -spec_tube 1.5 -ogl_spec 50"));
+	presets[ID_PRESET_WOOLIE_WOOL] =
+		Preset(_T("WoolieWool"), ID_PRESET_WOOLIE_WOOL,
+		   _T("-ambient_factor 105 -no_emissive_light -spec_exp 9 -spec_point 0.3 -spec_static 0.8 -spec_tube 0.7 -ogl_spec 120"));
 }
 
 BEGIN_EVENT_TABLE(LightingPresets, wxPanel)
@@ -125,6 +130,7 @@ EVT_RADIOBUTTON(ID_PRESET_CKID, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_COLECAMPBELL666, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_CASTOR, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_SPIDEY, LightingPresets::OnSelectLightingPreset)
+EVT_RADIOBUTTON(ID_PRESET_WOOLIE_WOOL, LightingPresets::OnSelectLightingPreset)
 END_EVENT_TABLE()
 
 void LightingPresets::OnSelectLightingPreset(wxCommandEvent &event) {
