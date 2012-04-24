@@ -103,6 +103,10 @@ FlagListManager::FlagListManager()
 }
 
 FlagListManager::~FlagListManager() {
+	this->DeleteExistingData();
+}
+
+void FlagListManager::DeleteExistingData() {
 	if (this->data != NULL) {
 		FlagFileData* temp = this->data;
 		this->data = NULL;
@@ -117,6 +121,8 @@ FlagListManager::~FlagListManager() {
 }
 
 void FlagListManager::BeginFlagFileProcessing() {
+	this->DeleteExistingData(); // don't leak any existing data
+	
 	this->data = new FlagFileData();
 	this->proxyData = new ProxyFlagData();
 	

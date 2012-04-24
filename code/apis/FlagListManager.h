@@ -72,6 +72,7 @@ public:
 
 private:
 	FlagListManager();
+	void DeleteExistingData();
 	
 	static FlagListManager* flagListManager;
 	
