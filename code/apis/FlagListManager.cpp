@@ -50,13 +50,13 @@ void FlagListManager::GenerateFlagFileProcessingStatusChanged(const FlagFileProc
 	wxCommandEvent event(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_NONE);
 	event.SetInt(status);
 
-	// FIXME uncomment after removing flag file processing from flag list (until then, the assert will trigger)
-//	if (status == FLAG_FILE_PROCESSING_OK) {
-//		wxCHECK_RET(this->data != NULL, _T("Attempted to get flag file data after processing succeded but was NULL."));
-//		event.SetExtraLong(static_cast<long>(this->data->GetItemCount()));
-//	} else {
-//		event.SetExtraLong(1); // item count of 1 for the error message that should appear in the flag list box
-//	}
+	if (status == FLAG_FILE_PROCESSING_OK) {
+		wxCHECK_RET(this->data != NULL,
+			_T("Attempted to get flag file data after processing succeded but was NULL."));
+		event.SetExtraLong(static_cast<long>(this->data->GetItemCount()));
+	} else {
+		event.SetExtraLong(1); // item count of 1 for status msg in flag list box
+	}
 
 	wxLogDebug(_T("Generating EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event"));
 	for (FlagFileProcessingEventHandlers::iterator
