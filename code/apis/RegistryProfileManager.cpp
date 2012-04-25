@@ -224,15 +224,15 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		L"SpeechTechroom",
+		L"SpeechBriefings",
 		0,
 		REG_DWORD,
-		(BYTE*)&inTechroom,
-		sizeof(inTechroom));
+		(BYTE*)&inBriefings,
+		sizeof(inBriefings));
 	ReturnChecker(ret, __LINE__);
 	ret = RegSetValueExW(
 		regHandle,
-		L"SpeechGame",
+		L"SpeechIngame",
 		0,
 		REG_DWORD,
 		(BYTE*)&inGame,
