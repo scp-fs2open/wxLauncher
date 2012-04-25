@@ -142,9 +142,9 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
 	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
 
-	ret = outConfig.Write( L"SpeechTechroom", inTechroom);
+	ret = outConfig.Write( L"SpeechBriefings", inBriefings);
 	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write( L"SpeechGame", inGame);
+	ret = outConfig.Write( L"SpeechIngame", inGame);
 	ReturnChecker(ret, __LINE__);
 	ret = outConfig.Write( L"SpeechMulti",inMulti);
 	ReturnChecker(ret, __LINE__);
