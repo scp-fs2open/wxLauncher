@@ -450,7 +450,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* networkType = new wxChoice(this, ID_NETWORK_TYPE);
 	networkType->Append(_T("None"));
 	networkType->Append(_T("Dialup"));
-	networkType->Append(_T("LAN/Direct Connection"));
+	networkType->Append(_T("LAN"));
 	wxString type;
 	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type, _T("None"), true);
 	networkType->SetStringSelection(type);
