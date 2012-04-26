@@ -19,9 +19,60 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "controls/FlagListBox.h"
 //#include "apis/ProfileProxy.h" // TODO uncomment once proxy is ready
+#include "tabs/AdvSettingsPage.h"
 #include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
+
+MyFlagListCheckBox::MyFlagListCheckBox(
+	wxWindow* parent,
+	const wxString& label,
+	const wxString& flagString,
+	int flagIndex)
+: wxCheckBox(parent, wxID_ANY, label),
+  flagString(flagString),
+  flagIndex(flagIndex) {
+	  wxASSERT(parent != NULL);
+	  wxASSERT(!flagString.IsEmpty());
+}
+
+void MyFlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
+	// FIXME the following line doesn't work yet because profile proxy isn't implemented
+	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
+	wxLogDebug(_T("flag %s with index %d is now %s"),
+		flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
+	
+	// FIXME temp until the proxy is working
+	wxCommandEvent fakeEvent;
+	dynamic_cast<AdvSettingsPage*>(this->GetParent()->GetParent())->OnNeedUpdateCommandLine(fakeEvent);
+}
+
+FlagListCheckBoxItem::FlagListCheckBoxItem(const wxString& fsoCategory)
+: fsoCategory(fsoCategory), checkBox(NULL), checkBoxSizer(NULL),
+  shortDescription(wxEmptyString), flagString(wxEmptyString), flagIndex(-1),
+  isRecommendedFlag(false) {
+	  wxASSERT(!fsoCategory.IsEmpty());
+}
+
+FlagListCheckBoxItem::FlagListCheckBoxItem(
+	MyFlagListCheckBox& checkBox, wxSizer& checkBoxSizer,
+	const wxString& shortDescription, const wxString& flagString,
+	const int flagIndex, const bool isRecommendedFlag)
+: fsoCategory(wxEmptyString), checkBox(&checkBox), checkBoxSizer(&checkBoxSizer),
+  shortDescription(shortDescription), flagString(flagString),
+  flagIndex(flagIndex), isRecommendedFlag(isRecommendedFlag) {
+	  // shortDescription can be empty
+	  wxASSERT(!flagString.IsEmpty());
+	  wxASSERT(flagIndex >= 0);
+}
+
+FlagListCheckBoxItem::~FlagListCheckBoxItem() {
+	delete this->checkBox;
+	delete this->checkBoxSizer;
+}
+
+#include <wx/listimpl.cpp> // Magic Incantation
+WX_DEFINE_LIST(FlagListCheckBoxItems);
 
 DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
 
@@ -76,7 +127,8 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 : wxVListBox(parent,ID_FLAGLISTBOX),
   isReadyEventGenerated(false),
   isReady(false),
-  flagData(NULL) {
+  flagData(NULL),
+  areCheckBoxesGenerated(false) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 	
@@ -98,10 +150,57 @@ void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
 	this->GenerateFlagListBoxReady();
 }
 
+void FlagListBox::GenerateCheckBoxes(const FlagListBoxData& data) {
+	wxASSERT(!data.IsEmpty());
+	wxASSERT_MSG(!this->areCheckBoxesGenerated,
+		_T("Attempted to generate checkboxes a second time."));
+	
+	MyFlagListCheckBox* checkBox;
+	wxSizer* checkBoxSizer;
+	
+	for (FlagListBoxData::const_iterator dataIter = data.begin();
+		 dataIter != data.end(); ++dataIter) {
+		
+		FlagListBoxDataItem* item = *dataIter;
+		
+		if (!item->fsoCategory.IsEmpty()) {
+			this->checkBoxes.Append(
+				new FlagListCheckBoxItem(item->fsoCategory));
+			continue;
+		}
+		
+		checkBox =
+			new MyFlagListCheckBox(
+				this,
+				wxEmptyString,
+				item->flagString,
+				item->GetFlagIndex());
+		checkBox->Hide();
+		
+		checkBox->Connect(
+			checkBox->GetId(),
+			wxEVT_COMMAND_CHECKBOX_CLICKED,
+			wxCommandEventHandler(FlagListCheckBox::OnClicked));
+		
+		checkBoxSizer = new wxBoxSizer(wxVERTICAL);
+		checkBoxSizer->AddSpacer(ITEM_VERTICAL_OFFSET);
+		checkBoxSizer->Add(checkBox);
+		
+		this->checkBoxes.Append(
+			new FlagListCheckBoxItem(*checkBox, *checkBoxSizer,
+				item->shortDescription, item->flagString, item->GetFlagIndex(),
+				item->isRecommendedFlag));
+	}
+	
+	this->areCheckBoxesGenerated = true;
+}
+
 FlagListBox::~FlagListBox() {
 	FlagFileData* temp = this->flagData;
 	this->flagData = NULL;
 	delete temp;
+	
+	this->checkBoxes.Clear();
 }
 
 void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
@@ -123,6 +222,66 @@ void FlagListBox::FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const {
 			index -= cat->flags.GetCount();
 		}
 		iter++;
+	}
+}
+
+FlagListCheckBoxItem* FlagListBox::MyFindFlagAt(size_t n) const {
+	wxCHECK_MSG(this->isReady, NULL,
+		_T("FindFlagAt() called when flag list box is not ready"));
+	wxCHECK_MSG(n >= 0 && n < this->checkBoxes.GetCount(), NULL,
+		wxString::Format(_T("FindFlagAt() called with out-of-range value %lu"), n));
+	
+	return this->checkBoxes[n];
+}
+
+void FlagListBox::MyOnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
+#if IS_WIN32 // replace the ugly default font with one based on the system default
+	wxFont font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	dc.SetFont(font);
+#endif
+	
+	if (this->IsReady()) {
+		this->errorText->Hide();
+		FlagListCheckBoxItem* item = this->MyFindFlagAt(n);
+		wxCHECK_RET(item != NULL, _T("Flag pointer is null"));
+		
+		if (item->GetCheckBox() != NULL) {
+			if (item->IsRecommendedFlag()) {
+				dc.DrawBitmap(this->skin->GetIdealIcon(), rect.x, rect.y);
+			}
+			
+			item->GetCheckBox()->Show();
+			item->GetCheckBoxSizer()->SetDimension(
+				rect.x + SkinSystem::IdealIconWidth,
+				rect.y,
+				SkinSystem::IdealIconWidth,
+				rect.height);
+			
+			if (item->GetShortDescription().IsEmpty()) {
+				dc.DrawText(wxString(_T(" ")) + item->GetFlagString(),
+					rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+					rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
+			} else {
+				dc.DrawText(wxString(_T(" ")) + item->GetShortDescription(),
+					rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+					rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
+			}
+		} else { // draw a category
+			wxASSERT(!item->GetFsoCategory().IsEmpty());
+#if IS_WIN32
+			font.SetWeight(wxFONTWEIGHT_BOLD);
+			dc.SetTextForeground(*wxWHITE);
+			dc.SetFont(font);
+#endif
+			dc.DrawText(wxString(_T(" ")) + item->GetFsoCategory(),
+				rect.x + SkinSystem::IdealIconWidth + WIDTH_OF_CHECKBOX,
+				rect.y + (VERTICAL_OFFSET_MULTIPLIER*ITEM_VERTICAL_OFFSET));
+#if IS_WIN32
+			dc.SetTextForeground(*wxBLACK);
+#endif
+		}
+	} else {
+		wxASSERT_MSG( n == 0, _T("FLAGLISTBOX: Trying to draw background n != 0") );
 	}
 }
 
@@ -204,6 +363,24 @@ void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const
 	dc.DrawRectangle(rect);
 }
 
+void FlagListBox::MyOnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const {
+	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+	
+	if (this->isReady) {
+		FlagListCheckBoxItem* item = MyFindFlagAt(n);
+		if (item != NULL && item->GetFlagString().IsEmpty()) { // category header
+			background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
+		}
+	}
+	
+	dc.DestroyClippingRegion();
+	wxBrush b(background);
+	dc.SetPen(wxPen(background));
+	dc.SetBrush(b);
+	dc.SetBackground(b);
+	dc.DrawRectangle(rect);
+}
+
 void FlagListBox::OnSize(wxSizeEvent &event) {
 	wxVListBox::OnSize(event); // call parents onSize
 	if (!this->IsReady()) {
@@ -264,6 +441,32 @@ wxString FlagListBox::GenerateStringList() {
 	return flagList;
 }
 
+wxString FlagListBox::MyGenerateStringList() const {
+	wxString flagList;
+	
+	wxCHECK_MSG(this->isReady, wxEmptyString,
+		_T("GenerateStringList() called when flag list box is not ready."));
+	
+	FlagListCheckBoxItems::const_iterator it = this->checkBoxes.begin();
+	while (it != this->checkBoxes.end()) {
+		FlagListCheckBoxItem* item = *it;
+		
+		if (item->GetCheckBox() != NULL
+			&& item->GetCheckBox()->IsChecked() 
+			&& !item->GetFlagString().IsEmpty()) {
+			
+			if (!flagList.IsEmpty()) {
+				flagList += _T(" ");
+			}
+			
+			flagList += item->GetFlagString();
+		}
+		++it;
+	}
+	
+	return flagList;
+}
+
 bool FlagListBox::SetFlag(const wxString& flagString, bool state) {
 	FlagCategoryList::const_iterator category = this->flagData->begin();
 	while (category != this->flagData->end()) {
@@ -277,6 +480,26 @@ bool FlagListBox::SetFlag(const wxString& flagString, bool state) {
 			flag++;
 		}
 		category++;
+	}
+	return false;
+}
+
+bool FlagListBox::MySetFlag(const wxString& flagString, const bool state) {
+	wxCHECK_MSG(this->isReady, false,
+		_T("SetFlag() called when flag list box is not ready."));
+	wxCHECK_MSG(!flagString.IsEmpty(), false,
+		_T("SetFlag() called with empty flagString."));
+	
+	FlagListCheckBoxItems::iterator it = this->checkBoxes.begin();
+	while (it != this->checkBoxes.end()) {
+		FlagListCheckBoxItem* item = *it;
+		
+		if (!item->GetFlagString().IsEmpty()
+			&& item->GetFlagString() == flagString) {
+			item->GetCheckBox()->SetValue(state);
+			return true;
+		}
+		++it;
 	}
 	return false;
 }
@@ -334,5 +557,20 @@ void FlagListBox::ResetFlags() {
 			flag++;
 		}
 		category++;
+	}
+}
+
+/** sets all flags off. */
+void FlagListBox::MyResetFlags() {
+	wxCHECK_RET(this->IsReady(),
+		_T("ResetFlags() called when flag list box isn't ready."));
+	
+	FlagListCheckBoxItems::iterator it = this->checkBoxes.begin();
+	while (it != this->checkBoxes.end()) {
+		FlagListCheckBoxItem* item = *it;
+		if (item->GetCheckBox() != NULL) {
+			item->GetCheckBox()->SetValue(false);
+		}
+		++it;
 	}
 }

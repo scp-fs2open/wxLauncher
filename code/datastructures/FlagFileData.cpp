@@ -19,7 +19,7 @@
 #include <wx/wx.h>
 
 #include "datastructures/FlagFileData.h"
-#include "tabs/AdvSettingsPage.h"
+#include "tabs/AdvSettingsPage.h" // TODO remove once FlagListCheckBox is gone
 
 #include "global/MemoryDebugging.h"
 
@@ -64,8 +64,37 @@ ProxyFlagDataItem::ProxyFlagDataItem(const wxString& flagString, int flagIndex)
 : flagString(flagString), flagIndex(flagIndex) {
 }
 
+#include <wx/listimpl.cpp> // Magic Incantation
+WX_DEFINE_LIST(ProxyFlagData);
+
+FlagListBoxDataItem::FlagListBoxDataItem(const wxString& fsoCategory)
+: fsoCategory(fsoCategory),
+  shortDescription(wxEmptyString),
+  flagString(wxEmptyString),
+  isRecommendedFlag(false),
+  flagIndex(-1) {
+	wxASSERT(!fsoCategory.IsEmpty());
+}
+
+FlagListBoxDataItem::FlagListBoxDataItem(const wxString& shortDescription,
+	const wxString& flagString, int flagIndex, bool isRecommendedFlag)
+: fsoCategory(wxEmptyString),
+  shortDescription(shortDescription),
+  flagString(flagString),
+  isRecommendedFlag(isRecommendedFlag),
+  flagIndex(flagIndex) {
+	// shortDescription can be empty
+	wxASSERT(!flagString.IsEmpty());
+	wxASSERT(flagIndex >= 0);
+}
+
+#include <wx/listimpl.cpp> // Magic Incantation
+WX_DEFINE_LIST(FlagListBoxData);
+
 FlagFileData::FlagFileData()
-: isProxyDataGenerated(false), areCheckBoxesGenerated(false) {
+: isProxyDataGenerated(false),
+  isFlagListBoxDataGenerated(false),
+  areCheckBoxesGenerated(false) {
 }
 
 FlagFileData::~FlagFileData() {
@@ -236,6 +265,42 @@ ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {
 	return proxyData;
 }
 
+FlagListBoxData* FlagFileData::GenerateFlagListBoxData() const {
+	wxASSERT(!this->allSupportedFlagsByCategory.IsEmpty());
+	wxASSERT_MSG(!this->isFlagListBoxDataGenerated,
+				 _T("Attempted to generate flag list box data twice."));
+	
+	FlagListBoxData* flagListBoxData = new FlagListBoxData();
+	
+	for (FlagCategoryList::const_iterator catIter = this->begin();
+		 catIter != this->end();
+		 catIter++) {
+		for (FlagList::const_iterator flagIter = (*catIter)->flags.begin();
+			 flagIter != (*catIter)->flags.end();
+			 flagIter++) {
+			Flag* flag = *flagIter;
+			
+			if (flag->flagString.IsEmpty()) {
+				flagListBoxData->Append(
+					new FlagListBoxDataItem(flag->fsoCatagory));
+			} else {
+				flagListBoxData->Append(
+					new FlagListBoxDataItem(
+						flag->shortDescription,
+						flag->flagString,
+						flag->GetFlagIndex(),
+						flag->isRecomendedFlag));
+			}
+		}
+	}
+	
+	// keep const in the function prototype to avoid corrupting data,
+	// but allow for making this one change
+	const_cast<FlagFileData*>(this)->isFlagListBoxDataGenerated = true;
+	
+	return flagListBoxData;
+}
+
 size_t FlagFileData::GetItemCount() const {
 	size_t itemCount = 0;
 	
@@ -245,9 +310,6 @@ size_t FlagFileData::GetItemCount() const {
 	
 	return itemCount;
 }
-
-#include <wx/listimpl.cpp> // Magic Incantation
-WX_DEFINE_LIST(ProxyFlagData);
 
 const FlagSet* FlagFileData::GetFlagSet(const wxString& flagSetName) const {
 	wxCHECK_MSG(!this->flagSets.IsEmpty(), NULL,
