@@ -84,6 +84,24 @@ private:
 
 WX_DECLARE_LIST(ProxyFlagDataItem, ProxyFlagData);
 
+/** Flag data needed by the flag list box. */
+class FlagListBoxDataItem {
+public:
+	FlagListBoxDataItem(const wxString& fsoCategory);
+	FlagListBoxDataItem(const wxString& shortDescription,
+		const wxString& flagString, int flagIndex, bool isRecommendedFlag);
+	wxString fsoCategory;
+	wxString shortDescription;
+	wxString flagString;
+	bool isRecommendedFlag;
+	int GetFlagIndex() const { return flagIndex; }
+private:
+	FlagListBoxDataItem();
+	int flagIndex;
+};
+
+WX_DECLARE_LIST(FlagListBoxDataItem, FlagListBoxData);
+
 /** The data extracted from the flag file. */
 class FlagFileData {
 public:
@@ -107,6 +125,9 @@ public:
 	/** Creates a version of the data suitable for use by the profile proxy. */
 	ProxyFlagData* GenerateProxyFlagData() const;
 	
+	/** Creates a version of the data suitable for use by the flag list box. */
+	FlagListBoxData* GenerateFlagListBoxData() const;
+	
 	/** Returns the total number of flags and flag category headers. */
 	size_t GetItemCount() const;
 	
@@ -119,6 +140,7 @@ public:
 	/** Gets the nth flag's webURL (if it has one). */
 	const wxString* GetWebURL(int n) const;
 	
+	// TODO move to private when no longer needed by non-member functions
 	FlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
 	FlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
 	
@@ -130,6 +152,7 @@ private:
 	FlagSetsList flagSets;
 	FlagCategoryList allSupportedFlagsByCategory;
 	bool isProxyDataGenerated;
+	bool isFlagListBoxDataGenerated;
 	bool areCheckBoxesGenerated;
 };
 
