@@ -34,7 +34,7 @@ the control that it represents is located on.
 These IDs are also used by the help manager to open the correct help page 
 for the context help. */
 enum WindowIDS {
-	ID_MAINTAB = wxID_HIGHEST, /* wxID_HIGHEST is the maximum event id that wx
+	ID_MAINTAB = wxID_HIGHEST + 1, /* wxID_HIGHEST is the maximum event id that wx
 							   will use. */
 	ID_CLOSE_BUTTON,
 	ID_HELP_BUTTON,
