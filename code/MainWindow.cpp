@@ -54,6 +54,11 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	this->SetStatusBar(new StatusBar(this));
 
+	// from http://stackoverflow.com/questions/6852413/
+#if IS_WIN32 // set the titlebar/alt-tab icon
+	this->SetIcon(wxICON(IDI_SMALL));
+#endif
+
 	// setup tabs
 
 #if 0
