@@ -1211,6 +1211,12 @@ void AddHeaders(ResolutionArray &resolutions) {
 		width /= gcd;
 		height /= gcd;
 		
+		// special exception: 8:5 should be 16:10
+		if ((width == 8) && (height == 5)) {
+			width *= 2;
+			height *= 2;
+		}
+		
 		if ((width != lastAspectWidth) || (height != lastAspectHeight)) {
 			wxLogDebug(_T(" found aspect ratio %d:%d"), width, height);
 			headers.Add(new Resolution(width, height, true));
