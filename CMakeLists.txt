@@ -107,6 +107,8 @@ add_executable(registry_helper WIN32
   code/apis/PlatformProfileManagerShared.cpp
   code/apis/CmdLineManager.h
   code/apis/CmdLineManager.cpp
+  code/apis/JoystickManager.h
+  code/apis/JoystickManager.cpp # needed so JOYMAN_INVALID_JOYSTICK is defined
   code/apis/ProfileManager.h
   code/apis/ProfileManager.cpp
   code/controls/LightingPresets.h
