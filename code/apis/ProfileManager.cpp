@@ -76,10 +76,18 @@ void ProMan::GenerateCurrentProfileChangedEvent() {
 }
 
 void ProMan::AddEventHandler(wxEvtHandler *handler) {
+	wxASSERT_MSG(eventHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("ProMan::AddEventHandler(): Handler at %p already registered."),
+			handler));
 	this->eventHandlers.Append(handler);
 }
 
 void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
+	wxASSERT_MSG(eventHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("ProMan::RemoveEventHandler(): Handler at %p not registered."),
+			handler));
 	this->eventHandlers.DeleteObject(handler);
 }
 	

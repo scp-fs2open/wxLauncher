@@ -79,10 +79,18 @@ DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
 WX_DEFINE_LIST(FlagListBoxReadyEventHandlers);
 
 void FlagListBox::RegisterFlagListBoxReady(wxEvtHandler *handler) {
+	wxASSERT_MSG(flagListBoxReadyHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterFlagListBoxReady(): Handler at %p already registered."),
+			handler));
 	this->flagListBoxReadyHandlers.Append(handler);
 }
 
 void FlagListBox::UnRegisterFlagListBoxReady(wxEvtHandler *handler) {
+	wxASSERT_MSG(flagListBoxReadyHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterFlagListBoxReady(): Handler at %p not registered."),
+			handler));
 	this->flagListBoxReadyHandlers.DeleteObject(handler);
 }
 

@@ -38,10 +38,18 @@ WX_DEFINE_LIST(FlagFileProcessingEventHandlers);
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(flagFileProcessingStatusChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterFlagFileProcessingStatusChanged(): Handler at %p already registered."),
+			handler));
 	this->flagFileProcessingStatusChangedHandlers.Append(handler);
 }
 
 void FlagListManager::UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(flagFileProcessingStatusChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterFlagFileProcessingStatusChanged(): Handler at %p not registered."),
+			handler));
 	this->flagFileProcessingStatusChangedHandlers.DeleteObject(handler);
 }
 
