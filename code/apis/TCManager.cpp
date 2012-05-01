@@ -109,7 +109,7 @@ void TCManager::GenerateTCChanged() {
 	while (iter != TCChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_TC_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_TC_CHANGED event to %p"), current);
 		iter++;
 	}
 }
@@ -120,7 +120,7 @@ void TCManager::GenerateTCBinaryChanged() {
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_TC_BINARY_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_TC_BINARY_CHANGED event to %p"), current);
 		iter++;
 	}
 }
@@ -131,7 +131,7 @@ void TCManager::GenerateTCSelectedModChanged() {
 	while (iter != TCSelectedModChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_TC_SELECTED_MOD_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_TC_SELECTED_MOD_CHANGED event to %p"), current);
 		iter++;
 	}
 }
@@ -142,7 +142,7 @@ void TCManager::GenerateTCFredBinaryChanged() {
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_TC_FRED_BINARY_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_TC_FRED_BINARY_CHANGED event to %p"), current);
 		iter++;
 	}
 }

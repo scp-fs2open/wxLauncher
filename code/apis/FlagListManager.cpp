@@ -64,7 +64,7 @@ void FlagListManager::GenerateFlagFileProcessingStatusChanged(const FlagFileProc
 		 end = this->flagFileProcessingStatusChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event to %p"), current);
 	}
 }
 

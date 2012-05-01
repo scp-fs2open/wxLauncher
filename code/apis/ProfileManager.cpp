@@ -58,7 +58,7 @@ void ProMan::GenerateChangeEvent() {
 	do {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent Profile Change event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent Profile Change event to %p"), current);
 		iter++;
 	} while (iter != this->eventHandlers.end());
 }
@@ -70,7 +70,7 @@ void ProMan::GenerateCurrentProfileChangedEvent() {
 	while (iter != this->eventHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent current profile changed event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent current profile changed event to %p"), current);
 		iter++;
 	} 
 }
