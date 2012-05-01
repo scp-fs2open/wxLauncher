@@ -19,14 +19,13 @@
 #include <wx/wx.h>
 
 #include "datastructures/FlagFileData.h"
-#include "tabs/AdvSettingsPage.h" // TODO remove once FlagListCheckBox is gone
 
 #include "global/MemoryDebugging.h"
 
 int Flag::flagIndexCounter = 0;
 
 Flag::Flag()
-: checkbox(NULL), checkboxSizer(NULL), flagIndex(flagIndexCounter++) {
+: flagIndex(flagIndexCounter++) {
 }
 
 #include <wx/listimpl.cpp> // Magic Incantation
@@ -41,24 +40,6 @@ FlagSet::FlagSet(wxString name)
 
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagSetsList);
-
-FlagListCheckBox::FlagListCheckBox(
-	wxWindow* parent,
-	const wxString& label,
-	const wxString& flagString,
-	int flagIndex)
-: wxCheckBox(parent, wxID_ANY, label), flagString(flagString), flagIndex(flagIndex) {
-}
-
-void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
-	// FIXME the following line doesn't work yet because profile proxy isn't implemented
-	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
-	wxLogDebug(_T("flag %s with index %d is now %s"), flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
-	
-	// FIXME temp until the proxy is working
-	wxCommandEvent fakeEvent;
-	dynamic_cast<AdvSettingsPage*>(this->GetParent()->GetParent())->OnNeedUpdateCommandLine(fakeEvent);
-}
 
 ProxyFlagDataItem::ProxyFlagDataItem(const wxString& flagString, int flagIndex)
 : flagString(flagString), flagIndex(flagIndex) {
@@ -93,8 +74,7 @@ WX_DEFINE_LIST(FlagListBoxData);
 
 FlagFileData::FlagFileData()
 : isProxyDataGenerated(false),
-  isFlagListBoxDataGenerated(false),
-  areCheckBoxesGenerated(false) {
+  isFlagListBoxDataGenerated(false) {
 }
 
 FlagFileData::~FlagFileData() {
@@ -102,10 +82,6 @@ FlagFileData::~FlagFileData() {
 		FlagCategory* category = *catIter;
 		for ( FlagList::iterator iter = category->flags.begin(); iter != category->flags.end(); iter++ ) {
 			Flag *flag = *iter;
-			if ( flag->checkboxSizer != NULL ) {
-				delete flag->checkboxSizer;
-				flag->checkboxSizer = NULL;
-			}
 			delete flag;
 		}
 		category->flags.Clear();
@@ -146,7 +122,6 @@ void FlagFileData::AddFlag(Flag* flag) {
 		
 		Flag* headFlag = new Flag();
 		headFlag->fsoCatagory = flag->fsoCatagory;
-		headFlag->checkbox = NULL;
 		headFlag->isRecomendedFlag = false;
 		flagCat->flags.Append(headFlag);
 		flagCat->flags.Append(flag);
@@ -210,38 +185,6 @@ void FlagFileData::GenerateFlagSets() {
 			easyIter++;
 		}
 	}
-}
-
-void FlagFileData::GenerateCheckBoxes(wxWindow* parent, const int verticalOffset) {
-	wxASSERT(parent != NULL);
-	wxASSERT(!this->allSupportedFlagsByCategory.IsEmpty());
-	wxASSERT(verticalOffset >= 0);
-	wxASSERT_MSG(!this->areCheckBoxesGenerated,
-		_T("Attempted to generate checkboxes a second time."));
-	
-	for (FlagCategoryList::iterator catIter = this->begin(); catIter != this->end(); catIter++) {
-		for (FlagList::iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {			
-			Flag* flag = *flagIter;
-			
-			if (flag->flagString.IsEmpty()) { // don't add a checkbox for flags serving as category headers
-				continue;
-			}
-			
-			flag->checkbox = new FlagListCheckBox(parent, wxEmptyString, flag->flagString, flag->GetFlagIndex());
-			flag->checkbox->Hide();
-			
-			flag->checkbox->Connect(
-				flag->checkbox->GetId(),
-				wxEVT_COMMAND_CHECKBOX_CLICKED,
-				wxCommandEventHandler(FlagListCheckBox::OnClicked));
-			
-			flag->checkboxSizer = new wxBoxSizer(wxVERTICAL);
-			flag->checkboxSizer->AddSpacer(verticalOffset);
-			flag->checkboxSizer->Add(flag->checkbox);
-		}
-	}
-	
-	this->areCheckBoxesGenerated = true;
 }
 
 ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {

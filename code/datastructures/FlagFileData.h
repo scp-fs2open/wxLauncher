@@ -19,18 +19,6 @@
 #ifndef FLAGFILEDATA_H
 #define FLAGFILEDATA_H
 
-class FlagListCheckBox: public wxCheckBox {
-public:
-	FlagListCheckBox(wxWindow* parent,
-		const wxString& label,
-		const wxString& flagString,
-		int flagIndex);
-	void OnClicked(wxCommandEvent &event);
-private:
-	wxString flagString;
-	int flagIndex; // index is needed so that proxy can keep flags ordered in flag list order
-};
-
 class Flag {
 public:
 	Flag();
@@ -41,8 +29,6 @@ public:
 	bool isRecomendedFlag;
 	wxUint32 easyEnable;
 	wxUint32 easyDisable;
-	FlagListCheckBox* checkbox;
-	wxSizer* checkboxSizer;
 	
 	int GetFlagIndex() const { return this->flagIndex; }
 private:
@@ -118,10 +104,6 @@ public:
 	 Until support for the new mod.ini is added, this function should be called exactly once. */
 	void GenerateFlagSets();
 	
-	/** Generates flag checkboxes for display. verticalOffset is the distance in pixels 
-	 between the top of the checkbox and the top of the flag's entry in the FlagListBox entry. */
-	void GenerateCheckBoxes(wxWindow* parent, const int verticalOffset);
-	
 	/** Creates a version of the data suitable for use by the profile proxy. */
 	ProxyFlagData* GenerateProxyFlagData() const;
 	
@@ -140,20 +122,18 @@ public:
 	/** Gets the nth flag's webURL (if it has one). */
 	const wxString* GetWebURL(int n) const;
 	
-	// TODO move to private when no longer needed by non-member functions
+private:
 	FlagCategoryList::iterator begin() { return this->allSupportedFlagsByCategory.begin(); }
 	FlagCategoryList::const_iterator begin() const { return this->allSupportedFlagsByCategory.begin(); }
 	
 	FlagCategoryList::iterator end() { return this->allSupportedFlagsByCategory.end(); }
 	FlagCategoryList::const_iterator end() const { return this->allSupportedFlagsByCategory.end(); }
 	
-private:
 	wxArrayString easyFlags;
 	FlagSetsList flagSets;
 	FlagCategoryList allSupportedFlagsByCategory;
 	bool isProxyDataGenerated;
 	bool isFlagListBoxDataGenerated;
-	bool areCheckBoxesGenerated;
 };
 
 #endif
