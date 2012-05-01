@@ -80,27 +80,59 @@ DEFINE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED);
 WX_DEFINE_LIST(TCEventHandlers);
 
 void TCManager::RegisterTCBinaryChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCBinaryChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterTCBinaryChanged(): Handler at %p already registered."),
+			handler));
 	TCBinaryChangedHandlers.Append(handler);
 }
 void TCManager::UnRegisterTCBinaryChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCBinaryChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterTCBinaryChanged(): Handler at %p not registered."),
+			handler));
 	TCBinaryChangedHandlers.DeleteObject(handler);
 }
 void TCManager::RegisterTCChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterTCChanged(): Handler at %p already registered."),
+			handler));
 	TCChangedHandlers.Append(handler);
 }
 void TCManager::UnRegisterTCChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterTCChanged(): Handler at %p not registered."),
+			handler));
 	TCChangedHandlers.DeleteObject(handler);
 }
 void TCManager::RegisterTCSelectedModChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCSelectedModChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterTCSelectedModChanged(): Handler at %p already registered."),
+			handler));
 	TCSelectedModChangedHandlers.Append(handler);
 }
 void TCManager::UnRegisterTCSelectedModChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCSelectedModChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterTCSelectedModChanged(): Handler at %p not registered."),
+			handler));
 	TCSelectedModChangedHandlers.DeleteObject(handler);
 }
 void TCManager::RegisterTCFredBinaryChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCFredBinaryChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterTCFredBinaryChanged(): Handler at %p already registered."),
+			handler));
 	TCFredBinaryChangedHandlers.Append(handler);
 }
 void TCManager::UnRegisterTCFredBinaryChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCFredBinaryChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterTCFredBinaryChanged(): Handler at %p not registered."),
+			handler));
 	TCFredBinaryChangedHandlers.DeleteObject(handler);
 }
 void TCManager::GenerateTCChanged() {

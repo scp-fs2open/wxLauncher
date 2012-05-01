@@ -32,15 +32,31 @@ DEFINE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED);
 WX_DEFINE_LIST(CmdLineEventHandlers);
 
 void CmdLineManager::RegisterCmdLineChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(CmdLineChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterCmdLineChanged(): Handler at %p already registered."),
+			handler));
 	CmdLineChangedHandlers.Append(handler);
 }
 void CmdLineManager::RegisterCustomFlagsChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(CustomFlagsChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterCustomFlagsChanged(): Handler at %p already registered."),
+			handler));
 	CustomFlagsChangedHandlers.Append(handler);
 }
 void CmdLineManager::UnRegisterCmdLineChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(CmdLineChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterCmdLineChanged(): Handler at %p not registered."),
+			handler));
 	CmdLineChangedHandlers.DeleteObject(handler);
 }
 void CmdLineManager::UnRegisterCustomFlagsChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(CustomFlagsChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterCustomFlagsChanged(): Handler at %p not registered."),
+			handler));
 	CustomFlagsChangedHandlers.DeleteObject(handler);
 }
 
