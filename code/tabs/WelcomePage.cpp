@@ -115,6 +115,8 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	this->lastLinkInfo = NULL;
 	ProMan* proman = ProMan::GetProfileManager();
 
+	wxLogDebug(_T("WelcomePage is at %p."), this);
+
 #if 0
 	// language
 	wxStaticText* launcherLanguageText = new wxStaticText(this, wxID_ANY, _("Launcher language:"));

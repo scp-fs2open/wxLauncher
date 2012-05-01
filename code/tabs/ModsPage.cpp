@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
 
+	wxLogDebug(_T("ModsPage is at %p."), this);
+
 	TCManager::RegisterTCChanged(this);
 	wxCommandEvent nullEvent;
 	this->OnTCChanged(nullEvent);

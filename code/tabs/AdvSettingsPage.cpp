@@ -43,6 +43,8 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 
+	wxLogDebug(_T("AdvSettingsPage is at %p."), this);
+
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);

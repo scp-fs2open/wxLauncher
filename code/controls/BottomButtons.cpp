@@ -69,6 +69,8 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		this->SetSizerAndFit(sizer);
 		this->Layout();
 
+		wxLogDebug(_T("BottomButtons is at %p."), this);
+
 		TCManager::RegisterTCBinaryChanged(this);
 		TCManager::RegisterTCChanged(this);
 		TCManager::RegisterTCFredBinaryChanged(this);
