@@ -51,7 +51,7 @@ void CmdLineManager::GenerateCmdLineChanged() {
 		 end = CmdLineChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_CMD_LINE_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_CMD_LINE_CHANGED event to %p"), current);
 	}
 }
 
@@ -62,6 +62,6 @@ void CmdLineManager::GenerateCustomFlagsChanged() {
 		 end = CustomFlagsChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_CUSTOM_FLAGS_CHANGED event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_CUSTOM_FLAGS_CHANGED event to %p"), current);
 	}
 }

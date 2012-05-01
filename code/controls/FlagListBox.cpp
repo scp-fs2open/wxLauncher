@@ -99,7 +99,7 @@ void FlagListBox::GenerateFlagListBoxReady() {
 		 end = this->flagListBoxReadyHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_FLAG_LIST_BOX_READY event to %p"), &(*iter));
+		wxLogDebug(_T(" Sent EVT_FLAG_LIST_BOX_READY event to %p"), current);
 	}
 	
 	this->isReadyEventGenerated = true;
