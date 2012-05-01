@@ -85,14 +85,14 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, 16);
 
 	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
-	ret = outConfig.Write( L"VideocardFs2open", videocardValue);
+	ret = outConfig.Write(REG_KEY_VIDEO_RESOLUTION_DEPTH, videocardValue);
 	ReturnChecker(ret, __LINE__);	
 
 
 	wxString soundDevice;
 	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
 
-	ret = outConfig.Write( L"SoundDeviceOAL", soundDevice);
+	ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_DEVICE, soundDevice);
 	ReturnChecker(ret, __LINE__);
 
 
@@ -103,21 +103,21 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	wxString oglAnisotropicFilter;
 	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
 
-	ret = outConfig.Write( L"OGL_AnisotropicFilter", oglAnisotropicFilter);
+	ret = outConfig.Write(REG_KEY_VIDEO_ANISOTROPIC, oglAnisotropicFilter);
 	ReturnChecker(ret, __LINE__);
 
 
 	wxString connectionSpeedValue;
 	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
 
-	ret = outConfig.Write( L"ConnectionSpeed", connectionSpeedValue);
+	ret = outConfig.Write(REG_KEY_NETWORK_SPEED, connectionSpeedValue);
 	ReturnChecker(ret, __LINE__);
 
 	
 	wxString networkConnectionValue;
 	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
 
-	ret = outConfig.Write( L"NetworkConnection", networkConnectionValue);
+	ret = outConfig.Write(REG_KEY_NETWORK_TYPE, networkConnectionValue);
 	ReturnChecker(ret, __LINE__);
 
 
@@ -142,26 +142,26 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
 	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
 
-	ret = outConfig.Write( L"SpeechBriefings", inBriefings);
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_BRIEFINGS, inBriefings);
 	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write( L"SpeechIngame", inGame);
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_GAME, inGame);
 	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write( L"SpeechMulti",inMulti);
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_MULTI,inMulti);
 	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write( L"SpeechTechroom", inTechroom);
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_TECHROOM, inTechroom);
 	ReturnChecker(ret, __LINE__);
 
 	
 	int speechVolume;
 	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
 
-	ret = outConfig.Write( L"SpeechVolume", speechVolume);
+	ret = outConfig.Write(REG_KEY_SPEECH_VOLUME, speechVolume);
 	ReturnChecker(ret, __LINE__);
 
 	int speechVoice;
 	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
 
-	ret = outConfig.Write( L"SpeechVoice", speechVoice);
+	ret = outConfig.Write(REG_KEY_SPEECH_VOICE, speechVoice);
 	ReturnChecker(ret, __LINE__);
 #endif
 
@@ -170,34 +170,34 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	int oglAntiAliasSample;
 	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
 
-	ret = outConfig.Write( L"OGL_AntiAliasSamples", oglAntiAliasSample);
+	ret = outConfig.Write(REG_KEY_VIDEO_ANTI_ALIAS, oglAntiAliasSample);
 
 	wxString filterMethod;
 	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
 	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
 
-	ret = outConfig.Write( L"TextureFilter", filterMethodValue);
+	ret = outConfig.Write(REG_KEY_VIDEO_TEXTURE_FILTER, filterMethodValue);
 	ReturnChecker(ret, __LINE__);
 
 
 	int currentJoystick;
 	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
 
-	ret = outConfig.Write( L"CurrentJoystick", currentJoystick);
+	ret = outConfig.Write(REG_KEY_JOYSTICK_ID, currentJoystick);
 	ReturnChecker(ret, __LINE__);
 
 	
 	int joystickForceFeedback;
 	cfg->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &joystickForceFeedback, false);
 
-	ret = outConfig.Write( L"EnableJoystickFF", joystickForceFeedback);
+	ret = outConfig.Write(REG_KEY_JOYSTICK_FORCE_FEEDBACK, joystickForceFeedback);
 	ReturnChecker(ret, __LINE__);
 
 
 	int joystickHit;
 	cfg->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &joystickHit, false);
 
-	ret = outConfig.Write( L"EnableHitEffect", joystickHit);
+	ret = outConfig.Write(REG_KEY_JOYSTICK_DIRECTIONAL, joystickHit);
 	ReturnChecker(ret, __LINE__);
 
 
@@ -205,7 +205,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
 	if (forcedport != 0) { // only write if it's a valid port
-		ret = outConfig.Write( L"ForcePort", forcedport);
+		ret = outConfig.Write(REG_KEY_NETWORK_PORT, forcedport);
 		ReturnChecker(ret, __LINE__);
 	}
 
@@ -217,11 +217,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Network folder
 	if (forcedport != 0) { // only write if it's a valid port
-		outConfig.SetPath( L"/Network" );
+		outConfig.SetPath(REG_KEY_NETWORK_FOLDER_FILE);
 		
 		wxString networkIP;
 		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
-			ret = outConfig.Write( L"CustomIP", networkIP);
+			ret = outConfig.Write(REG_KEY_NETWORK_IP, networkIP);
 			ReturnChecker(ret, __LINE__);
 		}
 		
@@ -266,7 +266,7 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	wxString readString;
 	int readNumber;
 
-	ret = inConfig.Read(L"VideocardFs2open", &readString);
+	ret = inConfig.Read(REG_KEY_VIDEO_RESOLUTION_DEPTH, &readString);
 	if ( ret == true ) {
 		// parses VideocardFS2open into its parts
 		wxString videoCard(readString);
@@ -309,7 +309,7 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 		}
 	}
 
-	ret = inConfig.Read(L"SoundDeviceOAL", &readString);
+	ret = inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
 	}
@@ -321,77 +321,77 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 
 
 
-	ret = inConfig.Read(L"OGL_AnisotropicFilter", &readString);
+	ret = inConfig.Read(REG_KEY_VIDEO_ANISOTROPIC, &readString);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, readString);
 	}
 
-	ret = inConfig.Read(L"ConnectionSpeed", &readString);
+	ret = inConfig.Read(REG_KEY_NETWORK_SPEED, &readString);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_NETWORK_SPEED, readString);
 	}
 
-	ret = inConfig.Read(L"NetworkConnection", &readString);
+	ret = inConfig.Read(REG_KEY_NETWORK_TYPE, &readString);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_NETWORK_TYPE, readString);
 	}
 
-	ret = inConfig.Read(L"SpeechTechroom", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_IN_TECHROOM, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechBriefings", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_IN_BRIEFINGS, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechIngame", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_IN_GAME, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_GAME, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechMulti", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_IN_MULTI, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_MULTI, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechVolume", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_VOLUME, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_VOLUME, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechVoice", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
 	}
 
-	ret = inConfig.Read(L"OGL_AntiAliasSamples", &readNumber);
+	ret = inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, readNumber);
 	}
 
-	ret = inConfig.Read(L"TextureFilter", &readNumber);
+	ret = inConfig.Read(REG_KEY_VIDEO_TEXTURE_FILTER, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, readNumber);
 	}
 
-	ret = inConfig.Read(L"CurrentJoystick", &readNumber);
+	ret = inConfig.Read(REG_KEY_JOYSTICK_ID, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_ID, readNumber);
 	}
 
-	ret = inConfig.Read(L"EnableJoystickFF", &readNumber);
+	ret = inConfig.Read(REG_KEY_JOYSTICK_FORCE_FEEDBACK, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, readNumber);
 	}
 
-	ret = inConfig.Read(L"EnableHitEffect", &readNumber);
+	ret = inConfig.Read(REG_KEY_JOYSTICK_DIRECTIONAL, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, readNumber);
 	}
 
-	ret = inConfig.Read(L"SpeechVoice", &readNumber);
+	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
 	}

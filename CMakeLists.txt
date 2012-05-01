@@ -180,6 +180,7 @@ set(GLOBAL_CODE_FILES
   code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
   code/global/ids.h
+  code/global/ids.cpp
   code/global/MemoryDebugging.h
   code/global/targetver.h
   code/global/version.h

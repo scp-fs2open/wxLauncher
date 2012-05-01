@@ -226,4 +226,35 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_JOYSTICK_FORCE_FEEDBACK		_T("/joystick/forcefeedback") //!< bool
 #define PRO_CFG_JOYSTICK_DIRECTIONAL		_T("/joystick/directional") //!< bool
 /** @}*/
+
+/** \defgroup registrykeys Keys used in the registry or fs2_open.ini */
+/** @{*/
+extern const wxString REG_KEY_FOLDER_LOCATION;
+
+extern const wxString REG_KEY_VIDEO_RESOLUTION_DEPTH;
+extern const wxString REG_KEY_VIDEO_TEXTURE_FILTER;
+extern const wxString REG_KEY_VIDEO_ANISOTROPIC;
+extern const wxString REG_KEY_VIDEO_ANTI_ALIAS;
+
+extern const wxString REG_KEY_AUDIO_OPENAL_DEVICE;
+
+extern const wxString REG_KEY_SPEECH_VOICE;
+extern const wxString REG_KEY_SPEECH_VOLUME;
+extern const wxString REG_KEY_SPEECH_IN_TECHROOM;
+extern const wxString REG_KEY_SPEECH_IN_BRIEFINGS;
+extern const wxString REG_KEY_SPEECH_IN_GAME;
+extern const wxString REG_KEY_SPEECH_IN_MULTI;
+
+extern const wxString REG_KEY_JOYSTICK_ID;
+extern const wxString REG_KEY_JOYSTICK_FORCE_FEEDBACK;
+extern const wxString REG_KEY_JOYSTICK_DIRECTIONAL;
+
+extern const wxString REG_KEY_NETWORK_TYPE;
+extern const wxString REG_KEY_NETWORK_SPEED;
+extern const wxString REG_KEY_NETWORK_PORT;
+extern const wxString REG_KEY_NETWORK_FOLDER_FILE;
+extern const wxString REG_KEY_NETWORK_FOLDER_REGISTRY;
+extern const wxString REG_KEY_NETWORK_IP;
+/** @}*/
+
 #endif
