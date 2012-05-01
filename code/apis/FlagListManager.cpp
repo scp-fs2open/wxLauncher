@@ -20,7 +20,6 @@
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "datastructures/FSOExecutable.h"
-#include "tabs/AdvSettingsPage.h" // TODO remove this include once the proxy is working
 #include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
