@@ -25,18 +25,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/FlagListManager.h"
 #include "apis/SkinManager.h"
 
-// temporary My prefix to avoid name clashes with FlagFileData
-// TODO remove My prefix after changeover is complete
-class MyFlagListCheckBox: public wxCheckBox {
+class FlagListCheckBox: public wxCheckBox {
 public:
-	MyFlagListCheckBox(
+	FlagListCheckBox(
 		wxWindow* parent,
 		const wxString& label,
 		const wxString& flagString,
 		int flagIndex);
 	void OnClicked(wxCommandEvent &event);
 private:
-	MyFlagListCheckBox();
+	FlagListCheckBox();
 	wxString flagString;
 	int flagIndex;
 };
@@ -44,12 +42,12 @@ private:
 class FlagListCheckBoxItem {
 public:
 	FlagListCheckBoxItem(const wxString& fsoCategory);
-	FlagListCheckBoxItem(MyFlagListCheckBox& checkBox, wxSizer& checkBoxSizer,
+	FlagListCheckBoxItem(FlagListCheckBox& checkBox, wxSizer& checkBoxSizer,
 		const wxString& shortDescription, const wxString& flagString,
 		int flagIndex, bool isRecommendedFlag);
 	~FlagListCheckBoxItem();
 	const wxString& GetFsoCategory() const { return this->fsoCategory; }
-	MyFlagListCheckBox* GetCheckBox() { return this->checkBox; }
+	FlagListCheckBox* GetCheckBox() { return this->checkBox; }
 	wxSizer* GetCheckBoxSizer() { return this->checkBoxSizer; }
 	const wxString& GetShortDescription() const { return this->shortDescription; }
 	const wxString& GetFlagString() const { return this->flagString; }
@@ -58,7 +56,7 @@ public:
 private:
 	FlagListCheckBoxItem();
 	wxString fsoCategory;
-	MyFlagListCheckBox* checkBox;
+	FlagListCheckBox* checkBox;
 	wxSizer* checkBoxSizer;
 	wxString shortDescription;
 	wxString flagString;
@@ -81,10 +79,7 @@ public:
 	void RegisterFlagListBoxReady(wxEvtHandler *handler);
 	void UnRegisterFlagListBoxReady(wxEvtHandler *handler);
 
-	// TODO remove during changeover. make sure OnDrawItem() and OnDrawBackground() stay virtual
-	void MyOnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual void OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
-	void MyOnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual void OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual wxCoord OnMeasureItem(size_t n) const;
 	virtual void OnSize(wxSizeEvent &event);
@@ -92,22 +87,21 @@ public:
 	void OnDoubleClickFlag(wxCommandEvent &event);
 
 	// TODO will eventually get removed once the proxy is in place, I think
-	wxString GenerateStringList();
-	wxString MyGenerateStringList() const;
+	wxString GenerateStringList() const;
 
 	/** Tries to find flagString in the list of flags and set it to state,
 	returns true on successful set, returns false if cannot find flag. */
 	bool SetFlag(const wxString& flagString, bool state);
-	bool MySetFlag(const wxString& flagString, bool state);
+	
 	/** Tries to find the flagSet specified and then set or unset all flags
 	contained in the flag set, returns true on success, returns false
 	iff it cannot find the flagset.  That is, will return true if none of
 	the flags in the flag set are real flags. */
 	bool SetFlagSet(const wxString& flagSet);
+	
 	void GetFlagSets(wxArrayString& arr) const;
 	
 	void ResetFlags();
-	void MyResetFlags();
 	
 	void AcceptFlagData(FlagFileData* flagData);
 	
@@ -128,8 +122,7 @@ private:
 
 	wxStaticText* errorText;
 
-	void FindFlagAt(size_t n, Flag **flag, Flag ** catFlag) const;
-	FlagListCheckBoxItem* MyFindFlagAt(size_t n) const;
+	FlagListCheckBoxItem* FindFlagAt(size_t n) const;
 
 	DECLARE_EVENT_TABLE();
 
