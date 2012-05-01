@@ -77,6 +77,8 @@ public:
 };
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
+	wxLogDebug(_T("BasicSettingsPage is at %p."), this);
+
 	TCManager::Initialize();
 	TCManager::RegisterTCChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
