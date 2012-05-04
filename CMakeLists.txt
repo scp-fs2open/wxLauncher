@@ -101,25 +101,25 @@ include(${wxWidgets_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 
 if(IS_WIN32) # helper is only needed on windows
-add_executable(registry_helper WIN32
-  code/apis/RegistryProfileManager.cpp
-  platform/win32/registry_helper.cpp
-  code/apis/PlatformProfileManagerShared.cpp
-  code/apis/CmdLineManager.h
-  code/apis/CmdLineManager.cpp
-  code/apis/JoystickManager.h
-  code/apis/JoystickManager.cpp # needed so JOYMAN_INVALID_JOYSTICK is defined
-  code/apis/ProfileManager.h
-  code/apis/ProfileManager.cpp
-  code/controls/LightingPresets.h
-  code/controls/LightingPresets.cpp
-  )
-set_target_properties(registry_helper
-  PROPERTIES LINKER_LANGUAGE CXX
-  LINK_FLAGS /MANIFESTUAC:NO
-  COMPILE_DEFINITIONS REGISTRY_HELPER
-  )
-target_link_libraries(registry_helper ${wxWidgets_LIBRARIES})
+  add_executable(registry_helper WIN32
+    code/apis/RegistryProfileManager.cpp
+    platform/win32/registry_helper.cpp
+    code/apis/PlatformProfileManagerShared.cpp
+    code/apis/CmdLineManager.h
+    code/apis/CmdLineManager.cpp
+    code/apis/JoystickManager.h
+    code/apis/JoystickManager.cpp # needed so JOYMAN_INVALID_JOYSTICK is defined
+    code/apis/ProfileManager.h
+    code/apis/ProfileManager.cpp
+    code/controls/LightingPresets.h
+    code/controls/LightingPresets.cpp
+    )
+  set_target_properties(registry_helper
+    PROPERTIES LINKER_LANGUAGE CXX
+    LINK_FLAGS /MANIFESTUAC:NO
+    COMPILE_DEFINITIONS REGISTRY_HELPER
+    )
+  target_link_libraries(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
 # Check to see if we have a HG executable so that we will be able to
