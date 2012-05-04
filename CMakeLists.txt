@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-# We don't use C but CMake on linux complains if we don't have it enabled
+# wxLauncher does not use C, but sqlite3 does.
 project(wxlauncher CXX C) 
 
 set(VERSION_MAJOR 0)
@@ -97,8 +97,33 @@ if((IS_WIN32) AND (NOT DEFINED PLATFORM_USES_REGISTRY))
   set(PLATFORM_USES_REGISTRY TRUE)
 endif()
 
+# Setup the targets for building the sqlite3 library as a shared library
+# and setup a target to optionally build the commandline sqlite application.
+add_library(sqlite3 SHARED
+  libraries/sqlite3/sqlite3.c
+  libraries/sqlite3/sqlite3.h
+  )
+set_target_properties(sqlite3
+  PROPERTIES COMPILE_DEFINITIONS SQLITE_ENABLE_COLUMN_METADATA
+  )
+
+add_executable(sqlite3cmd
+  EXCLUDE_FROM_ALL
+  libraries/sqlite3/shell.c
+  )
+set_target_properties(sqlite3cmd
+  PROPERTIES OUTPUT_NAME sqlite
+  EXCLUDE_FROM_DEFAULT_BUILD 1
+  )
+target_link_libraries(sqlite3cmd sqlite3)
+add_dependencies(sqlite3cmd sqlite3)
+
 include(${wxWidgets_USE_FILE})
-include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_SOURCE_DIR}/code
+  ${CMAKE_SOURCE_DIR}/libraries
+  )
 
 if(IS_WIN32) # helper is only needed on windows
   add_executable(registry_helper WIN32
@@ -257,10 +282,19 @@ set_source_files_properties(
   code/global/configure_launcher.h.in
   PROPERTIES HEADER_FILE_ONLY true)
 
-add_dependencies(wxlauncher helpmaker version.cpp.maker)
 if(IS_WIN32)
-  add_dependencies(wxlauncher registry_helper)
-endif(IS_WIN32)
+  set(WIN32_ONLY_DEPENDENCIES_wxLauncher
+    registry_helper
+    )
+else()
+  set(WIN32_ONLY_DEPENDENCIES_wxLauncher)
+endif()
+add_dependencies(wxlauncher
+  ${WIN32_ONLY_DEPENDENCIES_wxLauncher}
+  sqlite3
+  version.cpp.maker
+  helpmaker
+  )
 
 configure_file(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h)
@@ -269,7 +303,7 @@ foreach(temp_file ${helpmaker_temp_files})
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${temp_file})
 endforeach(temp_file)
 
-target_link_libraries(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
+target_link_libraries(wxlauncher sqlite3 ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
 
 # adapted from http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_apply_resources_on_Mac_OS_X_automatically.3F
 # copies necessary resources (and frameworks, if needed) to .app bundle
