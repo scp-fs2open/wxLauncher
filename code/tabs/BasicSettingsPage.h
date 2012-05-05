@@ -19,7 +19,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef BASICSETTINGSPAGE_H
 #define BASICSETTINGSPAGE_H
 
+#include <vector>
+
 #include <wx/wx.h>
+
+/** A mechanism for allowing a network settings option's description (GUI label)
+ to differ from its corresponding registry value. */
+class NetworkSettingsOption {
+public:
+	NetworkSettingsOption(const wxString& regValue, const wxString& guiDesc);
+	const wxString& GetRegistryValue() const { return this->regValue; }
+	const wxString& GetDescription() const { return this->guiDesc; }
+private:
+	NetworkSettingsOption();
+	wxString regValue;
+	wxString guiDesc;
+};
 
 class BasicSettingsPage : public wxPanel {
 public:
@@ -87,6 +102,11 @@ private:
 	void SetupOpenALSection();
 	void SetupJoystickSection();
 	void SetupControlsForJoystick(unsigned int i);
+	
+	static void InitializeNetworkOptions();
+	static std::vector<NetworkSettingsOption> networkTypeOptions;
+	static std::vector<NetworkSettingsOption> networkSpeedOptions;
+	
 	DECLARE_EVENT_TABLE();
 
 private:

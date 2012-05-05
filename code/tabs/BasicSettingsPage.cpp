@@ -41,6 +41,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+std::vector<NetworkSettingsOption> BasicSettingsPage::networkTypeOptions;
+std::vector<NetworkSettingsOption> BasicSettingsPage::networkSpeedOptions;
+
+NetworkSettingsOption::NetworkSettingsOption(
+	const wxString& regValue,
+	const wxString& guiDesc)
+: regValue(regValue), guiDesc(guiDesc) {
+	wxASSERT(!regValue.IsEmpty());
+	wxASSERT(!guiDesc.IsEmpty());
+}
+
+const size_t DEFAULT_VALUE_INDEX = 0;
+const wxString EMPTY_STRING(wxEmptyString);
+
+const wxString& GetDefaultRegistryValue(
+	const std::vector<NetworkSettingsOption>& options) {
+	wxCHECK_MSG(!options.empty(), EMPTY_STRING,
+		_T("GetDefaultRegistryValue(): passed in options vector is empty."));
+	
+	return options[DEFAULT_VALUE_INDEX].GetRegistryValue();
+}
+
 /** The index in the basic settings page's sizer where the settings sizer is located. */
 const size_t SETTINGS_SIZER_INDEX = 1;
 
@@ -76,9 +98,29 @@ public:
 	}
 };
 
+void BasicSettingsPage::InitializeNetworkOptions() {
+	wxASSERT(networkTypeOptions.empty());
+	wxASSERT(networkSpeedOptions.empty());
+	
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("Dialup"), _T("Dialup")));
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("LAN"), _T("Broadband/LAN")));
+	
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Slow"), _T("28k modem")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("56K"), _T("56k modem")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("ISDN"), _T("ISDN")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Cable"), _T("DSL")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Fast"), _T("Cable/LAN")));
+}
+
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxLogDebug(_T("BasicSettingsPage is at %p."), this);
 
+	if (networkTypeOptions.empty() || networkSpeedOptions.empty()) {
+		InitializeNetworkOptions();
+	}
+	
 	TCManager::Initialize();
 	TCManager::RegisterTCChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
@@ -450,21 +492,29 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
 
 	wxChoice* networkType = new wxChoice(this, ID_NETWORK_TYPE);
-	networkType->Append(_T("None"));
-	networkType->Append(_T("Dialup"));
-	networkType->Append(_T("LAN"));
+	for (std::vector<NetworkSettingsOption>::const_iterator
+		 it = networkTypeOptions.begin(),
+		 end = networkTypeOptions.end();
+		 it != end; ++it) {
+		networkType->Append(it->GetDescription());
+	}
+	
 	wxString type;
-	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type, _T("None"), true);
+	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type,
+		GetDefaultRegistryValue(networkTypeOptions), true);
 	networkType->SetStringSelection(type);
+	
 	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
-	networkSpeed->Append(_T("None"));
-	networkSpeed->Append(_T("Slow"));
-	networkSpeed->Append(_T("56K"));
-	networkSpeed->Append(_T("ISDN"));
-	networkSpeed->Append(_T("Cable"));
-	networkSpeed->Append(_T("Fast"));
+	for (std::vector<NetworkSettingsOption>::const_iterator
+		 it = networkSpeedOptions.begin(),
+		 end = networkSpeedOptions.end();
+		 it != end; ++it) {
+		networkSpeed->Append(it->GetDescription());
+	}
+	
 	wxString speed;
-	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed, _T("None"), true);
+	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed,
+		GetDefaultRegistryValue(networkSpeedOptions), true);
 	networkSpeed->SetStringSelection(speed);
 
 	wxTextCtrl* networkPort = 
@@ -1515,7 +1565,8 @@ void BasicSettingsPage::OnSelectNetworkSpeed(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(networkSpeed != NULL, _T("Unable to find Network speed choice"));
 
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_SPEED, networkSpeed->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_SPEED,
+		networkSpeedOptions[networkSpeed->GetSelection()].GetRegistryValue());
 }
 
 void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
@@ -1523,7 +1574,8 @@ void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(networkType != NULL, _T("Unable to find Network type choice"));
 
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_TYPE, networkType->GetStringSelection());
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_TYPE,
+		networkTypeOptions[networkType->GetSelection()].GetRegistryValue());
 }
 
 void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
