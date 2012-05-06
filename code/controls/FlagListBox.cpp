@@ -95,6 +95,7 @@ void FlagListBox::UnRegisterFlagListBoxReady(wxEvtHandler *handler) {
 }
 
 void FlagListBox::GenerateFlagListBoxReady() {
+	wxASSERT(this->IsReady());
 	wxASSERT_MSG(!this->isReadyEventGenerated,
 		_T("GenerateFlagListBoxReady() was called a second time."));
 	
@@ -214,7 +215,7 @@ FlagListBox::~FlagListBox() {
 }
 
 FlagListCheckBoxItem* FlagListBox::FindFlagAt(size_t n) const {
-	wxCHECK_MSG(this->isReady, NULL,
+	wxCHECK_MSG(this->IsReady(), NULL,
 		_T("FindFlagAt() called when flag list box is not ready"));
 	wxCHECK_MSG(n >= 0 && n < this->checkBoxes.GetCount(), NULL,
 		wxString::Format(_T("FindFlagAt() called with out-of-range value %lu"), n));
@@ -284,7 +285,7 @@ wxCoord FlagListBox::OnMeasureItem(size_t n) const {
 void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	
-	if (this->isReady) {
+	if (this->IsReady()) {
 		FlagListCheckBoxItem* item = FindFlagAt(n);
 		if (item != NULL && item->GetFlagString().IsEmpty()) { // category header
 			background = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
@@ -325,8 +326,8 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 }
 
 void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
-	wxCHECK_RET(this->flagData != NULL,
-		_T("OnDoubleClickFlag() called when flag data was null."));
+	wxCHECK_RET(this->IsReady(),
+		_T("OnDoubleClickFlag() called when flag list box is not ready."));
 	
 	const wxString* webURL = this->flagData->GetWebURL(this->GetSelection());
 	wxCHECK_RET(webURL != NULL,
@@ -340,7 +341,7 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 wxString FlagListBox::GenerateStringList() const {
 	wxString flagList;
 	
-	wxCHECK_MSG(this->isReady, wxEmptyString,
+	wxCHECK_MSG(this->IsReady(), wxEmptyString,
 		_T("GenerateStringList() called when flag list box is not ready."));
 	
 	FlagListCheckBoxItems::const_iterator it = this->checkBoxes.begin();
@@ -364,7 +365,7 @@ wxString FlagListBox::GenerateStringList() const {
 }
 
 bool FlagListBox::SetFlag(const wxString& flagString, const bool state) {
-	wxCHECK_MSG(this->isReady, false,
+	wxCHECK_MSG(this->IsReady(), false,
 		_T("SetFlag() called when flag list box is not ready."));
 	wxCHECK_MSG(!flagString.IsEmpty(), false,
 		_T("SetFlag() called with empty flagString."));
@@ -390,8 +391,8 @@ END_EVENT_TABLE()
 
 bool FlagListBox::SetFlagSet(const wxString& setToFind) {
 	wxASSERT(!setToFind.IsEmpty());
-	wxCHECK_MSG(this->flagData != NULL, false,
-		_T("SetFlagSet() called when flagData was null."));
+	wxCHECK_MSG(this->IsReady(), false,
+		_T("SetFlagSet() called when flag list box is not ready."));
 	
 	const FlagSet* flagSet = this->flagData->GetFlagSet(setToFind); 
 	
@@ -416,8 +417,8 @@ bool FlagListBox::SetFlagSet(const wxString& setToFind) {
 
 void FlagListBox::GetFlagSets(wxArrayString& arr) const {
 	wxASSERT(arr.IsEmpty());
-	wxCHECK_RET(this->flagData != NULL,
-		_T("GetFlagSets() called when flagData was null."));
+	wxCHECK_RET(this->IsReady(),
+		_T("GetFlagSets() called when flag list box is not ready."));
 	
 	this->flagData->GetFlagSetNames(arr);
 }
