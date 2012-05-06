@@ -32,6 +32,7 @@ public:
 private:
 	void UpdateComponents(const bool resetFlagList = true);
 	void RefreshFlags(const bool resetFlagList = true);
+	void UpdateFlagSetsBox();
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
 	SkinSystem *skin;
