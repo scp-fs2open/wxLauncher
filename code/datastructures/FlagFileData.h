@@ -62,7 +62,7 @@ class ProxyFlagDataItem {
 public:
 	ProxyFlagDataItem(const wxString& flagString, int flagIndex);
 	const wxString& GetFlagString() const { return flagString; }
-	int getFlagIndex() const { return flagIndex; }
+	int GetFlagIndex() const { return flagIndex; }
 private:
 	wxString flagString;
 	int flagIndex;
