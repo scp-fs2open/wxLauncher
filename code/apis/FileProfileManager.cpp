@@ -217,7 +217,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Network folder
 	if (forcedport != 0) { // only write if it's a valid port
-		outConfig.SetPath(REG_KEY_NETWORK_FOLDER_FILE);
+		outConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
 		
 		wxString networkIP;
 		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
@@ -225,7 +225,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 			ReturnChecker(ret, __LINE__);
 		}
 		
-		outConfig.SetPath( L"/");
+		outConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
 	}
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
