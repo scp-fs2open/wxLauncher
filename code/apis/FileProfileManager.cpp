@@ -247,15 +247,13 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 
 	wxFFileInputStream inConfigStream(inFileName.GetFullPath(), _T("rb"));
 	wxFileConfig inConfig(inConfigStream, wxMBConvUTF8());
-	bool ret;
 
 	wxString readString;
 	int readNumber;
 
 
 	// Video
-	ret = inConfig.Read(REG_KEY_VIDEO_RESOLUTION_DEPTH, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_VIDEO_RESOLUTION_DEPTH, &readString) ) {
 		// parses VideocardFS2open into its parts
 		wxString videoCard(readString);
 		wxString rest, rest1, rest2, rest3;
@@ -297,104 +295,83 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 		}
 	}
 
-	ret = inConfig.Read(REG_KEY_VIDEO_TEXTURE_FILTER, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_VIDEO_TEXTURE_FILTER, &readNumber) ) {
 		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_VIDEO_ANISOTROPIC, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_VIDEO_ANISOTROPIC, &readString) ) {
 		cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, readString);
 	}
 
-	ret = inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber) ) {
 		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, readNumber);
 	}
 
 
 	// Audio
-	ret = inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString) ) {
 		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
 	}
 
 
 	// Speech
 #if IS_WIN32 // Linux/OS X don't yet support speech
-	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_VOLUME, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_VOLUME, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_VOLUME, readNumber);
 	}
 	
-	ret = inConfig.Read(REG_KEY_SPEECH_IN_TECHROOM, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_IN_TECHROOM, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_IN_BRIEFINGS, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_IN_BRIEFINGS, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_IN_GAME, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_IN_GAME, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_GAME, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_IN_MULTI, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_SPEECH_IN_MULTI, &readNumber) ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_MULTI, readNumber);
 	}
 #endif
 
 
 	// Joystick
-	ret = inConfig.Read(REG_KEY_JOYSTICK_ID, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_JOYSTICK_ID, &readNumber) ) {
 		cfg->Write(PRO_CFG_JOYSTICK_ID, readNumber);
 	}
 	
-	ret = inConfig.Read(REG_KEY_JOYSTICK_FORCE_FEEDBACK, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_JOYSTICK_FORCE_FEEDBACK, &readNumber) ) {
 		cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, readNumber);
 	}
 	
-	ret = inConfig.Read(REG_KEY_JOYSTICK_DIRECTIONAL, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_JOYSTICK_DIRECTIONAL, &readNumber) ) {
 		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, readNumber);
 	}
 
 
 	//  Network
-	ret = inConfig.Read(REG_KEY_NETWORK_TYPE, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_NETWORK_TYPE, &readString) ) {
 		cfg->Write(PRO_CFG_NETWORK_TYPE, readString);
 	}
 
-	ret = inConfig.Read(REG_KEY_NETWORK_SPEED, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_NETWORK_SPEED, &readString) ) {
 		cfg->Write(PRO_CFG_NETWORK_SPEED, readString);
 	}
 
-	ret = inConfig.Read(REG_KEY_NETWORK_PORT, &readNumber);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_NETWORK_PORT, &readNumber) ) {
 		cfg->Write(PRO_CFG_NETWORK_PORT, readNumber);
 	}
 
-	inConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
-	
-	ret = inConfig.Read(REG_KEY_NETWORK_IP, &readString);
-	if ( ret == true ) {
+	if ( inConfig.Read(REG_KEY_NETWORK_IP, &readString) ) {
 		cfg->Write(PRO_CFG_NETWORK_IP, readString);
 	}
-	
-	inConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
 
 
 	return ProMan::NoError;
