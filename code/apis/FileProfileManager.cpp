@@ -79,16 +79,41 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	wxFileConfig outConfig(inConfigStream, wxMBConvUTF8());
 	bool ret;	
 
+	// Video
 	int width, height, bitdepth;
 	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
 	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 768);
 	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, 16);
 
 	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
+
 	ret = outConfig.Write(REG_KEY_VIDEO_RESOLUTION_DEPTH, videocardValue);
-	ReturnChecker(ret, __LINE__);	
+	ReturnChecker(ret, __LINE__);
+
+	
+	wxString filterMethod;
+	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
+	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
+	
+	ret = outConfig.Write(REG_KEY_VIDEO_TEXTURE_FILTER, filterMethodValue);
+	ReturnChecker(ret, __LINE__);
+	
+
+	wxString oglAnisotropicFilter;
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
+
+	ret = outConfig.Write(REG_KEY_VIDEO_ANISOTROPIC, oglAnisotropicFilter);
+	ReturnChecker(ret, __LINE__);
+	
+
+	int oglAntiAliasSample;
+	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
+
+	ret = outConfig.Write(REG_KEY_VIDEO_ANTI_ALIAS, oglAntiAliasSample);
+	ReturnChecker(ret, __LINE__);
 
 
+	// Audio
 	wxString soundDevice;
 	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
 
@@ -96,97 +121,50 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
-	// GammaD3D
-
-	// Language
-
-	wxString oglAnisotropicFilter;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
-
-	ret = outConfig.Write(REG_KEY_VIDEO_ANISOTROPIC, oglAnisotropicFilter);
-	ReturnChecker(ret, __LINE__);
-
-
-	wxString connectionSpeedValue;
-	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
-
-	ret = outConfig.Write(REG_KEY_NETWORK_SPEED, connectionSpeedValue);
-	ReturnChecker(ret, __LINE__);
-
-	
-	wxString networkConnectionValue;
-	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
-
-	ret = outConfig.Write(REG_KEY_NETWORK_TYPE, networkConnectionValue);
-	ReturnChecker(ret, __LINE__);
-
-
-	// ImageExportNum
-	
-	// LowMem
-
-	// ForceFullscreen
-
-	// MaxFPS
-
-	// SoundSampleRate
-
-	// SoundSampleBits
-
-	// ScreenshotNum
-
+	// Speech
 #if IS_WIN32 // speech is currently not supported in OS X or Linux (although Windows doesn't use this code)
-	int inMulti, inTechroom, inBriefings, inGame;
-	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
+	int speechVoice;
+	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
 
-	ret = outConfig.Write(REG_KEY_SPEECH_IN_BRIEFINGS, inBriefings);
-	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write(REG_KEY_SPEECH_IN_GAME, inGame);
-	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write(REG_KEY_SPEECH_IN_MULTI,inMulti);
-	ReturnChecker(ret, __LINE__);
-	ret = outConfig.Write(REG_KEY_SPEECH_IN_TECHROOM, inTechroom);
+	ret = outConfig.Write(REG_KEY_SPEECH_VOICE, speechVoice);
 	ReturnChecker(ret, __LINE__);
 
-	
+
 	int speechVolume;
 	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
 
 	ret = outConfig.Write(REG_KEY_SPEECH_VOLUME, speechVolume);
 	ReturnChecker(ret, __LINE__);
 
-	int speechVoice;
-	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
 
-	ret = outConfig.Write(REG_KEY_SPEECH_VOICE, speechVoice);
+	int inTechroom, inBriefings, inGame, inMulti;
+	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
+
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_TECHROOM, inTechroom);
+	ReturnChecker(ret, __LINE__);
+
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_BRIEFINGS, inBriefings);
+	ReturnChecker(ret, __LINE__);
+
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_GAME, inGame);
+	ReturnChecker(ret, __LINE__);
+
+	ret = outConfig.Write(REG_KEY_SPEECH_IN_MULTI, inMulti);
 	ReturnChecker(ret, __LINE__);
 #endif
 
-	// Fullscreen
 
-	int oglAntiAliasSample;
-	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
-
-	ret = outConfig.Write(REG_KEY_VIDEO_ANTI_ALIAS, oglAntiAliasSample);
-
-	wxString filterMethod;
-	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
-	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
-
-	ret = outConfig.Write(REG_KEY_VIDEO_TEXTURE_FILTER, filterMethodValue);
-	ReturnChecker(ret, __LINE__);
-
-
+	// Joystick
 	int currentJoystick;
 	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_ID, currentJoystick);
 	ReturnChecker(ret, __LINE__);
 
-	
+
 	int joystickForceFeedback;
 	cfg->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &joystickForceFeedback, false);
 
@@ -201,22 +179,29 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
+	// Network
+	wxString networkConnectionValue;
+	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
+
+	ret = outConfig.Write(REG_KEY_NETWORK_TYPE, networkConnectionValue);
+	ReturnChecker(ret, __LINE__);
+
+
+	wxString connectionSpeedValue;
+	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
+
+	ret = outConfig.Write(REG_KEY_NETWORK_SPEED, connectionSpeedValue);
+	ReturnChecker(ret, __LINE__);
+
+
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
 	if (forcedport != 0) { // only write if it's a valid port
 		ret = outConfig.Write(REG_KEY_NETWORK_PORT, forcedport);
 		ReturnChecker(ret, __LINE__);
-	}
 
-	// PXOBanners
-
-	// ProcessorAffinity
-
-	// PXO folder
-
-	// Network folder
-	if (forcedport != 0) { // only write if it's a valid port
+		// custom IP is written to "Network" folder
 		outConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
 		
 		wxString networkIP;
@@ -227,6 +212,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 		
 		outConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
 	}
+
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
@@ -266,6 +252,8 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	wxString readString;
 	int readNumber;
 
+
+	// Video
 	ret = inConfig.Read(REG_KEY_VIDEO_RESOLUTION_DEPTH, &readString);
 	if ( ret == true ) {
 		// parses VideocardFS2open into its parts
@@ -309,33 +297,41 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 		}
 	}
 
-	ret = inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString);
+	ret = inConfig.Read(REG_KEY_VIDEO_TEXTURE_FILTER, &readNumber);
 	if ( ret == true ) {
-		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
+		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, readNumber);
 	}
-
-	// GammaD3D
-
-
-	// Language
-
-
 
 	ret = inConfig.Read(REG_KEY_VIDEO_ANISOTROPIC, &readString);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, readString);
 	}
 
-	ret = inConfig.Read(REG_KEY_NETWORK_SPEED, &readString);
+	ret = inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber);
 	if ( ret == true ) {
-		cfg->Write(PRO_CFG_NETWORK_SPEED, readString);
+		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_NETWORK_TYPE, &readString);
+
+	// Audio
+	ret = inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString);
 	if ( ret == true ) {
-		cfg->Write(PRO_CFG_NETWORK_TYPE, readString);
+		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
 	}
 
+
+	// Speech
+#if IS_WIN32 // Linux/OS X don't yet support speech
+	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
+	if ( ret == true ) {
+		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
+	}
+
+	ret = inConfig.Read(REG_KEY_SPEECH_VOLUME, &readNumber);
+	if ( ret == true ) {
+		cfg->Write(PRO_CFG_SPEECH_VOLUME, readNumber);
+	}
+	
 	ret = inConfig.Read(REG_KEY_SPEECH_IN_TECHROOM, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, readNumber);
@@ -355,46 +351,51 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_SPEECH_IN_MULTI, readNumber);
 	}
+#endif
 
-	ret = inConfig.Read(REG_KEY_SPEECH_VOLUME, &readNumber);
-	if ( ret == true ) {
-		cfg->Write(PRO_CFG_SPEECH_VOLUME, readNumber);
-	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
-	if ( ret == true ) {
-		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
-	}
-
-	ret = inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber);
-	if ( ret == true ) {
-		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, readNumber);
-	}
-
-	ret = inConfig.Read(REG_KEY_VIDEO_TEXTURE_FILTER, &readNumber);
-	if ( ret == true ) {
-		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, readNumber);
-	}
-
+	// Joystick
 	ret = inConfig.Read(REG_KEY_JOYSTICK_ID, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_ID, readNumber);
 	}
-
+	
 	ret = inConfig.Read(REG_KEY_JOYSTICK_FORCE_FEEDBACK, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, readNumber);
 	}
-
+	
 	ret = inConfig.Read(REG_KEY_JOYSTICK_DIRECTIONAL, &readNumber);
 	if ( ret == true ) {
 		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, readNumber);
 	}
 
-	ret = inConfig.Read(REG_KEY_SPEECH_VOICE, &readNumber);
+
+	//  Network
+	ret = inConfig.Read(REG_KEY_NETWORK_TYPE, &readString);
 	if ( ret == true ) {
-		cfg->Write(PRO_CFG_SPEECH_VOICE, readNumber);
+		cfg->Write(PRO_CFG_NETWORK_TYPE, readString);
 	}
+
+	ret = inConfig.Read(REG_KEY_NETWORK_SPEED, &readString);
+	if ( ret == true ) {
+		cfg->Write(PRO_CFG_NETWORK_SPEED, readString);
+	}
+
+	ret = inConfig.Read(REG_KEY_NETWORK_PORT, &readNumber);
+	if ( ret == true ) {
+		cfg->Write(PRO_CFG_NETWORK_PORT, readNumber);
+	}
+
+	inConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
+	
+	ret = inConfig.Read(REG_KEY_NETWORK_IP, &readString);
+	if ( ret == true ) {
+		cfg->Write(PRO_CFG_NETWORK_IP, readString);
+	}
+	
+	inConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
+
 
 	return ProMan::NoError;
 }
