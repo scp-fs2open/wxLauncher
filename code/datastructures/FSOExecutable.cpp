@@ -109,7 +109,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_FILES);
 #endif
 
-	while (cont == true) {
+	while (cont) {
 #if IS_LINUX
 		if ( !filename.EndsWith(_T(".exe"))
 			&& !filename.EndsWith(_T(".app")) ) {
