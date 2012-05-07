@@ -216,6 +216,8 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		wxCHECK_RET(flagData != NULL,
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
 		this->flagListBox->AcceptFlagData(flagData);
+		// TODO: remove the GenerateCmdLineChanged() when the proxy is complete
+		CmdLineManager::GenerateCmdLineChanged();
 	} else {
 		this->flagListBox->SetItemCount(1); // for the errorText
 	}
