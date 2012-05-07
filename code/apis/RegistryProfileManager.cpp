@@ -130,6 +130,8 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		}
 #endif	
 	}
+
+	// Video
 	int width, height, bitdepth;
 	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
 	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 768);
@@ -146,153 +148,6 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
-	wxString soundDevice;
-	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_AUDIO_OPENAL_DEVICE,
-		0,
-		REG_SZ,
-		(BYTE*)soundDevice.c_str(),
-		(soundDevice.size() + 1)*2);
-	ReturnChecker(ret, __LINE__);
-
-
-	// GammaD3D
-
-	// Language
-
-	wxString oglAnisotropicFilter;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_VIDEO_ANISOTROPIC,
-		0,
-		REG_SZ,
-		(BYTE*)oglAnisotropicFilter.c_str(),
-		(oglAnisotropicFilter.size() + 1)*2);
-	ReturnChecker(ret, __LINE__);
-
-
-	wxString connectionSpeedValue;
-	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_NETWORK_SPEED,
-		0,
-		REG_SZ,
-		(BYTE*)connectionSpeedValue.c_str(),
-		(connectionSpeedValue.size() + 1)*2);
-	ReturnChecker(ret, __LINE__);
-
-	
-	wxString networkConnectionValue;
-	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_NETWORK_TYPE,
-		0,
-		REG_SZ,
-		(BYTE*)networkConnectionValue.c_str(),
-		(networkConnectionValue.size() + 1)*2);
-	ReturnChecker(ret, __LINE__);
-
-
-	// ImageExportNum
-	
-	// LowMem
-
-	// ForceFullscreen
-
-	// MaxFPS
-
-	// SoundSampleRate
-
-	// SoundSampleBits
-
-	// ScreenshotNum
-
-	int inMulti, inTechroom, inBriefings, inGame;
-	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_BRIEFINGS,
-		0,
-		REG_DWORD,
-		(BYTE*)&inBriefings,
-		sizeof(inBriefings));
-	ReturnChecker(ret, __LINE__);
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_GAME,
-		0,
-		REG_DWORD,
-		(BYTE*)&inGame,
-		sizeof(inGame));
-	ReturnChecker(ret, __LINE__);
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_MULTI,
-		0,
-		REG_DWORD,
-		(BYTE*)&inMulti,
-		sizeof(inMulti));
-	ReturnChecker(ret, __LINE__);
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_TECHROOM,
-		0,
-		REG_DWORD,
-		(BYTE*)&inTechroom,
-		sizeof(inTechroom));
-	ReturnChecker(ret, __LINE__);
-
-	
-	int speechVolume;
-	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_VOLUME,
-		0,
-		REG_DWORD,
-		(BYTE*)&speechVolume,
-		sizeof(speechVolume));
-	ReturnChecker(ret, __LINE__);
-
-	int speechVoice;
-	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_SPEECH_VOICE,
-		0,
-		REG_DWORD,
-		(BYTE*)&speechVoice,
-		sizeof(speechVoice));
-	ReturnChecker(ret, __LINE__);
-
-	// Fullscreen
-
-	int oglAntiAliasSample;
-	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
-
-	ret = RegSetValueExW(
-		regHandle,
-		REG_KEY_VIDEO_ANTI_ALIAS,
-		0,
-		REG_DWORD,
-		(BYTE*)&oglAntiAliasSample,
-		sizeof(oglAntiAliasSample));
-
 	wxString filterMethod;
 	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
 	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
@@ -307,6 +162,117 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
+	wxString oglAnisotropicFilter;
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_VIDEO_ANISOTROPIC,
+		0,
+		REG_SZ,
+		(BYTE*)oglAnisotropicFilter.c_str(),
+		(oglAnisotropicFilter.size() + 1)*2);
+	ReturnChecker(ret, __LINE__);
+
+
+	int oglAntiAliasSample;
+	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
+		
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_VIDEO_ANTI_ALIAS,
+		0,
+		REG_DWORD,
+		(BYTE*)&oglAntiAliasSample,
+		sizeof(oglAntiAliasSample));
+	ReturnChecker(ret, __LINE__);
+
+
+	// Audio
+	wxString soundDevice;
+	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_AUDIO_OPENAL_DEVICE,
+		0,
+		REG_SZ,
+		(BYTE*)soundDevice.c_str(),
+		(soundDevice.size() + 1)*2);
+	ReturnChecker(ret, __LINE__);
+
+
+	// Speech
+	int speechVoice;
+	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_VOICE,
+		0,
+		REG_DWORD,
+		(BYTE*)&speechVoice,
+		sizeof(speechVoice));
+	ReturnChecker(ret, __LINE__);
+
+
+	int speechVolume;
+	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_VOLUME,
+		0,
+		REG_DWORD,
+		(BYTE*)&speechVolume,
+		sizeof(speechVolume));
+	ReturnChecker(ret, __LINE__);
+
+
+	int inTechroom, inBriefings, inGame, inMulti;
+	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_TECHROOM,
+		0,
+		REG_DWORD,
+		(BYTE*)&inTechroom,
+		sizeof(inTechroom));
+	ReturnChecker(ret, __LINE__);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_BRIEFINGS,
+		0,
+		REG_DWORD,
+		(BYTE*)&inBriefings,
+		sizeof(inBriefings));
+	ReturnChecker(ret, __LINE__);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_GAME,
+		0,
+		REG_DWORD,
+		(BYTE*)&inGame,
+		sizeof(inGame));
+	ReturnChecker(ret, __LINE__);
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_MULTI,
+		0,
+		REG_DWORD,
+		(BYTE*)&inMulti,
+		sizeof(inMulti));
+	ReturnChecker(ret, __LINE__);
+
+
+	// Joystick
 	int currentJoystick;
 	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
 
@@ -345,10 +311,38 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		sizeof(joystickHit));
 	ReturnChecker(ret, __LINE__);
 
+
+	// Network
+	wxString networkConnectionValue;
+	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_NETWORK_TYPE,
+		0,
+		REG_SZ,
+		(BYTE*)networkConnectionValue.c_str(),
+		(networkConnectionValue.size() + 1)*2);
+	ReturnChecker(ret, __LINE__);
+
+
+	wxString connectionSpeedValue;
+	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
+
+	ret = RegSetValueExW(
+		regHandle,
+		REG_KEY_NETWORK_SPEED,
+		0,
+		REG_SZ,
+		(BYTE*)connectionSpeedValue.c_str(),
+		(connectionSpeedValue.size() + 1)*2);
+	ReturnChecker(ret, __LINE__);
+
+
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
 
-	if (forcedport != 0) { // only write port if it's a valid port
+	if (forcedport != 0) { // only write port and IP addr if port is valid
 		ret = RegSetValueExW(
 			regHandle,
 			REG_KEY_NETWORK_PORT,
@@ -357,28 +351,21 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			(BYTE*)&forcedport,
 			sizeof(forcedport));
 		ReturnChecker(ret, __LINE__);
-	}
-	// PXOBanners
 
-	// ProcessorAffinity
+		// Network folder (for custom IP address)
+		HKEY networkRegHandle = 0;
+		ret = RegCreateKeyExW(
+			regHandle,
+			REG_KEY_NETWORK_FOLDER_REGISTRY,
+			0,
+			NULL,
+			REG_OPTION_NON_VOLATILE,
+			KEY_WRITE,
+			NULL,
+			&networkRegHandle,
+			NULL);  // just want handle, don't care if it was created or opened
+		ReturnChecker(ret, __LINE__);
 
-	// PXO folder
-
-	// Network folder
-	HKEY networkRegHandle = 0;
-	ret = RegCreateKeyExW(
-		regHandle,
-		REG_KEY_NETWORK_FOLDER_REGISTRY,
-		0,
-		NULL,
-		REG_OPTION_NON_VOLATILE,
-		KEY_WRITE,
-		NULL,
-		&networkRegHandle,
-		NULL);  // just want handle, don't care if it was created or opened
-	ReturnChecker(ret, __LINE__);
-
-	if (forcedport != 0) { // only write if forcedport is a valid port
 		wxString networkIP;
 		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
 			ret = RegSetValueExW(
@@ -390,10 +377,11 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 				(networkIP.size()+1)*2);
 			ReturnChecker(ret, __LINE__);
 		}
+
+		RegCloseKey(networkRegHandle);
 	}
 
 	RegCloseKey(regHandle);
-	RegCloseKey(networkRegHandle);
 
 	return PushCmdlineFSO(cfg);
 #else // PLATFORM_USES_REGISTRY
@@ -470,17 +458,23 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		if ( inConfig.Read(PRO_CFG_VIDEO_BIT_DEPTH, &configData) ) {
 			cfg->Write(PRO_CFG_VIDEO_BIT_DEPTH, configData);
 		}
-		if ( inConfig.Read(PRO_CFG_OPENAL_DEVICE, &configData) ) {
-			cfg->Write(PRO_CFG_OPENAL_DEVICE, configData);
+		if ( inConfig.Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &configData) ) {
+			cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, configData);
 		}
 		if ( inConfig.Read(PRO_CFG_VIDEO_ANISOTROPIC, &configData) ) {
 			cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, configData);
 		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_SPEED, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_SPEED, configData);
+		if ( inConfig.Read(PRO_CFG_VIDEO_ANTI_ALIAS, &configData) ) {
+			cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, configData);
 		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_TYPE, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_TYPE, configData);
+		if ( inConfig.Read(PRO_CFG_OPENAL_DEVICE, &configData) ) {
+			cfg->Write(PRO_CFG_OPENAL_DEVICE, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
+			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_SPEECH_VOLUME, &configData) ) {
+			cfg->Write(PRO_CFG_SPEECH_VOLUME, configData);
 		}
 		if ( inConfig.Read(PRO_CFG_SPEECH_IN_TECHROOM, &configData) ) {
 			cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, configData);
@@ -494,24 +488,27 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		if ( inConfig.Read(PRO_CFG_SPEECH_IN_MULTI, &configData) ) {
 			cfg->Write(PRO_CFG_SPEECH_IN_MULTI, configData);
 		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_VOLUME, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_VOLUME, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_ANTI_ALIAS, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, configData);
-		}
 		if ( inConfig.Read(PRO_CFG_JOYSTICK_ID, &configData) ) {
 			cfg->Write(PRO_CFG_JOYSTICK_ID, configData);
 		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
-		}		
+		if ( inConfig.Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &configData) ) {
+			cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &configData) ) {
+			cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_NETWORK_TYPE, &configData) ) {
+			cfg->Write(PRO_CFG_NETWORK_TYPE, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_NETWORK_SPEED, &configData) ) {
+			cfg->Write(PRO_CFG_NETWORK_SPEED, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_NETWORK_PORT, &configData) ) {
+			cfg->Write(PRO_CFG_NETWORK_PORT, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_NETWORK_IP, &configData) ) {
+			cfg->Write(PRO_CFG_NETWORK_IP, configData);
+		}
 
 		if ( ret == ProMan::NoError ) {
 			// no error so just return, because the other process did what I needed.
@@ -522,12 +519,13 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		}
 #endif	
 	}
-	cfg->Write(_T("Test"), _T("Test"));
 	wxMBConvUTF16 textConv;
 	DWORD type = 0;
 	BYTE data[MAX_PATH*2];
+	memset(static_cast<void*>(data), 0, MAX_PATH*2);
 	DWORD dataSize = sizeof(data);
 
+	// Video
 	ret = RegQueryValueEx(
 		regHandle,
 		REG_KEY_VIDEO_RESOLUTION_DEPTH,
@@ -583,36 +581,28 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		}
 	}
 
+
+	DWORD numberdata;
+	
 	type = 0;
-	memset(static_cast<void*>(data), 0, MAX_PATH*2);
-	dataSize = sizeof(data);
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_AUDIO_OPENAL_DEVICE,
+		REG_KEY_VIDEO_TEXTURE_FILTER,
 		NULL,
 		&type,
-		data,
+		reinterpret_cast<LPBYTE>(&numberdata),
 		&dataSize);
 	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
 		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
 		return ProMan::UnknownError;
-	} else if ( type != REG_SZ && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
 	} else {
-		const char* data1 = reinterpret_cast<char*>(data);
-		wxString soundDevice(data1, textConv, dataSize);
-
-		if ( !soundDevice.IsEmpty() ) {
-			cfg->Write(PRO_CFG_OPENAL_DEVICE, soundDevice);
-		}
+		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, static_cast<long>(numberdata));
 	}
-
-	// GammaD3D
-
-
-	// Language
-
 
 
 	type = 0;
@@ -640,13 +630,36 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		}
 	}
 
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_VIDEO_ANTI_ALIAS,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, static_cast<long>(numberdata));
+	}
+
+
+	// Audio
 	type = 0;
 	memset(static_cast<void*>(data), 0, MAX_PATH*2);
 	dataSize = sizeof(data);
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_NETWORK_SPEED,
+		REG_KEY_AUDIO_OPENAL_DEVICE,
 		NULL,
 		&type,
 		data,
@@ -658,13 +671,206 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
 	} else {
 		const char* data1 = reinterpret_cast<char*>(data);
-		wxString speed(data1, textConv, dataSize);
+		wxString soundDevice(data1, textConv, dataSize);
 
-		if ( !speed.IsEmpty() ) {
-			cfg->Write(PRO_CFG_NETWORK_SPEED, speed);
+		if ( !soundDevice.IsEmpty() ) {
+			cfg->Write(PRO_CFG_OPENAL_DEVICE, soundDevice);
 		}
 	}
 
+
+	// Speech
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_VOICE,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_VOICE, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_VOLUME,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_VOLUME, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_TECHROOM,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_BRIEFINGS,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_GAME,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_IN_GAME, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_SPEECH_IN_MULTI,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_SPEECH_IN_MULTI, static_cast<long>(numberdata));
+	}
+
+		
+	// Joystick
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_JOYSTICK_ID,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_JOYSTICK_ID, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_JOYSTICK_FORCE_FEEDBACK,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_JOYSTICK_DIRECTIONAL,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, static_cast<long>(numberdata));
+	}
+		
+
+	// Network
 	type = 0;
 	memset(static_cast<void*>(data), 0, MAX_PATH*2);
 	dataSize = sizeof(data);
@@ -690,7 +896,32 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		}
 	}
 
-	DWORD numberdata;
+
+	type = 0;
+	memset(static_cast<void*>(data), 0, MAX_PATH*2);
+	dataSize = sizeof(data);
+
+	ret = RegQueryValueExW(
+		regHandle,
+		REG_KEY_NETWORK_SPEED,
+		NULL,
+		&type,
+		data,
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_SZ && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
+	} else {
+		const char* data1 = reinterpret_cast<char*>(data);
+		wxString speed(data1, textConv, dataSize);
+
+		if ( !speed.IsEmpty() ) {
+			cfg->Write(PRO_CFG_NETWORK_SPEED, speed);
+		}
+	}
+
 
 	type = 0;
 	numberdata = 0;
@@ -698,7 +929,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_TECHROOM,
+		REG_KEY_NETWORK_PORT,
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -709,229 +940,56 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
 		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
 	} else {
-		cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, static_cast<long>(numberdata));
+		cfg->Write(PRO_CFG_NETWORK_PORT, static_cast<long>(numberdata));
 	}
 
+
+	// Network folder
+	HKEY networkRegHandle = 0;
+	ret = RegCreateKeyExW(
+		regHandle,
+		REG_KEY_NETWORK_FOLDER_REGISTRY,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE | KEY_READ, // need write to make sure we get the virtualized registry when reading.
+		NULL,
+		&networkRegHandle,
+		NULL);  // just want handle, don't care if it was created or opened
+	ReturnChecker(ret, __LINE__);
+
+
 	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
+	memset(static_cast<void*>(data), 0, MAX_PATH*2);
+	dataSize = sizeof(data);
 
 	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_BRIEFINGS,
+		networkRegHandle,
+		REG_KEY_NETWORK_IP,
 		NULL,
 		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
+		data,
 		&dataSize);
 	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
 		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
 		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else if ( type != REG_SZ && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
 	} else {
-		cfg->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, static_cast<long>(numberdata));
+		const char* data1 = reinterpret_cast<char*>(data);
+		wxString ip(data1, textConv, dataSize);
+
+		if ( !ip.IsEmpty() ) {
+			cfg->SetPath(REG_KEY_NETWORK_FOLDER_CFG);
+			cfg->Write(PRO_CFG_NETWORK_IP, ip);
+			cfg->SetPath(REG_KEY_ROOT_FOLDER_CFG);
+		}
 	}
 
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
 
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_GAME,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_SPEECH_IN_GAME, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_IN_MULTI,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_SPEECH_IN_MULTI, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_VOLUME,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_SPEECH_VOLUME, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_VOICE,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_SPEECH_VOICE, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_VIDEO_ANTI_ALIAS,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_VIDEO_TEXTURE_FILTER,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_JOYSTICK_ID,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_JOYSTICK_ID, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_JOYSTICK_FORCE_FEEDBACK,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_JOYSTICK_DIRECTIONAL,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, static_cast<long>(numberdata));
-	}
-
-	type = 0;
-	numberdata = 0;
-	dataSize = sizeof(numberdata);
-
-	ret = RegQueryValueExW(
-		regHandle,
-		REG_KEY_SPEECH_VOICE,
-		NULL,
-		&type,
-		reinterpret_cast<LPBYTE>(&numberdata),
-		&dataSize);
-	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
-		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
-		return ProMan::UnknownError;
-	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
-		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
-	} else {
-		cfg->Write(PRO_CFG_SPEECH_VOICE, static_cast<long>(numberdata));
-	}
-
+	RegCloseKey(networkRegHandle);
+	RegCloseKey(regHandle);
+		
 	return ProMan::NoError;
 #else // PLATFORM_USES_REGISTRY
 	return ProMan::SupportNotCompiledIn;
