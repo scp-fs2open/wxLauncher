@@ -210,15 +210,12 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		(event.GetEventType() ==
 			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED));
 	
-	this->UpdateComponents(false);
-	
 	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
 		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		FlagFileData* flagData = FlagListManager::GetFlagListManager()->GetFlagFileData();
 		wxCHECK_RET(flagData != NULL,
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
 		this->flagListBox->AcceptFlagData(flagData);
-		CmdLineManager::GenerateCmdLineChanged();
 	} else {
 		this->flagListBox->SetItemCount(1); // for the errorText
 	}
