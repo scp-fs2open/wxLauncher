@@ -220,9 +220,7 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		this->flagListBox->AcceptFlagData(flagData);
 		CmdLineManager::GenerateCmdLineChanged();
 	} else {
-		size_t itemCount = static_cast<size_t>(event.GetExtraLong());
-		wxLogDebug(_T("processing not OK, flag list item count to be set to %u."), itemCount);
-		this->flagListBox->SetItemCount(itemCount);
+		this->flagListBox->SetItemCount(1); // for the errorText
 	}
 }
 
