@@ -116,7 +116,8 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 
 FlagListManager::FlagListManager()
 : data(NULL), proxyData(NULL) {
-	this->SetProcessingStatus(INITIAL_STATUS);
+	// FIXME: decide how to handle setting initial status when manager isn't yet initialized
+	this->processingStatus = INITIAL_STATUS;
 }
 
 FlagListManager::~FlagListManager() {
