@@ -37,30 +37,37 @@ WX_DEFINE_LIST(FlagFileProcessingEventHandlers);
 #include <wx/arrimpl.cpp> // Magic Incantation
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
+FlagFileProcessingEventHandlers FlagListManager::ffProcessingStatusChangedHandlers;
+
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
-	wxASSERT_MSG(flagFileProcessingStatusChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+	wxASSERT(FlagListManager::IsInitialized());
+	wxASSERT_MSG(ffProcessingStatusChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
 		wxString::Format(
 			_T("RegisterFlagFileProcessingStatusChanged(): Handler at %p already registered."),
 			handler));
-	this->flagFileProcessingStatusChangedHandlers.Append(handler);
+	FlagListManager::ffProcessingStatusChangedHandlers.Append(handler);
 }
 
 void FlagListManager::UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
-	wxASSERT_MSG(flagFileProcessingStatusChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+	wxASSERT(FlagListManager::IsInitialized());
+	wxASSERT_MSG(ffProcessingStatusChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
 		wxString::Format(
 			_T("UnRegisterFlagFileProcessingStatusChanged(): Handler at %p not registered."),
 			handler));
-	this->flagFileProcessingStatusChangedHandlers.DeleteObject(handler);
+	FlagListManager::ffProcessingStatusChangedHandlers.DeleteObject(handler);
 }
 
 void FlagListManager::GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status) {
+	wxASSERT(FlagListManager::IsInitialized());
+	
 	wxCommandEvent event(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_NONE);
 	event.SetInt(status);
 
 	wxLogDebug(_T("Generating EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event"));
 	for (FlagFileProcessingEventHandlers::iterator
-		 iter = this->flagFileProcessingStatusChangedHandlers.begin(),
-		 end = this->flagFileProcessingStatusChangedHandlers.end(); iter != end; ++iter) {
+		 iter = FlagListManager::ffProcessingStatusChangedHandlers.begin(),
+		 end = FlagListManager::ffProcessingStatusChangedHandlers.end();
+		 iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event to %p"), current);
@@ -78,6 +85,17 @@ bool FlagListManager::Initialize() {
 
 void FlagListManager::DeInitialize() {
 	wxASSERT(FlagListManager::IsInitialized());
+	
+	if (!FlagListManager::ffProcessingStatusChangedHandlers.IsEmpty()) {
+		wxLogDebug(_T("FlagListManager::DeInitialize(): contents of handler list:"));
+		for (FlagFileProcessingEventHandlers::const_iterator
+			 iter = FlagListManager::ffProcessingStatusChangedHandlers.begin(),
+			 end = FlagListManager::ffProcessingStatusChangedHandlers.end();
+			 iter != end; ++iter) {
+			wxLogDebug(_T(" handler at %p"), *iter);
+		}
+		FlagListManager::ffProcessingStatusChangedHandlers.Clear();
+	}
 	
 	FlagListManager* temp = FlagListManager::flagListManager;
 	FlagListManager::flagListManager = NULL;

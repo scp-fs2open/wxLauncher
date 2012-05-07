@@ -49,8 +49,8 @@ public:
 		FLAG_FILE_PROCESSING_ERROR
 	};
 
-	void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
-	void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	static void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	
 	void BeginFlagFileProcessing();
 	
@@ -75,9 +75,9 @@ private:
 	
 	static FlagListManager* flagListManager;
 	
-	FlagFileProcessingEventHandlers flagFileProcessingStatusChangedHandlers;
+	static FlagFileProcessingEventHandlers ffProcessingStatusChangedHandlers;
 	
-	void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
+	static void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
 	
 	/** ProcessingStatus is a low-level description of the status of flag file processing. */
 	enum ProcessingStatus {
