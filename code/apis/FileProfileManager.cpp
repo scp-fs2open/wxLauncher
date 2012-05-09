@@ -99,9 +99,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 	
 
-	wxString oglAnisotropicFilter;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
+	int oglAnisotropicFilter;
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, 0);
 
+	// Caution: FSO expects anisotropic values to be a string,
+	// but since we're writing to an .ini file, we can write it out as an int
 	ret = outConfig.Write(REG_KEY_VIDEO_ANISOTROPIC, oglAnisotropicFilter);
 	ReturnChecker(ret, __LINE__);
 	
@@ -300,7 +302,11 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	}
 
 	if ( inConfig.Read(REG_KEY_VIDEO_ANISOTROPIC, &readString) ) {
-		cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, readString);
+		long anisotropic;
+		// necessary because FSO expects registry value to be a string
+		if ( readString.ToLong(&anisotropic) ) {
+			cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, anisotropic);
+		}
 	}
 
 	if ( inConfig.Read(REG_KEY_VIDEO_ANTI_ALIAS, &readNumber) ) {

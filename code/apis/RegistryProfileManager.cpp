@@ -162,8 +162,12 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
-	wxString oglAnisotropicFilter;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, _T("0.0"));
+	int oglAnisotropicFilterInt;
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilterInt, 0);
+
+	// Since FSO expects anisotropic to be a string, we must convert it
+	wxString oglAnisotropicFilter(
+		wxString::Format(_T("%d"), oglAnisotropicFilterInt));
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -625,8 +629,9 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		const char* data1 = reinterpret_cast<char*>(data);
 		wxString ani(data1, textConv, dataSize);
 
-		if ( !ani.IsEmpty() ) {
-			cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, ani);
+		long anisotropic;
+		if ( !ani.IsEmpty() && ani.ToLong(&anisotropic)) {
+			cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, anisotropic);
 		}
 	}
 
