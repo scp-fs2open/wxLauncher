@@ -41,8 +41,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
-std::vector<NetworkSettingsOption> BasicSettingsPage::networkTypeOptions;
-std::vector<NetworkSettingsOption> BasicSettingsPage::networkSpeedOptions;
+typedef std::vector<NetworkSettingsOption> NetworkSettingsOptions;
+NetworkSettingsOptions BasicSettingsPage::networkTypeOptions;
+NetworkSettingsOptions BasicSettingsPage::networkSpeedOptions;
 
 NetworkSettingsOption::NetworkSettingsOption(
 	const wxString& regValue,
@@ -61,6 +62,38 @@ const wxString& GetDefaultRegistryValue(
 		_T("GetDefaultRegistryValue(): passed in options vector is empty."));
 	
 	return options[DEFAULT_VALUE_INDEX].GetRegistryValue();
+}
+
+int FindOptionIndexWithRegistryValue(
+		const NetworkSettingsOptions &options,
+		const wxString& regValue) {
+	wxCHECK_MSG(!options.empty(), -1,
+		_T("FindOptionIndexGivenRegistryValue(): passed in options is empty."));
+	wxCHECK_MSG(!regValue.IsEmpty(), -1,
+		_T("FindOptionIndexGivenRegistryValue(): passed in registry value is empty."));
+	
+	for (int i = 0, n = options.size(); i < n; ++i) {
+		if (options[i].GetRegistryValue() == regValue) {
+			return i;			
+		}
+	}
+	
+	wxLogError(
+		_T("Registry value '%s' was not found in list of options. Using default '%s'."),
+			   regValue.c_str(), GetDefaultRegistryValue(options).c_str());
+	
+	for (int i = 0, n = options.size(); i < n; ++i) {
+		if (options[i].GetRegistryValue() == GetDefaultRegistryValue(options)) {
+			return i;	
+		}
+	}
+
+	wxLogError(
+		_T("Default value '%s' was not found in list of options. Using first entry '%s'."),
+			GetDefaultRegistryValue(options).c_str(),
+			options[0].GetRegistryValue().c_str());
+	
+		return 0;
 }
 
 /** The index in the basic settings page's sizer where the settings sizer is located. */
@@ -488,7 +521,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBox* networkBox = new wxStaticBox(this, wxID_ANY, _("Network"));
 
 	wxChoice* networkType = new wxChoice(this, ID_NETWORK_TYPE);
-	for (std::vector<NetworkSettingsOption>::const_iterator
+	for (NetworkSettingsOptions::const_iterator
 		 it = networkTypeOptions.begin(),
 		 end = networkTypeOptions.end();
 		 it != end; ++it) {
@@ -498,10 +531,17 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString type;
 	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type,
 		GetDefaultRegistryValue(networkTypeOptions), true);
-	networkType->SetStringSelection(type);
+	
+	int networkTypeSelection =
+		FindOptionIndexWithRegistryValue(networkTypeOptions, type);
+	wxCHECK_RET(networkTypeSelection >= 0,
+		wxString::Format(
+			_T("FindOptionIndexWithRegistryValue() returned invalid index %d for network type."),
+			networkTypeSelection));
+	networkType->SetSelection(networkTypeSelection);
 	
 	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
-	for (std::vector<NetworkSettingsOption>::const_iterator
+	for (NetworkSettingsOptions::const_iterator
 		 it = networkSpeedOptions.begin(),
 		 end = networkSpeedOptions.end();
 		 it != end; ++it) {
@@ -511,7 +551,14 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString speed;
 	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed,
 		GetDefaultRegistryValue(networkSpeedOptions), true);
-	networkSpeed->SetStringSelection(speed);
+	
+	int networkSpeedSelection =
+		FindOptionIndexWithRegistryValue(networkSpeedOptions, speed);
+	wxCHECK_RET(networkSpeedSelection >= 0,
+		wxString::Format(
+			_T("FindOptionIndexWithRegistryValue() returned invalid index %d for network speed."),
+			networkSpeedSelection));
+	networkSpeed->SetSelection(networkSpeedSelection);
 
 	wxTextCtrl* networkPort = 
 		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
