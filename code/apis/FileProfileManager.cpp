@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
-#include "apis/JoystickManager.h"
 #include "global/ids.h"
 
 inline wxFileName GetPlatformDefaultConfigFilePath() {
@@ -81,9 +80,9 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Video
 	int width, height, bitdepth;
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 768);
-	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, 16);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, DEFAULT_VIDEO_RESOLUTION_WIDTH);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, DEFAULT_VIDEO_RESOLUTION_HEIGHT);
+	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, DEFAULT_VIDEO_BIT_DEPTH);
 
 	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
 
@@ -92,7 +91,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	
 	wxString filterMethod;
-	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
+	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, DEFAULT_VIDEO_TEXTURE_FILTER);
 	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
 	
 	ret = outConfig.Write(REG_KEY_VIDEO_TEXTURE_FILTER, filterMethodValue);
@@ -100,7 +99,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	
 
 	int oglAnisotropicFilter;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, 0);
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilter, DEFAULT_VIDEO_ANISOTROPIC);
 
 	// Caution: FSO expects anisotropic values to be a string,
 	// but since we're writing to an .ini file, we can write it out as an int
@@ -109,7 +108,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	
 
 	int oglAntiAliasSample;
-	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
+	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, DEFAULT_VIDEO_ANTI_ALIAS);
 
 	ret = outConfig.Write(REG_KEY_VIDEO_ANTI_ALIAS, oglAntiAliasSample);
 	ReturnChecker(ret, __LINE__);
@@ -117,7 +116,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Audio
 	wxString soundDevice;
-	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
+	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, DEFAULT_AUDIO_OPENAL_DEVICE);
 
 	ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_DEVICE, soundDevice);
 	ReturnChecker(ret, __LINE__);
@@ -126,24 +125,24 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	// Speech
 #if IS_WIN32 // speech is currently not supported in OS X or Linux (although Windows doesn't use this code)
 	int speechVoice;
-	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
+	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, DEFAULT_SPEECH_VOICE);
 
 	ret = outConfig.Write(REG_KEY_SPEECH_VOICE, speechVoice);
 	ReturnChecker(ret, __LINE__);
 
 
 	int speechVolume;
-	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
+	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, DEFAULT_SPEECH_VOLUME);
 
 	ret = outConfig.Write(REG_KEY_SPEECH_VOLUME, speechVolume);
 	ReturnChecker(ret, __LINE__);
 
 
 	int inTechroom, inBriefings, inGame, inMulti;
-	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, DEFAULT_SPEECH_IN_TECHROOM);
+	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, DEFAULT_SPEECH_IN_BRIEFINGS);
+	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, DEFAULT_SPEECH_IN_GAME);
+	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, DEFAULT_SPEECH_IN_MULTI);
 
 	ret = outConfig.Write(REG_KEY_SPEECH_IN_TECHROOM, inTechroom);
 	ReturnChecker(ret, __LINE__);
@@ -161,21 +160,24 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Joystick
 	int currentJoystick;
-	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
+	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, DEFAULT_JOYSTICK_ID);
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_ID, currentJoystick);
 	ReturnChecker(ret, __LINE__);
 
 
 	int joystickForceFeedback;
-	cfg->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &joystickForceFeedback, false);
+	cfg->Read(
+		PRO_CFG_JOYSTICK_FORCE_FEEDBACK,
+		&joystickForceFeedback,
+		DEFAULT_JOYSTICK_FORCE_FEEDBACK);
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_FORCE_FEEDBACK, joystickForceFeedback);
 	ReturnChecker(ret, __LINE__);
 
 
 	int joystickHit;
-	cfg->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &joystickHit, false);
+	cfg->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &joystickHit, DEFAULT_JOYSTICK_DIRECTIONAL);
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_DIRECTIONAL, joystickHit);
 	ReturnChecker(ret, __LINE__);
@@ -183,23 +185,23 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 
 	// Network
 	wxString networkConnectionValue;
-	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
+	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, DEFAULT_NETWORK_TYPE);
 
 	ret = outConfig.Write(REG_KEY_NETWORK_TYPE, networkConnectionValue);
 	ReturnChecker(ret, __LINE__);
 
 
 	wxString connectionSpeedValue;
-	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
+	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, DEFAULT_NETWORK_SPEED);
 
 	ret = outConfig.Write(REG_KEY_NETWORK_SPEED, connectionSpeedValue);
 	ReturnChecker(ret, __LINE__);
 
 
 	int forcedport;
-	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
+	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, DEFAULT_NETWORK_PORT);
 
-	if (forcedport != 0) { // only write if it's a valid port
+	if (forcedport != DEFAULT_NETWORK_PORT) { // only write if it's a valid port
 		ret = outConfig.Write(REG_KEY_NETWORK_PORT, forcedport);
 		ReturnChecker(ret, __LINE__);
 

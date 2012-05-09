@@ -53,17 +53,6 @@ NetworkSettingsOption::NetworkSettingsOption(
 	wxASSERT(!guiDesc.IsEmpty());
 }
 
-const size_t DEFAULT_VALUE_INDEX = 0;
-const wxString EMPTY_STRING(wxEmptyString);
-
-const wxString& GetDefaultRegistryValue(
-	const std::vector<NetworkSettingsOption>& options) {
-	wxCHECK_MSG(!options.empty(), EMPTY_STRING,
-		_T("GetDefaultRegistryValue(): passed in options vector is empty."));
-	
-	return options[DEFAULT_VALUE_INDEX].GetRegistryValue();
-}
-
 int FindOptionIndexWithRegistryValue(
 		const NetworkSettingsOptions &options,
 		const wxString& regValue) {
@@ -78,22 +67,7 @@ int FindOptionIndexWithRegistryValue(
 		}
 	}
 	
-	wxLogError(
-		_T("Registry value '%s' was not found in list of options. Using default '%s'."),
-			   regValue.c_str(), GetDefaultRegistryValue(options).c_str());
-	
-	for (int i = 0, n = options.size(); i < n; ++i) {
-		if (options[i].GetRegistryValue() == GetDefaultRegistryValue(options)) {
-			return i;	
-		}
-	}
-
-	wxLogError(
-		_T("Default value '%s' was not found in list of options. Using first entry '%s'."),
-			GetDefaultRegistryValue(options).c_str(),
-			options[0].GetRegistryValue().c_str());
-	
-		return 0;
+	return -1; // not found
 }
 
 /** The index in the basic settings page's sizer where the settings sizer is located. */
@@ -264,7 +238,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	long bitDepth;
 	depthCombo->Append(_("16-bit"));
 	depthCombo->Append(_("32-bit"));
-	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, 32, true);
+	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, DEFAULT_VIDEO_BIT_DEPTH, true);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
 #if !IS_WIN32 // TF/AF/AA don't yet work on Windows
@@ -274,7 +248,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxString filter;
 	textureFilterCombo->Append(_("Bilinear"));
 	textureFilterCombo->Append(_("Trilinear"));
-	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, _T("Trilinear"), true);
+	proman->ProfileRead(PRO_CFG_VIDEO_TEXTURE_FILTER, &filter, DEFAULT_VIDEO_TEXTURE_FILTER, true);
 	// FIXME shouldn't need case folding. comparison should be case-sensitive:
 	//       either Bilinear or Trilinear.
 	//       although now we've created legacy texture filter values. hmm.
@@ -291,7 +265,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	anisotropicCombo->Append(_T(" 4x"));
 	anisotropicCombo->Append(_T(" 8x"));
 	anisotropicCombo->Append(_T("16x"));
-	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, 0, true);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANISOTROPIC, &anisotropic, DEFAULT_VIDEO_ANISOTROPIC, true);
 	switch(anisotropic) {
 		case 0:
 			anisotropic = 0;
@@ -328,7 +302,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	aaCombo->Append(_T(" 4x"));
 	aaCombo->Append(_T(" 8x"));
 	aaCombo->Append(_T("16x"));
-	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, 0, true);
+	proman->ProfileRead(PRO_CFG_VIDEO_ANTI_ALIAS, &antialias, DEFAULT_VIDEO_ANTI_ALIAS, true);
 	switch(antialias) {
 		case 0:
 			antialias = 0;
@@ -455,8 +429,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		long speechVoice;
 		int speechSystemVoice = SpeechMan::GetVoice();
 		if ( speechSystemVoice < 0 ) {
-			wxLogWarning(_T("Had problem retrieving the system voice, using voice 0"));
-			speechSystemVoice = 0;
+			wxLogWarning(_T("Had problem retrieving the system voice, using voice %d"),
+				DEFAULT_SPEECH_VOICE);
+			speechSystemVoice = DEFAULT_SPEECH_VOICE;
 		}
 		// set the voice to what is in the profile, if not set in profile use
 		// system settings
@@ -475,32 +450,36 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		int speechSystemVolume = SpeechMan::GetVolume();
 		if (speechSystemVolume < 0) {
 			wxLogWarning(_T("Had problem in retrieving the system speech volume,")
-				_T(" setting to 50"));
-			speechSystemVolume = 50;
+				_T(" setting to %d"), DEFAULT_SPEECH_VOLUME);
+			speechSystemVolume = DEFAULT_SPEECH_VOLUME;
 		}
 		proman->ProfileRead(PRO_CFG_SPEECH_VOLUME, &speechVolume, speechSystemVolume, true);
 		if ( speechVolume < 0 || speechVolume > 100 ) {
 			wxLogWarning(_T("Speech Volume recorded in profile is out of range,")
-				_T(" resetting to 50"));
-			speechVolume = 50;
+				_T(" resetting to %d"), DEFAULT_SPEECH_VOLUME);
+			speechVolume = DEFAULT_SPEECH_VOLUME;
 		}
 		speechVoiceVolume->SetValue(speechVolume);
 
 
 		bool speechInTechroom;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, true, true);
+		proman->ProfileRead(
+			PRO_CFG_SPEECH_IN_TECHROOM, &speechInTechroom, DEFAULT_SPEECH_IN_TECHROOM, true);
 		speechInTechroomCheck->SetValue(speechInTechroom);
 
 		bool speechInBriefings;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, true, true);
+		proman->ProfileRead(
+			PRO_CFG_SPEECH_IN_BRIEFINGS, &speechInBriefings, DEFAULT_SPEECH_IN_BRIEFINGS, true);
 		speechInBriefingCheck->SetValue(speechInBriefings);
 
 		bool speechInGame;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_GAME, &speechInGame, true, true);
+		proman->ProfileRead(
+			PRO_CFG_SPEECH_IN_GAME, &speechInGame, DEFAULT_SPEECH_IN_GAME, true);
 		speechInGameCheck->SetValue(speechInGame);
 
 		bool speechInMulti;
-		proman->ProfileRead(PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, true, true);
+		proman->ProfileRead(
+			PRO_CFG_SPEECH_IN_MULTI, &speechInMulti, DEFAULT_SPEECH_IN_MULTI, true);
 		speechInMultiCheck->SetValue(speechInMulti);
 	} else {
 		speechBox->Disable();
@@ -530,14 +509,26 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	
 	wxString type;
 	proman->ProfileRead(PRO_CFG_NETWORK_TYPE, &type,
-		GetDefaultRegistryValue(networkTypeOptions), true);
+		DEFAULT_NETWORK_TYPE, true);
 	
 	int networkTypeSelection =
 		FindOptionIndexWithRegistryValue(networkTypeOptions, type);
-	wxCHECK_RET(networkTypeSelection >= 0,
-		wxString::Format(
-			_T("FindOptionIndexWithRegistryValue() returned invalid index %d for network type."),
-			networkTypeSelection));
+	if (networkTypeSelection < 0) {
+		wxLogError(
+			_T("Registry value '%s' was not found in list of options. Using default '%s'."),
+				type.c_str(), DEFAULT_NETWORK_TYPE.c_str());		
+	}
+	
+	networkTypeSelection =
+		FindOptionIndexWithRegistryValue(networkTypeOptions, DEFAULT_NETWORK_TYPE);
+	if (networkTypeSelection < 0) {
+		wxLogError(
+			_T("Default value '%s' was not found in list of type speed options. Using first entry '%s'."),
+				DEFAULT_NETWORK_TYPE.c_str(),
+				networkTypeOptions[0].GetRegistryValue().c_str());
+		networkTypeSelection = 0;
+	}
+
 	networkType->SetSelection(networkTypeSelection);
 	
 	wxChoice* networkSpeed = new wxChoice(this, ID_NETWORK_SPEED);
@@ -550,28 +541,40 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	
 	wxString speed;
 	proman->ProfileRead(PRO_CFG_NETWORK_SPEED, &speed,
-		GetDefaultRegistryValue(networkSpeedOptions), true);
+		DEFAULT_NETWORK_SPEED, true);
 	
 	int networkSpeedSelection =
 		FindOptionIndexWithRegistryValue(networkSpeedOptions, speed);
-	wxCHECK_RET(networkSpeedSelection >= 0,
-		wxString::Format(
-			_T("FindOptionIndexWithRegistryValue() returned invalid index %d for network speed."),
-			networkSpeedSelection));
+	if (networkSpeedSelection < 0) {
+		wxLogError(
+			_T("Registry value '%s' was not found in list of speed options. Using default '%s'."),
+				speed.c_str(), DEFAULT_NETWORK_SPEED.c_str());		
+	}
+	
+	networkSpeedSelection =
+		FindOptionIndexWithRegistryValue(networkSpeedOptions, DEFAULT_NETWORK_SPEED);
+	if (networkSpeedSelection < 0) {
+		wxLogError(
+			_T("Default value '%s' was not found in list of speed options. Using first entry '%s'."),
+				DEFAULT_NETWORK_SPEED.c_str(),
+				networkSpeedOptions[0].GetRegistryValue().c_str());
+		networkSpeedSelection = 0;
+	}
+	
 	networkSpeed->SetSelection(networkSpeedSelection);
 
 	wxTextCtrl* networkPort = 
 		new wxTextCtrl(this, ID_NETWORK_PORT, wxEmptyString);
 	long port;
-	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, 0, true);
-	if (port != 0) {
+	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, DEFAULT_NETWORK_PORT, true);
+	if (port != DEFAULT_NETWORK_PORT) {
 		networkPort->SetValue(wxString::Format(_T("%ld"), port));
 	}
 	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
-	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, _T(""), true);
+	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, DEFAULT_NETWORK_IP, true);
 	networkIP->SetValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
@@ -1776,7 +1779,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 			ProMan::GetProfileManager()->
 				ProfileRead(PRO_CFG_JOYSTICK_ID,
 					&profileJoystick,
-					JOYMAN_INVALID_JOYSTICK,
+					DEFAULT_JOYSTICK_ID,
 					true);
 			// set current joystick
 			for ( i = 0; i < this->joystickSelected->GetCount(); i++ ) {
@@ -1820,8 +1823,10 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 
 	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
 		bool ff, direct;
-		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, false, true);
-		ProMan::GetProfileManager()->ProfileRead(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, false, true);
+		ProMan::GetProfileManager()->ProfileRead(
+			PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, DEFAULT_JOYSTICK_DIRECTIONAL, true);
+		ProMan::GetProfileManager()->ProfileRead(
+			PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &ff, DEFAULT_JOYSTICK_FORCE_FEEDBACK, true);
 		this->joystickDirectionalHit->SetValue(direct);
 		this->joystickForceFeedback->SetValue(ff);
 

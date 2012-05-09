@@ -18,7 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
-#include "apis/JoystickManager.h"
 #include "global/ids.h"
 #include "generated/configure_launcher.h"
 
@@ -133,9 +132,9 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	// Video
 	int width, height, bitdepth;
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, 1024);
-	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, 768);
-	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, 16);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, DEFAULT_VIDEO_RESOLUTION_WIDTH);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, DEFAULT_VIDEO_RESOLUTION_HEIGHT);
+	cfg->Read(PRO_CFG_VIDEO_BIT_DEPTH, &bitdepth, DEFAULT_VIDEO_BIT_DEPTH);
 
 	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
 	ret = RegSetValueExW(
@@ -149,7 +148,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	wxString filterMethod;
-	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, _T("Trilinear"));
+	cfg->Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &filterMethod, DEFAULT_VIDEO_TEXTURE_FILTER);
 	int filterMethodValue = ( filterMethod.StartsWith(_T("Bilinear"))) ? 0 : 1;
 
 	ret = RegSetValueExW(
@@ -163,7 +162,9 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int oglAnisotropicFilterInt;
-	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC, &oglAnisotropicFilterInt, 0);
+	cfg->Read(PRO_CFG_VIDEO_ANISOTROPIC,
+		&oglAnisotropicFilterInt,
+		DEFAULT_VIDEO_ANISOTROPIC);
 
 	// Since FSO expects anisotropic to be a string, we must convert it
 	wxString oglAnisotropicFilter(
@@ -180,7 +181,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int oglAntiAliasSample;
-	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, 0);
+	cfg->Read(PRO_CFG_VIDEO_ANTI_ALIAS, &oglAntiAliasSample, DEFAULT_VIDEO_ANTI_ALIAS);
 		
 	ret = RegSetValueExW(
 		regHandle,
@@ -194,7 +195,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	// Audio
 	wxString soundDevice;
-	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, _T("Generic Software"));
+	cfg->Read(PRO_CFG_OPENAL_DEVICE, &soundDevice, DEFAULT_AUDIO_OPENAL_DEVICE);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -208,7 +209,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	// Speech
 	int speechVoice;
-	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, 0);
+	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, DEFAULT_SPEECH_VOICE);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -221,7 +222,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int speechVolume;
-	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, 100);
+	cfg->Read(PRO_CFG_SPEECH_VOLUME, &speechVolume, DEFAULT_SPEECH_VOLUME);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -234,10 +235,10 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int inTechroom, inBriefings, inGame, inMulti;
-	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, true);
-	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, true);
+	cfg->Read(PRO_CFG_SPEECH_IN_TECHROOM, &inTechroom, DEFAULT_SPEECH_IN_TECHROOM);
+	cfg->Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &inBriefings, DEFAULT_SPEECH_IN_BRIEFINGS);
+	cfg->Read(PRO_CFG_SPEECH_IN_GAME, &inGame, DEFAULT_SPEECH_IN_GAME);
+	cfg->Read(PRO_CFG_SPEECH_IN_MULTI, &inMulti, DEFAULT_SPEECH_IN_MULTI);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -278,7 +279,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	// Joystick
 	int currentJoystick;
-	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, JOYMAN_INVALID_JOYSTICK);
+	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, DEFAULT_JOYSTICK_ID);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -291,7 +292,10 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	
 	int joystickForceFeedback;
-	cfg->Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &joystickForceFeedback, false);
+	cfg->Read(
+		PRO_CFG_JOYSTICK_FORCE_FEEDBACK,
+		&joystickForceFeedback,
+		DEFAULT_JOYSTICK_FORCE_FEEDBACK);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -304,7 +308,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int joystickHit;
-	cfg->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &joystickHit, false);
+	cfg->Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &joystickHit, DEFAULT_JOYSTICK_DIRECTIONAL);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -318,7 +322,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	// Network
 	wxString networkConnectionValue;
-	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, _T("None"));
+	cfg->Read(PRO_CFG_NETWORK_TYPE, &networkConnectionValue, DEFAULT_NETWORK_TYPE);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -331,7 +335,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	wxString connectionSpeedValue;
-	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, _T("None"));
+	cfg->Read(PRO_CFG_NETWORK_SPEED, &connectionSpeedValue, DEFAULT_NETWORK_SPEED);
 
 	ret = RegSetValueExW(
 		regHandle,
@@ -344,9 +348,10 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 
 	int forcedport;
-	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, 0);
+	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, DEFAULT_NETWORK_PORT);
 
-	if (forcedport != 0) { // only write port and IP addr if port is valid
+	// only write port and IP addr if port is valid
+	if (forcedport != DEFAULT_NETWORK_PORT) {
 		ret = RegSetValueExW(
 			regHandle,
 			REG_KEY_NETWORK_PORT,
