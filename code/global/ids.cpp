@@ -64,7 +64,6 @@ const bool DEFAULT_SPEECH_IN_BRIEFINGS =		true;
 const bool DEFAULT_SPEECH_IN_GAME =				true;
 const bool DEFAULT_SPEECH_IN_MULTI =			true;
 
-// TODO FIXME move JOYMAN_INVALID_JOYSTICK to some constants file (such as ids)?
 const long DEFAULT_JOYSTICK_ID =				JOYMAN_INVALID_JOYSTICK;
 const bool DEFAULT_JOYSTICK_FORCE_FEEDBACK =	false;
 const bool DEFAULT_JOYSTICK_DIRECTIONAL =		false;
