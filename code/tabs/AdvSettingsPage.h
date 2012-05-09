@@ -42,7 +42,7 @@ public:
 	void OnExeChanged(wxCommandEvent& event);
 	void OnSelectFlagSet(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
-	void OnCustomFlagsChanged(wxCommandEvent& event);
+	void OnNeedUpdateCustomFlags(wxCommandEvent& event);
 	void OnFlagListBoxReady(wxCommandEvent& event);
 	void OnCurrentProfileChanged(wxCommandEvent& event);
 
