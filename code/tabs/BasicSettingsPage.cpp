@@ -291,7 +291,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxChoice* aaCombo = new wxChoice(this, ID_AA_COMBO);
 	long antialias;
 	aaCombo->Append(_("Off"));
-	aaCombo->Append(_T(" 1x"));
 	aaCombo->Append(_T(" 2x"));
 	aaCombo->Append(_T(" 4x"));
 	aaCombo->Append(_T(" 8x"));
@@ -301,20 +300,17 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		case 0:
 			antialias = 0;
 			break;
-		case 1:
+		case 2:
 			antialias = 1;
 			break;
-		case 2:
+		case 4:
 			antialias = 2;
 			break;
-		case 4:
+		case 8:
 			antialias = 3;
 			break;
-		case 8:
-			antialias = 4;
-			break;
 		case 16:
-			antialias = 5;
+			antialias = 4;
 			break;
 		default:
 			wxLogWarning(_T("invalid anti-aliasing factor %ld, setting to 0"),
@@ -1452,7 +1448,7 @@ void BasicSettingsPage::OnSelectVideoAntiAlias(wxCommandEvent &WXUNUSED(event)) 
 
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_ANTI_ALIAS,
-		(aa->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << (aa->GetSelection()-1)));
+		(aa->GetSelection() == 0) ? static_cast<long>(0) : static_cast<long>(1 << (aa->GetSelection())));
 
 }
 
