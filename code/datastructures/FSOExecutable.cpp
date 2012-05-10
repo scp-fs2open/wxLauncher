@@ -301,15 +301,15 @@ FreeSpace 2 Open 3.6.10 Release Inferno SSE
 FRED2 Open 3.6.11 Debug
 \endverbatim
 */
-wxString FSOExecutable::MakeVersionStringFromVersion(FSOExecutable ver) {
-	bool hasfullversion = (ver.major != 0 && ver.minor != 0 && ver.revision != 0);
+wxString FSOExecutable::GetVersionString() const {
+	bool hasfullversion = (this->major != 0 && this->minor != 0 && this->revision != 0);
 	return wxString::Format(_T("%s %s%s%s %s%s%s"),
-		(ver.binaryname.IsEmpty()) ? _T("Unknown") : ver.binaryname.c_str(), // FreeSpace 2 Open
-		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), ver.major, ver.minor, ver.revision).c_str() : wxEmptyString,
-		(ver.build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), ver.build).c_str(),
-		(ver.string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), ver.string.c_str()).c_str(),
-		(ver.debug) ? _T("Debug") : _T("Release"),
-		(ver.inferno) ? _T(" Inferno") : wxEmptyString,
-		(ver.sse == 0) ? wxEmptyString : (ver.sse == 1) ? _T(" SSE") : _T(" SSE2")
+		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FreeSpace 2 Open
+		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
+		(this->build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), this->build).c_str(),
+		(this->string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), this->string.c_str()).c_str(),
+		(this->debug) ? _T("Debug") : _T("Release"),
+		(this->inferno) ? _T(" Inferno") : wxEmptyString,
+		(this->sse == 0) ? wxEmptyString : (this->sse == 1) ? _T(" SSE") : _T(" SSE2")
 		);
 }

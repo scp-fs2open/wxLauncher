@@ -38,8 +38,7 @@ public:
 	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
-	static wxString MakeVersionStringFromVersion(FSOExecutable version);
-	wxString MakeVersionStringFromVersion();
+	wxString GetVersionString() const;
 protected:
 	int major;
 	int minor;
