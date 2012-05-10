@@ -65,7 +65,7 @@ EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdat
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
-EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnCustomFlagsChanged)
+EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnNeedUpdateCustomFlags)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_READY, AdvSettingsPage::OnFlagListBoxReady)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
@@ -223,7 +223,7 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 	}
 }
 
-void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
+void AdvSettingsPage::OnNeedUpdateCustomFlags(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
 	
 	this->UpdateComponents(false);
