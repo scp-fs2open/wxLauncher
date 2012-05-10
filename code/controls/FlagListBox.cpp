@@ -27,20 +27,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 FlagListCheckBox::FlagListCheckBox(
 	wxWindow* parent,
 	const wxString& label,
-	const wxString& flagString,
-	int flagIndex)
+	const wxString& flagString)
 : wxCheckBox(parent, wxID_ANY, label),
-  flagString(flagString),
-  flagIndex(flagIndex) {
+  flagString(flagString) {
 	  wxASSERT(parent != NULL);
 	  wxASSERT(!flagString.IsEmpty());
 }
 
 void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
 	// FIXME the following line doesn't work yet because profile proxy isn't implemented
-	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->flagIndex, this->IsChecked());
-	wxLogDebug(_T("flag %s with index %d is now %s"),
-		flagString.c_str(), flagIndex, this->IsChecked() ? _T("on") : _T("off"));
+	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->IsChecked());
+	wxLogDebug(_T("flag %s is now %s"),
+		flagString.c_str(), this->IsChecked() ? _T("on") : _T("off"));
 	
 	// FIXME temp until the proxy is working
 	wxCommandEvent fakeEvent;
@@ -49,7 +47,7 @@ void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
 
 FlagListCheckBoxItem::FlagListCheckBoxItem(const wxString& fsoCategory)
 : fsoCategory(fsoCategory), checkBox(NULL), checkBoxSizer(NULL),
-  shortDescription(wxEmptyString), flagString(wxEmptyString), flagIndex(-1),
+  shortDescription(wxEmptyString), flagString(wxEmptyString),
   isRecommendedFlag(false) {
 	  wxASSERT(!fsoCategory.IsEmpty());
 }
@@ -57,13 +55,12 @@ FlagListCheckBoxItem::FlagListCheckBoxItem(const wxString& fsoCategory)
 FlagListCheckBoxItem::FlagListCheckBoxItem(
 	FlagListCheckBox& checkBox, wxSizer& checkBoxSizer,
 	const wxString& shortDescription, const wxString& flagString,
-	const int flagIndex, const bool isRecommendedFlag)
+	const bool isRecommendedFlag)
 : fsoCategory(wxEmptyString), checkBox(&checkBox), checkBoxSizer(&checkBoxSizer),
   shortDescription(shortDescription), flagString(flagString),
-  flagIndex(flagIndex), isRecommendedFlag(isRecommendedFlag) {
+  isRecommendedFlag(isRecommendedFlag) {
 	  // shortDescription can be empty
 	  wxASSERT(!flagString.IsEmpty());
-	  wxASSERT(flagIndex >= 0);
 }
 
 FlagListCheckBoxItem::~FlagListCheckBoxItem() {
@@ -184,8 +181,7 @@ void FlagListBox::GenerateCheckBoxes(const FlagListBoxData& data) {
 			new FlagListCheckBox(
 				this,
 				wxEmptyString,
-				item->flagString,
-				item->GetFlagIndex());
+				item->flagString);
 		checkBox->Hide();
 		
 		checkBox->Connect(
@@ -199,7 +195,7 @@ void FlagListBox::GenerateCheckBoxes(const FlagListBoxData& data) {
 		
 		this->checkBoxes.Append(
 			new FlagListCheckBoxItem(*checkBox, *checkBoxSizer,
-				item->shortDescription, item->flagString, item->GetFlagIndex(),
+				item->shortDescription, item->flagString,
 				item->isRecommendedFlag));
 	}
 	
