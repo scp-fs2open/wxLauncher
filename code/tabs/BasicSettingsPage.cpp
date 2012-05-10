@@ -927,7 +927,7 @@ void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxArrayString
 #else
 		FSOExecutable ver = FSOExecutable::GetBinaryVersion(path.GetFullName());
 #endif
-		exeChoice->Insert(FSOExecutable::MakeVersionStringFromVersion(ver), 0, new FSOExecutable(ver));
+		exeChoice->Insert(ver.GetVersionString(), 0, new FSOExecutable(ver));
 		iter++;
 	}
 }
