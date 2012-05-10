@@ -52,21 +52,18 @@ FlagListBoxDataItem::FlagListBoxDataItem(const wxString& fsoCategory)
 : fsoCategory(fsoCategory),
   shortDescription(wxEmptyString),
   flagString(wxEmptyString),
-  isRecommendedFlag(false),
-  flagIndex(-1) {
+  isRecommendedFlag(false) {
 	wxASSERT(!fsoCategory.IsEmpty());
 }
 
 FlagListBoxDataItem::FlagListBoxDataItem(const wxString& shortDescription,
-	const wxString& flagString, int flagIndex, bool isRecommendedFlag)
+	const wxString& flagString, bool isRecommendedFlag)
 : fsoCategory(wxEmptyString),
   shortDescription(shortDescription),
   flagString(flagString),
-  isRecommendedFlag(isRecommendedFlag),
-  flagIndex(flagIndex) {
+  isRecommendedFlag(isRecommendedFlag) {
 	// shortDescription can be empty
 	wxASSERT(!flagString.IsEmpty());
-	wxASSERT(flagIndex >= 0);
 }
 
 #include <wx/listimpl.cpp> // Magic Incantation
@@ -231,7 +228,6 @@ FlagListBoxData* FlagFileData::GenerateFlagListBoxData() const {
 					new FlagListBoxDataItem(
 						flag->shortDescription,
 						flag->flagString,
-						flag->GetFlagIndex(),
 						flag->isRecomendedFlag));
 			}
 		}
