@@ -157,24 +157,26 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	wxLogDebug(_T("Making version struct for the executable '%s'"), binaryname.c_str());
 	FSOExecutable ver;
 	wxStringTokenizer tok(binaryname, _T("_.- ()[]/"));
-	wxString first;
 	ver.executablename = binaryname;
 
 	if ( !tok.HasMoreTokens() ) {
-		wxLogError(_T("Did not find initial 'fs2' token in executable '%s'"), binaryname.c_str());
+		wxLogError(
+			_T("Did not find initial 'fs2' or 'fred2' token in executable '%s'"),
+				binaryname.c_str());
 		return ver;
 	}
-	first = tok.GetNextToken();
+	wxString first(tok.GetNextToken());
 	if ( tok.HasMoreTokens() && (!first.CmpNoCase(_T("fred2")) || !first.CmpNoCase(_T("fs2"))) ) {
-		wxString first1 = tok.GetNextToken();
-		if ( !first1.CmpNoCase(_T("open")) ) {
+		wxString second(tok.GetNextToken());
+		if ( !second.CmpNoCase(_T("open")) ) {
 			if ( !first.CmpNoCase(_T("fs2")) ) {
 				ver.binaryname = _T("FreeSpace 2 Open");
 			} else {
 				ver.binaryname = _T("FRED2 Open");
 			}
 		} else {
-			wxLogWarning(_T("was expecting 'open'; got %s in executable %s"), first1.c_str(), binaryname.c_str());
+			wxLogWarning(_T("was expecting 'open'; got %s in executable %s"),
+				second.c_str(), binaryname.c_str());
 			return ver;
 		}
 	} else {
@@ -202,23 +204,29 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			if ( tempVersion < 1000 && tempVersion > 0 ) {
 				ver.major = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("major version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+				wxLogWarning(
+					_T("major version number out of range (%ld) in executable %s"),
+						tempVersion, binaryname.c_str());
 			}
 		} else if ( token.ToLong(&tempVersion) && ver.minor == 0 ) {
 			// must be minor version number
 			if ( tempVersion < 1000 && tempVersion > 0 ) {
 				ver.minor = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("minor version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+				wxLogWarning(
+					_T("minor version number out of range (%ld) in executable %s"),
+						tempVersion, binaryname.c_str());
 			}
 		} else if ( token.ToLong(&tempVersion) && ver.revision == 0) {
 			// must be revision version number
 			if ( tempVersion < 1000 && tempVersion > 0 ) {
 				ver.revision = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+				wxLogWarning(
+					_T("Revision version number out of range (%ld) in executable %s"),
+						tempVersion, binaryname.c_str());
 			}
-		} else if ( !token.CmpNoCase(_T("d")) ) {
+		} else if ( !token.CmpNoCase(_T("d")) || !token.CmpNoCase(_T("debug")) ) {
 			ver.debug = true;
 		} else if ( token.Lower().EndsWith(_T("d"), &temp) ) {
 			if ( temp.ToLong(&tempVersion) ) {
@@ -227,10 +235,14 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					ver.revision = (int)tempVersion;
 					ver.debug = true;
 				} else {
-					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+					wxLogWarning(
+						_T("Revision version number out of range (%ld) in executable %s"),
+							tempVersion, binaryname.c_str());
 				}
 			} else {
-				wxLogWarning(_T("Token ending in 'd' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
+				wxLogWarning(
+					_T("Token ending in 'd' is not a number (%s) in executable %s"),
+						token.c_str(), binaryname.c_str());
 			}
 		} else if ( token.Lower().EndsWith(_T("r"), &temp) ) {
 			if (temp.IsEmpty()) {
@@ -241,37 +253,37 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					ver.revision = (int)tempVersion;
 					ver.debug = false;
 				} else {
-					wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+					wxLogWarning(
+						_T("Revision version number out of range (%ld) in executable %s"),
+							tempVersion, binaryname.c_str());
 				}
 			} else {
-				wxLogWarning(_T("Token ending in 'r' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
+				wxLogWarning(
+					_T("Token ending in 'r' is not a number (%s) in executable %s"),
+						token.c_str(), binaryname.c_str());
 			}
 		} else if ( token.Lower().StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
 			// must be a revision number from SirKnightly's builds
 			if ( tempVersion > 0 ) {
 				ver.build = (int)tempVersion;
 			} else {
-				wxLogWarning(_T("SirKnightly build number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
+				wxLogWarning(
+					_T("SirKnightly build number out of range (%ld) in executable %s"),
+						tempVersion, binaryname.c_str());
 			}
-		} else if ( token.Lower().StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
+		} else if ( token.Lower().StartsWith(_T("ant"), &temp) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
 
 			// in case the token is of the format, e.g., "Ant8"
-			wxString tokenCopy(token.Lower());
 			long antNumber;
-			tokenCopy.Replace(_T("ant"), wxEmptyString);
-			if (tokenCopy.ToLong(&antNumber) && ver.major == 0) {
+			if (temp.ToLong(&antNumber) && ver.major == 0) {
 				ver.major = antNumber;
 			}
 		} else if ( !token.CmpNoCase(_T("sse2")) ) {
 			ver.sse = 2;
 		} else if ( !token.CmpNoCase(_T("sse")) ) {
 			ver.sse = 1;
-		} else if ( !token.CmpNoCase(_T("inf")) ) {
-			ver.inferno = true;
-		} else if ( !token.CmpNoCase(_T("debug")) ){
-			ver.debug = true;
-		} else if ( !token.CmpNoCase(_T("inferno")) ) {
+		} else if ( !token.CmpNoCase(_T("inf")) || !token.CmpNoCase(_T("inferno"))) {
 			ver.inferno = true;
 		} else {
 			if (!ver.string.IsEmpty()) {
