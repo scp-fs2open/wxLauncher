@@ -210,6 +210,8 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		(event.GetEventType() ==
 			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED));
 	
+	this->UpdateComponents(false);
+	
 	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
 		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		FlagFileData* flagData = FlagListManager::GetFlagListManager()->GetFlagFileData();
