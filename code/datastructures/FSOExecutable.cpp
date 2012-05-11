@@ -156,8 +156,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 	wxLogDebug(_T("Making version struct for the executable '%s'"), binaryname.c_str());
 	FSOExecutable ver;
-	// the Lower() works around case-sensitivity of == on wxStrings
-	wxStringTokenizer tok(binaryname.Lower(), _T("_.- ()[]"));
+	wxStringTokenizer tok(binaryname, _T("_.- ()[]/"));
 	wxString first;
 	ver.executablename = binaryname;
 
@@ -166,10 +165,10 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		return ver;
 	}
 	first = tok.GetNextToken();
-	if ( tok.HasMoreTokens() && (first == _T("fred2") || first == _T("fs2")) ) {
+	if ( tok.HasMoreTokens() && (!first.CmpNoCase(_T("fred2")) || !first.CmpNoCase(_T("fs2"))) ) {
 		wxString first1 = tok.GetNextToken();
-		if ( first1 == _T("open") ) {
-			if ( first == _T("fs2") ) {
+		if ( !first1.CmpNoCase(_T("open")) ) {
+			if ( !first.CmpNoCase(_T("fs2")) ) {
 				ver.binaryname = _T("FreeSpace 2 Open");
 			} else {
 				ver.binaryname = _T("FRED2 Open");
@@ -185,16 +184,15 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 
 	while ( tok.HasMoreTokens() ) {
 		wxString token = tok.GetNextToken();
-		token.MakeLower();
 		wxString temp;
 		long tempVersion;
 
 		if (token.IsEmpty()) { // can happen in OS X nightly debug builds
 			// do nothing
-		} else if ( token.StartsWith(_T("exe")) ) {
+		} else if ( !token.CmpNoCase(_T("exe")) ) {
 			; // do nothing
 #if IS_APPLE
-		} else if (token.StartsWith(_T("app"))) {
+		} else if ( !token.CmpNoCase(_T("app")) ) {
 			break; // we've reached the end of the app name
 #endif
 		} else if ( token.ToLong(&tempVersion) && token.size() == 8 ) {
@@ -220,9 +218,9 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Revision version number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
-		} else if ( token.StartsWith(_T("d")) && token.size() == 1 ) {
+		} else if ( !token.CmpNoCase(_T("d")) ) {
 			ver.debug = true;
-		} else if ( token.EndsWith(_T("d"), &temp) ) {
+		} else if ( token.Lower().EndsWith(_T("d"), &temp) ) {
 			if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
 				if ( tempVersion < 1000 && tempVersion > 0 ) {
@@ -234,7 +232,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Token ending in 'd' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
-		} else if ( token.EndsWith(_T("r"), &temp) ) {
+		} else if ( token.Lower().EndsWith(_T("r"), &temp) ) {
 			if (temp.IsEmpty()) {
 				// do nothing, the 'r' wasn't preceded by a number
 			} else if ( temp.ToLong(&tempVersion) ) {
@@ -248,32 +246,32 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			} else {
 				wxLogWarning(_T("Token ending in 'r' is not a number (%s) in executable %s"), token.c_str(), binaryname.c_str());
 			}
-		} else if ( token.StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
+		} else if ( token.Lower().StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
 			// must be a revision number from SirKnightly's builds
 			if ( tempVersion > 0 ) {
 				ver.build = (int)tempVersion;
 			} else {
 				wxLogWarning(_T("SirKnightly build number out of range (%ld) in executable %s"), tempVersion, binaryname.c_str());
 			}
-		} else if ( token.StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
+		} else if ( token.Lower().StartsWith(_T("ant")) && tok.HasMoreTokens() ) {
 			ver.string = _T("ant");
 
 			// in case the token is of the format, e.g., "Ant8"
-			wxString tokenCopy(token);
+			wxString tokenCopy(token.Lower());
 			long antNumber;
 			tokenCopy.Replace(_T("ant"), wxEmptyString);
 			if (tokenCopy.ToLong(&antNumber) && ver.major == 0) {
 				ver.major = antNumber;
 			}
-		} else if ( token.StartsWith(_T("sse2")) ) {
+		} else if ( !token.CmpNoCase(_T("sse2")) ) {
 			ver.sse = 2;
-		} else if ( token.StartsWith(_T("sse")) ) {
+		} else if ( !token.CmpNoCase(_T("sse")) ) {
 			ver.sse = 1;
-		} else if ( token.StartsWith(_T("inf")) ) {
+		} else if ( !token.CmpNoCase(_T("inf")) ) {
 			ver.inferno = true;
-		} else if ( token.StartsWith(_T("debug")) ){
+		} else if ( !token.CmpNoCase(_T("debug")) ){
 			ver.debug = true;
-		} else if ( token.StartsWith(_T("inferno")) ) {
+		} else if ( !token.CmpNoCase(_T("inferno")) ) {
 			ver.inferno = true;
 		} else {
 			if (!ver.string.IsEmpty()) {
