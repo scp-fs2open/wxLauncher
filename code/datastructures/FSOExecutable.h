@@ -38,8 +38,7 @@ public:
 	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
-	static wxString MakeVersionStringFromVersion(FSOExecutable version);
-	wxString MakeVersionStringFromVersion();
+	wxString GetVersionString() const;
 protected:
 	int major;
 	int minor;
@@ -48,6 +47,8 @@ protected:
 	int sse;
 	bool debug;
 	int build;
+	bool antipodes;
+	int antNumber; //!< antipodes number (such as 8)
 	wxString string;
 	wxString binaryname; //!< FS2 Open or FRED
 	wxString executablename; //!< the actual name of the binary

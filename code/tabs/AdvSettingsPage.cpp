@@ -65,7 +65,7 @@ EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdat
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
-EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnCustomFlagsChanged)
+EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnNeedUpdateCustomFlags)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_READY, AdvSettingsPage::OnFlagListBoxReady)
 EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
@@ -218,15 +218,14 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		wxCHECK_RET(flagData != NULL,
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
 		this->flagListBox->AcceptFlagData(flagData);
+		// TODO: remove the GenerateCmdLineChanged() when the proxy is complete
 		CmdLineManager::GenerateCmdLineChanged();
 	} else {
-		size_t itemCount = static_cast<size_t>(event.GetExtraLong());
-		wxLogDebug(_T("processing not OK, flag list item count to be set to %u."), itemCount);
-		this->flagListBox->SetItemCount(itemCount);
+		this->flagListBox->SetItemCount(1); // for the errorText
 	}
 }
 
-void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
+void AdvSettingsPage::OnNeedUpdateCustomFlags(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
 	
 	this->UpdateComponents(false);
@@ -236,6 +235,7 @@ void AdvSettingsPage::OnCustomFlagsChanged(wxCommandEvent &event) {
 void AdvSettingsPage::OnFlagListBoxReady(wxCommandEvent &WXUNUSED(event)) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
 	this->UpdateComponents(false);
+	this->UpdateFlagSetsBox();
 }
 
 void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
@@ -315,44 +315,54 @@ void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
 	customFlagsText->ChangeValue(customFlags);
 }
 
+void AdvSettingsPage::UpdateFlagSetsBox() {
+	wxASSERT(this->flagListBox != NULL);
+	wxASSERT(this->flagListBox->IsReady());
+	
+	wxChoice *flagSetChoice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
+	wxCHECK_RET(flagSetChoice != NULL,
+		_T("Unable to find the flagset choice control"));
+	
+	// TODO rethink the following assertion when new mod.ini is supported
+	// the assertion also assumes that the flag sets box is never reused
+	wxASSERT(flagSetChoice->IsEmpty()); // shouldn't add sets more than once
+	
+	wxArrayString flagSetsArray;
+	this->flagListBox->GetFlagSets(flagSetsArray);
+	
+	// before populating the flag set choice box, let's remove the flag sets
+	// that don't make sense and can thus potentially confuse users
+	
+	flagSetsArray.Remove(_T("Custom"));
+	flagSetsArray.Remove(_T("All features on"));
+	
+	flagSetChoice->Append(flagSetsArray);
+	
+	wxClientDC dc(this);
+	wxArrayString flagSets = flagSetChoice->GetStrings();
+	wxFont font(this->GetFont());
+	int maxStringWidth = 0;
+	int x, y;
+	
+	for (int i = 0, n = flagSets.GetCount(); i < n; ++i) {
+		dc.GetTextExtent(flagSets[i], &x, &y, NULL, NULL, &font);
+		
+		if (x > maxStringWidth) {
+			maxStringWidth = x;
+		}
+	}
+	
+	flagSetChoice->SetMinSize(
+		wxSize(maxStringWidth + 40, // 40 to include drop down box control
+			flagSetChoice->GetSize().GetHeight()));
+	this->Layout();
+}
+
 void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	if ( (this->flagListBox == NULL) || !this->flagListBox->IsReady() ) {
 		// The control I need to update does not exist, do nothing
 		return;
-	}
-
-	wxChoice *flagSetChoice = dynamic_cast<wxChoice*>(
-		wxWindow::FindWindowById(ID_SELECT_FLAG_SET, this));
-	wxCHECK_RET( flagSetChoice != NULL, _T("Unable to find the flagset choice control") );
-	wxArrayString flagSetsArray;
-	if (flagSetChoice->IsEmpty()) { // box should be appended just once
-		this->flagListBox->GetFlagSets(flagSetsArray);
-
-		// before populating the flag set choice box, let's remove the flag sets that don't make sense
-		// and can thus potentially confuse users
-
-		flagSetsArray.Remove(_T("Custom"));
-		flagSetsArray.Remove(_T("All features on"));
-
-		flagSetChoice->Append(flagSetsArray);
-
-		wxClientDC dc(this);
-		wxArrayString flagSets = flagSetChoice->GetStrings();
-		wxFont font(this->GetFont());
-		int maxStringWidth = 0;
-		int x, y;
-
-		for (int i = 0, n = flagSets.GetCount(); i < n; ++i) {
-			dc.GetTextExtent(flagSets[i], &x, &y, NULL, NULL, &font);
-
-			if (x > maxStringWidth) {
-				maxStringWidth = x;
-			}
-		}
-
-		flagSetChoice->SetMinSize(wxSize(maxStringWidth + 40, // 40 to include drop down box control
-			flagSetChoice->GetSize().GetHeight()));
-		this->Layout();
 	}
 
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(

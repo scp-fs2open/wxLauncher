@@ -252,9 +252,43 @@ extern const wxString REG_KEY_JOYSTICK_DIRECTIONAL;
 extern const wxString REG_KEY_NETWORK_TYPE;
 extern const wxString REG_KEY_NETWORK_SPEED;
 extern const wxString REG_KEY_NETWORK_PORT;
-extern const wxString REG_KEY_NETWORK_FOLDER_FILE;
+extern const wxString REG_KEY_NETWORK_FOLDER_CFG;
+extern const wxString REG_KEY_ROOT_FOLDER_CFG;
 extern const wxString REG_KEY_NETWORK_FOLDER_REGISTRY;
 extern const wxString REG_KEY_NETWORK_IP;
+/** @}*/
+
+/** \defgroup basicdefaults default values for basic settings */
+/** @{*/
+extern const long DEFAULT_VIDEO_RESOLUTION_WIDTH;
+extern const long DEFAULT_VIDEO_RESOLUTION_HEIGHT;
+extern const long DEFAULT_VIDEO_BIT_DEPTH;
+extern const wxString DEFAULT_VIDEO_TEXTURE_FILTER;
+extern const long DEFAULT_VIDEO_ANISOTROPIC;
+extern const long DEFAULT_VIDEO_ANTI_ALIAS;
+
+extern const wxString DEFAULT_AUDIO_OPENAL_DEVICE;
+
+extern const long DEFAULT_SPEECH_VOICE;
+extern const long DEFAULT_SPEECH_VOLUME;
+extern const bool DEFAULT_SPEECH_IN_TECHROOM;
+extern const bool DEFAULT_SPEECH_IN_BRIEFINGS;
+extern const bool DEFAULT_SPEECH_IN_GAME;
+extern const bool DEFAULT_SPEECH_IN_MULTI;
+
+extern const long DEFAULT_JOYSTICK_ID;
+extern const bool DEFAULT_JOYSTICK_FORCE_FEEDBACK;
+extern const bool DEFAULT_JOYSTICK_DIRECTIONAL;
+
+extern const wxString DEFAULT_NETWORK_TYPE;
+extern const wxString DEFAULT_NETWORK_SPEED;
+extern const long DEFAULT_NETWORK_PORT;
+extern const wxString DEFAULT_NETWORK_IP;
+/** @}*/
+
+/** \defgroup constants other constants */
+/** @{*/
+extern const unsigned int JOYMAN_INVALID_JOYSTICK;
 /** @}*/
 
 #endif

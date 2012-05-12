@@ -42,6 +42,36 @@ const wxString REG_KEY_JOYSTICK_DIRECTIONAL =		L"EnableHitEffect";
 const wxString REG_KEY_NETWORK_TYPE =				L"NetworkConnection";
 const wxString REG_KEY_NETWORK_SPEED =				L"ConnectionSpeed";
 const wxString REG_KEY_NETWORK_PORT =				L"ForcePort";
-const wxString REG_KEY_NETWORK_FOLDER_FILE =		L"/Network"; // FileProfileManager
+const wxString REG_KEY_NETWORK_FOLDER_CFG =			L"/Network"; // FileProfileManager
+const wxString REG_KEY_ROOT_FOLDER_CFG =			L"/"; // FileProfileManager
 const wxString REG_KEY_NETWORK_FOLDER_REGISTRY =	L"Network"; // RegistryProfileManager
 const wxString REG_KEY_NETWORK_IP =					L"CustomIP";
+
+// defaults for basic settings
+const long DEFAULT_VIDEO_RESOLUTION_WIDTH =		1024;
+const long DEFAULT_VIDEO_RESOLUTION_HEIGHT =	768;
+const long DEFAULT_VIDEO_BIT_DEPTH =			32;
+const wxString DEFAULT_VIDEO_TEXTURE_FILTER =	_T("Trilinear");
+const long DEFAULT_VIDEO_ANISOTROPIC =			0;
+const long DEFAULT_VIDEO_ANTI_ALIAS =			0;
+
+const wxString DEFAULT_AUDIO_OPENAL_DEVICE =	_T("no sound");
+
+const long DEFAULT_SPEECH_VOICE =				0;
+const long DEFAULT_SPEECH_VOLUME =				100;
+const bool DEFAULT_SPEECH_IN_TECHROOM =			true;
+const bool DEFAULT_SPEECH_IN_BRIEFINGS =		true;
+const bool DEFAULT_SPEECH_IN_GAME =				true;
+const bool DEFAULT_SPEECH_IN_MULTI =			true;
+
+const long DEFAULT_JOYSTICK_ID =				JOYMAN_INVALID_JOYSTICK;
+const bool DEFAULT_JOYSTICK_FORCE_FEEDBACK =	false;
+const bool DEFAULT_JOYSTICK_DIRECTIONAL =		false;
+
+const wxString DEFAULT_NETWORK_TYPE =			_T("None");
+const wxString DEFAULT_NETWORK_SPEED =			_T("None");
+const long DEFAULT_NETWORK_PORT =				0;
+const wxString DEFAULT_NETWORK_IP =				wxEmptyString;
+
+// constants
+const unsigned int JOYMAN_INVALID_JOYSTICK =	99999;

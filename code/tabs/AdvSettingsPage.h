@@ -32,6 +32,7 @@ public:
 private:
 	void UpdateComponents(const bool resetFlagList = true);
 	void RefreshFlags(const bool resetFlagList = true);
+	void UpdateFlagSetsBox();
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
 	SkinSystem *skin;
@@ -41,7 +42,7 @@ public:
 	void OnExeChanged(wxCommandEvent& event);
 	void OnSelectFlagSet(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
-	void OnCustomFlagsChanged(wxCommandEvent& event);
+	void OnNeedUpdateCustomFlags(wxCommandEvent& event);
 	void OnFlagListBoxReady(wxCommandEvent& event);
 	void OnCurrentProfileChanged(wxCommandEvent& event);
 

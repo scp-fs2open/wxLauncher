@@ -21,12 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/JoystickManager.h"
 #include "generated/configure_launcher.h"
 
-const unsigned int JOYMAN_INVALID_JOYSTICK = 99999;
-
 #if USE_JOYSTICK && HAS_SDL
 #include "SDL.h"
 #endif
 
+#include "global/ids.h"
 #include "global/MemoryDebugging.h"
 
 namespace JoyMan {

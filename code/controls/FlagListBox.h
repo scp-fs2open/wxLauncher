@@ -30,13 +30,11 @@ public:
 	FlagListCheckBox(
 		wxWindow* parent,
 		const wxString& label,
-		const wxString& flagString,
-		int flagIndex);
+		const wxString& flagString);
 	void OnClicked(wxCommandEvent &event);
 private:
 	FlagListCheckBox();
 	wxString flagString;
-	int flagIndex;
 };
 
 class FlagListCheckBoxItem {
@@ -44,14 +42,13 @@ public:
 	FlagListCheckBoxItem(const wxString& fsoCategory);
 	FlagListCheckBoxItem(FlagListCheckBox& checkBox, wxSizer& checkBoxSizer,
 		const wxString& shortDescription, const wxString& flagString,
-		int flagIndex, bool isRecommendedFlag);
+		bool isRecommendedFlag);
 	~FlagListCheckBoxItem();
 	const wxString& GetFsoCategory() const { return this->fsoCategory; }
 	FlagListCheckBox* GetCheckBox() { return this->checkBox; }
 	wxSizer* GetCheckBoxSizer() { return this->checkBoxSizer; }
 	const wxString& GetShortDescription() const { return this->shortDescription; }
 	const wxString& GetFlagString() const { return this->flagString; }
-	int GetFlagIndex() const { return this->flagIndex; }
 	bool IsRecommendedFlag() const { return this->isRecommendedFlag; }
 private:
 	FlagListCheckBoxItem();
@@ -60,7 +57,6 @@ private:
 	wxSizer* checkBoxSizer;
 	wxString shortDescription;
 	wxString flagString;
-	int flagIndex; // so proxy can keep flags ordered in flag list order
 	bool isRecommendedFlag;
 };
 
