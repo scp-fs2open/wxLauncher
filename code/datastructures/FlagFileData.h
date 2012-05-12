@@ -62,7 +62,7 @@ class ProxyFlagDataItem {
 public:
 	ProxyFlagDataItem(const wxString& flagString, int flagIndex);
 	const wxString& GetFlagString() const { return flagString; }
-	int getFlagIndex() const { return flagIndex; }
+	int GetFlagIndex() const { return flagIndex; }
 private:
 	wxString flagString;
 	int flagIndex;
@@ -75,15 +75,13 @@ class FlagListBoxDataItem {
 public:
 	FlagListBoxDataItem(const wxString& fsoCategory);
 	FlagListBoxDataItem(const wxString& shortDescription,
-		const wxString& flagString, int flagIndex, bool isRecommendedFlag);
+		const wxString& flagString, bool isRecommendedFlag);
 	wxString fsoCategory;
 	wxString shortDescription;
 	wxString flagString;
 	bool isRecommendedFlag;
-	int GetFlagIndex() const { return flagIndex; }
 private:
 	FlagListBoxDataItem();
-	int flagIndex;
 };
 
 WX_DECLARE_LIST(FlagListBoxDataItem, FlagListBoxData);

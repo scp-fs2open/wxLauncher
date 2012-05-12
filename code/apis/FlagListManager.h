@@ -26,8 +26,7 @@
 #include "datastructures/FlagFileData.h"
 
 /** Flag file processing status has changed.
- The event's int value indicates the FlagFileProcessingStatus, and
- its extraLong value indicates the item count for the flag list. */
+ The event's int value indicates the FlagFileProcessingStatus. */
 DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
 
 WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
@@ -50,8 +49,8 @@ public:
 		FLAG_FILE_PROCESSING_ERROR
 	};
 
-	void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
-	void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
+	static void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	
 	void BeginFlagFileProcessing();
 	
@@ -76,9 +75,9 @@ private:
 	
 	static FlagListManager* flagListManager;
 	
-	FlagFileProcessingEventHandlers flagFileProcessingStatusChangedHandlers;
+	static FlagFileProcessingEventHandlers ffProcessingStatusChangedHandlers;
 	
-	void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
+	static void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
 	
 	/** ProcessingStatus is a low-level description of the status of flag file processing. */
 	enum ProcessingStatus {
