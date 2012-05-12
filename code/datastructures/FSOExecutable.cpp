@@ -37,6 +37,8 @@ FSOExecutable::FSOExecutable() {
 	sse = 0;
 	debug = false;
 	build = 0;
+	antipodes = false;
+	antNumber = 0;
 	buildCaps = 0;
 }
 
@@ -199,6 +201,15 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 #endif
 		} else if ( token.ToLong(&tempVersion) && token.size() == 8 ) {
 			// must be a date from a nightly build; just ignore it
+		} else if ( token.ToLong(&tempVersion) && ver.antipodes && ver.antNumber == 0) {
+			// must be antipodes number
+			if ( tempVersion > 0 ) {
+				ver.antNumber = (int)tempVersion;
+			} else {
+				wxLogWarning(
+					_T("antipodes number out of range (%ld) in executable %s"),
+						tempVersion, binaryname.c_str());
+			}
 		} else if ( token.ToLong(&tempVersion) && ver.major == 0 ) {
 			// must be major version number
 			if ( tempVersion < 1000 && tempVersion > 0 ) {
@@ -271,13 +282,20 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					_T("SirKnightly build number out of range (%ld) in executable %s"),
 						tempVersion, binaryname.c_str());
 			}
-		} else if ( token.Lower().StartsWith(_T("ant"), &temp) && tok.HasMoreTokens() ) {
-			ver.string = _T("ant");
+		} else if ( !token.CmpNoCase(_T("ant")) ) {
+			ver.antipodes = true;
+		} else if ( token.Lower().StartsWith(_T("ant"), &temp) && !ver.antipodes ) {
+			ver.antipodes = true;
 
 			// in case the token is of the format, e.g., "Ant8"
 			long antNumber;
-			if (temp.ToLong(&antNumber) && ver.major == 0) {
-				ver.major = antNumber;
+			if (temp.ToLong(&antNumber)) {
+				if (antNumber > 0) {
+					ver.antNumber = antNumber;
+				} else {
+					wxLogWarning(_T("Invalid antipodes number %ld in executable %s"),
+						antNumber, binaryname.c_str());
+				}
 			}
 		} else if ( !token.CmpNoCase(_T("sse2")) ) {
 			ver.sse = 2;
@@ -292,34 +310,42 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			ver.string += token;
 		}
 	}
-	if ( ver.string.StartsWith(_T("ant")) ) {
-		// is an antipodes builds
-		ver.build = 0; // do not display build number if it exists (mostly for OS X)
-		ver.string = wxString::Format(_T("Antipodes%s"),
-			(ver.major == 0) ? _T("") : wxString::Format(_T(" %d"), ver.major).c_str());
-	}
+	
 	return ver;
 }
+
 /** Returns the version string to display to the user from a previously
 parsed FSOVersion object.  The intention is to display all information that
 is normally encoded into the executable's file name into a long string that
 more user friendly. 
 
 The resulting string looks something like this: \verbatim
-FreeSpace 2 Open Antipodes 4 Debug Inferno SSE2
-FreeSpace 2 Open 3.6.10 Release Inferno SSE
+FreeSpace 2 Open Antipodes 4 Debug SSE2
+FreeSpace 2 Open 3.6.10 Inferno SSE
 FRED2 Open 3.6.11 Debug
 \endverbatim
 */
 wxString FSOExecutable::GetVersionString() const {
-	bool hasfullversion = (this->major != 0 && this->minor != 0 && this->revision != 0);
-	return wxString::Format(_T("%s %s%s%s %s%s%s"),
+	const bool hasVersion = (this->major != 0) || this->antipodes;
+	const bool useFullVersion = hasVersion && !this->antipodes;
+	
+	// just to improve code readability
+	wxString antipodesStr;
+	if (this->antipodes) {
+		antipodesStr += _T(" Antipodes");
+		if (this->antNumber != 0) {
+			antipodesStr += wxString::Format(_T(" %d"), antNumber);
+		}
+	}
+	
+	return wxString::Format(_T("%s%s%s%s%s%s%s%s"),
 		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FreeSpace 2 Open
-		(hasfullversion) ? wxString::Format(_T("%d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
-		(this->build == 0) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" Build %d") : _T("Build %d"), this->build).c_str(),
-		(this->string.IsEmpty() ) ? wxEmptyString : wxString::Format((hasfullversion) ? _T(" (%s)") : _T("%s"), this->string.c_str()).c_str(),
-		(this->debug) ? _T("Debug") : _T("Release"),
-		(this->inferno) ? _T(" Inferno") : wxEmptyString,
+		(useFullVersion) ? wxString::Format(_T(" %d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
+		(this->antipodes) ? antipodesStr.c_str() : wxEmptyString,
+		(this->build == 0) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (Build %d)") : _T(" Build %d"), this->build).c_str(),
+		(this->string.IsEmpty()) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (%s)") : _T(" %s"), this->string.c_str()).c_str(),
+		(this->debug) ? _T(" Debug") : wxEmptyString,
+		(this->inferno && !this->antipodes) ? _T(" Inferno") : wxEmptyString,
 		(this->sse == 0) ? wxEmptyString : (this->sse == 1) ? _T(" SSE") : _T(" SSE2")
 		);
 }
