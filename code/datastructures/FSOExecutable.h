@@ -47,6 +47,8 @@ protected:
 	int sse;
 	bool debug;
 	int build;
+	bool antipodes;
+	int antNumber; //!< antipodes number (such as 8)
 	wxString string;
 	wxString binaryname; //!< FS2 Open or FRED
 	wxString executablename; //!< the actual name of the binary
