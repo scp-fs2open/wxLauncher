@@ -241,7 +241,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	proman->ProfileRead(PRO_CFG_VIDEO_BIT_DEPTH, &bitDepth, DEFAULT_VIDEO_BIT_DEPTH, true);
 	depthCombo->SetSelection((bitDepth == 16) ? 0 : 1);
 
-#if !IS_WIN32 // TF/AF/AA don't yet work on Windows
 	wxStaticText* textureFilterText = 
 		new wxStaticText(this, wxID_ANY, _("Texture filter:"));
 	wxChoice* textureFilterCombo = new wxChoice(this, ID_TEXTURE_FILTER_COMBO);
@@ -255,6 +254,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	filter.MakeLower();
 	textureFilterCombo->SetSelection( (filter == _T("bilinear")) ? 0 : 1);
 
+#if !IS_WIN32 // AF/AA don't yet work on Windows
 	wxStaticText* anisotropicText = 
 		new wxStaticText(this, wxID_ANY, _("Anisotropic:"));
 	wxChoice* anisotropicCombo = new wxChoice(this, ID_ANISOTROPIC_COMBO);
@@ -335,10 +335,10 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	videoSizerL->Add(depthText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerL->Add(depthCombo, wxSizerFlags().Expand());
 
-#if !IS_WIN32 // TF/AF/AA don't yet work on Windows
 	wxGridSizer* videoSizerR = new wxFlexGridSizer(2);
 	videoSizerR->Add(textureFilterText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(textureFilterCombo, wxSizerFlags().Expand());
+#if !IS_WIN32 // AF/AA don't yet work on Windows
 	videoSizerR->Add(anisotropicText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	videoSizerR->Add(anisotropicCombo, wxSizerFlags().Expand());
 	videoSizerR->Add(aaText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -348,6 +348,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBoxSizer* videoSizer = new wxStaticBoxSizer(videoBox, wxHORIZONTAL);
 #if IS_WIN32
 	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
+	videoSizer->Add(videoSizerR, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT, 5);
 #else
 	videoSizer->Add(videoSizerL, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxBOTTOM, 5);
 	videoSizer->AddStretchSpacer(5);
