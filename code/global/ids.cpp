@@ -59,10 +59,10 @@ const wxString DEFAULT_AUDIO_OPENAL_DEVICE =	_T("no sound");
 
 const long DEFAULT_SPEECH_VOICE =				0;
 const long DEFAULT_SPEECH_VOLUME =				100;
-const bool DEFAULT_SPEECH_IN_TECHROOM =			true;
-const bool DEFAULT_SPEECH_IN_BRIEFINGS =		true;
-const bool DEFAULT_SPEECH_IN_GAME =				true;
-const bool DEFAULT_SPEECH_IN_MULTI =			true;
+const bool DEFAULT_SPEECH_IN_TECHROOM =			false;
+const bool DEFAULT_SPEECH_IN_BRIEFINGS =		false;
+const bool DEFAULT_SPEECH_IN_GAME =				false;
+const bool DEFAULT_SPEECH_IN_MULTI =			false;
 
 const long DEFAULT_JOYSTICK_ID =				JOYMAN_INVALID_JOYSTICK;
 const bool DEFAULT_JOYSTICK_FORCE_FEEDBACK =	false;
