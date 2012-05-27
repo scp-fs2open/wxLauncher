@@ -36,6 +36,8 @@ Preset::Preset(const wxString& name, const int buttonId, const wxString& preset)
 // vertical spacing between radio buttons is platform-specific
 #if IS_WIN32
 const int RADIOBUTTON_SPACING = 20;
+#elif IS_LINUX
+const int RADIOBUTTON_SPACING = 5;
 #else
 const int RADIOBUTTON_SPACING = 10;
 #endif
