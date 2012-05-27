@@ -221,7 +221,7 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 		// TODO: remove the GenerateCmdLineChanged() when the proxy is complete
 		CmdLineManager::GenerateCmdLineChanged();
 	} else {
-		this->flagListBox->SetItemCount(1); // for the errorText
+		this->flagListBox->SetItemCount(0); // for the errorText
 	}
 }
 
