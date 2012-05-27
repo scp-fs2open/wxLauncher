@@ -33,7 +33,7 @@ WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
 
 WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 
-class FlagListManager {
+class FlagListManager: public wxEvtHandler {
 public:
 	static bool Initialize();
 	static void DeInitialize();
@@ -46,9 +46,12 @@ public:
 	enum FlagFileProcessingStatus {
 		FLAG_FILE_PROCESSING_OK = 0,
 		FLAG_FILE_PROCESSING_WAITING,
+		FLAG_FILE_PROCESSING_RESET,
 		FLAG_FILE_PROCESSING_ERROR
 	};
 
+	void OnBinaryChanged(wxCommandEvent &event);
+	
 	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	static void UnRegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
 	
@@ -113,5 +116,7 @@ private:
 	private:
 		FlagFileArray flagFileLocations;
 	};
+	
+	DECLARE_EVENT_TABLE()
 };
 #endif

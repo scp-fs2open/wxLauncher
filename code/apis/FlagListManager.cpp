@@ -19,6 +19,7 @@
 #include "generated/configure_launcher.h"
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
+#include "apis/TCManager.h"
 #include "datastructures/FSOExecutable.h"
 #include "global/ids.h"
 
@@ -116,12 +117,21 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 
 FlagListManager::FlagListManager()
 : data(NULL), proxyData(NULL) {
-	// FIXME: decide how to handle setting initial status when manager isn't yet initialized
-	this->processingStatus = INITIAL_STATUS;
+	TCManager::RegisterTCBinaryChanged(this);
 }
 
 FlagListManager::~FlagListManager() {
+	TCManager::UnRegisterTCBinaryChanged(this);
 	this->DeleteExistingData();
+}
+
+BEGIN_EVENT_TABLE(FlagListManager, wxEvtHandler)
+EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, FlagListManager::OnBinaryChanged)
+END_EVENT_TABLE()
+
+void FlagListManager::OnBinaryChanged(wxCommandEvent& event) {
+	this->DeleteExistingData();
+	this->SetProcessingStatus(INITIAL_STATUS);
 }
 
 void FlagListManager::DeleteExistingData() {
@@ -467,8 +477,10 @@ FlagListManager::FlagFileProcessingStatus FlagListManager::GetFlagFileProcessing
 	
 	if (processingStatus == PROCESSING_OK) {
 		return FlagListManager::FLAG_FILE_PROCESSING_OK;
-	} else if (processingStatus == INITIAL_STATUS || processingStatus == WAITING_FOR_FLAG_FILE) {
+	} else if (processingStatus == WAITING_FOR_FLAG_FILE) {
 		return FlagListManager::FLAG_FILE_PROCESSING_WAITING;
+	} else if (processingStatus == INITIAL_STATUS) {
+		return FlagListManager::FLAG_FILE_PROCESSING_RESET;
 	} else {
 		return FlagListManager::FLAG_FILE_PROCESSING_ERROR;
 	}

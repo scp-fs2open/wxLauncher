@@ -48,7 +48,6 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
-	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	// must call TCManager::CurrentProfileChanged() manually on startup,
@@ -60,7 +59,6 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 }
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
-EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
@@ -206,14 +204,20 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 }
 
 void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
-	wxASSERT((this->flagListBox != NULL) &&
-		(event.GetEventType() ==
-			EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED));
+	wxASSERT(event.GetEventType() == EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
+	
+	const FlagListManager::FlagFileProcessingStatus status =
+		static_cast<FlagListManager::FlagFileProcessingStatus>(event.GetInt());
+	
+	if (status == FlagListManager::FLAG_FILE_PROCESSING_RESET) {
+		wxCommandEvent resetEvent;
+		this->OnExeChanged(resetEvent);
+		return;
+	}
 	
 	this->UpdateComponents(false);
 	
-	if (FlagListManager::FlagFileProcessingStatus(event.GetInt()) ==
-		 FlagListManager::FLAG_FILE_PROCESSING_OK) {
+	if (status == FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		FlagFileData* flagData = FlagListManager::GetFlagListManager()->GetFlagFileData();
 		wxCHECK_RET(flagData != NULL,
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
