@@ -322,10 +322,8 @@ void FlagListBox::OnSize(wxSizeEvent &event) {
 }
 
 void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
-	// ignore double-click when flag list box is displaying an error msg
-	if (!this->IsReady()) {
-		return;
-	}
+	wxCHECK_RET(this->IsReady(),
+		_T("OnDoubleClickFlag() called when flag list box is not ready."));
 	
 	const wxString* webURL = this->flagData->GetWebURL(this->GetSelection());
 	wxCHECK_RET(webURL != NULL,
