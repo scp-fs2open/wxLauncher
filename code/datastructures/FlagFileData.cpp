@@ -195,6 +195,10 @@ ProxyFlagData* FlagFileData::GenerateProxyFlagData() const {
 		for (FlagList::const_iterator flagIter = (*catIter)->flags.begin(); flagIter != (*catIter)->flags.end(); flagIter++) {
 			Flag* flag = *flagIter;
 			
+			if (flag->flagString.IsEmpty()) { // must be a category header
+				continue;
+			}
+			
 			proxyData->Append(new ProxyFlagDataItem(flag->flagString, flag->GetFlagIndex()));
 		}
 	}
