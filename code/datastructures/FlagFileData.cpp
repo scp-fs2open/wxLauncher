@@ -105,6 +105,7 @@ void FlagFileData::AddEasyFlag(const wxString& easyFlag) {
 
 void FlagFileData::AddFlag(Flag* flag) {
 	wxASSERT(flag != NULL);
+	wxASSERT(!flag->fsoCatagory.IsEmpty());
 	
 	FlagCategoryList::iterator iter;
 	for (iter = this->begin(); iter != this->end(); iter++ ) {
