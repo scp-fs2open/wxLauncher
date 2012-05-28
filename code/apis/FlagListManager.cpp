@@ -130,6 +130,9 @@ EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, FlagListManager::OnBinaryChanged)
 END_EVENT_TABLE()
 
 void FlagListManager::OnBinaryChanged(wxCommandEvent& event) {
+	wxCHECK_RET(this->GetProcessingStatus() != WAITING_FOR_FLAG_FILE,
+		_T("Received binary changed event in middle of flag file processing."));
+	
 	this->DeleteExistingData();
 	this->SetProcessingStatus(INITIAL_STATUS);
 }
@@ -149,6 +152,9 @@ void FlagListManager::DeleteExistingData() {
 }
 
 void FlagListManager::BeginFlagFileProcessing() {
+	wxCHECK_RET(this->GetProcessingStatus() != WAITING_FOR_FLAG_FILE,
+		_T("Began flag file processing while processing was underway."));
+	
 	this->DeleteExistingData(); // don't leak any existing data
 	
 	this->data = new FlagFileData();
