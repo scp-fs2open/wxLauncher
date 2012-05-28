@@ -109,10 +109,20 @@ if(IS_WIN32) # helper is only needed on windows
     code/apis/PlatformProfileManagerShared.cpp
     code/apis/CmdLineManager.h
     code/apis/CmdLineManager.cpp
+    code/apis/FlagListManager.h
+    code/apis/FlagListManager.cpp
     code/apis/ProfileManager.h
     code/apis/ProfileManager.cpp
+    code/apis/ProfileProxy.h
+    code/apis/ProfileProxy.cpp
+    code/apis/TCManager.h
+    code/apis/TCManager.cpp
     code/controls/LightingPresets.h
     code/controls/LightingPresets.cpp
+    code/datastructures/FlagFileData.h
+    code/datastructures/FlagFileData.cpp
+    code/datastructures/FSOExecutable.h
+    code/datastructures/FSOExecutable.cpp
     )
   set_target_properties(registry_helper
     PROPERTIES LINKER_LANGUAGE CXX
@@ -208,6 +218,8 @@ set(API_CODE_FILES
   code/apis/OpenALManager.cpp
   code/apis/ProfileManager.h
   code/apis/ProfileManager.cpp
+  code/apis/ProfileProxy.h
+  code/apis/ProfileProxy.cpp
   code/apis/SkinManager.h
   code/apis/SkinManager.cpp
   code/apis/SpeechManager.h
