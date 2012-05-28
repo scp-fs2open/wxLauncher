@@ -293,10 +293,10 @@ void ProfileProxy::FinishProfileInitialization() const {
 	wxCHECK_RET(!this->IsProfileInitialized(),
 		_T("FinishProfileInitialization(): profile already initialized."));
 	
-	wxASSERT(!ProMan::GetProfileManager()->ProfileExists(
-		PRO_CFG_TC_CURRENT_FLAG_LINE));
-	ProMan::GetProfileManager()->ProfileWrite(
-		PRO_CFG_TC_CURRENT_FLAG_LINE, wxEmptyString);
+	if (!ProMan::GetProfileManager()->ProfileExists(PRO_CFG_TC_CURRENT_FLAG_LINE)) {
+		ProMan::GetProfileManager()->ProfileWrite(
+			PRO_CFG_TC_CURRENT_FLAG_LINE, wxEmptyString);
+	}
 	
 	wxLogDebug(_T("Autosaving newly initialized profile '%s'."),
 		ProMan::GetProfileManager()->GetCurrentName().c_str());
