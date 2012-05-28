@@ -18,8 +18,7 @@
 
 #include "controls/LightingPresets.h"
 
-#include "apis/CmdLineManager.h"
-#include "apis/ProfileManager.h"
+#include "apis/ProfileProxy.h"
 
 #include "global/ids.h"
 #include "global/MemoryDebugging.h"
@@ -43,7 +42,6 @@ const int RADIOBUTTON_SPACING = 10;
 #endif
 
 const int DEFAULT_PRESET_ID = ID_PRESETS_OFF;
-const wxString LightingPresets::FLAG_LINE_SEPARATOR = _T("|||");
 PresetHashMap LightingPresets::presets;
 
 LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
@@ -151,28 +149,23 @@ void LightingPresets::OnSelectLightingPreset(wxCommandEvent &event) {
 		copyPresetButton->Enable();
 	}
 	
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_LIGHTING_PRESET, presetName);
-	CmdLineManager::GenerateCmdLineChanged();
+	ProfileProxy::GetProxy()->SetLightingPreset(presetName);
 }
 
 void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 	wxASSERT_MSG(presets.size() != 0, _T("presets have not been initialized"));
 
-	wxString presetName;
-	wxCHECK_RET(ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName),
-				_T("copy lighting preset button pressed with no preset stored in profile"));
+	wxCHECK_RET(ProfileProxy::GetProxy()->HasLightingPreset(),
+		_T("copy lighting preset button pressed with no preset stored in profile"));
+	
+	wxString presetName(ProfileProxy::GetProxy()->GetLightingPresetName());
 
 	wxCHECK_RET(presetName != presets[ID_PRESETS_OFF].GetName(),
 				_T("copy lighting preset button pressed when 'presets off' is selected"));
 
 	wxLogDebug(_T("attempting to copy preset named %s to custom flags"), presetName.c_str());
-	
-	wxString flagLine;
 
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
-	flagLine.Append(_T(" ")).Append(GetFlagLineSeparator()).Append(_T(" ")).Append(PresetNameToPresetString(presetName));
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
-	CmdLineManager::GenerateCustomFlagsChanged();
+	ProfileProxy::GetProxy()->CopyPresetToCustomFlags();
 
 	this->Reset();
 }
@@ -192,16 +185,15 @@ const wxString& LightingPresets::PresetNameToPresetString(const wxString& preset
 		presetName.c_str(), presets[DEFAULT_PRESET_ID].GetName().c_str());
 	return presets[DEFAULT_PRESET_ID].GetPreset();
 }
-
-const wxString& LightingPresets::GetFlagLineSeparator() {
-	return FLAG_LINE_SEPARATOR;
-}
 	
 void LightingPresets::Initialize() {
 	wxString presetName;
-
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName,
-		PresetButtonIdToPresetName(DEFAULT_PRESET_ID), true);
+	
+	if (ProfileProxy::GetProxy()->HasLightingPreset()) {
+		presetName = ProfileProxy::GetProxy()->GetLightingPresetName();
+	} else {
+		presetName = PresetButtonIdToPresetName(DEFAULT_PRESET_ID);
+	}
 
 	int presetButtonId = PresetNameToPresetButtonId(presetName);
 

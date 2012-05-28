@@ -45,9 +45,6 @@ public:
 	void OnCopyLightingPreset(wxCommandEvent &event);
 
 	static const wxString& PresetNameToPresetString(const wxString& presetName);
-	/** Returns a special string used to mark the boundary between the flag line
-		and the appended lighting preset when the "copy preset" button is pressed. */
-	static const wxString& GetFlagLineSeparator();
 
 private:
 	void Initialize();
@@ -56,8 +53,6 @@ private:
 	static void InitializePresets();
 	static int PresetNameToPresetButtonId(const wxString& presetName);
 	static const wxString& PresetButtonIdToPresetName(int buttonId);
-
-	static const wxString FLAG_LINE_SEPARATOR;
 
 	static PresetHashMap presets;
 

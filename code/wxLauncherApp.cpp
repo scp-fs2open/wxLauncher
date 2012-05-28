@@ -41,6 +41,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/HelpManager.h"
 #include "apis/FlagListManager.h"
+#include "apis/ProfileProxy.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
@@ -116,6 +117,9 @@ bool wxLauncher::OnInit() {
 	
 	wxLogInfo(_T("Initializing FlagListManager..."));
 	FlagListManager::Initialize();
+	
+	wxLogInfo(_T("Initializing ProfileProxy..."));
+	ProfileProxy::Initialize();
 
 	wxLogInfo(_T("wxLauncher starting up."));
 
@@ -139,6 +143,7 @@ int wxLauncher::OnExit() {
 
 	ProMan::DeInitialize();
 	HelpManager::DeInitialize();
+	ProfileProxy::DeInitialize();
 	FlagListManager::DeInitialize();
 	
 #if HAS_SDL == 1

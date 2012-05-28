@@ -81,33 +81,35 @@ public:
 	virtual void OnSize(wxSizeEvent &event);
 
 	void OnDoubleClickFlag(wxCommandEvent &event);
-
-	// TODO will eventually get removed once the proxy is in place, I think
-	wxString GenerateStringList() const;
-
-	/** Tries to find flagString in the list of flags and set it to state,
-	returns true on successful set, returns false if cannot find flag. */
-	bool SetFlag(const wxString& flagString, bool state);
+	
+	/** Loads enabled flags from the proxy and checks the corresponding boxes. */
+	void LoadEnabledFlags();
 	
 	/** Tries to find the flagSet specified and then set or unset all flags
 	contained in the flag set, returns true on success, returns false
 	iff it cannot find the flagset.  That is, will return true if none of
 	the flags in the flag set are real flags. */
-	bool SetFlagSet(const wxString& flagSet);
+	bool SetFlagSet(const wxString& setToFind);
 	
 	void GetFlagSets(wxArrayString& arr) const;
-	
-	void ResetFlags();
 	
 	void AcceptFlagData(FlagFileData* flagData);
 	
 	bool IsReady() const { return this->isReady; }
+	
+	bool FlagsLoaded() const { return this->flagsLoaded; }
 
 private:
 	FlagListBoxReadyEventHandlers flagListBoxReadyHandlers;
 	void GenerateFlagListBoxReady();
 	bool isReadyEventGenerated;
 	bool isReady;
+	bool flagsLoaded;
+	
+	/** Tries to find flagString in the list of flags and set it to state.
+	 returns true on successful set, returns false if cannot find flag.
+	 Will update the proxy if updateProxy is true. */
+	bool SetFlag(const wxString& flagString, bool state, bool updateProxy = false);
 	
 	SkinSystem* skin;
 	
