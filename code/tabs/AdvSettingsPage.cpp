@@ -346,9 +346,18 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET( commandLine != NULL, _T("Unable to find the command line view text control") );
 
 	wxString tcPath, exeName, modline;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName);
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MODLINE, &modline);
+	wxCHECK_RET(
+		ProMan::GetProfileManager()->ProfileRead(
+			PRO_CFG_TC_ROOT_FOLDER, &tcPath),
+		_T("Could not find profile entry for root folder."));
+	wxCHECK_RET(
+		ProMan::GetProfileManager()->ProfileRead(
+			PRO_CFG_TC_CURRENT_BINARY, &exeName),
+		_T("Could not find profile entry for FSO binary."));
+	wxCHECK_RET(
+		ProMan::GetProfileManager()->ProfileRead(
+			PRO_CFG_TC_CURRENT_MODLINE, &modline),
+		_T("Could not find profile entry for mod line."));
 	
 	wxString flagFileFlags(ProfileProxy::GetProxy()->GetEnabledFlagsString());
 
