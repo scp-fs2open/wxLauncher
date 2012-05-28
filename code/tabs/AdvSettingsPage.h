@@ -30,8 +30,7 @@ public:
 	void OnNeedUpdateCommandLine(wxCommandEvent &event);
 
 private:
-	void UpdateComponents(const bool resetFlagList = true);
-	void RefreshFlags(const bool resetFlagList = true);
+	void UpdateComponents();
 	void UpdateFlagSetsBox();
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
@@ -43,8 +42,9 @@ public:
 	void OnSelectFlagSet(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
 	void OnNeedUpdateCustomFlags(wxCommandEvent& event);
+	void OnCustomFlagsBoxChanged(wxCommandEvent& event);
 	void OnFlagListBoxReady(wxCommandEvent& event);
-	void OnCurrentProfileChanged(wxCommandEvent& event);
+	void OnProxyFlagDataReady(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };

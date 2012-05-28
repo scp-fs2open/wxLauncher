@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/CmdLineManager.h"
 #include "apis/FlagListManager.h"
+#include "apis/ProfileProxy.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 #include "controls/LightingPresets.h"
@@ -49,7 +50,8 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
 	TCManager::RegisterTCSelectedModChanged(this);
-	ProMan::GetProfileManager()->AddEventHandler(this);
+	ProfileProxy::GetProxy()->RegisterProxyReset(this);
+	ProfileProxy::GetProxy()->RegisterProxyFlagDataReady(this);
 	// must call TCManager::CurrentProfileChanged() manually on startup,
 	// since initial profile switch takes place before TCManager has been initialized
 	// calling it here to ensure that AdvSettingsPage is set up by the time events are triggered
@@ -59,13 +61,14 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 }
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
+EVT_COMMAND(wxID_NONE, EVT_PROXY_RESET, AdvSettingsPage::OnExeChanged)
+EVT_COMMAND(wxID_NONE, EVT_PROXY_FLAG_DATA_READY, AdvSettingsPage::OnProxyFlagDataReady)
 EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
-EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, AdvSettingsPage::OnCurrentProfileChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnNeedUpdateCustomFlags)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_LIST_BOX_READY, AdvSettingsPage::OnFlagListBoxReady)
-EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnNeedUpdateCommandLine)
+EVT_TEXT(ID_CUSTOM_FLAGS_TEXT, AdvSettingsPage::OnCustomFlagsBoxChanged)
 EVT_CHOICE(ID_SELECT_FLAG_SET, AdvSettingsPage::OnSelectFlagSet)
 END_EVENT_TABLE()
 
@@ -186,20 +189,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	this->SetSizer(sizer);
 	this->Layout();
 
-	bool isProfileInitialized;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_MAIN_INITIALIZED, &isProfileInitialized, false);
-
-	if (!isProfileInitialized) {
-		// FIXME SHORT-TERM HACK adding blank entry for /tc/flags if it doesn't exist,
-		// to prevent appearance of unsaved changes when the user hasn't done anything
-		if (!ProMan::GetProfileManager()->ProfileExists(PRO_CFG_TC_CURRENT_FLAG_LINE)) {
-			ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, wxEmptyString);
-		}
-		
-		wxLogDebug(_T("autosaving newly initialized profile '%s'"),
-			ProMan::GetProfileManager()->GetCurrentName().c_str());
-		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_MAIN_INITIALIZED, true);
-		ProMan::GetProfileManager()->SaveCurrentProfile(true);
+	if (!ProfileProxy::GetProxy()->IsProfileInitialized()) {
+		ProfileProxy::GetProxy()->FinishProfileInitialization();
 	}
 }
 
@@ -209,21 +200,18 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 	const FlagListManager::FlagFileProcessingStatus status =
 		static_cast<FlagListManager::FlagFileProcessingStatus>(event.GetInt());
 	
+	// Ignore an event with reset status, since it's meant for the proxy
 	if (status == FlagListManager::FLAG_FILE_PROCESSING_RESET) {
-		wxCommandEvent resetEvent;
-		this->OnExeChanged(resetEvent);
 		return;
 	}
 	
-	this->UpdateComponents(false);
+	this->UpdateComponents();
 	
 	if (status == FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		FlagFileData* flagData = FlagListManager::GetFlagListManager()->GetFlagFileData();
 		wxCHECK_RET(flagData != NULL,
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
 		this->flagListBox->AcceptFlagData(flagData);
-		// TODO: remove the GenerateCmdLineChanged() when the proxy is complete
-		CmdLineManager::GenerateCmdLineChanged();
 	} else {
 		this->flagListBox->SetItemCount(0); // for the errorText
 	}
@@ -231,22 +219,42 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 
 void AdvSettingsPage::OnNeedUpdateCustomFlags(wxCommandEvent &event) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
+	wxASSERT(ProfileProxy::GetProxy()->IsFlagDataReady());
 	
-	this->UpdateComponents(false);
-	CmdLineManager::GenerateCmdLineChanged();
+	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
+	wxCHECK_RET(customFlagsText != NULL,
+		_T("Unable to find the custom flags text ctrl"));
+	
+	customFlagsText->ChangeValue(ProfileProxy::GetProxy()->GetCustomFlags());
 }
 
 void AdvSettingsPage::OnFlagListBoxReady(wxCommandEvent &WXUNUSED(event)) {
 	wxASSERT((this->flagListBox != NULL) && this->flagListBox->IsReady());
-	this->UpdateComponents(false);
+
+	if (ProfileProxy::GetProxy()->IsFlagDataReady()
+		 && !this->flagListBox->FlagsLoaded()) {
+		this->flagListBox->LoadEnabledFlags();
+		CmdLineManager::GenerateCustomFlagsChanged();
+		CmdLineManager::GenerateCmdLineChanged();
+	}
+	
+	this->UpdateComponents();
 	this->UpdateFlagSetsBox();
 }
 
-void AdvSettingsPage::OnCurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
-	this->UpdateComponents();
+void AdvSettingsPage::OnProxyFlagDataReady(wxCommandEvent& event) {
+	wxASSERT((this->flagListBox != NULL) &&
+		ProfileProxy::GetProxy()->IsFlagDataReady());
+	
+	if (this->flagListBox->IsReady() && !this->flagListBox->FlagsLoaded()) {
+		this->flagListBox->LoadEnabledFlags();
+		CmdLineManager::GenerateCustomFlagsChanged();
+		CmdLineManager::GenerateCmdLineChanged();
+	}	
 }
 
-void AdvSettingsPage::UpdateComponents(const bool resetFlagList) {
+void AdvSettingsPage::UpdateComponents() {
 	wxSizer* topSizer = this->GetSizer()->GetItem(TOP_SIZER_INDEX)->GetSizer();
 	wxCHECK_RET(topSizer != NULL, _T("cannot find the top sizer"));
 	
@@ -257,8 +265,6 @@ void AdvSettingsPage::UpdateComponents(const bool resetFlagList) {
 		_T("UpdateComponents() called when flagListBox was null."));
 	
 	if (this->flagListBox->IsReady()) {
-		this->RefreshFlags(resetFlagList);
-		
 		topSizer->Show(TOP_RIGHT_SIZER_INDEX);
 		topLeftSizer->Show(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
@@ -273,50 +279,16 @@ void AdvSettingsPage::UpdateComponents(const bool resetFlagList) {
 	}
 }
 
-// TODO will need to rethink this function once the proxy is added.
-void AdvSettingsPage::RefreshFlags(const bool resetFlagList) {
+void AdvSettingsPage::OnCustomFlagsBoxChanged(wxCommandEvent &WXUNUSED(event)) {
+	wxASSERT(this->flagListBox != NULL && this->flagListBox->IsReady());
+	wxASSERT(ProfileProxy::GetProxy()->IsFlagDataReady());
+	
 	wxTextCtrl* customFlagsText = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
 	wxCHECK_RET(customFlagsText != NULL,
 		_T("Unable to find the custom flags text ctrl"));
 	
-	wxString flagLine, customFlags, lightingPreset;
-	ProMan::GetProfileManager()->ProfileRead(
-		PRO_CFG_TC_CURRENT_FLAG_LINE, &flagLine);
-	
-	wxCHECK_RET(this->flagListBox != NULL,
-		_T("RefreshFlags() called when flagListBox was null."));
-	
-	if (resetFlagList) {
-		this->flagListBox->ResetFlags();
-	}
-	
-	wxStringTokenizer tokenizer(flagLine, _T(" "));
-	while(tokenizer.HasMoreTokens()) {
-		wxString tok = tokenizer.GetNextToken();
-		if (tok == LightingPresets::GetFlagLineSeparator()) {
-			lightingPreset.Append(tokenizer.GetNextToken());
-			while (tokenizer.HasMoreTokens()) {
-				lightingPreset.Append(_T(" ")).Append(tokenizer.GetNextToken());
-			}
-			break;
-		} else if (this->flagListBox->SetFlag(tok, true)) {
-			continue;
-		} else {
-			if (!customFlags.IsEmpty()) {
-				customFlags += _T(" ");
-			}
-			customFlags += tok;
-		}
-	}
-	if (!lightingPreset.IsEmpty()) {
-		if (!customFlags.IsEmpty()) {
-			lightingPreset.Append(_T(" "));
-		}
-		customFlags.Prepend(lightingPreset);
-	}
-	
-	customFlagsText->ChangeValue(customFlags);
+	ProfileProxy::GetProxy()->SetCustomFlags(customFlagsText->GetValue(), false);
 }
 
 void AdvSettingsPage::UpdateFlagSetsBox() {
@@ -372,22 +344,21 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 	wxTextCtrl* commandLine = dynamic_cast<wxTextCtrl*>(
 		wxWindow::FindWindowById(ID_COMMAND_LINE_TEXT, this));
 	wxCHECK_RET( commandLine != NULL, _T("Unable to find the command line view text control") );
-	wxTextCtrl* customFlags = dynamic_cast<wxTextCtrl*>(
-		wxWindow::FindWindowById(ID_CUSTOM_FLAGS_TEXT, this));
-	wxCHECK_RET( customFlags != NULL, _T("Unable to find the custom flags text control"));
 
 	wxString tcPath, exeName, modline;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &exeName);
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MODLINE, &modline);
 	
-	wxString presetName;
-	wxString lightingPresetString;
-	if (ProMan::GetProfileManager()->ProfileRead(PRO_CFG_LIGHTING_PRESET, &presetName)) {
-		lightingPresetString = LightingPresets::PresetNameToPresetString(presetName);
-	}
+	wxString flagFileFlags(ProfileProxy::GetProxy()->GetEnabledFlagsString());
 
-	wxString flagFileFlags = this->flagListBox->GenerateStringList();
+	wxString lightingPresetString;
+	if (ProfileProxy::GetProxy()->HasLightingPreset()) {
+		lightingPresetString = LightingPresets::PresetNameToPresetString(
+			ProfileProxy::GetProxy()->GetLightingPresetName());
+	}
+	
+	wxString customFlags(ProfileProxy::GetProxy()->GetCustomFlags());
 	
 	wxString cmdLine =
 		wxString::Format(_T("%s%c%s%s%s%s%s"),
@@ -400,21 +371,11 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 							wxString::Format(_T(" %s"), flagFileFlags.c_str()).c_str()),
 						 (lightingPresetString.IsEmpty() ? wxEmptyString :
 							wxString::Format(_T(" %s"), lightingPresetString.c_str()).c_str()),
-						 (customFlags->IsEmpty() ? wxEmptyString :
-							wxString::Format(_T(" %s"), customFlags->GetValue().c_str()).c_str()));
+						 (customFlags.IsEmpty() ? wxEmptyString :
+						  wxString::Format(_T(" %s"), customFlags.c_str()).c_str()));
 
 	commandLine->ChangeValue(FormatCommandLineString(cmdLine,
 		commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
-
-	wxString flagLine(flagFileFlags);
-	if (!customFlags->IsEmpty()) {
-		if (!flagLine.IsEmpty()) {
-			flagLine.Append(_T(" "));
-		}
-		flagLine.Append(customFlags->GetValue());
-	}
-
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_FLAG_LINE, flagLine);
 }
 
 // Adapted from ModList.cpp - FIXME there should really be just one copy
@@ -505,6 +466,5 @@ void AdvSettingsPage::OnSelectFlagSet(wxCommandEvent &WXUNUSED(event)) {
 	if ( ret == false ) {
 		wxLogError(_T("Unable to set flag set (%s). Set does not exist"), selectedSet.c_str());
 	}
-	CmdLineManager::GenerateCmdLineChanged();
 }
 	

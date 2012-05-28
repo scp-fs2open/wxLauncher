@@ -18,8 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 #include "controls/FlagListBox.h"
-//#include "apis/ProfileProxy.h" // TODO uncomment once proxy is ready
-#include "tabs/AdvSettingsPage.h"
+#include "apis/ProfileProxy.h"
 #include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
@@ -35,14 +34,10 @@ FlagListCheckBox::FlagListCheckBox(
 }
 
 void FlagListCheckBox::OnClicked(wxCommandEvent &WXUNUSED(event)) {
-	// FIXME the following line doesn't work yet because profile proxy isn't implemented
-	//	ProfileProxy::GetProfileProxy()->SetFlag(this->flagString, this->IsChecked());
+	ProfileProxy::GetProxy()->SetFlag(this->flagString, this->IsChecked());
+	
 	wxLogDebug(_T("flag %s is now %s"),
 		flagString.c_str(), this->IsChecked() ? _T("on") : _T("off"));
-	
-	// FIXME temp until the proxy is working
-	wxCommandEvent fakeEvent;
-	dynamic_cast<AdvSettingsPage*>(this->GetParent()->GetParent())->OnNeedUpdateCommandLine(fakeEvent);
 }
 
 FlagListCheckBoxItem::FlagListCheckBoxItem(const wxString& fsoCategory)
@@ -132,6 +127,7 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
 : wxVListBox(parent,ID_FLAGLISTBOX),
   isReadyEventGenerated(false),
   isReady(false),
+  flagsLoaded(false),
   flagData(NULL),
   areCheckBoxesGenerated(false) {
 	wxASSERT(skin != NULL);
@@ -334,48 +330,54 @@ void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {
 	}
 }
 
-wxString FlagListBox::GenerateStringList() const {
-	wxString flagList;
+void FlagListBox::LoadEnabledFlags() {
+	wxCHECK_RET(this->IsReady(),
+		_T("LoadEnabledFlags() called when flag list box is not ready."));
+	wxCHECK_RET(ProfileProxy::GetProxy()->IsFlagDataReady(),
+		_T("LoadEnabledFlags() called when proxy flag data is not ready."));
+	wxCHECK_RET(!this->flagsLoaded,
+		_T("LoadEnabledFlags() called when flags have already been loaded."));
 	
-	wxCHECK_MSG(this->IsReady(), wxEmptyString,
-		_T("GenerateStringList() called when flag list box is not ready."));
+	std::vector<wxString> enabledFlags(
+		ProfileProxy::GetProxy()->GetEnabledFlags());
 	
-	FlagListCheckBoxItems::const_iterator it = this->checkBoxes.begin();
-	while (it != this->checkBoxes.end()) {
-		FlagListCheckBoxItem* item = *it;
+	for (std::vector<wxString>::const_iterator
+		 it = enabledFlags.begin(), end = enabledFlags.end();
+		 it != end;
+		 ++it) {
+		const wxString& flag(*it);
 		
-		if (item->GetCheckBox() != NULL
-			&& item->GetCheckBox()->IsChecked() 
-			&& !item->GetFlagString().IsEmpty()) {
-			
-			if (!flagList.IsEmpty()) {
-				flagList += _T(" ");
-			}
-			
-			flagList += item->GetFlagString();
-		}
-		++it;
+		wxCHECK_RET(this->SetFlag(flag, true),
+			wxString::Format(
+				_T("LoadEnabledFlags(): Couldn't find flag %s"), flag.c_str()));
 	}
 	
-	return flagList;
+	this->flagsLoaded = true;
 }
 
-bool FlagListBox::SetFlag(const wxString& flagString, const bool state) {
+bool FlagListBox::SetFlag(
+	 const wxString& flagString, const bool state, const bool updateProxy) {
 	wxCHECK_MSG(this->IsReady(), false,
 		_T("SetFlag() called when flag list box is not ready."));
+	wxCHECK_MSG(ProfileProxy::GetProxy()->IsFlagDataReady(), false,
+		_T("SetFlag() called when proxy flag data is not ready."));
 	wxCHECK_MSG(!flagString.IsEmpty(), false,
 		_T("SetFlag() called with empty flagString."));
 	
-	FlagListCheckBoxItems::iterator it = this->checkBoxes.begin();
-	while (it != this->checkBoxes.end()) {
+	for (FlagListCheckBoxItems::iterator
+		 it = this->checkBoxes.begin(), end = this->checkBoxes.end();
+		 it != end;
+		 ++it) {
 		FlagListCheckBoxItem* item = *it;
 		
 		if (!item->GetFlagString().IsEmpty()
-			&& item->GetFlagString() == flagString) {
+				&& item->GetFlagString() == flagString) {
 			item->GetCheckBox()->SetValue(state);
+			if (updateProxy) {
+				ProfileProxy::GetProxy()->SetFlag(flagString, state);
+			}
 			return true;
 		}
-		++it;
 	}
 	return false;
 }
@@ -399,13 +401,19 @@ bool FlagListBox::SetFlagSet(const wxString& setToFind) {
 	wxArrayString::const_iterator disableIter =
 		flagSet->flagsToDisable.begin();
 	while ( disableIter != flagSet->flagsToDisable.end() ) {
-		this->SetFlag(*disableIter, false);
+		if (!this->SetFlag(*disableIter, false, true)) {
+			wxLogWarning(_T("Could not find flag %s to disable for flag set %s."),
+				disableIter->c_str(), setToFind.c_str());
+		}
 		disableIter++;
 	}
 	wxArrayString::const_iterator enableIter =
 		flagSet->flagsToEnable.begin();
 	while ( enableIter != flagSet->flagsToEnable.end() ) {
-		this->SetFlag(*enableIter, true);
+		if (!this->SetFlag(*enableIter, true, true)) {
+			wxLogWarning(_T("Could not find flag %s to enable for flag set %s."),
+				enableIter->c_str(), setToFind.c_str());			
+		}
 		enableIter++;
 	}
 	return true;
@@ -417,19 +425,4 @@ void FlagListBox::GetFlagSets(wxArrayString& arr) const {
 		_T("GetFlagSets() called when flag list box is not ready."));
 	
 	this->flagData->GetFlagSetNames(arr);
-}
-
-/** sets all flags off. */
-void FlagListBox::ResetFlags() {
-	wxCHECK_RET(this->IsReady(),
-		_T("ResetFlags() called when flag list box isn't ready."));
-	
-	FlagListCheckBoxItems::iterator it = this->checkBoxes.begin();
-	while (it != this->checkBoxes.end()) {
-		FlagListCheckBoxItem* item = *it;
-		if (item->GetCheckBox() != NULL) {
-			item->GetCheckBox()->SetValue(false);
-		}
-		++it;
-	}
 }
