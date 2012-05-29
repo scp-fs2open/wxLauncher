@@ -208,7 +208,7 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 
 wxString OpenALMan::SystemDefaultDevice() {
 #if USE_OPENAL
-	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType,alcGetStringType);
+	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType, alcGetString);
 
 	if ( GetString == NULL ) {
 		return wxEmptyString;
