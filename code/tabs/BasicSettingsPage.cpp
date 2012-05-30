@@ -572,11 +572,13 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		networkPort->ChangeValue(wxString::Format(_T("%ld"), port));
 	}
 	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	networkPort->SetMaxLength(5);
 
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
 	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, DEFAULT_NETWORK_IP, true);
 	networkIP->ChangeValue(ip);
+	networkIP->SetMaxLength(15); // for ###.###.###.###
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
 	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
