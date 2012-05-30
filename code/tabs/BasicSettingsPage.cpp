@@ -569,14 +569,14 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	long port;
 	proman->ProfileRead(PRO_CFG_NETWORK_PORT, &port, DEFAULT_NETWORK_PORT, true);
 	if (port != DEFAULT_NETWORK_PORT) {
-		networkPort->SetValue(wxString::Format(_T("%ld"), port));
+		networkPort->ChangeValue(wxString::Format(_T("%ld"), port));
 	}
 	networkPort->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 
 	wxTextCtrl* networkIP = new wxTextCtrl(this, ID_NETWORK_IP, wxEmptyString);
 	wxString ip;
 	proman->ProfileRead(PRO_CFG_NETWORK_IP, &ip, DEFAULT_NETWORK_IP, true);
-	networkIP->SetValue(ip);
+	networkIP->ChangeValue(ip);
 	
 	wxGridSizer* networkInsideSizerL = new wxFlexGridSizer(2);
 	networkInsideSizerL->Add(new wxStaticText(this, wxID_ANY, _("Connection type:")), 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -846,7 +846,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
 		wxLogInfo(_T("The current FS2/TC root folder is %s"), tcPath.c_str());
-		tcFolder->SetValue(tcPath);
+		tcFolder->ChangeValue(tcPath);
 
 		// note that disabling the controls is necessary if we reached this code from the
 		// "refresh list of FSO execs" button being pressed
