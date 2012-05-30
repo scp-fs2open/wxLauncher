@@ -187,5 +187,4 @@ void TCManager::CurrentProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 //	calls TCManager::GenerateTCBinaryChanged() unconditionally, so no need to explicitly call it here
 //	it's also assumed that BasicSettingsPage::OnTCChanged() calls TCManager::GenerateTCFredBinaryChanged()
 //	unconditionally if FRED launching is enabled
-	TCManager::GenerateTCSelectedModChanged();
 }
