@@ -751,7 +751,7 @@ EVT_TEXT(ID_NETWORK_PORT, BasicSettingsPage::OnChangePort)
 EVT_TEXT(ID_NETWORK_IP, BasicSettingsPage::OnChangeIP)
 
 // OpenAL
-EVT_CHOICE(ID_SELECT_SOUND_DEVICE, BasicSettingsPage::OnSelectOpenALDevice)
+EVT_CHOICE(ID_SELECT_SOUND_DEVICE, BasicSettingsPage::OnSelectSoundDevice)
 EVT_BUTTON(ID_DOWNLOAD_OPENAL, BasicSettingsPage::OnDownloadOpenAL)
 EVT_BUTTON(ID_DETECT_OPENAL, BasicSettingsPage::OnDetectOpenAL)
 
@@ -1644,7 +1644,7 @@ void BasicSettingsPage::OnSelectNetworkType(wxCommandEvent &event) {
 		networkTypeOptions[networkType->GetSelection()].GetRegistryValue());
 }
 
-void BasicSettingsPage::OnSelectOpenALDevice(wxCommandEvent &event) {
+void BasicSettingsPage::OnSelectSoundDevice(wxCommandEvent &event) {
 	wxChoice* openaldevice = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(event.GetId(), this));
 	wxCHECK_RET(openaldevice != NULL, _T("Unable to find OpenAL Device choice"));
