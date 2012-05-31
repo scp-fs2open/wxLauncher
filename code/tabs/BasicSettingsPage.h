@@ -70,6 +70,9 @@ public:
 	void OnChangeIP(wxCommandEvent &event);
 
 	void OnSelectSoundDevice(wxCommandEvent &event);
+	void OnSelectCaptureDevice(wxCommandEvent &event);
+	void OnToggleEnableEFX(wxCommandEvent &event);
+	void OnChangeSampleRate(wxCommandEvent &event);
 	void OnDownloadOpenAL(wxCommandEvent& event);
 	void OnDetectOpenAL(wxCommandEvent& event);
 

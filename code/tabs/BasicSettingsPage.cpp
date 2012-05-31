@@ -752,6 +752,9 @@ EVT_TEXT(ID_NETWORK_IP, BasicSettingsPage::OnChangeIP)
 
 // OpenAL
 EVT_CHOICE(ID_SELECT_SOUND_DEVICE, BasicSettingsPage::OnSelectSoundDevice)
+EVT_CHOICE(ID_SELECT_CAPTURE_DEVICE, BasicSettingsPage::OnSelectCaptureDevice)
+EVT_CHECKBOX(ID_ENABLE_EFX, BasicSettingsPage::OnToggleEnableEFX)
+EVT_TEXT(ID_AUDIO_SAMPLE_RATE, BasicSettingsPage::OnChangeSampleRate)
 EVT_BUTTON(ID_DOWNLOAD_OPENAL, BasicSettingsPage::OnDownloadOpenAL)
 EVT_BUTTON(ID_DETECT_OPENAL, BasicSettingsPage::OnDetectOpenAL)
 
@@ -1650,6 +1653,56 @@ void BasicSettingsPage::OnSelectSoundDevice(wxCommandEvent &event) {
 	wxCHECK_RET(openaldevice != NULL, _T("Unable to find OpenAL Device choice"));
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
+}
+
+void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
+	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+		_T("Selected FSO build doesn't have new sound code."));
+	
+	wxChoice* captureDevice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(captureDevice != NULL, _T("Unable to find capture device choice"));
+	
+	ProMan::GetProfileManager()->ProfileWrite(
+		PRO_CFG_OPENAL_CAPTURE_DEVICE, captureDevice->GetStringSelection());
+}
+
+void BasicSettingsPage::OnToggleEnableEFX(wxCommandEvent &event) {
+	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+		_T("Selected FSO build doesn't have new sound code."));
+	
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_EFX, event.IsChecked());
+}
+
+void BasicSettingsPage::OnChangeSampleRate(wxCommandEvent &event) {
+	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+		_T("Selected FSO build doesn't have new sound code."));
+	
+	wxTextCtrl* sampleRateBox = dynamic_cast<wxTextCtrl*>(
+		wxWindow::FindWindowById(event.GetId(), this));
+	wxCHECK_RET(sampleRateBox != NULL, _T("Unable to find sample rate text control"));
+	
+	if (sampleRateBox->IsEmpty()) {
+		wxLogDebug(_T("Sample rate field is blank, writing 0 to profile"));
+		
+		ProMan::GetProfileManager()->ProfileWrite(
+			PRO_CFG_OPENAL_SAMPLE_RATE, static_cast<long>(0));
+		return;
+	}
+	
+	long sampleRate;
+	if ( sampleRateBox->GetValue().ToLong(&sampleRate) ) {
+		if ( sampleRate <= 0 ) {
+			wxLogInfo(_T("Sample rate must be greater than 0"));
+		} else if ( sampleRate > 44100 ) {
+			wxLogInfo(_T("Sample rate must be at most 44100"));
+		} else {
+			ProMan::GetProfileManager()->ProfileWrite(
+				PRO_CFG_OPENAL_SAMPLE_RATE, sampleRate);
+		}
+	} else {
+		wxLogWarning(_T("Sample rate is not a number"));
+	}
 }
 
 void BasicSettingsPage::OnDownloadOpenAL(wxCommandEvent &WXUNUSED(event)) {
