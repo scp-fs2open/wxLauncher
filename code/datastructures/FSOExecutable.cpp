@@ -300,7 +300,20 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		} else if ( !token.CmpNoCase(_T("sse2")) ) {
 			ver.sse = 2;
 		} else if ( !token.CmpNoCase(_T("sse")) ) {
-			ver.sse = 1;
+			if (ver.string.Lower().EndsWith(_T("no"))) { // probably NO SSE
+				ver.sse = -1;
+				
+				const int lastSpaceIndex = ver.string.Find(_T(' '), true);
+				
+				if (lastSpaceIndex == wxNOT_FOUND) {
+					wxASSERT(ver.string.Lower() == _T("no"));
+					ver.string = wxEmptyString;
+				} else {
+					ver.string = ver.string.Mid(0, lastSpaceIndex);
+				}
+			} else {
+				ver.sse = 1;
+			}
 		} else if ( !token.CmpNoCase(_T("inf")) || !token.CmpNoCase(_T("inferno"))) {
 			ver.inferno = true;
 		} else {
@@ -338,6 +351,23 @@ wxString FSOExecutable::GetVersionString() const {
 		}
 	}
 	
+	// again, to improve code readability
+	wxString sseStr;
+	switch (this->sse) {
+		case -1:
+			sseStr = _T(" NO SSE");
+			break;
+		case 1:
+			sseStr = _T(" SSE");
+			break;
+		case 2:
+			sseStr = _T(" SSE2");
+			break;
+		default:
+			// nothing
+			break;
+	}
+	
 	return wxString::Format(_T("%s%s%s%s%s%s%s%s"),
 		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FreeSpace 2 Open
 		(useFullVersion) ? wxString::Format(_T(" %d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
@@ -346,6 +376,6 @@ wxString FSOExecutable::GetVersionString() const {
 		(this->string.IsEmpty()) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (%s)") : _T(" %s"), this->string.c_str()).c_str(),
 		(this->debug) ? _T(" Debug") : wxEmptyString,
 		(this->inferno && !this->antipodes) ? _T(" Inferno") : wxEmptyString,
-		(this->sse == 0) ? wxEmptyString : (this->sse == 1) ? _T(" SSE") : _T(" SSE2")
+		(this->sse == 0) ? wxEmptyString : sseStr.c_str()
 		);
 }
