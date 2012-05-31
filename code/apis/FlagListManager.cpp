@@ -116,7 +116,7 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 }
 
 FlagListManager::FlagListManager()
-: data(NULL), proxyData(NULL) {
+: data(NULL), proxyData(NULL), buildCaps(0) {
 	TCManager::RegisterTCBinaryChanged(this);
 }
 
@@ -149,6 +149,8 @@ void FlagListManager::DeleteExistingData() {
 		this->proxyData = NULL;
 		delete temp;
 	}
+	
+	this->buildCaps = 0;
 }
 
 void FlagListManager::BeginFlagFileProcessing() {
@@ -329,6 +331,13 @@ ProxyFlagData* FlagListManager::GetProxyFlagData() {
 	return temp;
 }
 
+wxByte FlagListManager::GetBuildCaps() const {
+	wxCHECK_MSG(this->IsProcessingOK(), 0,
+		_T("attempt to get build caps even though processing hasn't succeeded"));
+	
+	return this->buildCaps;
+}
+
 FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileName& flagfilename) {
 	if (!flagfilename.FileExists()) {
 		wxLogError(_T("The FreeSpace 2 Open executable did not generate a flag file."));
@@ -464,6 +473,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		wxLogInfo(_T(" Old build that does not output its capabilities, must not support OpenAL"));
 		buildCaps = 0;
 	}
+	this->buildCaps = buildCaps;
 	
 	this->data->GenerateFlagSets();
 	

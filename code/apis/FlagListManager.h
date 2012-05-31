@@ -71,6 +71,10 @@ public:
 	/** Returns the extracted data in a form suitable for use by the profile proxy.
 	 Should only be called when processing succeeds and only once per flag file processed. */
 	ProxyFlagData* GetProxyFlagData();
+	
+	/** Gets the build capabilities of the currently selected FSO executable.
+	 Should only be called when processing succeeds. */
+	wxByte GetBuildCaps() const;
 
 private:
 	FlagListManager();
@@ -108,6 +112,8 @@ private:
 	
 	FlagFileData* data;
 	ProxyFlagData* proxyData;
+	
+	wxByte buildCaps;
 	
 	class FlagProcess: public wxProcess {
 	public:
