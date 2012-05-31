@@ -34,6 +34,7 @@ namespace OpenALMan {
 	wxArrayString GetAvailiableDevices();
 	wxString GetCurrentVersion();
 	wxString SystemDefaultDevice();
+	bool BuildHasNewSoundCode();
 };
 
 #endif

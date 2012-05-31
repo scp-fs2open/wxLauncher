@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/dynlib.h>
 #include "generated/configure_launcher.h"
+#include "apis/FlagListManager.h"
 #include "apis/OpenALManager.h"
 #include "apis/ProfileManager.h"
 #include "global/ids.h"
@@ -29,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #endif
 
 #include "global/MemoryDebugging.h"
+
+const wxByte BUILD_CAP_NEW_SND = 1<<2;
 
 #if USE_OPENAL
 namespace OpenALMan {
@@ -316,3 +319,13 @@ wxString OpenALMan::GetCurrentVersion() {
 #endif
 }
 
+bool OpenALMan::BuildHasNewSoundCode() {
+	wxCHECK_MSG(OpenALMan::IsInitialized(), false,
+		_T("OpenALMan has not been initialized."));
+	wxCHECK_MSG(FlagListManager::IsInitialized(), false,
+		_T("FlagListManager has not been initialized."));
+	wxCHECK_MSG(FlagListManager::GetFlagListManager()->IsProcessingOK(), false,
+		_T("Flag file processing has not (yet) succeeded."));
+	
+	return FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_NEW_SND;
+}
