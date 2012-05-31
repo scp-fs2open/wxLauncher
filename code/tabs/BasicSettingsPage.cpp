@@ -16,6 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <algorithm>
+
 #include <wx/wx.h>
 #include <wx/filename.h>
 #include <wx/choicebk.h>
@@ -921,7 +923,13 @@ void BasicSettingsPage::FillFredExecutableDropBox(wxChoice* exeChoice, wxFileNam
 	BasicSettingsPage::FillExecutableDropBox(exeChoice, FSOExecutable::GetFredBinariesFromRootFolder(path));
 }
 
+bool compareExecutables(FSOExecutable exe1, FSOExecutable exe2) {
+	return exe1.GetVersionString().CmpNoCase(exe2.GetVersionString()) < 0;
+}
+
 void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes) {
+	std::vector<FSOExecutable> fsoExes;
+	
 	wxArrayString::iterator iter = exes.begin();
 	while ( iter != exes.end() ) {
 		wxFileName path(*iter);
@@ -930,8 +938,17 @@ void BasicSettingsPage::FillExecutableDropBox(wxChoice* exeChoice, wxArrayString
 #else
 		FSOExecutable ver = FSOExecutable::GetBinaryVersion(path.GetFullName());
 #endif
-		exeChoice->Insert(ver.GetVersionString(), 0, new FSOExecutable(ver));
+		
+		fsoExes.push_back(ver);
 		iter++;
+	}
+	
+	sort(fsoExes.begin(), fsoExes.end(), compareExecutables);
+	
+	for (std::vector<FSOExecutable>::const_iterator
+		 it = fsoExes.begin(), end = fsoExes.end();
+		 it != end; ++it) {
+		exeChoice->Append(it->GetVersionString(), new FSOExecutable(*it));
 	}
 }
 
