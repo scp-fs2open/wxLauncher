@@ -27,6 +27,12 @@ const wxString REG_KEY_VIDEO_ANISOTROPIC =			L"OGL_AnisotropicFilter";
 const wxString REG_KEY_VIDEO_ANTI_ALIAS =			L"OGL_AntiAliasSamples";
 
 const wxString REG_KEY_AUDIO_OPENAL_DEVICE =		L"SoundDeviceOAL";
+const wxString REG_KEY_AUDIO_FOLDER_CFG =			L"/Sound"; // FileProfileManager
+const wxString REG_KEY_AUDIO_FOLDER_REGISTRY =		L"Sound"; // RegistryProfileManager
+const wxString REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE =L"PlaybackDevice";
+const wxString REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE =L"CaptureDevice";
+const wxString REG_KEY_AUDIO_OPENAL_EFX =			L"EnableEFX";
+const wxString REG_KEY_AUDIO_OPENAL_SAMPLE_RATE =	L"SampleRate";
 
 const wxString REG_KEY_SPEECH_VOICE =				L"SpeechVoice";
 const wxString REG_KEY_SPEECH_VOLUME =				L"SpeechVolume";
@@ -56,6 +62,10 @@ const long DEFAULT_VIDEO_ANISOTROPIC =			0;
 const long DEFAULT_VIDEO_ANTI_ALIAS =			0;
 
 const wxString DEFAULT_AUDIO_OPENAL_DEVICE =	_T("no sound");
+const wxString DEFAULT_AUDIO_OPENAL_PLAYBACK_DEVICE = wxEmptyString;
+const wxString DEFAULT_AUDIO_OPENAL_CAPTURE_DEVICE = wxEmptyString;
+const bool DEFAULT_AUDIO_OPENAL_EFX =			false;
+const long DEFAULT_AUDIO_OPENAL_SAMPLE_RATE =	0;
 
 const long DEFAULT_SPEECH_VOICE =				0;
 const long DEFAULT_SPEECH_VOLUME =				100;

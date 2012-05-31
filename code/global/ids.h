@@ -221,6 +221,9 @@ enum ProfileDialogReturnValues {
 #define PRO_CFG_NETWORK_IP					_T("/network/ip")		//!< string
 
 #define PRO_CFG_OPENAL_DEVICE				_T("/openal/device")	//!< string
+#define PRO_CFG_OPENAL_CAPTURE_DEVICE		_T("/openal/capturedevice")	//!< string
+#define PRO_CFG_OPENAL_EFX					_T("/openal/efx")		//!< bool
+#define PRO_CFG_OPENAL_SAMPLE_RATE			_T("/openal/samplerate")//!< int
 
 #define PRO_CFG_JOYSTICK_ID					_T("/joystick/id")		//!< int
 #define PRO_CFG_JOYSTICK_FORCE_FEEDBACK		_T("/joystick/forcefeedback") //!< bool
@@ -237,6 +240,12 @@ extern const wxString REG_KEY_VIDEO_ANISOTROPIC;
 extern const wxString REG_KEY_VIDEO_ANTI_ALIAS;
 
 extern const wxString REG_KEY_AUDIO_OPENAL_DEVICE;
+extern const wxString REG_KEY_AUDIO_FOLDER_CFG;
+extern const wxString REG_KEY_AUDIO_FOLDER_REGISTRY;
+extern const wxString REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE;
+extern const wxString REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE;
+extern const wxString REG_KEY_AUDIO_OPENAL_EFX;
+extern const wxString REG_KEY_AUDIO_OPENAL_SAMPLE_RATE;
 
 extern const wxString REG_KEY_SPEECH_VOICE;
 extern const wxString REG_KEY_SPEECH_VOLUME;
@@ -268,6 +277,10 @@ extern const long DEFAULT_VIDEO_ANISOTROPIC;
 extern const long DEFAULT_VIDEO_ANTI_ALIAS;
 
 extern const wxString DEFAULT_AUDIO_OPENAL_DEVICE;
+extern const wxString DEFAULT_AUDIO_OPENAL_PLAYBACK_DEVICE;
+extern const wxString DEFAULT_AUDIO_OPENAL_CAPTURE_DEVICE;
+extern const bool DEFAULT_AUDIO_OPENAL_EFX;
+extern const long DEFAULT_AUDIO_OPENAL_SAMPLE_RATE;
 
 extern const long DEFAULT_SPEECH_VOICE;
 extern const long DEFAULT_SPEECH_VOLUME;
