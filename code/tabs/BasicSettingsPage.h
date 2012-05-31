@@ -69,7 +69,7 @@ public:
 	void OnChangePort(wxCommandEvent &event);
 	void OnChangeIP(wxCommandEvent &event);
 
-	void OnSelectOpenALDevice(wxCommandEvent &event);
+	void OnSelectSoundDevice(wxCommandEvent &event);
 	void OnDownloadOpenAL(wxCommandEvent& event);
 	void OnDetectOpenAL(wxCommandEvent& event);
 
