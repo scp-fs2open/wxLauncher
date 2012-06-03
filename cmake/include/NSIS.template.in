@@ -6,6 +6,8 @@
   !define VERSION "@CPACK_PACKAGE_VERSION@"
   !define PATCH  "@CPACK_PACKAGE_VERSION_PATCH@"
   !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
+  
+  !define UKP "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
 
 ;--------------------------------
 ;Variables
@@ -683,6 +685,15 @@ Section "-Core installation"
   Call ConditionalAddToRegisty
   Push "Contact"
   Push "@CPACK_NSIS_CONTACT@"
+  Call ConditionalAddToRegisty
+  Push "VersionMajor"
+  Push "@CPACK_PACKAGE_VERSION_MAJOR@"
+  Call ConditionalAddToRegisty
+  Push "VersionMinor"
+  Push "@CPACK_PACKAGE_VERSION_MINOR@"
+  Call ConditionalAddToRegisty
+  Push "VersionPatch"
+  Push "@CPACK_PACKAGE_VERSION_PATCH@"
   Call ConditionalAddToRegisty
   !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
