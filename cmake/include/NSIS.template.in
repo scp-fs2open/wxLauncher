@@ -21,6 +21,11 @@
   Var ADD_TO_PATH_CURRENT_USER
   Var INSTALL_DESKTOP
   Var IS_DEFAULT_INSTALLDIR
+  ; The already INstalled Version bits.
+  Var INVMAJOR
+  Var INVMINOR
+  Var INVPATCH
+  Var UNINSTALLER_DIR
 ;--------------------------------
 ;Include Modern UI
 
@@ -695,6 +700,9 @@ Section "-Core installation"
   Push "VersionPatch"
   Push "@CPACK_PACKAGE_VERSION_PATCH@"
   Call ConditionalAddToRegisty
+  Push ""
+  Push "$INSTDIR"
+  Call ConditionalAddToRegisty
   !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   
@@ -957,4 +965,49 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
 
   noOptionsPage:
+  ; check for an older version
+  ClearErrors
+  ReadRegDWORD $INVMAJOR SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionMajor"
+  ReadRegDWORD $INVMINOR SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionMinor"
+  ReadRegDWORD $INVPATCH SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionPatch"
+  
+  ; now to check with current versions
+  ; if version not equal then offer uninstall
+  ; if version is older then do uninstall
+  ; if version is newer then prompt an offer to uninstall
+  IntCmp $INVMAJOR "@CPACK_PACKAGE_VERSION_MAJOR@" 0 douninstall new_ver_inst
+  IntCmp $INVMINOR "@CPACK_PACKAGE_VERSION_MINOR@" 0 douninstall new_ver_inst
+  IntCmp $INVPATCH "@CPACK_PACKAGE_VERSION_PATCH@" 0 douninstall new_ver_inst
+  
+  MessageBox MB_YESNO|MB_ICONQUESTION \
+  	"You already have $INVMAJOR.$INVMINOR.$INVPATCH of @CPACK_NSIS_DISPLAY_NAME@ installed. Reinstall?" \
+  	/SD IDYES IDYES douninstall
+  Abort "@CPACK_NSIS_DISPLAY_NAME@ is already installed."
+  
+new_ver_inst:
+	MessageBox MB_YESNO|MB_ICONQUESTION \
+		"Newer version $0.$1.$2 is already installed. \
+		Downgrade to \
+		@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@?" \
+		/SD IDNO IDYES douninstall
+	Abort "Newer @CPACK_NSIS_DISPLAY_NAME@ already installed."
+
+douninstall:
+	ReadRegStr $UNINSTALLER_DIR SHCTX \
+		"Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" ""
+	IfFileExists "$UNINSTALLER_DIR\Uninstall.exe" actuallyuninstall
+	DetailPrint "$UNINSTALLER_DIR\Uninstall.exe does not exist"
+	goto notinstalled 	; just give up
+	
+actuallyuninstall:
+	DetailPrint "Uninstalling old @CPACK_NSIS_DISPLAY_NAME@"
+	Exec '"$UNINSTALLER_DIR\Uninstall.exe" /S'
+unistallerexists:
+	Sleep 100
+	IfFileExists "$UNINSTALLER_DIR\Uninstall.exe" unistallerexists
+	Sleep 1000
+	
+	
+	  
+notinstalled:
 FunctionEnd
