@@ -41,7 +41,7 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	cmdLineString += tcPath.c_str();
 	cmdLineString += wxFileName::GetPathSeparator();
 	cmdLineString += _T("data");
-#if !IS_WIN32
+
 	// if data folder does not exist in TC root folder, attempt to create it first
 	if (!wxDir::Exists(cmdLineString)) {
 		if (!::wxMkdir(cmdLineString)) {
@@ -53,7 +53,7 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	} else {
 		wxLogDebug(_T("data folder found in TC root folder"));	
 	}
-#endif
+
 	cmdLineString += wxFileName::GetPathSeparator();
 	cmdLineString += _T("cmdline_fso.cfg");
 	wxFileName cmdLineFileName(cmdLineString);
