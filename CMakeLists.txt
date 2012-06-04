@@ -238,7 +238,6 @@ set(RESOURCE_FILES
   platform/win32/wxlauncher.rc
   ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
-  ${helphtblocation}
   )
 source_group(Resources FILES ${RESOURCE_FILES})
 set(CODE_FILES
