@@ -102,11 +102,11 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 #ifndef REGISTRY_HELPER
 	} else if ( ret == ERROR_ACCESS_DENIED ) {
 		// Only try calling registry_helper.exe if not already in registry_helper.exe
-		wxString tempdir = wxStandardPaths::Get().GetTempDir();
-		wxLogDebug(_T("Using temp directory '%s'"), tempdir.c_str());
-		wxString tempfile = wxFileName::CreateTempFileName(tempdir);
+		wxString tempdir(L"profilespit");
+		wxFile outfile;
+		wxString tempfile = wxFileName::CreateTempFileName(tempdir, &outfile);
 		wxLogDebug(_T("Launching helper on %s"), tempfile.c_str());
-		wxFileOutputStream out(tempfile);
+		wxFileOutputStream out(outfile);
 		cfg->Save(out);
 		out.Close();
 
