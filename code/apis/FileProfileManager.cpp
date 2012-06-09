@@ -122,6 +122,56 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
+	// new sound code settings are written to "Sound" folder
+	outConfig.SetPath(REG_KEY_AUDIO_FOLDER_CFG);
+
+
+	wxString playbackDevice;
+	cfg->Read(
+		PRO_CFG_OPENAL_DEVICE,
+		&playbackDevice,
+		DEFAULT_AUDIO_OPENAL_PLAYBACK_DEVICE);
+
+	ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE, playbackDevice);
+	ReturnChecker(ret, __LINE__);
+
+
+	wxString captureDevice;
+	bool hasEntry = cfg->Read(
+		PRO_CFG_OPENAL_CAPTURE_DEVICE,
+		&captureDevice,
+		DEFAULT_AUDIO_OPENAL_CAPTURE_DEVICE);
+
+	if (hasEntry) {
+		ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE, captureDevice);
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	int enableEFX;
+	hasEntry = cfg->Read(PRO_CFG_OPENAL_EFX, &enableEFX, DEFAULT_AUDIO_OPENAL_EFX);
+
+	if (hasEntry) {
+		ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_EFX, enableEFX);
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	int sampleRate;
+	cfg->Read(
+		PRO_CFG_OPENAL_SAMPLE_RATE,
+		&sampleRate,
+		DEFAULT_AUDIO_OPENAL_SAMPLE_RATE);
+
+	if (sampleRate != DEFAULT_AUDIO_OPENAL_SAMPLE_RATE) {
+		ret = outConfig.Write(REG_KEY_AUDIO_OPENAL_SAMPLE_RATE, sampleRate);
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	outConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
+
+
 	// Speech
 #if IS_WIN32 // speech is currently not supported in OS X or Linux (although Windows doesn't use this code)
 	int speechVoice;
@@ -319,6 +369,23 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 	// Audio
 	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_DEVICE, &readString) ) {
 		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
+	}
+
+	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE, &readString) &&
+			!inConfig.Exists(PRO_CFG_OPENAL_DEVICE)) {
+		cfg->Write(PRO_CFG_OPENAL_DEVICE, readString);
+	}
+
+	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE, &readString) ) {
+		cfg->Write(PRO_CFG_OPENAL_CAPTURE_DEVICE, readString);
+	}
+
+	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_EFX, &readNumber) ) {
+		cfg->Write(PRO_CFG_OPENAL_EFX, readNumber);
+	}
+
+	if ( inConfig.Read(REG_KEY_AUDIO_OPENAL_SAMPLE_RATE, &readNumber) ) {
+		cfg->Write(PRO_CFG_OPENAL_SAMPLE_RATE, readNumber);
 	}
 
 

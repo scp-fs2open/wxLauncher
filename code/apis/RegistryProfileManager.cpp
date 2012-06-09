@@ -209,6 +209,91 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 
+	// Audio folder (for new sound code settings)
+	HKEY audioRegHandle = 0;
+	ret = RegCreateKeyExW(
+		regHandle,
+		REG_KEY_AUDIO_FOLDER_REGISTRY,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&audioRegHandle,
+		NULL);  // just want handle, don't care if it was created or opened
+	ReturnChecker(ret, __LINE__);
+
+
+	wxString playbackDevice;
+	cfg->Read(
+		PRO_CFG_OPENAL_DEVICE,
+		&playbackDevice,
+		DEFAULT_AUDIO_OPENAL_PLAYBACK_DEVICE);
+
+	ret = RegSetValueExW(
+		audioRegHandle,
+		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE,
+		0,
+		REG_SZ,
+		(BYTE*)playbackDevice.c_str(),
+		(playbackDevice.size() + 1)*2);
+	ReturnChecker(ret, __LINE__);
+
+
+	wxString captureDevice;
+	bool hasEntry = cfg->Read(
+		PRO_CFG_OPENAL_CAPTURE_DEVICE,
+		&captureDevice,
+		DEFAULT_AUDIO_OPENAL_CAPTURE_DEVICE);
+
+	if (hasEntry) {
+		ret = RegSetValueExW(
+			audioRegHandle,
+			REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE,
+			0,
+			REG_SZ,
+			(BYTE*)captureDevice.c_str(),
+			(captureDevice.size() + 1)*2);
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	int enableEFX;
+	hasEntry = cfg->Read(PRO_CFG_OPENAL_EFX, &enableEFX, DEFAULT_AUDIO_OPENAL_EFX);
+
+	if (hasEntry) {
+		ret = RegSetValueExW(
+			audioRegHandle,
+			REG_KEY_AUDIO_OPENAL_EFX,
+			0,
+			REG_DWORD,
+			(BYTE*)&enableEFX,
+			sizeof(enableEFX));
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	int sampleRate;
+	cfg->Read(
+		PRO_CFG_OPENAL_SAMPLE_RATE,
+		&sampleRate,
+		DEFAULT_AUDIO_OPENAL_SAMPLE_RATE);
+
+	if (sampleRate != DEFAULT_AUDIO_OPENAL_SAMPLE_RATE) {
+		ret = RegSetValueExW(
+			audioRegHandle,
+			REG_KEY_AUDIO_OPENAL_SAMPLE_RATE,
+			0,
+			REG_DWORD,
+			(BYTE*)&sampleRate,
+			sizeof(sampleRate));
+		ReturnChecker(ret, __LINE__);
+	}
+
+
+	RegCloseKey(audioRegHandle);
+
+
 	// Speech
 	int speechVoice;
 	cfg->Read(PRO_CFG_SPEECH_VOICE, &speechVoice, DEFAULT_SPEECH_VOICE);
@@ -481,6 +566,15 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		if ( inConfig.Read(PRO_CFG_OPENAL_DEVICE, &configData) ) {
 			cfg->Write(PRO_CFG_OPENAL_DEVICE, configData);
 		}
+		if ( inConfig.Read(PRO_CFG_OPENAL_CAPTURE_DEVICE, &configData) ) {
+			cfg->Write(PRO_CFG_OPENAL_CAPTURE_DEVICE, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_OPENAL_EFX, &configData) ) {
+			cfg->Write(PRO_CFG_OPENAL_EFX, configData);
+		}
+		if ( inConfig.Read(PRO_CFG_OPENAL_SAMPLE_RATE, &configData) ) {
+			cfg->Write(PRO_CFG_OPENAL_SAMPLE_RATE, configData);
+		}
 		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
 			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
 		}
@@ -688,6 +782,114 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		if ( !soundDevice.IsEmpty() ) {
 			cfg->Write(PRO_CFG_OPENAL_DEVICE, soundDevice);
 		}
+	}
+
+	// Audio folder
+	HKEY audioRegHandle = 0;
+	ret = RegCreateKeyExW(
+		regHandle,
+		REG_KEY_AUDIO_FOLDER_REGISTRY,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE | KEY_READ, // need write to make sure we get the virtualized registry when reading.
+		NULL,
+		&audioRegHandle,
+		NULL);  // just want handle, don't care if it was created or opened
+	ReturnChecker(ret, __LINE__);
+
+
+	type = 0;
+	memset(static_cast<void*>(data), 0, MAX_PATH*2);
+	dataSize = sizeof(data);
+
+	ret = RegQueryValueExW(
+		audioRegHandle,
+		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE,
+		NULL,
+		&type,
+		data,
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_SZ && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
+	} else {
+		const char* data1 = reinterpret_cast<char*>(data);
+		wxString playbackDevice(data1, textConv, dataSize);
+
+		if ( !playbackDevice.IsEmpty() && !cfg->Exists(PRO_CFG_OPENAL_DEVICE)) {
+			cfg->Write(PRO_CFG_OPENAL_DEVICE, playbackDevice);
+		}
+	}
+
+
+	type = 0;
+	memset(static_cast<void*>(data), 0, MAX_PATH*2);
+	dataSize = sizeof(data);
+
+	ret = RegQueryValueExW(
+		audioRegHandle,
+		REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE,
+		NULL,
+		&type,
+		data,
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_SZ && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_STRING, __LINE__);
+	} else {
+		const char* data1 = reinterpret_cast<char*>(data);
+		wxString captureDevice(data1, textConv, dataSize);
+
+		if ( !captureDevice.IsEmpty() ) {
+			cfg->Write(PRO_CFG_OPENAL_CAPTURE_DEVICE, captureDevice);
+		}
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		audioRegHandle,
+		REG_KEY_AUDIO_OPENAL_EFX,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_OPENAL_EFX, static_cast<long>(numberdata));
+	}
+
+
+	type = 0;
+	numberdata = 0;
+	dataSize = sizeof(numberdata);
+
+	ret = RegQueryValueExW(
+		audioRegHandle,
+		REG_KEY_AUDIO_OPENAL_SAMPLE_RATE,
+		NULL,
+		&type,
+		reinterpret_cast<LPBYTE>(&numberdata),
+		&dataSize);
+	if ( ret != ERROR_SUCCESS && ret != ERROR_FILE_NOT_FOUND ) {
+		wxLogError(UNKOWN_ERROR_MSG, ret, __LINE__);
+		return ProMan::UnknownError;
+	} else if ( type != REG_DWORD && ret == ERROR_SUCCESS) {
+		wxLogWarning(REG_DATA_NOT_DWORD, __LINE__);
+	} else {
+		cfg->Write(PRO_CFG_OPENAL_SAMPLE_RATE, static_cast<long>(numberdata));
 	}
 
 
@@ -999,6 +1201,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	}
 
 
+	RegCloseKey(audioRegHandle);
 	RegCloseKey(networkRegHandle);
 	RegCloseKey(regHandle);
 		
