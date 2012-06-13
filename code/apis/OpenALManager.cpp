@@ -45,15 +45,6 @@ bool OpenALMan::Initialize() {
 #if USE_OPENAL
 	if ( isInitialized ) {
 		return true;
-	} else if ( OpenALLib.Load(_T("OpenAL32")) ) {
-		isInitialized = true;
-		return true;
-	} else if ( OpenALLib.Load(_T("libopenal")) ) {
-		isInitialized = true;
-		return true;
-	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
-		isInitialized = true;
-		return true;
 #if IS_APPLE
 	} else if ( OpenALLib.Load(_T("/System/Library/Frameworks/OpenAL.framework/OpenAL"),
 							   wxDL_VERBATIM) ) {
@@ -61,6 +52,16 @@ bool OpenALMan::Initialize() {
 		return true;
 	} else if ( OpenALLib.Load(_T("/Library/Frameworks/OpenAL.framework/OpenAL"),
 							   wxDL_VERBATIM) ) {
+		isInitialized = true;
+		return true;
+#else
+	} else if ( OpenALLib.Load(_T("OpenAL32")) ) {
+		isInitialized = true;
+		return true;
+	} else if ( OpenALLib.Load(_T("libopenal")) ) {
+		isInitialized = true;
+		return true;
+	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
 		isInitialized = true;
 		return true;
 #endif
