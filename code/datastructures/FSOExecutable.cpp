@@ -114,6 +114,8 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	while (cont) {
 #if IS_LINUX
 		if ( !filename.EndsWith(_T(".exe"))
+			&& !filename.EndsWith(_T(".map"))
+			&& !filename.EndsWith(_T(".pdb"))
 			&& !filename.EndsWith(_T(".app")) ) {
 #endif
 		files.Add(filename);
