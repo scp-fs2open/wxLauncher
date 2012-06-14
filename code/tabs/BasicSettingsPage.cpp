@@ -148,6 +148,8 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCFredBinaryChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
+	// TODO: uncomment once SetupOpenALSection() supports new sound code
+//	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
 }
@@ -638,6 +640,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->audioSizer->Add(audioOldSoundSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	this->audioSizer->Add(audioButtonsSizer, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 
+	// TODO: remove once SetupOpenALSection() supports new sound code
 	// fill in controls
 	this->SetupOpenALSection();
 
@@ -733,6 +736,8 @@ EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExec
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
+EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED,
+	BasicSettingsPage::OnFlagFileProcessingStatusChanged)
 
 // Video controls
 EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectVideoResolution)
@@ -776,6 +781,15 @@ EVT_BUTTON(ID_JOY_DETECT_BUTTON, BasicSettingsPage::OnDetectJoystick)
 EVT_COMMAND(wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, BasicSettingsPage::ProfileChanged)
 
 END_EVENT_TABLE()
+
+void BasicSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent& event) {
+	const FlagListManager::FlagFileProcessingStatus status =
+		static_cast<FlagListManager::FlagFileProcessingStatus>(event.GetInt());
+	
+	if (status == FlagListManager::FLAG_FILE_PROCESSING_OK) {
+		this->SetupOpenALSection();
+	}
+}
 
 void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
