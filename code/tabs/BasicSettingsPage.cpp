@@ -1749,13 +1749,13 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->downloadOpenALButton->Enable();
 	} else {
 		// have working openal
-		this->soundDeviceCombo->Append(OpenALMan::GetAvailiableDevices());
+		this->soundDeviceCombo->Append(OpenALMan::GetAvailablePlaybackDevices());
 		wxASSERT_MSG(soundDeviceCombo->GetCount() > 0, _T("sound device combo box is empty!"));
 		wxString openaldevice;
 		if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
 			soundDeviceCombo->SetStringSelection(openaldevice);
 		} else {
-			wxString defaultSoundDevice(OpenALMan::SystemDefaultDevice());
+			wxString defaultSoundDevice(OpenALMan::GetSystemDefaultPlaybackDevice());
 			wxLogDebug(_T("Reported default sound device: %s"), defaultSoundDevice.c_str());
 			if (!defaultSoundDevice.IsEmpty() &&
 				(soundDeviceCombo->FindString(defaultSoundDevice) != wxNOT_FOUND)) {

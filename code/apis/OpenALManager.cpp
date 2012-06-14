@@ -31,6 +31,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h"
 
+// from FSO, code/sound/openal.cpp, SVN r8840
+// enumeration extension
+#ifndef ALC_DEFAULT_ALL_DEVICES_SPECIFIER
+#define ALC_DEFAULT_ALL_DEVICES_SPECIFIER        0x1012
+#endif
+
+#ifndef ALC_ALL_DEVICES_SPECIFIER
+#define ALC_ALL_DEVICES_SPECIFIER                0x1013
+#endif
+
 const wxByte BUILD_CAP_NEW_SND = 1<<2;
 
 #if USE_OPENAL
@@ -166,12 +176,19 @@ bool OpenALMan::checkForALError_(size_t line) {
 }
 #endif
 
-wxArrayString OpenALMan::GetAvailiableDevices() {
+wxArrayString GetAvailableDevices(const ALenum deviceType) {
 	wxArrayString arr;
 #if USE_OPENAL
-	wxCHECK_MSG( OpenALMan::IsInitialized(), arr,
-		_T("GetAvailiableDevices called but OpenALMan not initialized"));
+	wxCHECK_MSG(OpenALMan::IsInitialized(), arr,
+		_T("GetAvailableDevices called but OpenALMan not initialized"));
+	
+	wxCHECK_MSG(deviceType == ALC_DEVICE_SPECIFIER ||
+		deviceType == ALC_CAPTURE_DEVICE_SPECIFIER, arr,
+		wxString::Format(_T("GetAvailableDevices given invalid specifier %d"),
+			deviceType));
 
+	ALenum adjustedDeviceType = deviceType;
+	
 	alcIsExtensionPresentType isExtentsionPresent = 
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 
@@ -184,10 +201,15 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 		return arr;
 	}
 
+	if ((deviceType == ALC_DEVICE_SPECIFIER) &&
+			(*isExtentsionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE) {
+		adjustedDeviceType = ALC_ALL_DEVICES_SPECIFIER;
+	}
+	
 	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType, alcGetString);
 
 	if ( GetString != NULL ) {
-		const ALCchar* devices = (*GetString)(NULL, ALC_DEVICE_SPECIFIER);
+		const ALCchar* devices = (*GetString)(NULL, adjustedDeviceType);
 		if ( devices != NULL ) {
 			size_t len;
 			size_t offset = 0;
@@ -210,26 +232,86 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 	return arr;
 }
 
-wxString OpenALMan::SystemDefaultDevice() {
+wxArrayString OpenALMan::GetAvailablePlaybackDevices() {
 #if USE_OPENAL
+	wxCHECK_MSG(OpenALMan::IsInitialized(), wxArrayString(),
+		_T("GetAvailablePlaybackDevices called but OpenALMan not initialized"));
+	return GetAvailableDevices(ALC_DEVICE_SPECIFIER);
+#else
+	return wxArrayString();
+#endif	
+}
+
+wxArrayString OpenALMan::GetAvailableCaptureDevices() {
+#if USE_OPENAL
+	wxCHECK_MSG(OpenALMan::IsInitialized(), wxArrayString(),
+		_T("GetAvailableCaptureDevices called but OpenALMan not initialized"));
+	return GetAvailableDevices(ALC_CAPTURE_DEVICE_SPECIFIER);
+#else
+	return wxArrayString();
+#endif
+}
+
+wxString GetSystemDefaultDevice(const ALenum deviceType) {
+#if USE_OPENAL
+	wxCHECK_MSG( OpenALMan::IsInitialized(), wxEmptyString,
+		_T("GetSystemDefaultDevice called but OpenALMan not initialized"));
+	wxCHECK_MSG(deviceType == ALC_DEFAULT_DEVICE_SPECIFIER ||
+		deviceType == ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER, wxEmptyString,
+		wxString::Format(_T("GetSystemDefaultDevice given invalid specifier %d"),
+			deviceType));
+	
+	ALenum adjustedDeviceType = deviceType;
+	
+	alcIsExtensionPresentType isExtentsionPresent = 
+		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
+	
+	if ((isExtentsionPresent != NULL) &&
+		(deviceType == ALC_DEFAULT_DEVICE_SPECIFIER) &&
+		((*isExtentsionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE)) {
+			adjustedDeviceType = ALC_DEFAULT_ALL_DEVICES_SPECIFIER;
+	}
+	
 	alcGetStringType GetString = GetOALFuncPtr(alcGetStringType, alcGetString);
 
 	if ( GetString == NULL ) {
 		return wxEmptyString;
 	} else {
-		const ALCchar* device = (*GetString)(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
-		if ( device == NULL ) {
-			wxLogError(_("Unable to get system default OpenAL device"));
+		const ALCchar* defaultDevice = (*GetString)(NULL, adjustedDeviceType);
+		if ( defaultDevice == NULL ) {
+			wxLogError(_("Unable to get system default OpenAL %sdevice"),
+				(deviceType == ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER ?
+					_T("capture ") : wxEmptyString));
 			return wxEmptyString;
 		} else {
-			wxString DefaultDevice(device, wxConvUTF8);
-			return DefaultDevice;
+			return wxString(defaultDevice, wxConvUTF8);
 		}
 	}
 #else
 	return wxEmptyString;
 #endif
 }
+
+wxString OpenALMan::GetSystemDefaultPlaybackDevice() {
+#if USE_OPENAL
+	wxCHECK_MSG(OpenALMan::IsInitialized(), wxEmptyString,
+		_T("GetSystemDefaultPlaybackDevice called but OpenALMan not initialized"));
+	return GetSystemDefaultDevice(ALC_DEFAULT_DEVICE_SPECIFIER);
+#else
+	return wxEmptyString;
+#endif
+}
+
+wxString OpenALMan::GetSystemDefaultCaptureDevice() {
+#if USE_OPENAL
+	wxCHECK_MSG(OpenALMan::IsInitialized(), wxEmptyString,
+		_T("GetSystemDefaultCaptureDevice called but OpenALMan not initialized"));
+	return GetSystemDefaultDevice(ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
+#else
+	return wxEmptyString;
+#endif
+}
+
 
 wxString OpenALMan::GetCurrentVersion() {
 #if USE_OPENAL
@@ -317,6 +399,21 @@ wxString OpenALMan::GetCurrentVersion() {
 	return wxString::Format(_("Detected OpenAL version: %s"), Version.c_str());
 #else
 	return wxEmptyString;
+#endif
+}
+
+bool OpenALMan::IsEFXSupported() {
+#if USE_OPENAL
+	wxCHECK_MSG( OpenALMan::IsInitialized(), false,
+		_T("IsEFXSupported called but OpenALMan not initialized"));
+	
+	alcIsExtensionPresentType isExtentsionPresent = 
+		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
+	
+	return (isExtentsionPresent != NULL) &&
+		((*isExtentsionPresent)(NULL, "ALC_EXT_EFX") == AL_TRUE);
+#else
+	return false;
 #endif
 }
 
