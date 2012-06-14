@@ -43,9 +43,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+/** A mechanism for allowing a network settings option's description (GUI label)
+ to differ from its corresponding registry value. */
+class NetworkSettingsOption {
+public:
+	NetworkSettingsOption(const wxString& regValue, const wxString& guiDesc);
+	const wxString& GetRegistryValue() const { return this->regValue; }
+	const wxString& GetDescription() const { return this->guiDesc; }
+private:
+	NetworkSettingsOption();
+	wxString regValue;
+	wxString guiDesc;
+};
+
 typedef std::vector<NetworkSettingsOption> NetworkSettingsOptions;
-NetworkSettingsOptions BasicSettingsPage::networkTypeOptions;
-NetworkSettingsOptions BasicSettingsPage::networkSpeedOptions;
+NetworkSettingsOptions networkTypeOptions;
+NetworkSettingsOptions networkSpeedOptions;
 
 NetworkSettingsOption::NetworkSettingsOption(
 	const wxString& regValue,
@@ -53,6 +66,22 @@ NetworkSettingsOption::NetworkSettingsOption(
 : regValue(regValue), guiDesc(guiDesc) {
 	wxASSERT(!regValue.IsEmpty());
 	wxASSERT(!guiDesc.IsEmpty());
+}
+
+void InitializeNetworkOptions() {
+	wxASSERT(networkTypeOptions.empty());
+	wxASSERT(networkSpeedOptions.empty());
+	
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("Dialup"), _T("Dialup")));
+	networkTypeOptions.push_back(NetworkSettingsOption(_T("LAN"), _T("Broadband/LAN")));
+	
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Slow"), _T("28k modem")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("56K"), _T("56k modem")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("ISDN"), _T("ISDN")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Cable"), _T("DSL")));
+	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Fast"), _T("Cable/LAN")));
 }
 
 int FindOptionIndexWithRegistryValue(
@@ -106,22 +135,6 @@ public:
 		return false;
 	}
 };
-
-void BasicSettingsPage::InitializeNetworkOptions() {
-	wxASSERT(networkTypeOptions.empty());
-	wxASSERT(networkSpeedOptions.empty());
-	
-	networkTypeOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
-	networkTypeOptions.push_back(NetworkSettingsOption(_T("Dialup"), _T("Dialup")));
-	networkTypeOptions.push_back(NetworkSettingsOption(_T("LAN"), _T("Broadband/LAN")));
-	
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("None"), _T("None")));
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Slow"), _T("28k modem")));
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("56K"), _T("56k modem")));
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("ISDN"), _T("ISDN")));
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Cable"), _T("DSL")));
-	networkSpeedOptions.push_back(NetworkSettingsOption(_T("Fast"), _T("Cable/LAN")));
-}
 
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxLogDebug(_T("BasicSettingsPage is at %p."), this);
