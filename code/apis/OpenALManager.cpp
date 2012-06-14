@@ -100,7 +100,7 @@ bool OpenALMan::IsInitialized() {
 #endif
 }
 
-bool OpenALMan::WasCompliedIn() {
+bool OpenALMan::WasCompiledIn() {
 #if USE_OPENAL
 	return true;
 #else
@@ -189,11 +189,11 @@ wxArrayString GetAvailableDevices(const ALenum deviceType) {
 
 	ALenum adjustedDeviceType = deviceType;
 	
-	alcIsExtensionPresentType isExtentsionPresent = 
+	alcIsExtensionPresentType isExtensionPresent =
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 
-	if ( isExtentsionPresent != NULL ) {
-		if ( (*isExtentsionPresent)(NULL, "ALC_ENUMERATION_EXT") != AL_TRUE ) {
+	if ( isExtensionPresent != NULL ) {
+		if ( (*isExtensionPresent)(NULL, "ALC_ENUMERATION_EXT") != AL_TRUE ) {
 			wxLogFatalError(_T("OpenAL does not seem to support device enumeration."));
 			return arr;
 		}
@@ -202,7 +202,7 @@ wxArrayString GetAvailableDevices(const ALenum deviceType) {
 	}
 
 	if ((deviceType == ALC_DEVICE_SPECIFIER) &&
-			(*isExtentsionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE) {
+			(*isExtensionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE) {
 		adjustedDeviceType = ALC_ALL_DEVICES_SPECIFIER;
 	}
 	
@@ -263,12 +263,12 @@ wxString GetSystemDefaultDevice(const ALenum deviceType) {
 	
 	ALenum adjustedDeviceType = deviceType;
 	
-	alcIsExtensionPresentType isExtentsionPresent = 
+	alcIsExtensionPresentType isExtensionPresent =
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 	
-	if ((isExtentsionPresent != NULL) &&
+	if ((isExtensionPresent != NULL) &&
 		(deviceType == ALC_DEFAULT_DEVICE_SPECIFIER) &&
-		((*isExtentsionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE)) {
+		((*isExtensionPresent)(NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE)) {
 			adjustedDeviceType = ALC_DEFAULT_ALL_DEVICES_SPECIFIER;
 	}
 	
@@ -407,11 +407,11 @@ bool OpenALMan::IsEFXSupported() {
 	wxCHECK_MSG( OpenALMan::IsInitialized(), false,
 		_T("IsEFXSupported called but OpenALMan not initialized"));
 	
-	alcIsExtensionPresentType isExtentsionPresent = 
+	alcIsExtensionPresentType isExtensionPresent =
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 	
-	return (isExtentsionPresent != NULL) &&
-		((*isExtentsionPresent)(NULL, "ALC_EXT_EFX") == AL_TRUE);
+	return (isExtensionPresent != NULL) &&
+		((*isExtensionPresent)(NULL, "ALC_EXT_EFX") == AL_TRUE);
 #else
 	return false;
 #endif

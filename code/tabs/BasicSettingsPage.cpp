@@ -1828,7 +1828,7 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 }
 
 void BasicSettingsPage::SetupOpenALSection() {
-	if ( !OpenALMan::WasCompliedIn() ) {
+	if ( !OpenALMan::WasCompiledIn() ) {
 		wxLogWarning(_T("Launcher was not compiled to support OpenAL"));
 		if (this->openALVersion != NULL) {
 			this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
