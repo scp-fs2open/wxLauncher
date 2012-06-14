@@ -89,6 +89,13 @@ private:
 	void OnCurrentFredBinaryChanged(wxCommandEvent& event);
 	void ShowSettings(const bool showSettings);
 	void OpenNonSCPWebSite(wxString url);
+	
+	enum SoundDeviceType {
+		PLAYBACK,
+		CAPTURE
+	};
+	
+	void InitializeSoundDeviceDropDownBox(const SoundDeviceType deviceType);
 	void SetupOpenALSection();
 	void SetupJoystickSection();
 	void SetupControlsForJoystick(unsigned int i);

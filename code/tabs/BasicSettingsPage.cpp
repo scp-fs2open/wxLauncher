@@ -1722,6 +1722,97 @@ void BasicSettingsPage::OnDetectOpenAL(wxCommandEvent& WXUNUSED(event)) {
 	}
 }
 
+void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
+	const SoundDeviceType deviceType) {
+	
+	wxCHECK_RET((deviceType == PLAYBACK) || (deviceType == CAPTURE),
+		wxString::Format(_T("Invalid device type %d given."), deviceType));
+	
+	WindowIDS deviceDropDownBoxID;
+	wxString deviceTypeNameAdjustment;
+	wxString deviceProfileEntryName;
+	wxArrayString availableDevices;
+	wxString defaultDevice;
+	
+	if (deviceType == PLAYBACK) {
+		deviceDropDownBoxID = ID_SELECT_SOUND_DEVICE;
+		// (deviceTypeNameAdjustment remains empty in this case)
+		deviceProfileEntryName = PRO_CFG_OPENAL_DEVICE;
+		availableDevices = OpenALMan::GetAvailablePlaybackDevices();
+		defaultDevice = OpenALMan::GetSystemDefaultPlaybackDevice();
+	} else {
+		deviceDropDownBoxID = ID_SELECT_CAPTURE_DEVICE;
+		deviceTypeNameAdjustment = _T(" capture");
+		deviceProfileEntryName = PRO_CFG_OPENAL_CAPTURE_DEVICE;
+		availableDevices = OpenALMan::GetAvailableCaptureDevices();
+		defaultDevice = OpenALMan::GetSystemDefaultCaptureDevice();
+	}
+	
+	wxChoice* deviceDropDownBox = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(deviceDropDownBoxID, this));
+	
+	// validity checking
+	wxCHECK_RET(deviceDropDownBox != NULL,
+		wxString::Format(_T("Unable to find the sound%s device drop down box"),
+			deviceTypeNameAdjustment.c_str()));
+	
+	wxASSERT_MSG(deviceDropDownBox->IsEmpty(),
+		wxString::Format(
+			_T("Sound%s device drop down box has a count of %d")
+				_T(" when it should be empty; first entry is %s"),
+			deviceDropDownBox->GetCount(),
+			deviceDropDownBox->GetString(0).c_str()));
+	
+	wxASSERT(!deviceProfileEntryName.IsEmpty());
+	
+	if (availableDevices.IsEmpty()) {
+		wxASSERT_MSG(deviceType == CAPTURE,
+			_T("No sound devices were found on the system."));
+		
+		wxLogDebug(_T("No capture devices were found on the system."));
+		return;
+	}
+	
+	wxASSERT_MSG(!defaultDevice.IsEmpty(),
+		wxString::Format(_T("No default sound%s device was found."),
+			deviceTypeNameAdjustment.c_str()));
+	
+	// update device drop down box and select a device
+	deviceDropDownBox->Append(availableDevices);
+	
+	wxString device;
+	
+	if (ProMan::GetProfileManager()->ProfileRead(deviceProfileEntryName, &device)) {
+		deviceDropDownBox->SetStringSelection(device);
+	} else {
+		wxLogDebug(_T("Reported default sound%s device: %s"),
+			deviceTypeNameAdjustment.c_str(), defaultDevice.c_str());
+		
+		if (!defaultDevice.IsEmpty() &&
+			(deviceDropDownBox->FindString(defaultDevice) != wxNOT_FOUND)) {
+			deviceDropDownBox->SetStringSelection(defaultDevice);
+		} else {
+			wxLogWarning(
+				_T("Default sound%s device %s not found. Using first entry %s."),
+				deviceTypeNameAdjustment.c_str(),
+				defaultDevice.c_str(),
+				deviceDropDownBox->GetString(0).c_str());
+			deviceDropDownBox->SetSelection(0);
+		}
+	}
+	
+	// update current profile if necessary
+	if (!ProMan::GetProfileManager()->ProfileRead(deviceProfileEntryName, &device) ||
+		(device != deviceDropDownBox->GetStringSelection())) {
+		wxLogDebug(_T("updating OpenAL sound%s device profile entry to \"%s\""),
+			deviceTypeNameAdjustment.c_str(),
+			deviceDropDownBox->GetStringSelection().c_str());
+		ProMan::GetProfileManager()->ProfileWrite(
+			deviceProfileEntryName,
+			deviceDropDownBox->GetStringSelection());
+	}
+}
+
 void BasicSettingsPage::SetupOpenALSection() {
 	if ( !OpenALMan::WasCompliedIn() ) {
 		wxLogWarning(_T("Launcher was not compiled to support OpenAL"));
@@ -1743,30 +1834,9 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->downloadOpenALButton->Enable();
 	} else {
 		// have working openal
-		this->soundDeviceCombo->Append(OpenALMan::GetAvailablePlaybackDevices());
-		wxASSERT_MSG(soundDeviceCombo->GetCount() > 0, _T("sound device combo box is empty!"));
-		wxString openaldevice;
-		if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openaldevice) ) {
-			soundDeviceCombo->SetStringSelection(openaldevice);
-		} else {
-			wxString defaultSoundDevice(OpenALMan::GetSystemDefaultPlaybackDevice());
-			wxLogDebug(_T("Reported default sound device: %s"), defaultSoundDevice.c_str());
-			if (!defaultSoundDevice.IsEmpty() &&
-				(soundDeviceCombo->FindString(defaultSoundDevice) != wxNOT_FOUND)) {
-				soundDeviceCombo->SetStringSelection(defaultSoundDevice);	
-			} else { // just pick the first one on the list as the default
-				soundDeviceCombo->SetSelection(0);
-			}
-		}
-		// update current profile if necessary
-		ProMan* proman = ProMan::GetProfileManager();
-		wxString openALDevice;
-		if (!proman->ProfileRead(PRO_CFG_OPENAL_DEVICE, &openALDevice) ||
-			(openALDevice != this->soundDeviceCombo->GetStringSelection())) {
-			wxLogDebug(_T("updating OpenAL sound device profile entry to \"%s\""),
-				soundDeviceCombo->GetStringSelection().c_str());
-			proman->ProfileWrite(PRO_CFG_OPENAL_DEVICE, this->soundDeviceCombo->GetStringSelection());
-		}
+		this->InitializeSoundDeviceDropDownBox(PLAYBACK);
+		wxASSERT_MSG(!soundDeviceCombo->IsEmpty(),
+			_T("sound device combo box is empty!"));
 		
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
