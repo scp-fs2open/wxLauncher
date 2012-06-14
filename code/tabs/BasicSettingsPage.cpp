@@ -696,17 +696,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	// Final Layout
 	wxBoxSizer* settingsSizer = new wxBoxSizer(wxVERTICAL);
 
-#if IS_WIN32
-	wxBoxSizer* videoAudioSizer = new wxBoxSizer(wxHORIZONTAL);
-	videoAudioSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxRIGHT, 10));
-	videoAudioSizer->Add(audioSizer, wxSizerFlags().Proportion(1).Expand());
-	settingsSizer->Add(videoAudioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
-	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
-#else
 	settingsSizer->Add(videoSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(audioSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+#if IS_WIN32
+	settingsSizer->Add(speechSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+#else
 	settingsSizer->Add(joystickSizer, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	settingsSizer->Add(networkSizer, wxSizerFlags().Expand());
 #endif
