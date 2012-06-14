@@ -177,7 +177,7 @@ wxArrayString OpenALMan::GetAvailiableDevices() {
 
 	if ( isExtentsionPresent != NULL ) {
 		if ( (*isExtentsionPresent)(NULL, "ALC_ENUMERATION_EXT") != AL_TRUE ) {
-			wxLogError(_T("OpenAL does not seem to support device enumeration"));
+			wxLogFatalError(_T("OpenAL does not seem to support device enumeration."));
 			return arr;
 		}
 	} else {
