@@ -70,6 +70,7 @@ public:
 	void OnDetectJoystick(wxCommandEvent& event);
 
 	void ProfileChanged(wxCommandEvent& event);
+	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
 
 private:
 	static void FillFSOExecutableDropBox(wxChoice* exeChoice, wxFileName path);
