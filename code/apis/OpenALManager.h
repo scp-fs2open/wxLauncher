@@ -30,10 +30,16 @@ namespace OpenALMan {
 	bool DeInitialize();
 	bool WasCompliedIn();
 	bool IsInitialized();
-
-	wxArrayString GetAvailiableDevices();
+	
+	wxArrayString GetAvailablePlaybackDevices();
+	wxArrayString GetAvailableCaptureDevices();
+	
 	wxString GetCurrentVersion();
-	wxString SystemDefaultDevice();
+	
+	wxString GetSystemDefaultPlaybackDevice();
+	wxString GetSystemDefaultCaptureDevice();
+	
+	bool IsEFXSupported();
 	bool BuildHasNewSoundCode();
 };
 
