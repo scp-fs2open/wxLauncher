@@ -110,7 +110,7 @@ private:
 	wxButton* detectOpenALButton;
 
 	wxSizer* audioButtonsSizer;
-	wxSizer* audioNonButtonsSizer;
+	wxSizer* audioOldSoundSizer;
 	wxSizer* audioSizer;
 
 	wxChoice* joystickSelected;
