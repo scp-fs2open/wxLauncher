@@ -1707,8 +1707,8 @@ void BasicSettingsPage::OnChangeSampleRate(wxCommandEvent &event) {
 	if ( sampleRateBox->GetValue().ToLong(&sampleRate) ) {
 		if ( sampleRate <= 0 ) {
 			wxLogInfo(_T("Sample rate must be greater than 0"));
-		} else if ( sampleRate > 44100 ) {
-			wxLogInfo(_T("Sample rate must be at most 44100"));
+		} else if ( sampleRate > 48000 ) {
+			wxLogInfo(_T("Sample rate must be at most 48000"));
 		} else {
 			ProMan::GetProfileManager()->ProfileWrite(
 				PRO_CFG_OPENAL_SAMPLE_RATE, sampleRate);
