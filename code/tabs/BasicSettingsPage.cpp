@@ -623,11 +623,11 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
 	this->detectOpenALButton = new wxButton(this, ID_DETECT_OPENAL, _("Detect OpenAL"));
 
-	this->audioNonButtonsSizer = new wxBoxSizer(wxVERTICAL);
-	this->audioNonButtonsSizer->Add(soundDeviceText, wxSizerFlags().Border(wxBOTTOM, 5));
-	this->audioNonButtonsSizer->Add(soundDeviceCombo,
+	this->audioOldSoundSizer = new wxBoxSizer(wxVERTICAL);
+	this->audioOldSoundSizer->Add(soundDeviceText, wxSizerFlags().Border(wxBOTTOM, 5));
+	this->audioOldSoundSizer->Add(soundDeviceCombo,
 					wxSizerFlags().Expand());
-	this->audioNonButtonsSizer->Add(openALVersion,
+	this->audioOldSoundSizer->Add(openALVersion,
 					wxSizerFlags().Center().Border(wxTOP, 5));
 	
 	this->audioButtonsSizer = new wxBoxSizer(wxVERTICAL);
@@ -635,7 +635,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->audioButtonsSizer->Add(detectOpenALButton, wxSizerFlags().Expand());
 	
 	this->audioSizer = new wxStaticBoxSizer(audioBox, wxHORIZONTAL);
-	this->audioSizer->Add(audioNonButtonsSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	this->audioSizer->Add(audioOldSoundSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	this->audioSizer->Add(audioButtonsSizer, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 
 	// fill in controls
@@ -1841,7 +1841,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
 		if (this->openALVersion != NULL) {
-			this->audioNonButtonsSizer->Detach(this->openALVersion);
+			this->audioOldSoundSizer->Detach(this->openALVersion);
 			this->openALVersion->Hide();
 			delete this->openALVersion;
 			this->openALVersion = NULL;
@@ -1855,8 +1855,8 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->detectOpenALButton->Hide();
 		
 		this->audioSizer->Remove(this->audioButtonsSizer);
-		this->audioSizer->Detach(this->audioNonButtonsSizer);
-		this->audioSizer->Add(this->audioNonButtonsSizer,
+		this->audioSizer->Detach(this->audioOldSoundSizer);
+		this->audioSizer->Add(this->audioOldSoundSizer,
 			wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 		this->Layout();
 	}
