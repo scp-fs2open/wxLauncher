@@ -1623,7 +1623,7 @@ void BasicSettingsPage::OnChangePort(wxCommandEvent &event) {
 	wxCHECK_RET(port != NULL, _T("Unable to find Port Text Control"));
 
 	if (port->IsEmpty()) {
-		wxLogInfo(_T("Port field is blank, writing 0 to profile"));
+		wxLogDebug(_T("Port field is blank, writing 0 to profile"));
 		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_NETWORK_PORT, static_cast<long>(0));
 		return;
 	}
