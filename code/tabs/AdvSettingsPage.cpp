@@ -44,6 +44,10 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	wxASSERT(skin != NULL);
 	this->skin = skin;
 
+	this->errorText =
+		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+			wxDefaultSize, wxALIGN_CENTER);
+	
 	wxLogDebug(_T("AdvSettingsPage is at %p."), this);
 
 	CmdLineManager::RegisterCmdLineChanged(this);
@@ -213,7 +217,7 @@ void AdvSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent &event) {
 			_T("Flag file processing succeeded but could not retrieve extracted data."));
 		this->flagListBox->AcceptFlagData(flagData);
 	} else {
-		this->flagListBox->SetItemCount(0); // for the errorText
+		this->UpdateErrorText();
 	}
 }
 
@@ -268,15 +272,37 @@ void AdvSettingsPage::UpdateComponents() {
 		topSizer->Show(TOP_RIGHT_SIZER_INDEX);
 		topLeftSizer->Show(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Show(BOTTOM_SIZER_INDEX);
-		this->flagListBox->SetMinSize(wxSize(-1, FLAG_LIST_BOX_HEIGHT)); // FIXME HACK fixed flag list box height
+		this->flagListBox->Show();
+		this->errorText->Hide();
 		this->Layout();
 	} else {
 		topSizer->Hide(TOP_RIGHT_SIZER_INDEX);
 		topLeftSizer->Hide(WIKI_LINK_SIZER_INDEX);
 		this->GetSizer()->Hide(BOTTOM_SIZER_INDEX);
-		this->flagListBox->SetMinSize(wxSize(-1, TAB_AREA_HEIGHT - 10)); // FIXME HACK the 10 is for the borders
+		this->flagListBox->Hide();
+		this->errorText->Show();
 		this->Layout();
 	}
+}
+
+void AdvSettingsPage::UpdateErrorText() {
+	wxCHECK_RET(!FlagListManager::GetFlagListManager()->IsProcessingOK(),
+		_T("UpdateErrorText() called when processing succeeded."));
+	
+	wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
+	
+	wxString msg = FlagListManager::GetFlagListManager()->GetStatusMessage();
+
+	wxASSERT(!msg.IsEmpty());
+	
+	this->errorText->SetLabel(msg);
+	
+	wxFont errorFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	this->errorText->SetFont(errorFont);
+	
+	this->errorText->SetSize(rect, wxSIZE_FORCE);
+	this->errorText->Wrap(rect.width);
+	this->errorText->Center();
 }
 
 void AdvSettingsPage::OnCustomFlagsBoxChanged(wxCommandEvent &WXUNUSED(event)) {

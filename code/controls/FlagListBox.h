@@ -78,7 +78,6 @@ public:
 	virtual void OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual void OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const;
 	virtual wxCoord OnMeasureItem(size_t n) const;
-	virtual void OnSize(wxSizeEvent &event);
 
 	void OnDoubleClickFlag(wxCommandEvent &event);
 	
@@ -117,8 +116,6 @@ private:
 	FlagListCheckBoxItems checkBoxes;
 	void GenerateCheckBoxes(const FlagListBoxData& data);
 	bool areCheckBoxesGenerated;
-
-	wxStaticText* errorText;
 
 	FlagListCheckBoxItem* FindFlagAt(size_t n) const;
 
