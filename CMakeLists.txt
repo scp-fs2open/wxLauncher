@@ -186,6 +186,8 @@ set(GUI_CONTROL_CODE_FILES
   code/controls/ModList.cpp
   code/controls/StatusBar.h
   code/controls/StatusBar.cpp
+  code/controls/TruncatableChoice.h
+  code/controls/TruncatableChoice.cpp
   )
 source_group("GUI Controls" FILES ${GUI_CONTROL_CODE_FILES})
 set(GLOBAL_CODE_FILES
