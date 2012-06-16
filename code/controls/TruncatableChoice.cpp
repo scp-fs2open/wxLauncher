@@ -28,7 +28,7 @@ void TruncatableChoice::SetMaxLength(const int maxLength) {
 	
 	this->maxLength = maxLength;
 	
-	if (maxLength == 0) {
+	if ((maxLength == 0) || (this->maxLength > GetEffectiveMinSize().GetWidth())) {
 		this->SetMinSize(this->GetEffectiveMinSize());
 	} else {
 		this->SetMinSize(wxSize(maxLength, -1));
