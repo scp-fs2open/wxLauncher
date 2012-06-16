@@ -132,10 +132,6 @@ FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
   areCheckBoxesGenerated(false) {
 	wxASSERT(skin != NULL);
 	this->skin = skin;
-	
-	this->errorText =
-		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
-			wxDefaultSize, wxALIGN_CENTER);
 }
 
 void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
@@ -222,7 +218,6 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 #endif
 	
 	if (this->IsReady()) {
-		this->errorText->Hide();
 		FlagListCheckBoxItem* item = this->FindFlagAt(n);
 		wxCHECK_RET(item != NULL, _T("Flag pointer is null"));
 		
@@ -290,31 +285,6 @@ void FlagListBox::OnDrawBackground(wxDC &dc, const wxRect &rect, size_t n) const
 	dc.SetBrush(b);
 	dc.SetBackground(b);
 	dc.DrawRectangle(rect);
-}
-
-void FlagListBox::OnSize(wxSizeEvent &event) {
-	wxVListBox::OnSize(event); // call parents onSize
-	if (!this->IsReady()) {
-		wxRect rect(0, 0, this->GetSize().x, this->GetSize().y);
-		
-		wxString msg = wxEmptyString;
-		
-		if (!FlagListManager::GetFlagListManager()->IsProcessingOK()) {
-			msg = FlagListManager::GetFlagListManager()->GetStatusMessage();
-		} else {
-			msg = _("Waiting for extracted flag file data to be received.");
-		}
-		wxASSERT(!msg.IsEmpty());
-		
-		this->errorText->Show();
-		this->errorText->SetLabel(msg);
-		wxFont errorFont(16, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
-		this->errorText->SetFont(errorFont);
-
-		this->errorText->SetSize(rect, wxSIZE_FORCE);
-		this->errorText->Wrap(rect.width);
-		this->errorText->Center();
-	}
 }
 
 void FlagListBox::OnDoubleClickFlag(wxCommandEvent &WXUNUSED(event)) {

@@ -31,11 +31,13 @@ public:
 
 private:
 	void UpdateComponents();
+	void UpdateErrorText();
 	void UpdateFlagSetsBox();
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
 	SkinSystem *skin;
 	FlagListBox* flagListBox;
+	wxStaticText* errorText;
 	
 public:
 	void OnExeChanged(wxCommandEvent& event);
