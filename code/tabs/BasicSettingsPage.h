@@ -85,6 +85,7 @@ private:
 		INVALID_TC_ROOT_FOLDER
 	};
 	
+	void InitializeMemberVariables();
 	void DisableExecutableChoiceControls(const ReasonForExecutableDisabling reason);
 	void OnCurrentBinaryChanged(wxCommandEvent& event);
 	void OnCurrentFredBinaryChanged(wxCommandEvent& event);
