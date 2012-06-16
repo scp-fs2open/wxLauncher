@@ -139,6 +139,8 @@ public:
 BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxLogDebug(_T("BasicSettingsPage is at %p."), this);
 
+	this->InitializeMemberVariables();
+	
 	if (networkTypeOptions.empty() || networkSpeedOptions.empty()) {
 		InitializeNetworkOptions();
 	}
@@ -159,6 +161,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->GetSizer()->Clear(true);
 	}
 
+	this->InitializeMemberVariables();
+	
 	ProMan* proman = ProMan::GetProfileManager();
 	// exe Selection
 	bool fredEnabled;
@@ -1099,6 +1103,33 @@ void BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton(wxCommandEvent 
 			TCManager::GenerateTCFredBinaryChanged();
 		}
 	}
+}
+
+/** Initializes member variables, such as setting pointers to NULL. Made into a
+ function, since it needs to be done at multiple places in the code. */
+void BasicSettingsPage::InitializeMemberVariables() {
+	// following the order in BasicSettingsPage.h
+	this->soundDeviceText = NULL;
+	this->soundDeviceCombo = NULL;
+	this->openALVersion = NULL;
+	this->downloadOpenALButton = NULL;
+	this->detectOpenALButton = NULL;
+	
+	this->audioButtonsSizer = NULL;
+	this->audioOldSoundSizer = NULL;
+	this->audioSizer = NULL;
+	
+	this->joystickSelected = NULL;
+#if IS_WIN32
+	this->joystickForceFeedback = NULL;
+	this->joystickDirectionalHit = NULL;
+	this->joystickCalibrateButton = NULL;
+	this->joystickDetectButton = NULL;
+#endif
+	this->isTcRootFolderValid = false;
+	this->isCurrentBinaryValid = false;
+	this->isCurrentFredBinaryValid = false;
+	
 }
 
 /** Disables the executable choice and refresh button controls, such as would occur
