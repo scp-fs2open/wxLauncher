@@ -30,6 +30,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+const int TEXT_FONT_SIZE = 14;
+const int TEXT_WRAP_WIDTH = TAB_AREA_WIDTH - 225;
+
 ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
 	this->skin = skin;
 
@@ -54,12 +57,12 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder\nof a FreeSpace 2 installation or a total conversion\non the Basic Settings page."),
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of a FreeSpace 2 installation or a total conversion on the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
 		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-		noTC->Wrap(TAB_AREA_WIDTH-50);
+		noTC->Wrap(TEXT_WRAP_WIDTH);
 
 		wxFileName infoLocation(_T(RESOURCES_PATH), _T("info_big.png"));
 		wxBitmap infoIcon(infoLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
@@ -80,12 +83,12 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
-			_("The selected root folder does not exist.\nSelect a valid root folder for a FreeSpace 2 installation\nor a total conversion on the Basic Settings page."),
+			_("The selected root folder does not exist.\n\nSelect a valid root folder for a FreeSpace 2 installation or a total conversion on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		nonexistentTC->SetFont(messageFont);
 		nonexistentTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-		nonexistentTC->Wrap(TAB_AREA_WIDTH-50);
+		nonexistentTC->Wrap(TEXT_WRAP_WIDTH);
 
 		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
 		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
@@ -106,12 +109,12 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The selected root folder\ndoes not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder,\nor add FS2 Open executables to the selected root folder\nand press the Refresh button."),
+			_("The selected root folder does not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);
 		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
-		invalidTC->Wrap(TAB_AREA_WIDTH-50);
+		invalidTC->Wrap(TEXT_WRAP_WIDTH);
 		
 		wxFileName warningLocation(_T(RESOURCES_PATH), _T("warning_big.png"));
 		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
