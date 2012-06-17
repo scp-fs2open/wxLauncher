@@ -150,8 +150,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCFredBinaryChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
-	// TODO: uncomment once SetupOpenALSection() supports new sound code
-//	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
+	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
 }
@@ -623,7 +622,19 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBox* audioBox = new wxStaticBox(this, wxID_ANY, _("Audio"));
 
 	this->soundDeviceText = new wxStaticText(this, wxID_ANY, _("Sound device:"));
-	this->soundDeviceCombo = new wxChoice(this, ID_SELECT_SOUND_DEVICE);
+	this->soundDeviceCombo = new TruncatableChoice(this, ID_SELECT_SOUND_DEVICE);
+	
+	this->captureDeviceText = new wxStaticText(this, wxID_ANY, _("Capture device:"));
+	this->captureDeviceCombo = new TruncatableChoice(this, ID_SELECT_CAPTURE_DEVICE);
+	
+	wxCheckBox* efxCheckBox = new wxCheckBox(this, ID_ENABLE_EFX, _("Enable EFX"));
+	
+	wxStaticText* sampleRateText = new wxStaticText(this, wxID_ANY, _("Sample rate:"));
+	wxTextCtrl* sampleRateBox = new wxTextCtrl(this, ID_AUDIO_SAMPLE_RATE);
+
+	sampleRateBox->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
+	sampleRateBox->SetMaxLength(5);
+	
 	this->openALVersion = new wxStaticText(this, wxID_ANY, wxEmptyString);
 
 	this->downloadOpenALButton = new wxButton(this, ID_DOWNLOAD_OPENAL, _("Download OpenAL"));
@@ -636,17 +647,30 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->audioOldSoundSizer->Add(openALVersion,
 					wxSizerFlags().Center().Border(wxTOP, 5));
 	
+	this->audioNewSoundDeviceSizer = new wxFlexGridSizer(2);
+	this->audioNewSoundDeviceSizer->Add(captureDeviceText, 0,
+		wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	this->audioNewSoundDeviceSizer->Add(captureDeviceCombo, wxSizerFlags().Expand());
+	
+	this->audioNewSoundSizer = new wxBoxSizer(wxHORIZONTAL);
+	this->audioNewSoundSizer->Add(this->audioNewSoundDeviceSizer);
+	this->audioNewSoundSizer->AddStretchSpacer(5);
+	this->audioNewSoundSizer->Add(efxCheckBox, 0, wxALIGN_CENTER_VERTICAL);
+	this->audioNewSoundSizer->AddStretchSpacer(5);
+	this->audioNewSoundSizer->Add(sampleRateText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+	this->audioNewSoundSizer->Add(sampleRateBox, 0, wxALIGN_CENTER_VERTICAL);
+	this->audioNewSoundSizer->AddStretchSpacer(5);
+	
 	this->audioButtonsSizer = new wxBoxSizer(wxVERTICAL);
 	this->audioButtonsSizer->Add(downloadOpenALButton, wxSizerFlags().Expand());
 	this->audioButtonsSizer->Add(detectOpenALButton, wxSizerFlags().Expand());
 	
 	this->audioSizer = new wxStaticBoxSizer(audioBox, wxHORIZONTAL);
-	this->audioSizer->Add(audioOldSoundSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	this->audioSizer->Add(audioOldSoundSizer,
+		wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	this->audioSizer->Add(audioNewSoundSizer);
+	this->audioSizer->Hide(audioNewSoundSizer, true);
 	this->audioSizer->Add(audioButtonsSizer, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
-
-	// TODO: remove once SetupOpenALSection() supports new sound code
-	// fill in controls
-	this->SetupOpenALSection();
 
 	// Joystick
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
@@ -1111,12 +1135,16 @@ void BasicSettingsPage::InitializeMemberVariables() {
 	// following the order in BasicSettingsPage.h
 	this->soundDeviceText = NULL;
 	this->soundDeviceCombo = NULL;
+	this->captureDeviceText = NULL;
+	this->captureDeviceCombo = NULL;
 	this->openALVersion = NULL;
 	this->downloadOpenALButton = NULL;
 	this->detectOpenALButton = NULL;
 	
 	this->audioButtonsSizer = NULL;
 	this->audioOldSoundSizer = NULL;
+	this->audioNewSoundSizer = NULL;
+	this->audioNewSoundDeviceSizer = NULL;
 	this->audioSizer = NULL;
 	
 	this->joystickSelected = NULL;
@@ -1878,31 +1906,138 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->downloadOpenALButton->Enable();
 	} else {
 		// have working openal
-		this->InitializeSoundDeviceDropDownBox(PLAYBACK);
+		if (this->soundDeviceCombo->IsEmpty()) {
+			this->InitializeSoundDeviceDropDownBox(PLAYBACK);
+		}
 		wxASSERT_MSG(!soundDeviceCombo->IsEmpty(),
 			_T("sound device combo box is empty!"));
 		
+		if (OpenALMan::BuildHasNewSoundCode()) {
+			if (this->captureDeviceCombo->IsEmpty()) {
+				this->InitializeSoundDeviceDropDownBox(CAPTURE);
+			}
+			
+			wxCheckBox* efxCheckBox = dynamic_cast<wxCheckBox*>(
+				wxWindow::FindWindowById(ID_ENABLE_EFX, this));
+			wxCHECK_RET(efxCheckBox != NULL,
+				_T("Cannot find enable EFX checkbox."));
+			
+			if (OpenALMan::IsEFXSupported()) {
+				bool enableEFX;
+				ProMan::GetProfileManager()->ProfileRead(
+					PRO_CFG_OPENAL_EFX, &enableEFX, false);
+				efxCheckBox->SetValue(enableEFX);
+			}
+			
+			long sampleRate;
+			ProMan::GetProfileManager()->ProfileRead(
+				PRO_CFG_OPENAL_SAMPLE_RATE,
+				&sampleRate,
+				DEFAULT_AUDIO_OPENAL_SAMPLE_RATE);
+			
+			wxTextCtrl* sampleRateBox = dynamic_cast<wxTextCtrl*>(
+				wxWindow::FindWindowById(ID_AUDIO_SAMPLE_RATE, this));
+			wxCHECK_RET(sampleRateBox != NULL,
+				_T("Cannot find sample rate text ctrl."));
+			
+			if (sampleRate != DEFAULT_AUDIO_OPENAL_SAMPLE_RATE) {
+				sampleRateBox->ChangeValue(wxString::Format(_T("%ld"), sampleRate));
+			}
+			
+			this->soundDeviceText->SetLabel(_("Playback device:"));
+
+			if (this->audioOldSoundSizer->GetItem(this->soundDeviceText) != NULL) {
+				wxASSERT(this->audioOldSoundSizer->GetItem(
+					this->soundDeviceCombo) != NULL);
+				
+				this->audioOldSoundSizer->Detach(this->soundDeviceText);
+				this->audioOldSoundSizer->Detach(this->soundDeviceCombo);
+				
+				this->audioNewSoundDeviceSizer->Prepend(this->soundDeviceCombo,
+					wxSizerFlags().Expand());
+				this->audioNewSoundDeviceSizer->Prepend(this->soundDeviceText,
+					0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
+			}
+			
+			this->audioSizer->Hide(this->audioOldSoundSizer, true);
+			this->audioSizer->Show(this->audioNewSoundSizer, true);
+			
+			if (!OpenALMan::IsEFXSupported()) {
+				wxLogDebug(_T("EFX is not supported. Hiding Enable EFX checkbox."));
+				this->audioNewSoundSizer->Hide(efxCheckBox);
+			}
+			
+			if (this->captureDeviceCombo->IsEmpty()) {
+				this->audioNewSoundDeviceSizer->Hide(this->captureDeviceCombo);
+				this->audioNewSoundDeviceSizer->Hide(this->captureDeviceText);
+			}
+
+			// compute and set max device drop down box length
+			this->audioNewSoundSizer->Detach(this->audioNewSoundDeviceSizer);
+			
+			const int minAudioNewSoundSizerWidth =
+				ClientToWindowSize(audioNewSoundSizer->GetMinSize()).GetWidth();
+			wxCHECK_RET(minAudioNewSoundSizerWidth > 0,
+				wxString::Format(
+					_T("minimum audio new sound sizer width is invalid value %d"),
+					minAudioNewSoundSizerWidth));
+			// TODO: Remove the debug statement after further testing.
+			wxLogDebug(_T("min audio new sound sizer width: %d"),
+				minAudioNewSoundSizerWidth);
+			
+			// the 75 is to cover spacing and static box borders (yes, hackish)
+			const int maxDeviceComboLength =
+				TAB_AREA_WIDTH - minAudioNewSoundSizerWidth -
+					this->soundDeviceText->GetSize().GetWidth() - 75;
+			// TODO: Remove the debug statement after further testing.
+			wxLogDebug(_T("max device combo length: %d"),
+				maxDeviceComboLength);
+			
+			this->soundDeviceCombo->SetMaxLength(maxDeviceComboLength);
+			this->captureDeviceCombo->SetMaxLength(maxDeviceComboLength);
+			
+			this->audioNewSoundSizer->Prepend(this->audioNewSoundDeviceSizer);
+			
+			this->audioSizer->Detach(this->audioNewSoundSizer);
+			this->audioSizer->Add(this->audioNewSoundSizer,
+				wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+		} else {
+			this->soundDeviceText->SetLabel(_("Sound device:"));
+			this->soundDeviceCombo->SetMaxLength(0); // reset
+			
+			if (this->audioNewSoundDeviceSizer->GetItem(
+					this->soundDeviceText) != NULL) {
+				wxASSERT(this->audioNewSoundDeviceSizer->GetItem(
+					this->soundDeviceCombo) != NULL);
+				
+				this->audioNewSoundDeviceSizer->Detach(this->soundDeviceText);
+				this->audioNewSoundDeviceSizer->Detach(this->soundDeviceCombo);
+
+				this->audioOldSoundSizer->Add(soundDeviceText,
+					wxSizerFlags().Border(wxBOTTOM, 5));
+				this->audioOldSoundSizer->Add(soundDeviceCombo,
+					wxSizerFlags().Proportion(1).Expand());
+			}
+			
+			this->audioSizer->Hide(this->audioNewSoundSizer, true);
+			this->audioSizer->Show(this->audioOldSoundSizer, true);
+			
+			this->audioSizer->Detach(this->audioOldSoundSizer);
+			this->audioSizer->Add(this->audioOldSoundSizer,
+				wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+		}
+		
+		this->audioSizer->Hide(this->audioButtonsSizer, true);
+		
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
-		if (this->openALVersion != NULL) {
-			this->audioOldSoundSizer->Detach(this->openALVersion);
-			this->openALVersion->Hide();
-			delete this->openALVersion;
-			this->openALVersion = NULL;
-		}
 		
 		wxLogInfo(OpenALMan::GetCurrentVersion());
 		
-		this->downloadOpenALButton->Disable();
-		this->downloadOpenALButton->Hide();
-		this->detectOpenALButton->Disable();
-		this->detectOpenALButton->Hide();
+		this->audioOldSoundSizer->Hide(this->openALVersion);
 		
-		this->audioSizer->Remove(this->audioButtonsSizer);
-		this->audioSizer->Detach(this->audioOldSoundSizer);
-		this->audioSizer->Add(this->audioOldSoundSizer,
-			wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 		this->Layout();
+		this->Refresh();
 	}
 }
 

@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 
+#include "controls/TruncatableChoice.h"
+
 class BasicSettingsPage : public wxPanel {
 public:
 	BasicSettingsPage(wxWindow* parent);
@@ -106,13 +108,17 @@ private:
 
 private:
 	wxStaticText* soundDeviceText;
-	wxChoice* soundDeviceCombo;
+	TruncatableChoice* soundDeviceCombo;
+	wxStaticText* captureDeviceText;
+	TruncatableChoice* captureDeviceCombo;
 	wxStaticText* openALVersion;
 	wxButton* downloadOpenALButton;
 	wxButton* detectOpenALButton;
 
 	wxSizer* audioButtonsSizer;
 	wxSizer* audioOldSoundSizer;
+	wxSizer* audioNewSoundSizer;
+	wxSizer* audioNewSoundDeviceSizer;
 	wxSizer* audioSizer;
 
 	wxChoice* joystickSelected;
