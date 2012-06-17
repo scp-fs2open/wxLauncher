@@ -82,9 +82,9 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 	}
 
 	if ( this->defaultSkin->windowIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("wxLauncher.ico"));
+		wxFileName filename(_T(RESOURCES_PATH), _T("wxlauncher.ico"));
 		wxIcon* temp = new wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		if (temp->IsOk())
+		if (!temp->IsOk())
 			wxLogFatalError( _T("Icon not valid") );
 
 		this->defaultSkin->windowIcon = temp;
