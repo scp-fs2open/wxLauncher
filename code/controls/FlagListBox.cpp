@@ -138,6 +138,8 @@ void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
 	wxCHECK_RET(flagData != NULL, _T("AcceptFlagData(): flagData is null."));
 	wxCHECK_RET(this->flagData == NULL,
 		_T("AcceptFlagData(): flag list box given flag data twice."));
+
+	this->isReady = true;
 	
 	this->flagData = flagData;
 	FlagListBoxData* data = this->flagData->GenerateFlagListBoxData();
@@ -146,7 +148,6 @@ void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
 	this->GenerateCheckBoxes(*data);
 	this->SetItemCount(flagData->GetItemCount());
 
-	this->isReady = true;
 	this->GenerateFlagListBoxReady();
 }
 
@@ -174,7 +175,7 @@ void FlagListBox::GenerateCheckBoxes(const FlagListBoxData& data) {
 				this,
 				wxEmptyString,
 				item->flagString);
-		checkBox->Hide();
+		checkBox->Hide(); // we don't yet know where it should appear, so hide
 		
 		checkBox->Connect(
 			checkBox->GetId(),
