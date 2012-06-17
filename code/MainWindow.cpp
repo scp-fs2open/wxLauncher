@@ -57,6 +57,10 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	// from http://stackoverflow.com/questions/6852413/
 #if IS_WIN32 // set the titlebar/alt-tab icon
 	this->SetIcon(wxICON(IDI_SMALL));
+#elif IS_LINUX
+	wxFileName iconFilename(_T(RESOURCES_PATH), _T("wxlauncher.ico"));
+	wxIcon icon(iconFilename.GetFullPath(), wxBITMAP_TYPE_ICO);
+	this->SetIcon(icon);
 #endif
 
 	// setup tabs
