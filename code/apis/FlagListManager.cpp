@@ -270,36 +270,36 @@ wxString FlagListManager::GetStatusMessage() const {
 			msg = _("Waiting for flag file processing to be initialized.");
 			break;
 		case MISSING_TC:
-			msg = _("No FreeSpace 2 installation or total conversion\nhas been selected.\nSelect a FreeSpace 2 installation or a total conversion\non the Basic Settings page.");
+			msg = _("No FreeSpace 2 installation or total conversion has been selected.\n\nSelect a FreeSpace 2 installation or a total conversion on the Basic Settings page.");
 			break;
 		case NONEXISTENT_TC:
-			msg = _("The selected root folder does not exist.\nSelect a different FreeSpace 2 installation\nor total conversion on the Basic Settings page.");
+			msg = _("The selected root folder does not exist.\n\nSelect a different FreeSpace 2 installation or total conversion on the Basic Settings page.");
 			break;
 		case INVALID_TC:
-			msg = wxString(_("The selected root folder\nhas no FreeSpace 2 Open executables.\n")) +
-			_("Either add FS2 Open executables to the root folder\nand refresh the list of executables\non the Basic Settings page,\nor select a different FreeSpace 2 installation\nor total conversion on the Basic Settings page.");
+			msg = wxString(_("The selected root folder does not contain any FreeSpace 2 Open executables.\n\n")) +
+				_("On the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button.");
 			break;
 		case MISSING_EXE:
-			msg = _("No FreeSpace 2 Open executable has been selected.\nSelect an executable on the Basic Settings page.");
+			msg = _("No FreeSpace 2 Open executable has been selected.\n\nSelect an executable on the Basic Settings page.");
 			break;
 		case INVALID_BINARY:
-			msg = _("The selected FreeSpace 2 Open executable does not exist.\nSelect another on the Basic Settings page.");
+			msg = _("The selected FreeSpace 2 Open executable does not exist.\n\nSelect another on the Basic Settings page.");
 			break;
 		case WAITING_FOR_FLAG_FILE:
 			msg = _("Waiting for flag file to be generated and parsed.");
 			break;
 		case FLAG_FILE_NOT_GENERATED:
-			msg = _("The executable did not generate a flag file.\nMake sure that the executable\nis a FreeSpace 2 Open executable.");
+			msg = _("The executable did not generate a flag file.\n\nMake sure that the executable is a FreeSpace 2 Open executable.");
 			break;
 		case FLAG_FILE_NOT_VALID:
-			msg = _("Generated flag file was not complete.\nPlease talk to a maintainer of this launcher,\nsince you probably found a bug.");
+			msg = _("Generated flag file was not complete.\n\nPlease talk to a maintainer of this launcher, since you probably found a bug.");
 			break;
 		case FLAG_FILE_NOT_SUPPORTED:
-			msg = _("Generated flag file is not supported.\nUpdate the launcher or talk to a maintainer of this launcher\nif you have the most recent version.");
+			msg = _("Generated flag file is not supported.\n\nUpdate the launcher or talk to a maintainer of this launcher if you have the most recent version.");
 			break;
 		default:
 			msg = wxString::Format(
-				_("Unknown error occurred while obtaining the flag file\nfrom the FreeSpace 2 Open executable (%d)"),
+				_("Unknown error (%d) occurred while obtaining the flag file from the FreeSpace 2 Open executable."),
 				this->GetProcessingStatus());
 			break;
 	}
