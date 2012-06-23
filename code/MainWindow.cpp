@@ -169,7 +169,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
 	if ( !p->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
-		wxLogError(_T("TC root folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
+		wxLogError(_T("Game root folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;

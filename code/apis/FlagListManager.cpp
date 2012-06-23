@@ -270,10 +270,10 @@ wxString FlagListManager::GetStatusMessage() const {
 			msg = _("Waiting for flag file processing to be initialized.");
 			break;
 		case MISSING_TC:
-			msg = _("No FreeSpace 2 installation or total conversion has been selected.\n\nSelect a FreeSpace 2 installation or a total conversion on the Basic Settings page.");
+			msg = _("No FreeSpace 2 Open-based game has been selected.\n\nSelect the root folder of a FreeSpace 2 Open-based game on the Basic Settings page.");
 			break;
 		case NONEXISTENT_TC:
-			msg = _("The selected root folder does not exist.\n\nSelect a different FreeSpace 2 installation or total conversion on the Basic Settings page.");
+			msg = _("The selected root folder does not exist.\n\nSelect a different FreeSpace 2 Open-based game on the Basic Settings page.");
 			break;
 		case INVALID_TC:
 			msg = wxString(_("The selected root folder does not contain any FreeSpace 2 Open executables.\n\n")) +

@@ -57,7 +57,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of a FreeSpace 2 installation or a total conversion on the Basic Settings page."),
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of a FreeSpace 2 Open-based game on the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
@@ -83,7 +83,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
-			_("The selected root folder does not exist.\n\nSelect a valid root folder for a FreeSpace 2 installation or a total conversion on the Basic Settings page."),
+			_("The selected root folder does not exist.\n\nSelect a valid root folder for a FreeSpace 2 Open-based game on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		nonexistentTC->SetFont(messageFont);
