@@ -42,10 +42,10 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	cmdLineString += wxFileName::GetPathSeparator();
 	cmdLineString += _T("data");
 
-	// if data folder does not exist in TC root folder, attempt to create it first
+	// if data folder does not exist in root folder, attempt to create it first
 	if (!wxDir::Exists(cmdLineString)) {
 		if (!::wxMkdir(cmdLineString)) {
-			wxLogError(_T("Couldn't create data folder in TC root folder %s"),
+			wxLogError(_T("Couldn't create data folder in game root folder %s"),
 					   tcPath.c_str());
 			return ProMan::UnknownError;
 		}

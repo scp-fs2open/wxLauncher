@@ -167,9 +167,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	bool fredEnabled;
 	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 or total conversion root folder and executable"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 Open-based game root folder and executable"));
 
-	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("FS2 or TC root folder:"));
+	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("Game root folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX);
 	wxButton* selectButton = new wxButton(this, ID_EXE_SELECT_ROOT_BUTTON, _T("Browse..."));
 
@@ -822,7 +822,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
-	wxDirDialog filechooser(this, _T("Choose the root folder of a FreeSpace 2 installation or a total conversion"),
+	wxDirDialog filechooser(this, _T("Choose the root folder of a FreeSpace 2 Open-based game"),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
 	wxString chosenDirectory;
@@ -833,7 +833,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		}
 		chosenDirectory = filechooser.GetPath();
 		if ( chosenDirectory == directory ) {
-			wxLogInfo(_T("The TC root folder selection was not changed."));
+			wxLogInfo(_T("The game root folder selection was not changed."));
 			return; // User canceled, bail out.
 		}
 		path.SetPath(chosenDirectory);
@@ -900,7 +900,7 @@ void BasicSettingsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	}
 
 	if ( ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath) ) {
-		wxLogInfo(_T("The current FS2/TC root folder is %s"), tcPath.c_str());
+		wxLogInfo(_T("The current game root folder is %s"), tcPath.c_str());
 		tcFolder->ChangeValue(tcPath);
 
 		// note that disabling the controls is necessary if we reached this code from the
@@ -1027,7 +1027,7 @@ void BasicSettingsPage::OnPressExecutableChoiceRefreshButton(wxCommandEvent &WXU
 
 	wxString tcPath, binaryName;
 	wxCHECK_RET(ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath),
-		_T("OnPressExecutableChoiceRefreshButton: FS2/TC root folder entry not found"));
+		_T("OnPressExecutableChoiceRefreshButton: root folder entry not found"));
 	
 	if (!wxFileName::DirExists(tcPath)) {
 		// warning not needed, since it will be issued by DisableExecutableChoiceControls
@@ -1098,7 +1098,7 @@ void BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton(wxCommandEvent 
 
 	wxString tcPath, fredBinaryName;
 	wxCHECK_RET(ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath),
-		_T("OnPressFredExecutableChoiceRefreshButton: FS2/TC root folder entry not found"));
+		_T("OnPressFredExecutableChoiceRefreshButton: root folder entry not found"));
 	
 	if (!wxFileName::DirExists(tcPath)) {
 		// warning not needed, since it will be issued by DisableExecutableChoiceControls
