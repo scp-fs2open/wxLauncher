@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 #include <wx/wx.h>
+#include <wx/cmdline.h>
 #include <wx/image.h>
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
@@ -152,5 +153,5 @@ int wxLauncher::OnExit() {
 
 	wxLogInfo(_T("wxLogger shutdown complete."));
 
-	return 0;
+	return wxApp::OnExit();
 }
