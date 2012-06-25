@@ -184,7 +184,12 @@ bool ProMan::DeInitialize() {
 		
 		delete ProMan::proman;
 		ProMan::proman = NULL;
-		
+
+		// Set the wxWidgets default FileConfig to null
+		// so that it doesn't try to delete it again when
+		// we shutdown
+		wxFileConfig::Set((wxConfigBase*)NULL);
+
 		return true;
 	} else {
 		return false;
