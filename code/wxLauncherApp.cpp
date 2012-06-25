@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/SkinManager.h"
 #include "controls/Logger.h"
 #include "global/version.h"
+#include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/HelpManager.h"
 #include "apis/FlagListManager.h"
@@ -132,6 +133,12 @@ bool wxLauncher::OnInit() {
 	splashWindow->Show(false);
 	splashWindow->Destroy();
 #endif
+
+	// must call TCManager::CurrentProfileChanged() manually on startup,
+	// since initial profile switch takes place before TCManager has been initialized
+	// calling it here to ensure that AdvSettingsPage is set up by the time events are triggered
+	wxCommandEvent tcMgrInitEvent;
+	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 
 	wxLogStatus(_T("Ready."));
 	return true;

@@ -56,12 +56,6 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(pa
 	TCManager::RegisterTCSelectedModChanged(this);
 	ProfileProxy::GetProxy()->RegisterProxyReset(this);
 	ProfileProxy::GetProxy()->RegisterProxyFlagDataReady(this);
-	// must call TCManager::CurrentProfileChanged() manually on startup,
-	// since initial profile switch takes place before TCManager has been initialized
-	// calling it here to ensure that AdvSettingsPage is set up by the time events are triggered
-	// TODO once InstallPage is ready, might need to move the CurrentProfileChanged() call there
-	wxCommandEvent tcMgrInitEvent;
-	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 }
 
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
