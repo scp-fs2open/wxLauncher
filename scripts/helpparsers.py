@@ -209,7 +209,7 @@ class Stage4Parser(OutputParser):
           # make sure the file being refered to exists in stage3
           check_ref = change_filename(value, ".stage3", ".", self.files['stage3'], makedirs=False)
           if not os.path.exists(check_ref):
-            logging.warning(" File (%s) does not exist to be bundled into archive!", check_ref)
+            logging.debug(" File (%s) does not exist to be bundled into archive!", check_ref)
             
           fixed_ref = change_filename(value, ".htm", ".", ".", makedirs=False)
           attrs = update_attribute(attrs, "href", fixed_ref)
