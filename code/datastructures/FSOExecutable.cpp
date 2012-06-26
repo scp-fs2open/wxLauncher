@@ -78,6 +78,21 @@ bool FSOExecutable::HasFSOExecutables(const wxFileName& path) {
 	return !FSOExecutable::GetBinariesFromRootFolder(path, true).IsEmpty(); 
 }
 
+#if IS_LINUX
+bool IsFileToIgnore(const wxString& filename) {
+	return filename.EndsWith(_T(".exe"))
+		|| filename.EndsWith(_T(".map"))
+		|| filename.EndsWith(_T(".pdb"))
+		|| filename.EndsWith(_T(".app"))
+		|| filename.EndsWith(_T(".tar"))
+		|| filename.EndsWith(_T(".gz"))
+		|| filename.EndsWith(_T(".bz2"))
+		|| filename.EndsWith(_T(".tgz"))
+		|| filename.EndsWith(_T(".tbz"))
+		|| filename.EndsWith(_T(".tbz2"));
+}
+#endif
+
 #if IS_WIN32
 #define EXECUTABLE_GLOB_PATTERN _T("fs2_*.exe")
 #define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*.exe")
@@ -113,10 +128,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 
 	while (cont) {
 #if IS_LINUX
-		if ( !filename.EndsWith(_T(".exe"))
-			&& !filename.EndsWith(_T(".map"))
-			&& !filename.EndsWith(_T(".pdb"))
-			&& !filename.EndsWith(_T(".app")) ) {
+		if ( !IsFileToIgnore(filename) ) {
 #endif
 		files.Add(filename);
 #if IS_LINUX
