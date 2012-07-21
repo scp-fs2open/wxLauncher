@@ -36,6 +36,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h"
 
+const wxString NO_MOD(_("(No mod)"));
+
 class ModInfoDialog: wxDialog {
 public:
 	ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent);
@@ -84,7 +86,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	this->semicolon[0] = ';';
 	this->semicolon[1] = '\0';
 
-	this->stringNoMod = _("(No mod)");
+	this->stringNoMod = NO_MOD;
 
 	this->appendmods = NULL;
 	this->prependmods = NULL;
@@ -399,7 +401,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	// set (No mod) if none or previous does not exist
 	wxString currentMod;
 	ProMan::GetProfileManager()->ProfileRead(
-		PRO_CFG_TC_CURRENT_MOD, &currentMod, _("(No mod)"));
+		PRO_CFG_TC_CURRENT_MOD, &currentMod, NO_MOD);
 
 	{
 		size_t i;
