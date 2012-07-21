@@ -16,6 +16,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <algorithm>
+#include <vector>
+
 #include <wx/wx.h>
 #include <wx/vlbox.h>
 #include <wx/fileconf.h>
@@ -76,6 +79,40 @@ ConfigPair::~ConfigPair() {
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ConfigArray);
 
+bool CompareModItems(ModItem* item1, ModItem* item2) {
+	wxASSERT(item1 != NULL);
+	wxASSERT(item2 != NULL);
+	
+	wxASSERT(item1->shortname != NULL);
+	wxASSERT(item2->shortname != NULL);
+	
+	wxString item1Name(
+		(item1->name != NULL) ? *item1->name : *item1->shortname);
+	
+	wxString item2Name(
+		(item2->name != NULL) ? *item2->name : *item2->shortname);
+
+	// ignore a leading "the" for comparison purposes
+	wxString temp;
+	
+	if (item1Name.Lower().StartsWith(_T("the"), &temp)) {
+		item1Name = temp.Trim(false);
+	}
+	
+	if (item2Name.Lower().StartsWith(_T("the"), &temp)) {
+		item2Name = temp.Trim(false);
+	}
+	
+	// (No mod) must come before all other mods
+	if (!item1Name.CmpNoCase(NO_MOD)) {
+		return true;
+	} else if (!item2Name.CmpNoCase(NO_MOD)) {
+		return false;
+	} else {
+		return item1Name.CmpNoCase(item2Name) < 0;
+	}
+}
+
 ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
@@ -90,6 +127,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->appendmods = NULL;
 	this->prependmods = NULL;
+	
+	std::vector<ModItem*> modsTemp; // for use in presorting
 
 	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
@@ -392,7 +431,14 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			}
 		}
 
-		this->tableData->Add(item);
+		modsTemp.push_back(item);
+	}
+	
+	std::sort(modsTemp.begin(), modsTemp.end(), CompareModItems);
+	
+	for (std::vector<ModItem*>::const_iterator it = modsTemp.begin();
+		 it != modsTemp.end(); ++it) {
+		this->tableData->Add(*it);
 	}
 
 	this->SetItemCount(this->tableData->Count());
