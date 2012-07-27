@@ -655,7 +655,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	this->audioNewSoundSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->audioNewSoundSizer->Add(this->audioNewSoundDeviceSizer);
 	this->audioNewSoundSizer->AddStretchSpacer(5);
-	this->audioNewSoundSizer->Add(efxCheckBox, 0, wxALIGN_CENTER_VERTICAL);
+	this->audioNewSoundSizer->Add(efxCheckBox, 0,
+		wxALIGN_CENTER_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN);
 	this->audioNewSoundSizer->AddStretchSpacer(5);
 	this->audioNewSoundSizer->Add(sampleRateText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
 	this->audioNewSoundSizer->Add(sampleRateBox, 0, wxALIGN_CENTER_VERTICAL);
@@ -1732,6 +1733,14 @@ void BasicSettingsPage::OnSelectSoundDevice(wxCommandEvent &event) {
 	wxCHECK_RET(openaldevice != NULL, _T("Unable to find OpenAL Device choice"));
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
+
+	if (OpenALMan::BuildHasNewSoundCode()) {
+		wxCheckBox* enableEFX = dynamic_cast<wxCheckBox*>(
+			wxWindow::FindWindowById(ID_ENABLE_EFX));
+		wxCHECK_RET(enableEFX != NULL, _T("Unable to find enable EFX checkbox"));
+
+		enableEFX->Show(OpenALMan::IsEFXSupported(openaldevice->GetStringSelection()));
+	}
 }
 
 void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
@@ -1922,12 +1931,10 @@ void BasicSettingsPage::SetupOpenALSection() {
 			wxCHECK_RET(efxCheckBox != NULL,
 				_T("Cannot find enable EFX checkbox."));
 			
-			if (OpenALMan::IsEFXSupported()) {
-				bool enableEFX;
-				ProMan::GetProfileManager()->ProfileRead(
-					PRO_CFG_OPENAL_EFX, &enableEFX, false);
-				efxCheckBox->SetValue(enableEFX);
-			}
+			bool enableEFX;
+			ProMan::GetProfileManager()->ProfileRead(
+				PRO_CFG_OPENAL_EFX, &enableEFX, false);
+			efxCheckBox->SetValue(enableEFX);
 			
 			long sampleRate;
 			ProMan::GetProfileManager()->ProfileRead(
@@ -1962,8 +1969,12 @@ void BasicSettingsPage::SetupOpenALSection() {
 			this->audioSizer->Hide(this->audioOldSoundSizer, true);
 			this->audioSizer->Show(this->audioNewSoundSizer, true);
 			
-			if (!OpenALMan::IsEFXSupported()) {
-				wxLogDebug(_T("EFX is not supported. Hiding Enable EFX checkbox."));
+			const wxString playbackDevice(this->soundDeviceCombo->GetStringSelection());
+			if (!OpenALMan::IsEFXSupported(playbackDevice)) {
+				wxLogDebug(
+					_T("Playback device '%s' does not support EFX.")
+					_T(" Hiding Enable EFX checkbox."),
+						playbackDevice.c_str());
 				this->audioNewSoundSizer->Hide(efxCheckBox);
 			}
 			
