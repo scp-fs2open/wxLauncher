@@ -402,16 +402,70 @@ wxString OpenALMan::GetCurrentVersion() {
 #endif
 }
 
-bool OpenALMan::IsEFXSupported() {
+// bits are adapted from GetCurrentVersion() and FSO, sound/ds.cpp, ds_init()
+bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 #if USE_OPENAL
 	wxCHECK_MSG( OpenALMan::IsInitialized(), false,
 		_T("IsEFXSupported called but OpenALMan not initialized"));
 	
+	if (playbackDeviceName.IsEmpty()) {
+		wxLogError(_T("IsEFXSupported: playback device name is empty"));
+		return false;
+	}
+	
+	// clear errors, I have not done any openAL stuff, so make sure that any
+	// errors that are active are because of me.
+	checkForALError();
+	
+	alcOpenDeviceType OpenDevice = 
+		GetOALFuncPtr(alcOpenDeviceType, alcOpenDevice);
+
+	if (OpenDevice == NULL || checkForALError() == false) {
+		wxLogError(_T("IsEFXSupported: Unable to open device."));
+		return false;
+	}
+
+	ALCdevice* playbackDevice = (*OpenDevice)(playbackDeviceName.char_str());
+	
+	if (playbackDevice == NULL || checkForALError() == false) {
+		wxLogError(
+			_T("IsEFXSupported: alcOpenDevice returned NULL when opening device '%s'"),
+			playbackDeviceName.c_str());
+		return false;
+	}
+
 	alcIsExtensionPresentType isExtensionPresent =
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 	
-	return (isExtensionPresent != NULL) &&
-		((*isExtensionPresent)(NULL, "ALC_EXT_EFX") == AL_TRUE);
+	if (isExtensionPresent == NULL || checkForALError() == false) {
+		wxLogError(
+			_T("IsEFXSupported: Could not get alcIsExtensionPresent function."));
+		return false;
+	}
+	
+	bool hasEFX = (*isExtensionPresent)(playbackDevice, "ALC_EXT_EFX") == AL_TRUE;
+	
+	if (checkForALError() == false) {
+		wxLogError(_T("IsEFXSupported: Error in checking for EFX extension"));
+		return false;
+	}
+
+	alcCloseDeviceType CloseDevice =
+		GetOALFuncPtr(alcCloseDeviceType, alcCloseDevice);
+	
+	if (CloseDevice == NULL) {
+		wxLogError(_T("IsEFXSupported: Unable to close device."));
+		return false;
+	}
+
+	(*CloseDevice)(playbackDevice);
+	
+	if (checkForALError() == false) {
+		wxLogError(_T("IsEFXSupported: Error in closing device"));
+		return false;
+	}
+
+	return hasEFX;
 #else
 	return false;
 #endif
