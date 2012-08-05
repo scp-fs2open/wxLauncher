@@ -903,6 +903,9 @@ wxString ProMan::GetCurrentName() {
 	return this->currentProfileName;
 }
 
+/** Implements the literal switch to another profile.
+Does not cause prompts and may destroy data if autosave is not on.
+*/
 bool ProMan::SwitchTo(wxString name) {
 	if ( this->profiles.find(name) == this->profiles.end() ) {
 		return false;
