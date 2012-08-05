@@ -23,10 +23,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class wxLauncher: public wxApp {
 public:
+	wxLauncher();
 	virtual bool OnInit();
 	virtual int OnExit();
 
+	virtual void OnInitCmdLine(wxCmdLineParser& parser);
+	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+
 	SkinSystem* skin;
+
+	bool mKeepForSessionOnly;
 };
 
 DECLARE_APP(wxLauncher);

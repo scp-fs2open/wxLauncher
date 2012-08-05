@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ProMan* ProMan::proman = NULL;
 bool ProMan::isInitialized = false;
+ProMan::Flags ProMan::flags;
 
 const wxString& ProMan::DEFAULT_PROFILE_NAME = _T("Default");
 #define GLOBAL_INI_FILE_NAME _T("global.ini")
@@ -96,10 +97,11 @@ void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
 it can intercept global wxWidgets configuation functions. 
 \return true when setup was successful, false if proman is not
 ready and the program should not continue. */
-bool ProMan::Initialize() {
+bool ProMan::Initialize(Flags flags) {
 	wxConfigBase::DontCreateOnDemand();
 
 	ProMan::proman = new ProMan();
+	ProMan::flags = flags;
 
 	wxFileName file;
 	file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
@@ -158,6 +160,7 @@ bool ProMan::Initialize() {
 //			PullProfile(ProMan::proman->profiles[ProMan::DEFAULT_PROFILE_NAME]);
 		}
 		wxLogInfo(_T(" Resetting lastprofile to Default."));
+		// Do not ignore updating last profile here because this is fixing bad data
 		ProMan::proman->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, ProMan::DEFAULT_PROFILE_NAME);
 		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
 		ProMan::proman->globalProfile->Save(globalProfileOutput);
@@ -904,7 +907,8 @@ bool ProMan::SwitchTo(wxString name) {
 		this->currentProfileName = name;
 		this->currentProfile = this->profiles.find(name)->second;
 		wxFileConfig::Set(this->currentProfile);
-		this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
+		if ( !(ProMan::flags & NoUpdateLastProfile) )
+			this->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, name);
 		this->ResetPrivateCopy();
 //		TestConfigFunctions(*this->currentProfile); // remove after testing on all platforms
 		this->GenerateCurrentProfileChangedEvent();

@@ -49,8 +49,44 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 IMPLEMENT_APP(wxLauncher);
 
+const static wxCmdLineEntryDesc CmdLineOptions[] = {
+	{wxCMD_LINE_SWITCH, NULL, _T("session-only"),
+	_T("Do not remeber the profile that is selected at exit")},
+	{wxCMD_LINE_NONE},
+};
+
+void wxLauncher::OnInitCmdLine(wxCmdLineParser& parser)
+{
+	parser.SetDesc(CmdLineOptions);
+	parser.SetSwitchChars(_T("-")); // always use -, even on windows
+
+	wxApp::OnInitCmdLine(parser);
+}
+
+bool wxLauncher::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+	if (!wxApp::OnCmdLineParsed(parser))
+		return false;
+
+	if (parser.Found(_T("session-only")))
+	{
+		mKeepForSessionOnly = true;
+	}
+
+	return true;
+}
+
+wxLauncher::wxLauncher()
+	:mKeepForSessionOnly(false)
+{
+}
+
 bool wxLauncher::OnInit() {
 	wxInitAllImageHandlers();
+
+	// call base class OnInit so that cmdline stuff works.
+	if (!wxApp::OnInit())
+		return false; // base said abort so abort
 
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -104,7 +140,10 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 
 	wxLogInfo(_T("Initializing profiles..."));
-	if ( !ProMan::Initialize() ) {
+	ProMan::Flags promanFlags = ProMan::None;
+	if (mKeepForSessionOnly)
+		promanFlags = promanFlags | ProMan::NoUpdateLastProfile;
+	if ( !ProMan::Initialize(promanFlags) ) {
 		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
 		return false;
 	}
