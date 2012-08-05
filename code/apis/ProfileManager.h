@@ -32,7 +32,13 @@ DECLARE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED, -1);
 
 class ProMan {
 public:
-	static bool Initialize();
+	enum Flags
+	{
+		None = 0,
+		NoUpdateLastProfile = 1 << 0,
+		ProManFlagsMax
+	};
+	static bool Initialize(Flags flags = None);
 	static bool DeInitialize();
 	static ProMan* GetProfileManager();
 
@@ -112,6 +118,7 @@ public:
 private:
 	static ProMan* proman;
 	static bool isInitialized;
+	static Flags flags;
 	wxFileConfig* currentProfile;
 	wxString currentProfileName;
 	
@@ -147,5 +154,21 @@ private:
 
 	EventHandlers eventHandlers;
 };
+
+// These operators should be refactored into a common
+// macro rather than copied for the next enum flag
+inline ProMan::Flags operator|(ProMan::Flags a, ProMan::Flags b)
+{
+	return static_cast<ProMan::Flags>(
+		static_cast<int>(a) | static_cast<int>(b)
+		);
+}
+
+inline ProMan::Flags operator&(ProMan::Flags a, ProMan::Flags b)
+{
+	return static_cast<ProMan::Flags>(
+		static_cast<int>(a) & static_cast<int>(b)
+		);
+}
 
 #endif
