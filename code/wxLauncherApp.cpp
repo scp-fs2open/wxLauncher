@@ -81,6 +81,42 @@ wxLauncher::wxLauncher()
 {
 }
 
+/** Display the splash screen.
+
+\param splashWindow Out. Point to splash window if created. NULL otherwise.
+\param returns false if an error occurented while loading spalsh; a
+false return value indicates that this function has already informed the user
+of the failue.  Returns true otherwise.
+*/
+bool displaySplash(wxSplashScreen **splashWindow)
+{
+	wxBitmap splash;
+	wxFileName splashFile(_T(RESOURCES_PATH),_T("SCP_Header.png"));
+	if (splash.LoadFile(splashFile.GetFullPath(), wxBITMAP_TYPE_ANY)) {
+#if NDEBUG
+		(*splashWindow) = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
+#else
+		(*splashWindow) = NULL;//new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 1000, NULL, wxID_ANY);
+#endif
+		wxYield();
+	} else {
+		wxFileName expectedDir;
+		if (wxFileName(_T(RESOURCES_PATH)).IsAbsolute()) {
+			expectedDir = wxFileName(_T(RESOURCES_PATH));
+		} else {
+			expectedDir = wxFileName(::wxGetCwd(), _T(RESOURCES_PATH));	
+		}
+		wxLogFatalError(wxString::Format(
+			_T("Unable to load splash image. ")
+			_T("This normally means that you are running the Launcher from a folder")
+			_T(" that the launcher does not know how to find the resource folder from.")
+			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
+			expectedDir.GetFullPath().c_str()).c_str());
+		return false;
+	}
+	return true;
+}
+
 bool wxLauncher::OnInit() {
 	wxInitAllImageHandlers();
 
@@ -108,32 +144,10 @@ bool wxLauncher::OnInit() {
 		}
 	}
 
-	wxBitmap splash;
 	wxSplashScreen* splashWindow = NULL;
-	wxFileName splashFile(_T(RESOURCES_PATH),_T("SCP_Header.png"));
-	if (splash.LoadFile(splashFile.GetFullPath(), wxBITMAP_TYPE_ANY)) {
-#if NDEBUG
-		splashWindow = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
-#else
-		splashWindow = NULL;//new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 1000, NULL, wxID_ANY);
-#endif
-		wxYield();
-	} else {
-		wxFileName expectedDir;
-		if (wxFileName(_T(RESOURCES_PATH)).IsAbsolute()) {
-			expectedDir = wxFileName(_T(RESOURCES_PATH));
-		} else {
-			expectedDir = wxFileName(::wxGetCwd(), _T(RESOURCES_PATH));	
-		}
-		wxLogFatalError(wxString::Format(
-			_T("Unable to load splash image. ")
-			_T("This normally means that you are running the Launcher from a folder")
-			_T(" that the launcher does not know how to find the resource folder from.")
-			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
-			expectedDir.GetFullPath().c_str()).c_str());
+	if (!displaySplash(&splashWindow))
 		return false;
-	}
-	
+
 	wxLog::SetActiveTarget(new Logger());
 	wxLogInfo(_T("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
 	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
