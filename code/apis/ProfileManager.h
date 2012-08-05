@@ -121,7 +121,7 @@ private:
 	static RegistryCodes PushProfile(wxFileConfig *cfg); //!< push profile into registry
 	static RegistryCodes PullProfile(wxFileConfig *cfg); //!< pull profile from registry
 
-	static void CopyConfig(wxConfigBase& src, wxConfigBase &dest, const bool includeMainGroup = true, const wxString path = _T("/"));
+	static void CopyConfig(const wxConfigBase& src, wxConfigBase &dest, const bool includeMainGroup = true, const wxString path = _T("/"));
 	static void CopyConfigEntry(const wxConfigBase& src, wxConfigBase& dest, const wxString path, const wxString entry);
 
 	static void ClearConfig(wxConfigBase& cfg);
