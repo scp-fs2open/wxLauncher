@@ -91,7 +91,15 @@ void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
 			handler));
 	this->eventHandlers.DeleteObject(handler);
 }
-	
+
+/** Load a profile from a fully quaified path.  Returns NULL on failure
+or a pointer to a wxFileConfig that you must delete when done. */
+wxFileConfig* LoadProfileFromFile(const wxFileName &file)
+{
+	wxFFileInputStream globalProfileInput(file.GetFullPath(),
+		(file.FileExists())?_T("rb"):_T("w+b"));
+	return new wxFileConfig(globalProfileInput);
+}
 
 /** Sets up the profile manager. Must be called on program startup so that
 it can intercept global wxWidgets configuation functions. 
@@ -118,9 +126,7 @@ bool ProMan::Initialize(Flags flags) {
 		return false;
 	}
 
-	wxFFileInputStream globalProfileInput(file.GetFullPath(),
-		(file.FileExists())?_T("rb"):_T("w+b"));
-	ProMan::proman->globalProfile = new wxFileConfig(globalProfileInput);
+	ProMan::proman->globalProfile = LoadProfileFromFile(file);
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
@@ -843,6 +849,24 @@ wxArrayString ProMan::GetAllProfileNames() {
 	return out;
 }
 
+void SaveProfileToDisk(wxFileConfig* toSave, const wxString& name)
+{
+	wxString profileFilename;
+	if ( !toSave->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
+		wxLogError(_T("Profile '%s' does not have a file name. Cannot save it."),
+			name.c_str());
+		// FIXME maybe make a new file and save the current profile there
+	} else {
+		wxFileName file;
+		file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
+		wxASSERT( file.IsOk() );
+		wxFFileOutputStream configOutput(file.GetFullPath());
+		toSave->Save(configOutput);
+		wxLogDebug(_T("Profile '%s' saved to '%s'"),
+			name.c_str(), file.GetFullPath().c_str());
+	}
+}
+
 /** Saves the current profile to disk, regardless of whether it has unsaved changes.
  Does not affect the global profile or any other profile. */
 void ProMan::SaveCurrentProfile(bool quiet) {
@@ -853,23 +877,13 @@ void ProMan::SaveCurrentProfile(bool quiet) {
 	}
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
 	if ( config != NULL ) {
-		wxString profileFilename;
-		if ( !config->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
-			wxLogError(_T("Current profile does not have a file name. Cannot save it."));
-			// FIXME maybe make a new file and save the current profile there
-		} else {
-			wxFileName file;
-			file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
-			wxASSERT( file.IsOk() );
-			wxFFileOutputStream configOutput(file.GetFullPath());
-			config->Save(configOutput);
-			this->ResetPrivateCopy();
-			if (!quiet) {
-				wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());				
-			}
-			wxLogDebug(_T("Current config%s saved (%s)."),
-				quiet ? _T(" quietly") : wxEmptyString, file.GetFullPath().c_str());
+		SaveProfileToDisk(config, this->currentProfileName.c_str());
+		this->ResetPrivateCopy();
+		if (!quiet) {
+			wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());				
 		}
+		wxLogDebug(_T("Current config%s saved."),
+			quiet ? _T(" quietly") : wxEmptyString);
 	} else {
 		wxLogError(_T("Configbase is not a wxFileConfig."));
 	}
@@ -916,55 +930,83 @@ bool ProMan::SwitchTo(wxString name) {
 	}
 }
 
-/** Creates a profile. If the second argument is non-empty and is the name
- of an existing profile, its settings/flags will be copied over to the new profile.
- Returns true on success. */
-bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& cloneFromProfileName) {
-	const bool useCloning = !cloneFromProfileName.IsEmpty();
-	
-	if (useCloning) {
-		wxLogDebug(_T("Cloning original profile (%s) to %s"),
-			cloneFromProfileName.c_str(), newProfileName.c_str());
-	} else {
-		wxLogDebug(_T("Creating blank profile %s"), newProfileName.c_str());
-	}
-	
-	if ( useCloning && !this->DoesProfileExist(cloneFromProfileName) ) {
-		wxLogWarning(_("Profile to clone from '%s' does not exist!"), cloneFromProfileName.c_str());
-		return false;
-	}
+/** Creates a profile from a fullyqualified path. */
+bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileName& sourceFile)
+{
+	wxLogDebug(_T("Importing profile in '%s' as '%s'"),
+		sourceFile.GetFullPath().c_str(), newProfileName.c_str());
+	wxFileConfig *sourceConfig = LoadProfileFromFile(sourceFile);
 
-	if ( this->DoesProfileExist(newProfileName) ) {
+	return this->CreateProfile(newProfileName, sourceConfig);
+}
+
+/** Creates a profile named newProfileName from the contents of sourceConfig.
+If sourceConfig is NULL then the newProfile is created blank. */
+bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileConfig *sourceConfig)
+{
+	if (this->DoesProfileExist(newProfileName)) {
 		wxLogWarning(_("New profile '%s' already exists!"), newProfileName.c_str());
 		return false;
 	}
-	if ( !this->CreateNewProfile(newProfileName) ) {
+
+	if (!this->CreateNewProfile(newProfileName)) {
 		wxLogWarning(_T("New profile creation failed."));
 		return false;
 	}
 
-	if (useCloning) {
+	if (sourceConfig != NULL)
+	{
+		/* We just created this profile it had better exist */
 		wxFileConfig* newProfileConfig = this->profiles[newProfileName];
-		wxCHECK_MSG( newProfileConfig != NULL, false, _T("Create returned true but did not create profile"));
-		wxFileConfig* cloneFromProfileConfig = this->profiles[cloneFromProfileName];
-		wxCHECK_MSG( cloneFromProfileConfig != NULL, false,
-			wxString::Format(_T("Cannot find profile '%s' from which to clone"),
-				cloneFromProfileName.c_str()) );
+		wxCHECK_MSG(newProfileConfig != NULL, false, _T("Create returned true but did not create profile"));
 
-		// FIXME remove after testing on all platforms
-//		wxLogDebug(_T("contents of new profile '%s' before clone:"), newProfileName.c_str());
-//		LogConfigContents(*newProfileConfig);
-		
-		CopyConfig(*cloneFromProfileConfig, *newProfileConfig, false);
+#if PROFILE_DEBUGGING
+		wxLogDebug(_T("contents of new profile '%s' before clone:"), newProfileName.c_str());
+		LogConfigContents(*newProfileConfig);
+#endif
 
-		// FIXME remove after testing on all platforms
-//		wxLogDebug(_T("contents of new profile '%s' after clone:"), newProfileName.c_str());
-//		LogConfigContents(*newProfileConfig);
-//		wxLogDebug(_T("contents of cloned from profile '%s' after clone:"), cloneFromProfileName.c_str());
-//		LogConfigContents(*cloneFromProfileConfig);
+		CopyConfig(*sourceConfig, *newProfileConfig, false);
+		SaveProfileToDisk(newProfileConfig, newProfileName);
+
+#if PROFILE_DEBUGGING
+		wxLogDebug(_T("contents of new profile '%s' after clone:"), newProfileName.c_str());
+		LogConfigContents(*newProfileConfig);
+		wxLogDebug(_T("contents of cloned from profile '%s' after clone:"), cloneFromProfileName.c_str());
+		LogConfigContents(*cloneFromProfileConfig);
+#endif
+
 	}
+
 	this->GenerateChangeEvent();
 	return true;
+}
+
+/** Creates a profile by name. If the second argument is non-empty and is the name
+ of an existing profile, its settings/flags will be copied over to the new profile.
+ Returns true on success. */
+bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& cloneFromProfileName) {
+	wxFileConfig *cloneSource = NULL;
+
+	if (cloneFromProfileName.IsEmpty())
+	{
+		wxLogDebug(_T("Creating blank profile '%s'"), newProfileName.c_str());
+	}
+	else
+	{
+		wxLogDebug(_T("Cloning original profile (%s) to '%s'"),
+			cloneFromProfileName.c_str(), newProfileName.c_str());
+		if (!this->DoesProfileExist(cloneFromProfileName))
+		{
+			wxLogWarning(_("Profile to clone from '%s' does not exist!"), cloneFromProfileName.c_str());
+			return false;
+		}
+		cloneSource = this->profiles[cloneFromProfileName];
+		wxCHECK_MSG( cloneSource != NULL, false,
+			wxString::Format(_T("Cannot find profile '%s' from which to clone"),
+				cloneFromProfileName.c_str()) );
+	}
+
+	return this->CreateProfile(newProfileName, cloneSource);
 }
 
 bool ProMan::DeleteProfile(wxString name) {

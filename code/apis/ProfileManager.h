@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include <wx/fileconf.h>
+#include <wx/filename.h>
 
 WX_DECLARE_STRING_HASH_MAP( wxFileConfig*, ProfileMap );
 WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
@@ -89,6 +90,8 @@ public:
 		const wxString& profileName);
 
 	bool CreateProfile(const wxString& newProfileName, const wxString& cloneFromProfileName = wxEmptyString);
+	bool CreateProfile(const wxString& newProfileName, const wxFileName& sourceFile);
+	bool CreateProfile(const wxString& newProfileName, const wxFileConfig *sourceConfig);
 	bool DeleteProfile(wxString name);
 	bool DoesProfileExist(wxString name);
 	bool SwitchTo(wxString name);

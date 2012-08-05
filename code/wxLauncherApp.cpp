@@ -51,7 +51,16 @@ IMPLEMENT_APP(wxLauncher);
 
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
 	{wxCMD_LINE_SWITCH, NULL, _T("session-only"),
-	_T("Do not remeber the profile that is selected at exit")},
+	_T("Do not remember the profile that is selected at exit")},
+	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
+	_T("Add profile PROFILE from FILE. If PROFILE already exists ")
+	_T("it will not be overwritten. *Operator*")},
+	{wxCMD_LINE_OPTION, NULL, _T("profile"),
+	_T("The name of a profile to operate on. Operand PROFILE."),
+	wxCMD_LINE_VAL_STRING, 0},
+	{wxCMD_LINE_OPTION, NULL, _T("file"),
+	_T("The path to a file to operate on. Operand FILE."),
+	wxCMD_LINE_VAL_STRING, 0},
 	{wxCMD_LINE_NONE},
 };
 
@@ -72,12 +81,31 @@ bool wxLauncher::OnCmdLineParsed(wxCmdLineParser& parser)
 	{
 		mKeepForSessionOnly = true;
 	}
+	
+	if (parser.Found(_T("add-profile")))
+	{
+		mProfileOperator = ProManOperator::add;
+		if (!parser.Found(_T("profile"), &mProfileOperand))
+		{
+			wxLogError(_T("No profile specified to add"));
+			return false;
+		}
+		if (!parser.Found(_T("file"), &mFileOperand))
+		{
+			wxLogError(_T("No file specified to add as profile"));
+			return false;
+		}
+	}
 
 	return true;
 }
 
 wxLauncher::wxLauncher()
-	:mKeepForSessionOnly(false)
+	:skin(NULL),
+	mProfileOperator(ProManOperator::none),
+	mKeepForSessionOnly(false),
+	mShowGUI(false)
+	// The strings init themselves sanely
 {
 }
 
@@ -115,6 +143,17 @@ bool displaySplash(wxSplashScreen **splashWindow)
 		return false;
 	}
 	return true;
+}
+
+int wxLauncher::OnRun() {
+	if (mProfileOperator == ProManOperator::none)
+	{
+		return wxApp::OnRun();
+	}
+	else
+	{
+		return ProManOperator::RunProfileOperator(mProfileOperator);
+	}
 }
 
 bool wxLauncher::OnInit() {
@@ -161,6 +200,12 @@ bool wxLauncher::OnInit() {
 		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
 		return false;
 	}
+	if (mProfileOperator != ProManOperator::none)
+	{
+		// We are not to create a GUI so we are done init now
+		return true;
+	}
+
 	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	wxFileSystem::AddHandler(new wxInternetFSHandler);
 
@@ -198,18 +243,25 @@ bool wxLauncher::OnInit() {
 }
 
 int wxLauncher::OnExit() {
-	if (this->skin != NULL) {
-		delete this->skin;
-	}
 
 	ProMan::DeInitialize();
-	HelpManager::DeInitialize();
-	ProfileProxy::DeInitialize();
-	FlagListManager::DeInitialize();
-	
+
+	if (mProfileOperator == ProManOperator::none)
+	{
+
+		if (this->skin != NULL) {
+			delete this->skin;
+		}
+
+		HelpManager::DeInitialize();
+		ProfileProxy::DeInitialize();
+		FlagListManager::DeInitialize();
+
 #if HAS_SDL == 1
-	SDL_Quit();
+		SDL_Quit();
 #endif
+
+	}
 
 	wxLogInfo(_T("wxLogger shutdown complete."));
 

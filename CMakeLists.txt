@@ -221,7 +221,9 @@ set(API_CODE_FILES
   code/apis/OpenALManager.h
   code/apis/OpenALManager.cpp
   code/apis/ProfileManager.h
+  code/apis/ProfileManagerOperator.h
   code/apis/ProfileManager.cpp
+  code/apis/ProfileManagerOperator.cpp
   code/apis/ProfileProxy.h
   code/apis/ProfileProxy.cpp
   code/apis/SkinManager.h

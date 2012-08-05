@@ -16,31 +16,27 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef WXLAUNCHERAPP_H
-#define WXLAUNCHERAPP_H
-#include <wx/wx.h>
-#include "apis/SkinManager.h"
+#include "generated/configure_launcher.h"
+#include "apis/ProfileManager.h"
 #include "apis/ProfileManagerOperator.h"
+#include "wxLauncherApp.h"
+#include "global/ids.h"
 
-class wxLauncher: public wxApp {
-public:
-	wxLauncher();
-	virtual bool OnInit();
-	virtual int OnExit();
-	virtual int OnRun();
+#include "global/MemoryDebugging.h"
 
-	virtual void OnInitCmdLine(wxCmdLineParser& parser);
-	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+int ProManOperator::RunProfileOperator(ProManOperator::profileOperator op)
+{
+	wxLauncher &app = wxGetApp();
 
-	SkinSystem* skin;
+	if (op == add)
+	{
+		wxFileName sourceFile(app.mFileOperand);
+		if (ProMan::GetProfileManager()->
+			CreateProfile(app.mProfileOperand, sourceFile))
+		{
+			return 0;
+		}
+	}
 
-	wxString mFileOperand;
-	wxString mProfileOperand;
-	ProManOperator::profileOperator mProfileOperator;
-	bool mKeepForSessionOnly;
-	bool mShowGUI;
-};
-
-DECLARE_APP(wxLauncher);
-
-#endif
+	return 1;
+}
