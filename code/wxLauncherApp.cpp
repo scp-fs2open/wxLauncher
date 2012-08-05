@@ -55,6 +55,8 @@ const static wxCmdLineEntryDesc CmdLineOptions[] = {
 	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
 	_T("Add profile PROFILE from FILE. If PROFILE already exists ")
 	_T("it will not be overwritten. *Operator*")},
+	{wxCMD_LINE_SWITCH, NULL, _T("select-profile"),
+	_T("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
 	{wxCMD_LINE_OPTION, NULL, _T("profile"),
 	_T("The name of a profile to operate on. Operand PROFILE."),
 	wxCMD_LINE_VAL_STRING, 0},
@@ -93,6 +95,15 @@ bool wxLauncher::OnCmdLineParsed(wxCmdLineParser& parser)
 		if (!parser.Found(_T("file"), &mFileOperand))
 		{
 			wxLogError(_T("No file specified to add as profile"));
+			return false;
+		}
+	}
+	else if(parser.Found(_T("select-profile")))
+	{
+		mProfileOperator = ProManOperator::select;
+		if (!parser.Found(_T("profile"), &mProfileOperand))
+		{
+			wxLogError(_T("No profile specified to select"));
 			return false;
 		}
 	}

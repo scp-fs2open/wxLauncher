@@ -37,6 +37,12 @@ int ProManOperator::RunProfileOperator(ProManOperator::profileOperator op)
 			return 0;
 		}
 	}
+	else if (op == select)
+	{
+		ProMan::GetProfileManager()->
+			SwitchTo(app.mProfileOperand);
+		return 0;
+	}
 
 	return 1;
 }
