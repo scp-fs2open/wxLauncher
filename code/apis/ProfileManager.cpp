@@ -1015,13 +1015,18 @@ bool ProMan::DeleteProfile(wxString name) {
  The wxWindows group is not copied, if it exists. If includeMainGroup is true, then
  the contents of the "main" group (profile-specific information, such as name and filename)
  are copied as well, otherwise they are not copied. */
-void ProMan::CopyConfig(wxConfigBase& src,
+void ProMan::CopyConfig(const wxConfigBase& in_src,
 						wxConfigBase& dest,
 						const bool includeMainGroup,
 						const wxString path) {
 	wxString entryName;
 	long entryIndex;
 	bool entryKeepGoing;
+
+	/* BUGNOTE - This is possibly not safe, but because the following code
+	uses non const functions and restores what it does mutate this
+	should be safe. */
+	wxConfigBase& src = const_cast<wxConfigBase&>(in_src);
 	
 	entryKeepGoing = src.GetFirstEntry(entryName, entryIndex);
 	while (entryKeepGoing) {
