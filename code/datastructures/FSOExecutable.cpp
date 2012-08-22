@@ -84,6 +84,7 @@ bool IsFileToIgnore(const wxString& filename) {
 		|| filename.EndsWith(_T(".map"))
 		|| filename.EndsWith(_T(".pdb"))
 		|| filename.EndsWith(_T(".app"))
+		|| filename.EndsWith(_T(".ini"))
 		|| filename.EndsWith(_T(".tar"))
 		|| filename.EndsWith(_T(".gz"))
 		|| filename.EndsWith(_T(".bz2"))
