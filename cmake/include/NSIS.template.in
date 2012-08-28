@@ -648,6 +648,7 @@ Section "-Core installation"
   
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
+  WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "cmdinterpreter" "$INSTDIR\bin\wxlauncher.exe"
   
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
