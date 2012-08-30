@@ -174,6 +174,11 @@ bool wxLauncher::OnInit() {
 	if (!wxApp::OnInit())
 		return false; // base said abort so abort
 
+	wxLog::SetActiveTarget(new Logger());
+	wxLogInfo(_T("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
+	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
+	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
+
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
@@ -197,11 +202,6 @@ bool wxLauncher::OnInit() {
 	wxSplashScreen* splashWindow = NULL;
 	if (!displaySplash(&splashWindow))
 		return false;
-
-	wxLog::SetActiveTarget(new Logger());
-	wxLogInfo(_T("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
-	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
-	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
 
 	wxLogInfo(_T("Initializing profiles..."));
 	ProMan::Flags promanFlags = ProMan::None;
