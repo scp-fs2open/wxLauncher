@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <sapi.h>
 #endif
 
+#include <vector>
+
 #include "apis/SpeechManager.h"
 
 #include "global/MemoryDebugging.h"
@@ -31,8 +33,39 @@ using namespace SpeechMan;
 #if USE_SPEECH
 // wxLauncher objects
 bool isInitialized = false;
-WX_DECLARE_STRING_HASH_MAP( ISpObjectToken*, VoiceMap);
-VoiceMap voiceNames;
+
+class VoiceData {
+public:
+	VoiceData(const wxString& voiceName, ISpObjectToken* voice);
+	VoiceData::VoiceData(const VoiceData& vd);
+	VoiceData& VoiceData::operator=(const VoiceData& vd);
+	const wxString& GetVoiceName() const { return this->voiceName; }
+	ISpObjectToken* GetVoice() const { return this->voice; }
+private:
+	VoiceData();
+	wxString voiceName;
+	ISpObjectToken* voice;
+};
+
+VoiceData::VoiceData(const wxString& voiceName, ISpObjectToken* voice)
+: voiceName(voiceName), voice(voice) {
+}
+
+VoiceData::VoiceData(const VoiceData& vd)
+: voiceName(vd.voiceName), voice(vd.voice) {
+}
+
+VoiceData& VoiceData::operator=(const VoiceData& vd) {
+	if (this == &vd) {
+		return *this;
+	}
+
+	this->voiceName = vd.voiceName;
+	this->voice = vd.voice;
+	return *this;
+}
+
+std::vector<VoiceData> voices;
 
 // COM objects
 ISpVoice * comVoice = NULL;
@@ -104,7 +137,7 @@ bool EnumerateVoices() {
 		for(size_t i = 0; i < idlength; i++) {
 			wxLogDebug(_T("   %04X"), id[i]);
 		}
-		voiceNames[wxString(id, wxMBConvUTF16(), wcslen(id))] = comAVoice;
+		voices.push_back(VoiceData(wxString(id, wxMBConvUTF16(), wcslen(id)), comAVoice));
 
 #ifdef __WXDEBUG__
 		enumerateObjectToken(comAVoice);
@@ -163,10 +196,9 @@ bool SpeechMan::IsInitialized() {
 wxArrayString SpeechMan::EnumVoices() {
 	wxArrayString arr;
 #if USE_SPEECH
-	VoiceMap::iterator iter = voiceNames.begin();
-	while ( iter != voiceNames.end() ) {
-		arr.Add(iter->first);
-		iter++;
+	for (std::vector<VoiceData>::const_iterator it = voices.begin();
+		it != voices.end(); ++it) {
+			arr.Add(it->GetVoiceName());
 	}
 #endif
 	return arr;  // reference counted copy
@@ -190,11 +222,11 @@ void SpeechMan::Speak(wxString what) {
 void SpeechMan::SetVoice(size_t i) {
 	wxCHECK_RET( isInitialized, _T("SetVoice called but SpeechMan not initialized."));
 	wxCHECK_RET( comVoice != NULL, _T("SetVoice called but comVoice is null"));
-	wxCHECK_RET( i < voiceNames.size(), _T("i is larger than the number of voices"));
-	wxString voiceName = EnumVoices().Item(i);
-	ISpObjectToken * voice = voiceNames[voiceName];
+	wxCHECK_RET( i < voices.size(), _T("i is larger than the number of voices"));
 
-	HRESULT result = comVoice->SetVoice(voice);
+	wxLogDebug(_T("Selected voice: %s"), voices[i].GetVoiceName().c_str());
+
+	HRESULT result = comVoice->SetVoice(voices[i].GetVoice());
 	wxCHECK_RET( SUCCEEDED(result), _T("Error in setting voice"));
 #else
 void SpeechMan::SetVoice(size_t) {
