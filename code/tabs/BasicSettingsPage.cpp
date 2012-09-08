@@ -536,18 +536,21 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		FindOptionIndexWithRegistryValue(networkTypeOptions, type);
 	if (networkTypeSelection < 0) {
 		wxLogError(
-			_T("Registry value '%s' was not found in list of options. Using default '%s'."),
-				type.c_str(), DEFAULT_NETWORK_TYPE.c_str());		
-	}
-	
-	networkTypeSelection =
-		FindOptionIndexWithRegistryValue(networkTypeOptions, DEFAULT_NETWORK_TYPE);
-	if (networkTypeSelection < 0) {
-		wxLogError(
-			_T("Default value '%s' was not found in list of type speed options. Using first entry '%s'."),
-				DEFAULT_NETWORK_TYPE.c_str(),
-				networkTypeOptions[0].GetRegistryValue().c_str());
-		networkTypeSelection = 0;
+			_T("Profile value '%s' was not found in list of type options. ")
+			_T("Using default '%s'."),
+				type.c_str(),
+				DEFAULT_NETWORK_TYPE.c_str());		
+		
+		networkTypeSelection =
+			FindOptionIndexWithRegistryValue(networkTypeOptions, DEFAULT_NETWORK_TYPE);
+		if (networkTypeSelection < 0) {
+			wxLogError(
+				_T("Default value '%s' was not found in list of type options. ")
+				_T("Using first entry '%s'."),
+					DEFAULT_NETWORK_TYPE.c_str(),
+					networkTypeOptions[0].GetRegistryValue().c_str());
+			networkTypeSelection = 0;
+		}
 	}
 
 	networkType->SetSelection(networkTypeSelection);
@@ -568,18 +571,21 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 		FindOptionIndexWithRegistryValue(networkSpeedOptions, speed);
 	if (networkSpeedSelection < 0) {
 		wxLogError(
-			_T("Registry value '%s' was not found in list of speed options. Using default '%s'."),
-				speed.c_str(), DEFAULT_NETWORK_SPEED.c_str());		
-	}
-	
-	networkSpeedSelection =
-		FindOptionIndexWithRegistryValue(networkSpeedOptions, DEFAULT_NETWORK_SPEED);
-	if (networkSpeedSelection < 0) {
-		wxLogError(
-			_T("Default value '%s' was not found in list of speed options. Using first entry '%s'."),
-				DEFAULT_NETWORK_SPEED.c_str(),
-				networkSpeedOptions[0].GetRegistryValue().c_str());
-		networkSpeedSelection = 0;
+			_T("Profile value '%s' was not found in list of speed options. ")
+			_T("Using default '%s'."),
+				speed.c_str(),
+				DEFAULT_NETWORK_SPEED.c_str());		
+		
+		networkSpeedSelection =
+			FindOptionIndexWithRegistryValue(networkSpeedOptions, DEFAULT_NETWORK_SPEED);
+		if (networkSpeedSelection < 0) {
+			wxLogError(
+				_T("Default value '%s' was not found in list of speed options. ")
+				_T("Using first entry '%s'."),
+					DEFAULT_NETWORK_SPEED.c_str(),
+					networkSpeedOptions[0].GetRegistryValue().c_str());
+			networkSpeedSelection = 0;
+		}
 	}
 	
 	networkSpeed->SetSelection(networkSpeedSelection);
