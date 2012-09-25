@@ -104,9 +104,9 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 	
 	// (No mod) must come before all other mods
-	if (!item1Name.CmpNoCase(NO_MOD)) {
+	if (!item1->shortname->Cmp(NO_MOD)) {
 		return true;
-	} else if (!item2Name.CmpNoCase(NO_MOD)) {
+	} else if (!item2->shortname->Cmp(NO_MOD)) {
 		return false;
 	} else {
 		return item1Name.CmpNoCase(item2Name) < 0;
