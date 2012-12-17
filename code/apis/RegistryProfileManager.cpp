@@ -1194,9 +1194,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 		wxString ip(data1, textConv, dataSize);
 
 		if ( !ip.IsEmpty() ) {
-			cfg->SetPath(REG_KEY_NETWORK_FOLDER_CFG);
 			cfg->Write(PRO_CFG_NETWORK_IP, ip);
-			cfg->SetPath(REG_KEY_ROOT_FOLDER_CFG);
 		}
 	}
 
