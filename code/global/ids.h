@@ -265,7 +265,7 @@ extern const wxString REG_KEY_NETWORK_TYPE;
 extern const wxString REG_KEY_NETWORK_SPEED;
 extern const wxString REG_KEY_NETWORK_PORT;
 extern const wxString REG_KEY_NETWORK_FOLDER_CFG;
-extern const wxString REG_KEY_ROOT_FOLDER_CFG;
+extern const wxString REG_KEY_DEFAULT_FOLDER_CFG;
 extern const wxString REG_KEY_NETWORK_FOLDER_REGISTRY;
 extern const wxString REG_KEY_NETWORK_IP;
 /** @}*/
