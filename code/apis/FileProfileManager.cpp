@@ -74,9 +74,20 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 		configFileName.SetFullName(FSO_CONFIG_FILENAME);
 	}
 
-	wxStringInputStream inConfigStream(_T(""));
-	wxFileConfig outConfig(inConfigStream, wxMBConvUTF8());
-	bool ret;	
+	wxFFileInputStream configFileInputStream(configFileName.GetFullPath());
+	wxStringInputStream configBlankInputStream(_T("")); // in case ini file doesn't exist
+	wxInputStream* configInputStreamPtr = &configFileInputStream;
+	
+	if (!configFileInputStream.IsOk()) {
+		wxLogDebug(_T("Could not read from ini file %s, writing new file"),
+			configFileName.GetFullPath().c_str());
+		configInputStreamPtr = &configBlankInputStream;
+	}
+	wxFileConfig outConfig(*configInputStreamPtr, wxMBConvUTF8());
+	bool ret;
+	
+	// most settings are written to "Default" folder
+	outConfig.SetPath(REG_KEY_DEFAULT_FOLDER_CFG);
 
 	// Video
 	int width, height, bitdepth;
@@ -169,7 +180,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	}
 
 
-	outConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
+	outConfig.SetPath(REG_KEY_DEFAULT_FOLDER_CFG);
 
 
 	// Speech
@@ -264,15 +275,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 			ReturnChecker(ret, __LINE__);
 		}
 		
-		outConfig.SetPath(REG_KEY_ROOT_FOLDER_CFG);
+		outConfig.SetPath(REG_KEY_DEFAULT_FOLDER_CFG);
 	}
-
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), configFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(configFileName.GetFullPath());
-	
-	// places all fs2_open.ini entries in the Default group
-	outFileStream.Write("[Default]\n", 10);
 
 	outConfig.Save(outFileStream);
 

@@ -49,7 +49,7 @@ const wxString REG_KEY_NETWORK_TYPE =				L"NetworkConnection";
 const wxString REG_KEY_NETWORK_SPEED =				L"ConnectionSpeed";
 const wxString REG_KEY_NETWORK_PORT =				L"ForcePort";
 const wxString REG_KEY_NETWORK_FOLDER_CFG =			L"/Network"; // FileProfileManager
-const wxString REG_KEY_ROOT_FOLDER_CFG =			L"/"; // FileProfileManager
+const wxString REG_KEY_DEFAULT_FOLDER_CFG =			L"/Default"; // FileProfileManager
 const wxString REG_KEY_NETWORK_FOLDER_REGISTRY =	L"Network"; // RegistryProfileManager
 const wxString REG_KEY_NETWORK_IP =					L"CustomIP";
 
