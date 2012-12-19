@@ -53,25 +53,25 @@ inline wxFileName GetPlatformDefaultConfigFilePath() {
 	}
 
 ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
-	wxFileName outFileName;
+	wxFileName configFileName;
 	if ( cfg->Exists(INT_CONFIG_FILE_LOCATION) ) {
-		wxString outFileNameString;
-		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &outFileNameString)) {
-			outFileName.Assign(outFileNameString);
+		wxString configFileNameString;
+		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &configFileNameString)) {
+			configFileName.Assign(configFileNameString);
 		} else {
 			wxLogError(_T("Unable to retrieve Config File location even though config says key exists"));
 			return ProMan::UnknownError;
 		}
 	} else {
-		outFileName = GetPlatformDefaultConfigFilePath();
+		configFileName = GetPlatformDefaultConfigFilePath();
 	}
-	wxASSERT_MSG( outFileName.Normalize(),
+	wxASSERT_MSG( configFileName.Normalize(),
 		wxString::Format(_T("Unable to normalize PlatformDefaultConfigFilePath (%s)"),
-		outFileName.GetFullPath().c_str()));
+		configFileName.GetFullPath().c_str()));
 
-	if ( !outFileName.FileExists() && outFileName.DirExists() ) {
+	if ( !configFileName.FileExists() && configFileName.DirExists() ) {
 		// was given a directory name
-		outFileName.SetFullName(FSO_CONFIG_FILENAME);
+		configFileName.SetFullName(FSO_CONFIG_FILENAME);
 	}
 
 	wxStringInputStream inConfigStream(_T(""));
@@ -268,8 +268,8 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	}
 
 
-	wxLogDebug(_T("Writing fs2_open.ini to %s"), outFileName.GetFullPath().c_str());
-	wxFFileOutputStream outFileStream(outFileName.GetFullPath());
+	wxLogDebug(_T("Writing fs2_open.ini to %s"), configFileName.GetFullPath().c_str());
+	wxFFileOutputStream outFileStream(configFileName.GetFullPath());
 	
 	// places all fs2_open.ini entries in the Default group
 	outFileStream.Write("[Default]\n", 10);
