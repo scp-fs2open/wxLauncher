@@ -167,7 +167,7 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	bool fredEnabled;
 	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 
-	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FreeSpace 2 Open-based game root folder and executable"));
+	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FS2 Open game root folder and executable"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("Game root folder:"));
 	wxTextCtrl* rootFolderBox = new wxTextCtrl(this, ID_EXE_ROOT_FOLDER_BOX);
@@ -829,7 +829,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
-	wxDirDialog filechooser(this, _T("Choose the root folder of a FreeSpace 2 Open-based game"),
+	wxDirDialog filechooser(this, _T("Choose the root folder of an FS2 Open game"),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
 	wxString chosenDirectory;

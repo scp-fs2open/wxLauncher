@@ -175,7 +175,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 	if ( !p->ProfileRead(cfgBinaryPath, &binary) ) {
-		wxLogError(_T("No FreeSpace 2 Open executable has been selected (%s)"), cfgBinaryPath.c_str());
+		wxLogError(_T("No FS2 Open executable has been selected (%s)"), cfgBinaryPath.c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
@@ -236,7 +236,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		wxLogInfo(_T("FRED2 Open is now running..."));
 	} else {
 		this->FS2_pid = pid;
-		wxLogInfo(_T("FreeSpace 2 Open is now running..."));
+		wxLogInfo(_T("FS2 Open is now running..."));
 	}
 
 	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
@@ -255,7 +255,7 @@ void MainWindow::OnKill(wxButton* button, bool killFred) {
 	int ret = ::wxKill((killFred)?this->FRED2_pid:this->FS2_pid, wxSIGKILL);
 	if ( ret != wxKILL_OK ) {
 		wxLogError(_T("Got KillError %d"), ret);
-		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED2 Open"):_T("FreeSpace 2 Open"));
+		wxLogError(_T("Failed to kill %s process!"), killFred?_T("FRED2 Open"):_T("FS2 Open"));
 	}
 }
 
@@ -278,7 +278,7 @@ void MainWindow::OnFS2Exited(wxProcessEvent &event) {
 
 	int exitCode = event.GetExitCode();
 
-	wxLogInfo(_T("FreeSpace 2 Open exited with a status of %d"), exitCode);
+	wxLogInfo(_T("FS2 Open exited with a status of %d"), exitCode);
 
 	delete this->process;
 	this->process = NULL;
