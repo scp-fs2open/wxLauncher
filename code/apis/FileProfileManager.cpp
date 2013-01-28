@@ -262,21 +262,31 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, DEFAULT_NETWORK_PORT);
 
-	if (forcedport != DEFAULT_NETWORK_PORT) { // only write if it's a valid port
+	if (forcedport != DEFAULT_NETWORK_PORT) {
 		ret = outConfig.Write(REG_KEY_NETWORK_PORT, forcedport);
 		ReturnChecker(ret, __LINE__);
-
-		// custom IP is written to "Network" folder
-		outConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
-		
-		wxString networkIP;
-		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
-			ret = outConfig.Write(REG_KEY_NETWORK_IP, networkIP);
-			ReturnChecker(ret, __LINE__);
-		}
-		
-		outConfig.SetPath(REG_KEY_DEFAULT_FOLDER_CFG);
+	} else if (outConfig.Exists(REG_KEY_NETWORK_PORT)) {
+		ret = outConfig.DeleteEntry(REG_KEY_NETWORK_PORT, false);
+		ReturnChecker(ret, __LINE__);
 	}
+
+
+	// custom IP is written to "Network" folder
+	outConfig.SetPath(REG_KEY_NETWORK_FOLDER_CFG);
+
+	wxString networkIP;
+	cfg->Read(PRO_CFG_NETWORK_IP, &networkIP, DEFAULT_NETWORK_IP);
+
+	if (networkIP != DEFAULT_NETWORK_IP) {
+		ret = outConfig.Write(REG_KEY_NETWORK_IP, networkIP);
+		ReturnChecker(ret, __LINE__);
+	} else if (outConfig.Exists(REG_KEY_NETWORK_IP)) {
+		ret = outConfig.DeleteEntry(REG_KEY_NETWORK_IP, false);
+		ReturnChecker(ret, __LINE__);
+	}
+
+	outConfig.SetPath(REG_KEY_DEFAULT_FOLDER_CFG);
+
 
 	wxLogDebug(_T("Writing fs2_open.ini to %s"), configFileName.GetFullPath().c_str());
 	wxFFileOutputStream outFileStream(configFileName.GetFullPath());
