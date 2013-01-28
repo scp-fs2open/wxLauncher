@@ -155,12 +155,6 @@ enum StatusBarIconIDs {
 	ID_SB_MAX_ID,
 };
 
-enum ProfileDialogReturnValues {
-	RETURN_CANCEL,
-	RETURN_DO_CLONE,
-	RETURN_CONFRIM_DELETE,
-};
-
 /** \defgroup Storage Storage locations */
 /** @{*/
 #define GET_PROFILE_STORAGEFOLDER()			wxStandardPaths::Get().GetUserDataDir()
