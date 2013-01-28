@@ -414,6 +414,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 #endif
 		}
 
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 		// langauges
 		for ( size_t i = 0;	i < SupportedLanguages.Count(); i++ ) {
 			wxString section = wxString::Format(_T("/%s"), SupportedLanguages[i].c_str());
@@ -430,6 +431,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 				(*(item->i18n))[SupportedLanguages[i]] = temp;
 			}
 		}
+#endif
 
 		modsTemp.push_back(item);
 	}
@@ -565,6 +567,7 @@ void ModList::readFlagSet(wxFileConfig* config,
     &(set->notes));
 }
 
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nItem **trans) {
 	wxString section = wxString::Format(_T("/%s"), langaugename.c_str());
 	if ( config->Exists(section) ) {
@@ -578,12 +581,11 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 			&((*trans)->infotext));
 
 	} else {
-#if 0 // preprocessing out until this functionality is complete
 		wxLogDebug( 
 			wxString::Format(_T("  Section '%s' does not exist."), langaugename.c_str()));
-#endif
 	}
 }
+#endif
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
@@ -784,6 +786,7 @@ FlagSetItem::~FlagSetItem() {
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(FlagSets);
 
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 ///////////////////////////////////////////////////////////////////////////////
 // I18nData
 /** \class I18nItem
@@ -815,6 +818,7 @@ const wxString __SupportedLanguages[] = {
 /** Languages that are supported by the launcher and thus will search for
 translations for in mod.ini's. */
 wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguages)/sizeof(wxString), __SupportedLanguages);
+#endif
 
 //#include <wx/impl.cpp>
 //WX_DEFINE_OBJARRAY(I18nData);
@@ -848,7 +852,9 @@ ModItem::ModItem(SkinSystem* skin) {
 
 	this->flagsets = NULL;
 	this->skin = NULL;
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	this->i18n = NULL;
+#endif
 
 	this->infoTextPanel = new InfoText(this);
 	this->modImagePanel = new ModImage(this);
@@ -874,6 +880,7 @@ ModItem::~ModItem() {
 	if (this->secondarylist != NULL) delete this->secondarylist;
 	if (this->flagsets != NULL) delete this->flagsets;
 	if (this->skin != NULL) delete this->skin;
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	if (this->i18n != NULL) {
 		I18nData::iterator i18niter = this->i18n->begin();
 		while (i18niter != this->i18n->end()) {
@@ -882,6 +889,7 @@ ModItem::~ModItem() {
 		}
 		delete this->i18n;
 	}
+#endif
 	if (this->infoTextPanel != NULL) delete this->infoTextPanel;
 	if (this->modImagePanel != NULL) delete this->modImagePanel;
 	if (this->modNamePanel != NULL) delete this->modNamePanel;

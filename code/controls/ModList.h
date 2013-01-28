@@ -47,6 +47,7 @@ public:
 
 WX_DECLARE_OBJARRAY(FlagSetItem, FlagSets);
 
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 extern wxSortedArrayString SupportedLanguages;
 
 class I18nItem {
@@ -58,6 +59,7 @@ public:
 };
 
 WX_DECLARE_STRING_HASH_MAP(I18nItem*, I18nData);
+#endif
 
 
 struct Words {
@@ -93,7 +95,9 @@ public:
 	
 	Skin* skin;
 
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	I18nData* i18n;
+#endif
 
 	void Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer *mainSizer, wxSizer *buttons, wxStaticBitmap* warn);
 
@@ -170,8 +174,10 @@ private:
 		wxString keyvalue, wxString ** location);
 	void readFlagSet(wxFileConfig* config,
 		wxString keyprefix, FlagSetItem * set);
+#ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	void readTranslation(wxFileConfig* config,
 		wxString langaugename, I18nItem ** trans);
+#endif
 	wxString excapeSpecials(wxString toexcape);
 
 	ModItemArray* tableData;
