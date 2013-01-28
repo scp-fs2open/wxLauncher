@@ -131,8 +131,10 @@ button Enables.  The lines that are highligted red are new
 variables that CMake has found. 
 - Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
 source directory if it remains NOTFOUND.
-- Set PYTHON_EXECUTABLE to the python that you want to use (it may not show
-up. If it doesn't show up, don't worry about it, it means that cmake found it)
+- Set PYTHON_EXECUTABLE to the python that you want to use. It may not show
+up. If it doesn't show up, it means that cmake found python automatically,
+but if cmake selects the wrong version of python, please see "CMake selects the
+wrong python".
 - Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher. Make sure
 that it is unchecked if you plan on distributing the code as with this checked,
 the launcher will only run on the dev machine. This option changes where the
@@ -162,6 +164,17 @@ Or instead type:
 - cmake -DUSE_OPENAL=1 -DCMAKE_INSTALL_PREFIX=/usr/local ../
 - make
 - make install (with root privileges)
+
+CMake selects the wrong python
+------------------------------
+If CMake selects the wrong version of python (should be version 2), you
+can set the version yourself by setting PYTHON_EXECUTABLE when you run CMake by
+adding "-DPYTHON_EXECUTABLE=</path/to/python2>" to your command line, for
+example "-DPYTHON_EXECUTABLE=/usr/bin/python2".
+
+If you run into this problem, please post in this ticket
+<http://code.google.com/p/wxlauncher/issues/detail?id=99> with your distro,
+OS version, and whether you're running 32- or 64-bit.
 
 Building - OS X 10.6 (Snow Leopard), although should also work on 10.5 (Leopard)
 ==============================
