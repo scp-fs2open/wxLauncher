@@ -24,7 +24,7 @@
 
 #include "controls/LightingPresets.h"
 
-#include "global/ids.h"
+#include "global/ProfileKeys.h"
 
 #include <wx/tokenzr.h>
 

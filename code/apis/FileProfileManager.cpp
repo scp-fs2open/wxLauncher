@@ -24,7 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
-#include "global/ids.h"
+#include "global/BasicDefaults.h"
+#include "global/ProfileKeys.h"
+#include "global/RegistryKeys.h"
 
 inline wxFileName GetPlatformDefaultConfigFilePath() {
 	wxFileName path;

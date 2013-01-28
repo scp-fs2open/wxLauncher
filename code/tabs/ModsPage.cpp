@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/settings.h>
 #include "tabs/ModsPage.h"
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 #include "controls/ModList.h"
 #include "apis/SkinManager.h"
 #include "apis/ProfileManager.h"

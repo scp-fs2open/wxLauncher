@@ -18,7 +18,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
-#include "global/ids.h"
+#include "global/BasicDefaults.h"
+#include "global/ProfileKeys.h"
+#include "global/RegistryKeys.h"
 #include "generated/configure_launcher.h"
 
 #include <wx/process.h>

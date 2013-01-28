@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/LightingPresets.h"
 #include "controls/ModList.h" // for code needed in rendering command line text
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 
 #include <wx/html/htmlwin.h>
 #include <wx/tokenzr.h>

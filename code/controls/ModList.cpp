@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/SkinManager.h"
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 #include "controls/ModList.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"

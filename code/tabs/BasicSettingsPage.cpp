@@ -31,7 +31,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #endif
 
 #include "tabs/BasicSettingsPage.h"
+#include "global/BasicDefaults.h"
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
@@ -2110,7 +2112,7 @@ void BasicSettingsPage::SetupJoystickSection() {
 #endif
 	} else {
 		this->joystickSelected
-			->Append(_("No Joystick"), new JoyNumber(JOYMAN_INVALID_JOYSTICK));
+			->Append(_("No Joystick"), new JoyNumber(DEFAULT_JOYSTICK_ID));
 		for ( unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++ ) {
 			if ( JoyMan::IsJoystickPluggedIn(i) ) {
 				this->joystickSelected

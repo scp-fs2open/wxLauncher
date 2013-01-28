@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/ProfileManagerOperator.h"
 #include "wxLauncherApp.h"
-#include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
 

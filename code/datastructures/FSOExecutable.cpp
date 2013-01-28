@@ -18,7 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 #include "datastructures/FSOExecutable.h"
-#include "global/ids.h"
 #include <wx/dir.h>
 #include <wx/tokenzr.h>
 
