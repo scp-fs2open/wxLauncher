@@ -19,6 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef PROFILEMANAGEROPERATOR_H
 #define PROFILEMANAGEROPERATOR_H
 
+/** ProManOperator: Mechanism to manipulate profiles through cmd line options.
+ none indicates that this feature is not in use and that normal operation
+ should occur instead. */
+
 namespace ProManOperator
 {
 
