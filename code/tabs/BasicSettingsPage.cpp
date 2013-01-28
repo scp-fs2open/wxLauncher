@@ -850,7 +850,19 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 		} else if ( FSOExecutable::IsRootFolderValid(path) ) {
 			break;
 		} else {
-			wxLogWarning(_T("Folder does not have any supported executables"));
+			wxString folderName;
+			if (path.GetDirCount() != 0) {
+				folderName = path.GetDirs().Last();
+			} else {
+				folderName = path.GetVolume();
+				if (folderName.IsEmpty()) { // occurs on Unix, according to wx docs
+					folderName = _T("/");
+				}
+			}
+			wxLogWarning(_T("Folder \"%s\" does not have any supported executables"),
+				folderName.c_str());
+			wxLogDebug(_T("Folder \"%s\" does not have any supported executables"),
+				path.GetFullPath().c_str());
 		}
 	}
 	wxLogDebug(_T("User chose '%s' as the TC root folder"), path.GetPath().c_str());
