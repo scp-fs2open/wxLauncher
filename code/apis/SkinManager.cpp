@@ -139,16 +139,10 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 			new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	}
 
-#if IS_LINUX // fix title that's too long to fit on one line in Ubuntu Lucid standard font
-	const wxString FORMAT_FIX = _T("<br>");
-#else
-	const wxString FORMAT_FIX = _T(" ");
-#endif
-
 	if ( this->defaultSkin->welcomePageText == NULL ) {
 		this->defaultSkin->welcomePageText =
 			new wxString(
-_("<p><center><b><font size='3'>Welcome to wxLauncher,") + FORMAT_FIX + _("your one-stop shop for FreeSpace 2 and related content</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=63609.0'>Multiplayer Setup</a> = <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = </center></p>"));
+_("<p><center><b><font size='3'>Welcome to wxLauncher, the next-generation launcher for FS2 Open games</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=63609.0'>Multiplayer Setup</a> = <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = </center></p>"));
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
