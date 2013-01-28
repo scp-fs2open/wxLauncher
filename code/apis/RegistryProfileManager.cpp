@@ -437,7 +437,6 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	int forcedport;
 	cfg->Read(PRO_CFG_NETWORK_PORT, &forcedport, DEFAULT_NETWORK_PORT);
 
-	// only write port and IP addr if port is valid
 	if (forcedport != DEFAULT_NETWORK_PORT) {
 		ret = RegSetValueExW(
 			regHandle,
@@ -447,35 +446,59 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			(BYTE*)&forcedport,
 			sizeof(forcedport));
 		ReturnChecker(ret, __LINE__);
+	} else {
+		wxLogDebug(_T("Forced Port is default. Clearing entry if it exists."));
 
-		// Network folder (for custom IP address)
-		HKEY networkRegHandle = 0;
-		ret = RegCreateKeyExW(
+		ret = RegDeleteValueW(
 			regHandle,
-			REG_KEY_NETWORK_FOLDER_REGISTRY,
-			0,
-			NULL,
-			REG_OPTION_NON_VOLATILE,
-			KEY_WRITE,
-			NULL,
-			&networkRegHandle,
-			NULL);  // just want handle, don't care if it was created or opened
-		ReturnChecker(ret, __LINE__);
+			REG_KEY_NETWORK_PORT);
 
-		wxString networkIP;
-		if ( cfg->Read(PRO_CFG_NETWORK_IP, &networkIP) ) {
-			ret = RegSetValueExW(
-				networkRegHandle,
-				REG_KEY_NETWORK_IP,
-				0,
-				REG_SZ,
-				(BYTE*)networkIP.c_str(),
-				(networkIP.size()+1)*2);
+		if (ret != ERROR_FILE_NOT_FOUND) { // ignore if entry doesn't exist
 			ReturnChecker(ret, __LINE__);
 		}
-
-		RegCloseKey(networkRegHandle);
 	}
+
+
+	wxString networkIP;
+	cfg->Read(PRO_CFG_NETWORK_IP, &networkIP, DEFAULT_NETWORK_IP);
+
+	// Network folder (for custom IP address)
+	HKEY networkRegHandle = 0;
+	ret = RegCreateKeyExW(
+		regHandle,
+		REG_KEY_NETWORK_FOLDER_REGISTRY,
+		0,
+		NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&networkRegHandle,
+		NULL);  // just want handle, don't care if it was created or opened
+	ReturnChecker(ret, __LINE__);
+
+	if (networkIP != DEFAULT_NETWORK_IP) {
+		ret = RegSetValueExW(
+			networkRegHandle,
+			REG_KEY_NETWORK_IP,
+			0,
+			REG_SZ,
+			(BYTE*)networkIP.c_str(),
+			(networkIP.size()+1)*2);
+		ReturnChecker(ret, __LINE__);
+	} else {
+		wxLogDebug(_T("Custom IP is default. Clearing entry if it exists."));
+
+		ret = RegDeleteValueW(
+			networkRegHandle,
+			REG_KEY_NETWORK_IP);
+
+		if (ret != ERROR_FILE_NOT_FOUND) { // ignore if entry doesn't exist
+			ReturnChecker(ret, __LINE__);
+		}
+	}
+
+	RegCloseKey(networkRegHandle);
+
 
 	RegCloseKey(regHandle);
 
