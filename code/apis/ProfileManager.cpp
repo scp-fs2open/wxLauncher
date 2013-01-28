@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
 #include "wxLauncherApp.h"
-#include "global/ids.h"
+#include "global/ProfileKeys.h"
 
 #include "global/MemoryDebugging.h"
 
@@ -112,7 +112,7 @@ bool ProMan::Initialize(Flags flags) {
 	ProMan::flags = flags;
 
 	wxFileName file;
-	file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
+	file.Assign(GetProfileStorageFolder(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
 		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath().c_str());
@@ -130,7 +130,7 @@ bool ProMan::Initialize(Flags flags) {
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
-	wxDir::GetAllFiles(GET_PROFILE_STORAGEFOLDER(), &foundProfiles, _T("pro?????.ini"));
+	wxDir::GetAllFiles(GetProfileStorageFolder(), &foundProfiles, _T("pro?????.ini"));
 
 	wxLogInfo(_T(" Found %d profile(s)."), foundProfiles.Count());
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
@@ -246,7 +246,7 @@ void ProMan::SaveProfilesBeforeExiting() {
 	if ( this->globalProfile != NULL ) {
 		wxLogInfo(_T("saving global profile before exiting."));
 		wxFileName file;
-		file.Assign(GET_PROFILE_STORAGEFOLDER(), GLOBAL_INI_FILE_NAME);
+		file.Assign(GetProfileStorageFolder(), GLOBAL_INI_FILE_NAME);
 		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
 		this->globalProfile->Save(globalProfileOutput);
 		
@@ -293,7 +293,7 @@ in the profiles map. Returns true if creation was successful. */
 bool ProMan::CreateNewProfile(wxString newName) {
 	wxFileName profile;
 	profile.Assign(
-		GET_PROFILE_STORAGEFOLDER(),
+		GetProfileStorageFolder(),
 		this->GenerateNewProfileFileName());
 
 	wxLogInfo(_T("New profile will be written to %s"), profile.GetFullPath().c_str());
@@ -321,7 +321,7 @@ bool ProMan::CreateNewProfile(wxString newName) {
  pro#####.ini with ##### being the least 5-digit number not yet taken. */
 wxString ProMan::GenerateNewProfileFileName() {
 	wxArrayString profileFiles;
-	wxDir::GetAllFiles(GET_PROFILE_STORAGEFOLDER(), &profileFiles, _T("pro*.ini"), wxDIR_FILES);
+	wxDir::GetAllFiles(GetProfileStorageFolder(), &profileFiles, _T("pro*.ini"), wxDIR_FILES);
 	
 	long l;
 	
@@ -858,7 +858,7 @@ void SaveProfileToDisk(wxFileConfig* toSave, const wxString& name)
 		// FIXME maybe make a new file and save the current profile there
 	} else {
 		wxFileName file;
-		file.Assign(GET_PROFILE_STORAGEFOLDER(), profileFilename);
+		file.Assign(GetProfileStorageFolder(), profileFilename);
 		wxASSERT( file.IsOk() );
 		wxFFileOutputStream configOutput(file.GetFullPath());
 		toSave->Save(configOutput);
@@ -1035,7 +1035,7 @@ bool ProMan::DeleteProfile(wxString name) {
 		}
 
 		wxFileName file;
-		file.Assign(GET_PROFILE_STORAGEFOLDER(), filename);
+		file.Assign(GetProfileStorageFolder(), filename);
 
 		if ( file.FileExists() ) {
 			wxLogDebug(_T(" Backing file exists"));
@@ -1328,7 +1328,8 @@ void ProMan::TestConfigFunctions(wxConfigBase& src) {
 	wxLogDebug(_T("is dest a subset of src? %s"), IsConfigSubset(*dest, src) ? _T("true") : _T("false"));
 	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
 	
-	wxLogDebug(_T("deleting entry %s from dest"), PRO_CFG_LIGHTING_PRESET);
+	wxLogDebug(_T("deleting entry %s from dest"),
+		PRO_CFG_LIGHTING_PRESET.c_str());
 	dest->DeleteEntry(PRO_CFG_LIGHTING_PRESET, true);
 	
 	wxLogDebug(_T("contents of dest config after entry deletion:"));

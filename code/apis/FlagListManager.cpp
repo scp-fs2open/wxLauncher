@@ -21,7 +21,7 @@
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "datastructures/FSOExecutable.h"
-#include "global/ids.h"
+#include "global/ProfileKeys.h"
 
 #include "global/MemoryDebugging.h"
 
@@ -202,7 +202,7 @@ void FlagListManager::BeginFlagFileProcessing() {
 	}
 	// Make sure that the directory that I am going to change to exists
 	wxFileName tempExecutionLocation;
-	tempExecutionLocation.AssignDir(GET_PROFILE_STORAGEFOLDER());
+	tempExecutionLocation.AssignDir(GetProfileStorageFolder());
 	tempExecutionLocation.AppendDir(_T("temp_flag_folder"));
 	if ( !tempExecutionLocation.DirExists() 
 		&& !tempExecutionLocation.Mkdir() ) {

@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 #include "controls/BottomButtons.h"
 #include "datastructures/FSOExecutable.h"
 #include "apis/TCManager.h"

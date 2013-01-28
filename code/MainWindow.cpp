@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
 #include "global/ids.h"
+#include "global/ProfileKeys.h"
 #include "generated/configure_launcher.h"
 #include "MainWindow.h"
 #include "tabs/WelcomePage.h"
@@ -169,7 +170,8 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	ProMan* p = ProMan::GetProfileManager();
 	wxString folder, binary;
 	if ( !p->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &folder) ) {
-		wxLogError(_T("Game root folder for current profile is not set (%s)"), PRO_CFG_TC_ROOT_FOLDER);
+		wxLogError(_T("Game root folder for current profile is not set (%s)"),
+			PRO_CFG_TC_ROOT_FOLDER.c_str());
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;

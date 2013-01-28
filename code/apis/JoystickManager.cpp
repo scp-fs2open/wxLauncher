@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "SDL.h"
 #endif
 
-#include "global/ids.h"
+#include "global/BasicDefaults.h"
 #include "global/MemoryDebugging.h"
 
 namespace JoyMan {
@@ -190,7 +190,7 @@ unsigned int JoyMan::NumberOfPluggedInJoysticks() {
 /** \bug Assumes all joysticks support ForceFeedback */
 #if USE_JOYSTICK
 bool JoyMan::SupportsForceFeedback(unsigned int i) {
-	if ( i == JOYMAN_INVALID_JOYSTICK ) {
+	if ( i == static_cast<unsigned int>(DEFAULT_JOYSTICK_ID) ) {
 		return false;
 	} else {
 		return true;
@@ -204,7 +204,7 @@ bool JoyMan::SupportsForceFeedback(unsigned int) {
 /** \bug Assumes all joysticks have a calibrate tool. */
 #if USE_JOYSTICK
 bool JoyMan::HasCalibrateTool(unsigned int i) {
-	if ( i == JOYMAN_INVALID_JOYSTICK ) {
+	if ( i == static_cast<unsigned int>(DEFAULT_JOYSTICK_ID) ) {
 		return false;
 	} else {
 		return true;
@@ -237,7 +237,7 @@ wxString JoyMan::JoystickName(unsigned int) {
 /** Returns true when the joystick is plugged in. */
 #if USE_JOYSTICK
 bool JoyMan::IsJoystickPluggedIn(unsigned int i) {
-	if ( i == JOYMAN_INVALID_JOYSTICK ) {
+	if ( i == static_cast<unsigned int>(DEFAULT_JOYSTICK_ID) ) {
 		return false;
 	} else {
 		// FIXME because we're using indexes to represent joysticks, there's no guarantee

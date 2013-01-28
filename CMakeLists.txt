@@ -195,9 +195,14 @@ source_group("GUI Controls" FILES ${GUI_CONTROL_CODE_FILES})
 set(GLOBAL_CODE_FILES
   code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h
+  code/global/BasicDefaults.h
+  code/global/BasicDefaults.cpp
   code/global/ids.h
-  code/global/ids.cpp
   code/global/MemoryDebugging.h
+  code/global/ProfileKeys.h
+  code/global/ProfileKeys.cpp
+  code/global/RegistryKeys.h
+  code/global/RegistryKeys.cpp
   code/global/targetver.h
   code/global/version.h
   code/global/version.cpp

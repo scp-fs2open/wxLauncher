@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/FlagListManager.h"
 #include "apis/OpenALManager.h"
 #include "apis/ProfileManager.h"
-#include "global/ids.h"
+#include "global/ProfileKeys.h"
 
 #if USE_OPENAL
 #include <al.h>

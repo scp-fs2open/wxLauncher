@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "tabs/WelcomePage.h"
 #include "controls/StatusBar.h"
+#include "global/ProfileKeys.h"
 #include "apis/HelpManager.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
@@ -460,7 +461,8 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			if ( proman->GlobalRead(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
 				newsWindow->SetPage(theNews);
 			} else {
-				wxLogFatalError(_T("%s does not exist but the exists function says it does"), GBL_CFG_NET_THE_NEWS);
+				wxLogFatalError(_T("%s does not exist but the exists function says it does"),
+					GBL_CFG_NET_THE_NEWS.c_str());
 			}
 		} else {
 			wxFileSystem filesystem;
