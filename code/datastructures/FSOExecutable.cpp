@@ -187,7 +187,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		wxString second(tok.GetNextToken());
 		if ( !second.CmpNoCase(_T("open")) ) {
 			if ( !first.CmpNoCase(_T("fs2")) ) {
-				ver.binaryname = _T("FreeSpace 2 Open");
+				ver.binaryname = _T("FS2 Open");
 			} else {
 				ver.binaryname = _T("FRED2 Open");
 			}
@@ -348,8 +348,8 @@ is normally encoded into the executable's file name into a long string that
 more user friendly. 
 
 The resulting string looks something like this: \verbatim
-FreeSpace 2 Open Antipodes 4 Debug SSE2
-FreeSpace 2 Open 3.6.10 Inferno SSE
+FS2 Open Antipodes 4 Debug SSE2
+FS2 Open 3.6.10 Inferno SSE
 FRED2 Open 3.6.11 Debug
 \endverbatim
 */
@@ -384,7 +384,7 @@ wxString FSOExecutable::GetVersionString() const {
 	}
 	
 	return wxString::Format(_T("%s%s%s%s%s%s%s%s"),
-		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FreeSpace 2 Open
+		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FS2 Open
 		(useFullVersion) ? wxString::Format(_T(" %d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
 		(this->antipodes) ? antipodesStr.c_str() : wxEmptyString,
 		(this->build == 0) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (Build %d)") : _T(" Build %d"), this->build).c_str(),

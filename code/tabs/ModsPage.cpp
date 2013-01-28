@@ -57,7 +57,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
-		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of a FreeSpace 2 Open-based game on the Basic Settings page."),
+		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of an FS2 Open game on the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		noTC->SetFont(messageFont);
@@ -83,7 +83,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
-			_("The selected root folder does not exist.\n\nSelect a valid root folder for a FreeSpace 2 Open-based game on the Basic Settings page."),
+			_("The selected root folder does not exist.\n\nSelect a valid root folder for an FS2 Open game on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		nonexistentTC->SetFont(messageFont);
@@ -109,7 +109,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 #endif
 	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
-			_("The selected root folder does not contain any FreeSpace 2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
+			_("The selected root folder does not contain any FS2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 		invalidTC->SetFont(messageFont);

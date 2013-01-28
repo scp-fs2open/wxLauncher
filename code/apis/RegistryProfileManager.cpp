@@ -126,7 +126,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
 		} else {
-			wxLogError(_T("Unable to write FreeSpace 2 Open settings to the registry (0x%08X)"), ret);
+			wxLogError(_T("Unable to write FS2 Open settings to the registry (0x%08X)"), ret);
 			return static_cast<ProMan::RegistryCodes>(ret);
 		}
 #endif	
@@ -619,7 +619,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
 		} else {
-			wxLogError(_T("Unable to read FreeSpace 2 Open settings from the registry (%d)"), ret);
+			wxLogError(_T("Unable to read FS2 Open settings from the registry (%d)"), ret);
 			return static_cast<ProMan::RegistryCodes>(ret);
 		}
 #endif	

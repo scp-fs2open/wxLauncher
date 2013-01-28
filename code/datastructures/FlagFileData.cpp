@@ -178,7 +178,7 @@ void FlagFileData::GenerateFlagSets() {
 		if ( counter > (wxUint32)(1 << 31) ) {
 			// we have checked 31 bits of counter, this is too many easy flag sets
 			easyIter = this->easyFlags.end();
-			wxLogError(_T("FreeSpace 2 Open executable has more than 31 easy flag categories"));
+			wxLogError(_T("FS2 Open executable has more than 31 easy flag categories"));
 		} else {
 			easyIter++;
 		}
