@@ -28,17 +28,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
 
+// NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
 inline wxFileName GetPlatformDefaultConfigFilePath() {
 	wxFileName path;
 #if IS_WIN32
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
 	path.AppendDir(_T("FS2 Open"));
 #elif IS_APPLE
-	path.AssignDir(wxFileName::GetHomeDir());
+	path.AssignHomeDir();
 	path.AppendDir(_T("Library"));
 	path.AppendDir(_T("FS2_Open"));
 #elif IS_LINUX
-	path.AssignDir(wxFileName::GetHomeDir());
+	path.AssignHomeDir();
 	path.AppendDir(_T(".fs2_open"));
 #else
 # error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
