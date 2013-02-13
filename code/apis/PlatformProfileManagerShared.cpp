@@ -38,20 +38,59 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	}
 
 	wxString cmdLineString;
+#if IS_LINUX // write to folder in home dir
+	extern wxFileName GetPlatformDefaultConfigFilePath();
+	cmdLineString += GetPlatformDefaultConfigFilePath().GetFullPath().c_str();
+#else
 	cmdLineString += tcPath.c_str();
 	cmdLineString += wxFileName::GetPathSeparator();
+#endif
 	cmdLineString += _T("data");
+	
+#if IS_LINUX // try to rename file in root folder if exists
+	wxFileName tcCfgFile(tcPath + wxFileName::GetPathSeparator());
+	tcCfgFile.AppendDir(_T("data"));
+	tcCfgFile.SetFullName(_T("cmdline_fso.cfg"));
+	
+	if (tcCfgFile.IsOk() && ::wxFileExists(tcCfgFile.GetFullPath())) {
+		wxFileName tcCfgRenameFile(tcCfgFile);
+		tcCfgRenameFile.SetFullName(_T("cmdline_fso.old.cfg"));
+		
+		// rename target exists; attempt to delete it
+		if (tcCfgRenameFile.IsOk() && ::wxFileExists(tcCfgRenameFile.GetFullPath())) {
+			wxLogWarning(_T("Backup cmdline_fso.old.cfg file %s exists, deleting it"),
+				tcCfgRenameFile.GetFullPath().c_str());
+			
+			if (!::wxRemoveFile(tcCfgRenameFile.GetFullPath())) {
+				wxLogError(_T("Could not remove backup cmdline_fso.old.cfg file %s"),
+					tcCfgRenameFile.GetFullPath().c_str());
+			}
+		}
+		
+		// now try the rename
+		if (!::wxRenameFile(tcCfgFile.GetFullPath(),
+					tcCfgRenameFile.GetFullPath(), false)) {
+			wxLogError(_T("Could not rename root folder copy %s to %s"),
+				tcCfgFile.GetFullPath().c_str(),
+				tcCfgRenameFile.GetFullPath().c_str());
+		} else {
+			wxLogInfo(_T("Renamed root folder copy of cmdline_fso.cfg"));
+		}
+	}
+#endif
 
-	// if data folder does not exist in root folder, attempt to create it first
+	// if data folder does not exist in cmdline folder, attempt to create it first
 	if (!wxDir::Exists(cmdLineString)) {
 		if (!::wxMkdir(cmdLineString)) {
-			wxLogError(_T("Couldn't create data folder in game root folder %s"),
-					   tcPath.c_str());
+			wxLogError(_T("Couldn't create 'data' folder %s"),
+				cmdLineString.c_str());
 			return ProMan::UnknownError;
 		}
-		wxLogDebug(_T("data folder created in TC root folder"));
+		wxLogDebug(_T("'data' folder %s created"),
+			cmdLineString.c_str());
 	} else {
-		wxLogDebug(_T("data folder found in TC root folder"));	
+		wxLogDebug(_T("'data' folder %s found"),
+			cmdLineString.c_str());	
 	}
 
 	cmdLineString += wxFileName::GetPathSeparator();
