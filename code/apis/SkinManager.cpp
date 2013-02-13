@@ -35,11 +35,6 @@ Skin::Skin() {
 	this->windowTitle = NULL;
 	this->windowIcon = NULL;
 	this->welcomeHeader = NULL;
-	this->welcomeIcon = NULL;
-	this->modsIcon = NULL;
-	this->basicIcon = NULL;
-	this->advancedIcon = NULL;
-	this->installIcon = NULL;
 	this->idealIcon = NULL;
 	this->baseFont = NULL;
 	this->welcomePageText = NULL;
@@ -51,11 +46,6 @@ Skin::~Skin() {
 	if (this->windowTitle != NULL) delete this->windowTitle;
 	if (this->windowIcon != NULL) delete this->windowIcon;
 	if (this->welcomeHeader != NULL) delete this->welcomeHeader;
-	if (this->welcomeIcon != NULL) delete this->welcomeIcon;
-	if (this->modsIcon != NULL) delete this->modsIcon;
-	if (this->basicIcon != NULL) delete this->basicIcon;
-	if (this->advancedIcon != NULL) delete this->advancedIcon;
-	if (this->installIcon != NULL) delete this->installIcon;
 	if (this->idealIcon != NULL) delete this->idealIcon;
 	if (this->baseFont != NULL) delete this->baseFont;
 	if (this->welcomePageText != NULL) delete this->welcomePageText;
@@ -97,36 +87,6 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 		wxASSERT(this->defaultSkin->welcomeHeader->IsOk());
 	}
 
-	if ( this->defaultSkin->welcomeIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("welcome.png"));
-		this->defaultSkin->welcomeIcon =
-			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(this->defaultSkin->welcomeIcon->IsOk());
-	}
-	if ( this->defaultSkin->modsIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("mods.png"));
-		this->defaultSkin->modsIcon =
-			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(this->defaultSkin->modsIcon->IsOk());
-	}
-	if ( this->defaultSkin->basicIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("basic.png"));
-		this->defaultSkin->basicIcon =
-			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(this->defaultSkin->basicIcon->IsOk());
-	}
-	if ( this->defaultSkin->advancedIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("advanced.png"));
-		this->defaultSkin->advancedIcon = 
-			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(this->defaultSkin->advancedIcon->IsOk());
-	}
-	if ( this->defaultSkin->installIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("install.png"));
-		this->defaultSkin->installIcon =
-			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(this->defaultSkin->installIcon->IsOk());
-	}
 	if ( this->defaultSkin->idealIcon == NULL ) {
 		wxFileName filename(_T(RESOURCES_PATH), _T("recommended.png"));
 		this->defaultSkin->idealIcon = 
@@ -181,91 +141,6 @@ wxString SkinSystem::GetTitle() {
 		wxLogFatalError(_T("Cannot retrieve a window title. (%p, %p, %p)"),
 			this->modSkin, this->TCSkin, this->defaultSkin);
 		return wxString();
-	}
-}
-
-wxBitmap SkinSystem::GetWelcomeIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->welcomeIcon != NULL ) {
-			return *(this->modSkin->welcomeIcon);
-	} else if ( this->TCSkin != NULL
-		&& this->TCSkin->welcomeIcon != NULL ) {
-			return *(this->TCSkin->welcomeIcon);
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->welcomeIcon != NULL ) {
-			return *(this->defaultSkin->welcomeIcon);
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a welcome icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullBitmap;
-	}
-}
-
-wxBitmap SkinSystem::GetModsIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->modsIcon != NULL ) {
-			return *(this->modSkin->modsIcon);
-	} else if ( this->TCSkin != NULL
-		&& this->TCSkin->modsIcon != NULL ) {
-			return *(this->TCSkin->modsIcon);
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->modsIcon != NULL ) {
-			return *(this->defaultSkin->modsIcon);
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a mods icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullBitmap;
-	}
-}
-
-wxBitmap SkinSystem::GetBasicIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->basicIcon != NULL ) {
-			return *(this->modSkin->basicIcon);
-	} else if ( this->TCSkin != NULL
-		&& this->TCSkin->basicIcon != NULL ) {
-			return *(this->TCSkin->basicIcon);
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->basicIcon != NULL ) {
-			return *(this->defaultSkin->basicIcon);
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a basic icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullBitmap;
-	}
-}
-
-wxBitmap SkinSystem::GetAdvancedIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->advancedIcon != NULL ) {
-			return *(this->modSkin->advancedIcon);
-	} else if ( this->TCSkin != NULL
-		&& this->TCSkin->advancedIcon != NULL ) {
-			return *(this->TCSkin->advancedIcon);
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->advancedIcon != NULL ) {
-			return *(this->defaultSkin->advancedIcon);
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a advanced icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullBitmap;
-	}
-}
-
-wxBitmap SkinSystem::GetInstallIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->installIcon != NULL ) {
-			return *(this->modSkin->installIcon);
-	} else if ( this->TCSkin != NULL
-		&& this->TCSkin->installIcon != NULL ) {
-			return *(this->TCSkin->installIcon);
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->installIcon != NULL ) {
-			return *(this->defaultSkin->installIcon);
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a install icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
-		return wxNullBitmap;
 	}
 }
 
@@ -453,35 +328,6 @@ bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
 			shortmodname.c_str(), filepath.c_str());
 	}
 	return false;
-}
-
-/** Verifies that the icon exists, is the correct size (resizing if needed)
-and then returns a new wxBitmap that contains the file. */
-wxBitmap* SkinSystem::VerifyTabIcon(wxString currentTC, wxString shortmodname,
-									wxString filepath) {
-	wxFileName filename;
-	if ( SkinSystem::SearchFile(&filename, currentTC, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
-
-		wxImage image(filename.GetFullPath());
-		
-		if ( image.IsOk() ) {
-			if ( image.GetWidth() != static_cast<int>(SkinSystem::TabIconWidth)
-				|| image.GetHeight() != static_cast<int>(SkinSystem::TabIconHeight) ) {
-					wxLogDebug(_T("   Resizing image from %dx%d"), 
-						image.GetWidth(), image.GetHeight());
-
-					image = image.Scale(
-						SkinSystem::TabIconWidth,
-						SkinSystem::TabIconHeight,
-						wxIMAGE_QUALITY_HIGH);
-			}
-			return new wxBitmap(image);
-		} else {
-			wxLogDebug(_T("   Image not valid!"));
-		}
-	}
-	return NULL;
 }
 
 /** Verifies that the ideal icon exists and is the correct size. Returns a

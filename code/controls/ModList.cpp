@@ -352,47 +352,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 			readIniFileString(config, _T("/skin/welcometxt"), &(item->skin->welcomePageText));
 
-			// read in file names of the icons
-			wxString *welcomeIconFile = NULL,
-				*modsIconFile = NULL,
-				*basicIconFile = NULL,
-				*advancedIconFile = NULL,
-				*installIconFile = NULL;
-			readIniFileString(config, _T("/skin/iconwelcome"), &welcomeIconFile);
-			readIniFileString(config, _T("/skin/iconmods"), &modsIconFile);
-			readIniFileString(config, _T("/skin/iconbasic"), &basicIconFile);
-			readIniFileString(config, _T("/skin/iconadvanced"), &advancedIconFile);
-			readIniFileString(config, _T("/skin/iconinstall"), &installIconFile);
-
-			// Verify the icon will fit
-			
-
-			if ( welcomeIconFile != NULL ) {
-				item->skin->welcomeIcon = SkinSystem::VerifyTabIcon(tcPath,
-					shortname, *welcomeIconFile);
-				delete welcomeIconFile;
-			}
-			if ( modsIconFile != NULL )	{
-				item->skin->modsIcon = SkinSystem::VerifyTabIcon(tcPath,
-					shortname, *modsIconFile);
-				delete modsIconFile;
-			}
-			if ( basicIconFile != NULL ) {
-				item->skin->basicIcon = SkinSystem::VerifyTabIcon(tcPath,
-					shortname, *basicIconFile);
-				delete basicIconFile;
-			}
-			if ( advancedIconFile != NULL ) {
-				item->skin->advancedIcon = SkinSystem::VerifyTabIcon(tcPath,
-					shortname, *advancedIconFile);
-				delete advancedIconFile;
-			}
-			if ( installIconFile != NULL ) {
-				item->skin->installIcon = SkinSystem::VerifyTabIcon(tcPath,
-					shortname, *installIconFile);
-				delete installIconFile;
-			}
-
 			wxString *idealIconFile = NULL;
 			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
 			if ( idealIconFile != NULL ) {

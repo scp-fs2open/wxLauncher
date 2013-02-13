@@ -30,11 +30,6 @@ public:
 	wxString* windowTitle;
 	wxIcon* windowIcon;
 	wxBitmap* welcomeHeader;
-	wxBitmap* welcomeIcon;
-	wxBitmap* modsIcon;
-	wxBitmap* basicIcon;
-	wxBitmap* advancedIcon;
-	wxBitmap* installIcon;
 	wxBitmap* idealIcon;
 	wxFont* baseFont;
 	wxString* welcomePageText;
@@ -54,11 +49,6 @@ public:
 	wxString GetTitle();
 	wxIcon GetIcon();
 	wxBitmap GetBanner();
-	wxBitmap GetWelcomeIcon();
-	wxBitmap GetModsIcon();
-	wxBitmap GetBasicIcon();
-	wxBitmap GetAdvancedIcon();
-	wxBitmap GetInstallIcon();
 	wxBitmap GetIdealIcon();
 	wxBitmap GetWarningIcon();
 	wxBitmap GetBigWarningIcon();
@@ -71,7 +61,6 @@ public:
 
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxBitmap* VerifyTabIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxFont* VerifyFontChoice(wxString currentTC, wxString shortmodname,
 		wxString fontname=_T(""), int fontsize=0, wxString fontFamilyStr=_T(""),
@@ -81,8 +70,6 @@ public:
 	static bool SearchFile(wxFileName* filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
 
-	static const unsigned int TabIconWidth = 64;
-	static const unsigned int TabIconHeight = 64;
 	static const unsigned int IdealIconWidth = 24;
 	static const unsigned int IdealIconHeight = 24;
 	static const unsigned int InfoWindowImageWidth = 255;
