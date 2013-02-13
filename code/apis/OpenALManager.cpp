@@ -343,7 +343,7 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	alcCreateContextType CreateContext =
 		GetOALFuncPtr(alcCreateContextType,alcCreateContext);
-	if ( OpenDevice == NULL || checkForALError() == false ) {
+	if ( CreateContext == NULL || checkForALError() == false ) {
 		return _("Unable to open context on device");
 	}
 
