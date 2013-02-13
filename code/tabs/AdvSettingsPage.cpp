@@ -332,7 +332,6 @@ void AdvSettingsPage::UpdateFlagSetsBox() {
 	// that don't make sense and can thus potentially confuse users
 	
 	flagSetsArray.Remove(_T("Custom"));
-	flagSetsArray.Remove(_T("All features on"));
 	
 	flagSetChoice->Append(flagSetsArray);
 	
