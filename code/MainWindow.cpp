@@ -66,22 +66,8 @@ MainWindow::MainWindow(SkinSystem* skin) {
 
 	// setup tabs
 
-#if 0
-	// Images used by wxImageList must be all the same dimentions
-	wxImageList* images = new wxImageList;
-  images->Create(64,64);
-	images->Add(skin->GetWelcomeIcon());
-	images->Add(skin->GetModsIcon());
-	images->Add(skin->GetBasicIcon());
-	images->Add(skin->GetAdvancedIcon());
-	images->Add(skin->GetInstallIcon());
-#endif
-
 	this->mainTab = new wxNotebook();
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(WINDOW_WIDTH,-1), wxNB_TOP);
-#if 0
-	this->mainTab->AssignImageList(images);
-#endif
 
 	this->mainTab->AddPage(new WelcomePage(this->mainTab, skin), _("Welcome"), true);
 	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false);
