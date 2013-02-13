@@ -60,7 +60,6 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 		this->defaultSkin = new Skin();
 	}
 	this->TCSkin = NULL;
-	this->modSkin = NULL;
 
 	wxArtProvider::Push(new ArtProvider(this));
 
@@ -124,56 +123,46 @@ _("<p><center><b><font size='3'>Welcome to wxLauncher, the next-generation launc
 SkinSystem::~SkinSystem() {
 	if (this->defaultSkin != NULL) delete this->defaultSkin;
 	if (this->TCSkin != NULL) delete this->TCSkin;
-	if (this->modSkin != NULL) delete this->modSkin;
 }
 
 wxString SkinSystem::GetTitle() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->windowTitle != NULL ) {
-			return *(this->modSkin->windowTitle);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->windowTitle != NULL ) {
 			return *(this->TCSkin->windowTitle);
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->windowTitle != NULL ) {
 			return *(this->defaultSkin->windowTitle);
 	} else {
-		wxLogFatalError(_T("Cannot retrieve a window title. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve a window title. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return wxString();
 	}
 }
 
 wxBitmap SkinSystem::GetIdealIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->idealIcon != NULL ) {
-			return *(this->modSkin->idealIcon);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->idealIcon != NULL ) {
 			return *(this->TCSkin->idealIcon);
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->idealIcon != NULL ) {
 			return *(this->defaultSkin->idealIcon);
 	} else {
-		wxLogFatalError(_T("Cannot retrieve an ideal icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve an ideal icon. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
 
 wxBitmap SkinSystem::GetBanner() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->welcomeHeader != NULL ) {
-			return *(this->modSkin->welcomeHeader);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->welcomeHeader != NULL ) {
 			return *(this->TCSkin->welcomeHeader);
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->welcomeHeader != NULL ) {
 			return *(this->defaultSkin->welcomeHeader);
 	} else {
-		wxLogFatalError(_T("Cannot retrieve a banner. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve a banner. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
@@ -184,61 +173,49 @@ wxFont SkinSystem::GetFont() {
 }
 
 const wxFont* SkinSystem::GetFontPointer() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->baseFont != NULL ) {
-			return this->modSkin->baseFont;
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->baseFont != NULL ) {
 			return this->TCSkin->baseFont;
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->baseFont != NULL ) {
 			return this->defaultSkin->baseFont;
 	} else {
-		wxLogFatalError(_T("Cannot retrieve a font. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve a font. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return NULL;
 	}
 }
 
 wxString SkinSystem::GetWelcomePageText() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->welcomePageText != NULL ) {
-			return *(this->modSkin->welcomePageText);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->welcomePageText != NULL ) {
 			return *(this->TCSkin->welcomePageText);
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->welcomePageText ) {
 			return *(this->defaultSkin->welcomePageText);
 	} else {
-		wxLogFatalError(_T("Cannot retrieve a font. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve a font. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return wxEmptyString;
 	}
 }
 
 wxBitmap SkinSystem::GetWarningIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->warningIcon != NULL ) {
-			return *(this->modSkin->warningIcon);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->warningIcon != NULL ) {
 			return *(this->TCSkin->warningIcon);
 	} else if ( this->defaultSkin != NULL
 		&& this->defaultSkin->warningIcon ) {
 			return *(this->defaultSkin->warningIcon);
 	} else {
-		wxLogFatalError(_T("Cannot retrieve a warning icon. (%p, %p, %p)"),
-			this->modSkin, this->TCSkin, this->defaultSkin);
+		wxLogFatalError(_T("Cannot retrieve a warning icon. (%p, %p)"),
+			this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
 	}
 }
 
 wxBitmap SkinSystem::GetBigWarningIcon() {
-	if ( this->modSkin != NULL
-		&& this->modSkin->bigWarningIcon != NULL ) {
-			return *(this->modSkin->bigWarningIcon);
-	} else if ( this->TCSkin != NULL
+	if ( this->TCSkin != NULL
 		&& this->TCSkin->bigWarningIcon != NULL ) {
 			return *(this->TCSkin->bigWarningIcon);
 	} else if ( this->defaultSkin != NULL
