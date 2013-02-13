@@ -57,7 +57,6 @@ public:
 	wxString GetWelcomePageText();
 
 	void SetTCSkin(Skin *skin = NULL);
-	void SetModSkin(Skin *skin = NULL);
 
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
@@ -83,7 +82,6 @@ public:
 private:
 	Skin* defaultSkin;
 	Skin* TCSkin;
-	Skin* modSkin;
 };
 
 #endif
