@@ -280,21 +280,21 @@ wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 
 /** Opens, verifies, the window icon, returning NULL if anything is not valid.
 \note Does allocate memory. */
-wxBitmap* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
+wxIcon* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 									   wxString filepath) {
    wxFileName filename;
    if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
 	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
-	   wxImage image(filename.GetFullPath());
-	   if ( image.IsOk() ) {
-		   if ( image.GetWidth() == 32 && image.GetHeight() == 32 ) {
-			   return new wxBitmap(image);
+	   wxIcon icon(filename.GetFullPath()); // TODO: specify icon format? verify extension?
+	   if ( icon.IsOk() ) { // FIXME: check correct width/height to use
+		   if ( icon.GetWidth() == 32 && icon.GetHeight() == 32 ) {
+			   return new wxIcon(icon);
 		   } else {
-			   wxLogDebug(_T("   Image size wrong"));
+			   wxLogDebug(_T("   Icon size wrong"));
 		   }
 	   } else {
-		   wxLogDebug(_T("   Image not valid."));
+		   wxLogDebug(_T("   Icon not valid."));
 	   }
    }
    return NULL;

@@ -60,7 +60,7 @@ public:
 	void SetModSkin(Skin *skin = NULL);
 
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxBitmap* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
+	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxFont* VerifyFontChoice(wxString currentTC, wxString shortmodname,
 		wxString fontname=_T(""), int fontsize=0, wxString fontFamilyStr=_T(""),
