@@ -121,9 +121,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->skinSystem = skin;
 
-	this->semicolon[0] = ';';
-	this->semicolon[1] = '\0';
-
 	this->stringNoMod = NO_MOD;
 
 	this->appendmods = NULL;
@@ -481,7 +478,7 @@ void ModList::readIniFileString(wxFileConfig* config,
 	if ( config->Exists(keyvalue) ) {
 			*location = new wxString();
 			config->Read(keyvalue, *location);
-			if ( (*location)->EndsWith(this->semicolon) ) {
+			if ( (*location)->EndsWith(_T(";")) ) {
 				(*location)->RemoveLast();
 			}
 	}
