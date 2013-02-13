@@ -340,7 +340,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 			readIniFileString(config, _T("/skin/wtitle"), &(item->skin->windowTitle));
 			
-#if 0 // FIXME: remove preprocessing out after tab icons removed
 			wxString *windowIconFile = NULL;
 			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
 			if ( windowIconFile != NULL ) {
@@ -348,7 +347,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 					shortname, *windowIconFile);
 				delete windowIconFile;
 			}
-#endif
 
 			readIniFileString(config, _T("/skin/welcometxt"), &(item->skin->welcomePageText));
 
