@@ -107,7 +107,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 if(IS_WIN32) # helper is only needed on windows
   add_executable(registry_helper WIN32
     code/global/ids.h
-    code/global/ids.cpp
+    code/global/BasicDefaults.h
+    code/global/BasicDefaults.cpp
+    code/global/ProfileKeys.h
+    code/global/ProfileKeys.cpp
+    code/global/RegistryKeys.h
+    code/global/RegistryKeys.cpp
     code/apis/RegistryProfileManager.cpp
     platform/win32/registry_helper.cpp
     code/apis/PlatformProfileManagerShared.cpp
