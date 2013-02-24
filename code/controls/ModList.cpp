@@ -359,16 +359,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 				delete idealIconFile;
 			}
 
-			wxString *fontName = NULL;
-			readIniFileString(config, _T("/skin/font"), &fontName);
-			int fontSize = 0;
-			config->Read(_T("/skin/fontsize"), &fontSize);
-			if ( fontName != NULL ) {
-				item->skin->baseFont = SkinSystem::VerifyFontChoice(tcPath,
-					shortname, *fontName, fontSize);
-				delete fontName;
-			}
-
 		} else {
 #if 0 // preprocessing out until this functionality is complete
 			wxLogDebug(_T("  Does Not Contain An skin Section."));

@@ -36,7 +36,6 @@ Skin::Skin() {
 	this->windowIcon = NULL;
 	this->welcomeHeader = NULL;
 	this->idealIcon = NULL;
-	this->baseFont = NULL;
 	this->welcomePageText = NULL;
 	this->warningIcon = NULL;
 	this->bigWarningIcon = NULL;
@@ -47,13 +46,13 @@ Skin::~Skin() {
 	if (this->windowIcon != NULL) delete this->windowIcon;
 	if (this->welcomeHeader != NULL) delete this->welcomeHeader;
 	if (this->idealIcon != NULL) delete this->idealIcon;
-	if (this->baseFont != NULL) delete this->baseFont;
 	if (this->welcomePageText != NULL) delete this->welcomePageText;
 	if (this->warningIcon != NULL) delete this->warningIcon;
 	if (this->bigWarningIcon != NULL) delete this->bigWarningIcon;
 }
 
-SkinSystem::SkinSystem(Skin *defaultSkin) {
+SkinSystem::SkinSystem(Skin *defaultSkin)
+: font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)) {
 	if ( defaultSkin != NULL ) {
 		this->defaultSkin = defaultSkin;
 	} else {
@@ -91,11 +90,6 @@ SkinSystem::SkinSystem(Skin *defaultSkin) {
 		this->defaultSkin->idealIcon = 
 			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->idealIcon->IsOk());
-	}
-
-	if ( this->defaultSkin->baseFont == NULL ) {
-		this->defaultSkin->baseFont =
-			new wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 	}
 
 	if ( this->defaultSkin->welcomePageText == NULL ) {
@@ -164,25 +158,6 @@ wxBitmap SkinSystem::GetBanner() {
 		wxLogFatalError(_T("Cannot retrieve a banner. (%p, %p)"),
 			this->TCSkin, this->defaultSkin);
 		return wxNullBitmap;
-	}
-}
-
-wxFont SkinSystem::GetFont() {
-	const wxFont *temp = GetFontPointer();
-	return (temp == NULL) ? wxNullFont : *temp;
-}
-
-const wxFont* SkinSystem::GetFontPointer() {
-	if ( this->TCSkin != NULL
-		&& this->TCSkin->baseFont != NULL ) {
-			return this->TCSkin->baseFont;
-	} else if ( this->defaultSkin != NULL
-		&& this->defaultSkin->baseFont != NULL ) {
-			return this->defaultSkin->baseFont;
-	} else {
-		wxLogFatalError(_T("Cannot retrieve a font. (%p, %p)"),
-			this->TCSkin, this->defaultSkin);
-		return NULL;
 	}
 }
 
@@ -331,63 +306,6 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 		  }
 	  }
 	  return NULL;
-}
-
-/** Returns a valid font object based on the font name and/or size passed in. */
-wxFont* SkinSystem::VerifyFontChoice(wxString currentTC, wxString shortmodname,
-									 wxString fontname, int fontsize,
-									 wxString fontFamilyStr, wxString fontStyleStr,
-									 wxString fontWeightStr, bool underline) {
-	 WXUNUSED(currentTC);
-	 WXUNUSED(shortmodname);
-	 
-	// interpret the fontfamily string
-
-	 wxFontFamily fontfamily = wxFONTFAMILY_UNKNOWN;
-	 fontFamilyStr.MakeLower();
-	 if ( fontFamilyStr.StartsWith(_T("decorative")) ) {
-		 fontfamily = wxFONTFAMILY_DECORATIVE;
-	 } else if ( fontFamilyStr.StartsWith(_T("roman")) ) {
-		 fontfamily = wxFONTFAMILY_ROMAN;
-	 } else if ( fontFamilyStr.StartsWith(_T("script")) ) {
-		 fontfamily = wxFONTFAMILY_SCRIPT;
-	 } else if ( fontFamilyStr.StartsWith(_T("swiss")) ) {
-		 fontfamily = wxFONTFAMILY_SWISS;
-	 } else if ( fontFamilyStr.StartsWith(_T("modern")) ) {
-		 fontfamily = wxFONTFAMILY_MODERN;
-	 } else if ( fontFamilyStr.StartsWith(_T("teletype")) ) {
-		 fontfamily = wxFONTFAMILY_TELETYPE;
-	 }
-
-	 wxFontStyle fontstyle = wxFONTSTYLE_MAX;
-	 fontStyleStr.MakeLower();
-	 if ( fontStyleStr.StartsWith(_T("slant")) ) {
-		fontstyle = wxFONTSTYLE_SLANT;
-	 } else if ( fontStyleStr.StartsWith(_T("italic")) ) {
-		 fontstyle = wxFONTSTYLE_ITALIC;
-	 }
-
-	 wxFontWeight fontweight = wxFONTWEIGHT_MAX;
-	 fontStyleStr.MakeLower();
-	 if ( fontStyleStr.StartsWith(_T("bold")) ) {
-		 fontweight = wxFONTWEIGHT_BOLD;
-	 } else if ( fontStyleStr.StartsWith(_T("light")) ) {
-		 fontweight = wxFONTWEIGHT_LIGHT;
-	 }
-
-	 wxFont font(
-		 (fontsize < 0) ? 12 : fontsize,	// font size
-		 (fontfamily == wxFONTFAMILY_UNKNOWN) ? wxFONTFAMILY_DEFAULT : fontfamily,
-		 (fontstyle == wxFONTSTYLE_MAX) ? wxFONTSTYLE_NORMAL : fontstyle,
-		 (fontweight == wxFONTWEIGHT_MAX) ? wxFONTWEIGHT_NORMAL : fontweight,
-		 underline,
-		 fontname);
-
-	 if ( font.IsOk() ) {
-		 return new wxFont(font);
-	 } else {
-		 return NULL;
-	 }
 }
 
 wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
