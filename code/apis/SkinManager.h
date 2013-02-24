@@ -31,7 +31,6 @@ public:
 	wxIcon* windowIcon;
 	wxBitmap* welcomeHeader;
 	wxBitmap* idealIcon;
-	wxFont* baseFont;
 	wxString* welcomePageText;
 	wxBitmap* warningIcon;
 	wxBitmap* bigWarningIcon;
@@ -52,8 +51,7 @@ public:
 	wxBitmap GetIdealIcon();
 	wxBitmap GetWarningIcon();
 	wxBitmap GetBigWarningIcon();
-	wxFont GetFont();
-	const wxFont* GetFontPointer();
+	const wxFont& GetFont() const { return this->font; }
 	wxString GetWelcomePageText();
 
 	void SetTCSkin(Skin *skin = NULL);
@@ -61,9 +59,6 @@ public:
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxFont* VerifyFontChoice(wxString currentTC, wxString shortmodname,
-		wxString fontname=_T(""), int fontsize=0, wxString fontFamilyStr=_T(""),
-		wxString fontStyleStr=_T(""), wxString fontWeightStr=_T(""), bool underline=false );
 	static wxBitmap MakeModsListImage(const wxBitmap &orig);
 
 	static bool SearchFile(wxFileName* filename, wxString currentTC,
@@ -82,6 +77,8 @@ public:
 private:
 	Skin* defaultSkin;
 	Skin* TCSkin;
+	
+	wxFont font;
 };
 
 #endif
