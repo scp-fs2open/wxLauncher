@@ -34,11 +34,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/SkinManager.h"
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
+#include "global/Utils.h"
 #include "controls/ModList.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 
 #include "global/MemoryDebugging.h"
+
+using TextUtils::Words;
+using TextUtils::ArrayOfWords;
 
 const wxString NO_MOD(_("(No mod)"));
 
@@ -891,29 +895,6 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSiz
 #include <wx/arrimpl.cpp>
 WX_DEFINE_OBJARRAY(ModItemArray);
 
-#include <wx/arrimpl.cpp>
-WX_DEFINE_OBJARRAY(ArrayOfWords);
-
-/** Helper function for ModItem::InfoText and ModItem::ModName. */
-void FillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
-								wxDC &dc,
-								wxFont *testFont,
-								ArrayOfWords *words)
-{
-	while ( tokens.HasMoreTokens() ) {
-		wxString tok = tokens.GetNextToken();
-		int x, y;
-		dc.GetTextExtent(tok, &x, &y, NULL, NULL, testFont);
-
-		Words* temp = new Words();
-		temp->size.SetWidth(x);
-		temp->size.SetHeight(y);
-		temp->word = tok;
-
-		words->Add(temp);
-	}
-}
-
 ///////////////////////////////////////////
 /** \class ModItem::InfoText
 Extends wxPanel so that it can draw the info text to the correct size in the list
@@ -929,7 +910,7 @@ void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
 
-		FillArrayOfWordsFromTokens(tokens, dc, NULL, &words);
+		FillArrayOfWordsFromTokens(tokens, dc, NULL, words);
 
 		const int maxwidth = rect.width;
 		int currentx = rect.x, currenty = rect.y;
@@ -995,7 +976,7 @@ void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
 
-		FillArrayOfWordsFromTokens(tokens, dc, &testFont, &words);
+		FillArrayOfWordsFromTokens(tokens, dc, &testFont, words);
 
 		const int maxwidth = rect.width;
 		int currentx = rect.x, currenty = rect.y;
