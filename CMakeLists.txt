@@ -209,6 +209,8 @@ set(GLOBAL_CODE_FILES
   code/global/RegistryKeys.h
   code/global/RegistryKeys.cpp
   code/global/targetver.h
+  code/global/Utils.h
+  code/global/Utils.cpp
   code/global/version.h
   code/global/version.cpp
   )

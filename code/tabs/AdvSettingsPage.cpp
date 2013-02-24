@@ -26,9 +26,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 #include "controls/LightingPresets.h"
-#include "controls/ModList.h" // for code needed in rendering command line text
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
+#include "global/Utils.h"
 
 #include <wx/html/htmlwin.h>
 #include <wx/tokenzr.h>
@@ -407,47 +407,17 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 		commandLine->GetSize().GetWidth() - 30)); // 30 for scrollbar
 }
 
-// Adapted from ModList.cpp - FIXME there should really be just one copy
-void ASPFillArrayOfWordsFromTokens(wxStringTokenizer &tokens,
-								   wxDC& dc,
-								   wxFont *testFont,
-								   ArrayOfWords *words)
-{
-	while ( tokens.HasMoreTokens() ) {
-		wxString tok = tokens.GetNextToken();
-#if IS_APPLE
-		if (tok.Lower() == _T("(debug)")) { // left over from tokenizing executable in debug .app
-			tok = _T("");
-		}
-		// remove the text after ".app" in the FSO executable name
-		int DotAppIndex = tok.Find(_T(".app/")); // the trailing / ensures that the .app indicates an extension
-		if (DotAppIndex != wxNOT_FOUND) {
-			tok = tok.Mid(0, DotAppIndex + 4); // 4 so that ".app" is retained
-		}
-#endif
-		int x, y;
-		dc.GetTextExtent(tok, &x, &y, NULL, NULL, testFont);
-
-		Words* temp = new Words();
-		temp->size.SetWidth(x);
-		temp->size.SetHeight(y);
-		temp->word = tok;
-
-		words->Add(temp);
-	}
-}
-
 wxString AdvSettingsPage::FormatCommandLineString(const wxString& origCmdLine,
 												  const int textAreaWidth) {
 	// inspired by ModItem::InfoText::Draw()
 	wxStringTokenizer tokens(origCmdLine);
-	ArrayOfWords words;
+	TextUtils::ArrayOfWords words;
 	words.Alloc(tokens.CountTokens());
 	
 	wxClientDC dc(this);
 	wxFont font(this->GetFont());
 
-	ASPFillArrayOfWordsFromTokens(tokens, dc, &font, &words);
+	FillArrayOfWordsFromTokens(tokens, dc, &font, words, true);
 
 	const int spaceWidth = dc.GetTextExtent(_T(" ")).GetWidth();
 	

@@ -62,13 +62,6 @@ WX_DECLARE_STRING_HASH_MAP(I18nItem*, I18nData);
 #endif
 
 
-struct Words {
-	wxString word;
-	wxSize size;
-};
-
-WX_DECLARE_OBJARRAY(Words, ArrayOfWords);
-
 class ModItem{
 public:
 	ModItem(SkinSystem* skin);
