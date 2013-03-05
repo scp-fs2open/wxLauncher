@@ -204,10 +204,14 @@ set(GLOBAL_CODE_FILES
   code/global/BasicDefaults.cpp
   code/global/ids.h
   code/global/MemoryDebugging.h
+  code/global/ModDefaults.h
+  code/global/ModDefaults.cpp
   code/global/ProfileKeys.h
   code/global/ProfileKeys.cpp
   code/global/RegistryKeys.h
   code/global/RegistryKeys.cpp
+  code/global/SkinDefaults.h
+  code/global/SkinDefaults.cpp
   code/global/targetver.h
   code/global/Utils.h
   code/global/Utils.cpp
