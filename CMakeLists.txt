@@ -221,6 +221,8 @@ set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FlagFileData.cpp
   code/datastructures/FSOExecutable.h
   code/datastructures/FSOExecutable.cpp
+  code/datastructures/NewsSource.h
+  code/datastructures/NewsSource.cpp
   )
 source_group("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
 set(API_CODE_FILES
