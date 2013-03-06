@@ -24,24 +24,24 @@
 
 /** \defgroup skindefaults values for default skin */
 /** @{*/
-extern const wxString DEFAULT_WINDOW_TITLE;
-extern const wxString DEFAULT_WINDOW_ICON;
-extern const wxString DEFAULT_BANNER;
-extern const wxString DEFAULT_WELCOME_TEXT;
+extern const wxString DEFAULT_SKIN_WINDOW_TITLE;
+extern const wxString DEFAULT_SKIN_WINDOW_ICON;
+extern const wxString DEFAULT_SKIN_BANNER;
+extern const wxString DEFAULT_SKIN_WELCOME_TEXT;
 
-extern const wxString DEFAULT_ICON_OK;
-extern const wxString DEFAULT_ICON_WARNING;
-extern const wxString DEFAULT_ICON_WARNING_BIG;
-extern const wxString DEFAULT_ICON_ERROR;
-extern const wxString DEFAULT_ICON_INFO;
-extern const wxString DEFAULT_ICON_INFO_BIG;
-extern const wxString DEFAULT_ICON_HELP;
-extern const wxString DEFAULT_ICON_HELP_BIG;
-extern const wxString DEFAULT_ICON_IDEAL;
+extern const wxString DEFAULT_SKIN_ICON_OK;
+extern const wxString DEFAULT_SKIN_ICON_WARNING;
+extern const wxString DEFAULT_SKIN_ICON_WARNING_BIG;
+extern const wxString DEFAULT_SKIN_ICON_ERROR;
+extern const wxString DEFAULT_SKIN_ICON_INFO;
+extern const wxString DEFAULT_SKIN_ICON_INFO_BIG;
+extern const wxString DEFAULT_SKIN_ICON_HELP;
+extern const wxString DEFAULT_SKIN_ICON_HELP_BIG;
+extern const wxString DEFAULT_SKIN_ICON_IDEAL;
 
-extern const wxString DEFAULT_NO_MOD_MOD_DESC;
+extern const wxString DEFAULT_SKIN_NO_MOD_MOD_DESC;
 
-extern const NewsSourceId DEFAULT_NEWS_SOURCE;
+extern const NewsSourceId DEFAULT_SKIN_NEWS_SOURCE;
 /** @}*/
 
 #endif

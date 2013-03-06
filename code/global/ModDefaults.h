@@ -23,11 +23,11 @@
 
 /** \defgroup moddefaults default values for mod-specific settings */
 /** @{*/
-extern const int DEFAULT_MIN_HORIZONTAL_RES;
-extern const int DEFAULT_MIN_VERTICAL_RES;
+extern const int DEFAULT_MOD_MIN_HORIZONTAL_RES;
+extern const int DEFAULT_MOD_MIN_VERTICAL_RES;
 
-extern const wxString DEFAULT_RECOMMENDED_LIGHTING_NAME;
-extern const wxString DEFAULT_RECOMMENDED_LIGHTING_FLAGSET;
+extern const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME;
+extern const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET;
 /** @}*/
 
 #endif
