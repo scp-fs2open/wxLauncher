@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "tabs/WelcomePage.h"
 #include "controls/StatusBar.h"
 #include "global/ProfileKeys.h"
+#include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "apis/HelpManager.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
@@ -512,7 +513,7 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		updateNewsQuestion->SetBackgroundColour(
 			wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 		wxFileName updateNewsQuestionIconLocation(
-			_T(RESOURCES_PATH), _T("helpicon.png"));
+			_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP);
 		wxIcon updateNewsQuestionIcon(
 			updateNewsQuestionIconLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(updateNewsQuestionIcon.IsOk());
@@ -550,7 +551,7 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxBoxSizer* choiceSizer = new wxBoxSizer(wxHORIZONTAL);
 
 		wxFileName questionMarkLocation(
-			_T(RESOURCES_PATH), _T("questionmark.png"));
+			_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP_BIG);
 		wxBitmap questionMark(
 			questionMarkLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(questionMark.IsOk());

@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include "controls/StatusBar.h"
 #include "global/ids.h"
+#include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "controls/Logger.h"
 #include "generated/configure_launcher.h"
 
@@ -48,16 +49,16 @@ StatusBar::StatusBar(wxWindow *parent)
 	this->parent = parent;
 	this->showingToolTip = false;
 
-	wxFileName iconLocationOk(_T(RESOURCES_PATH), _T("icon_ok.png"));
+	wxFileName iconLocationOk(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_OK);
 	this->icons[ID_SB_OK] = wxBitmap(iconLocationOk.GetFullPath(), wxBITMAP_TYPE_ANY);
 	
-	wxFileName iconLocationWarning(_T(RESOURCES_PATH), _T("icon_warning.png"));
+	wxFileName iconLocationWarning(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING);
 	this->icons[ID_SB_WARNING] = wxBitmap(iconLocationWarning.GetFullPath(), wxBITMAP_TYPE_ANY);
 	
-	wxFileName iconLocationError(_T(RESOURCES_PATH), _T("icon_error.png"));
+	wxFileName iconLocationError(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_ERROR);
 	this->icons[ID_SB_ERROR] = wxBitmap(iconLocationError.GetFullPath(), wxBITMAP_TYPE_ANY);
 
-	wxFileName iconLocationInformation(_T(RESOURCES_PATH), _T("icon_information.png"));
+	wxFileName iconLocationInformation(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_INFO);
 	this->icons[ID_SB_INFO] = wxBitmap(iconLocationInformation.GetFullPath(), wxBITMAP_TYPE_ANY);
 
 	for( int i = 0; i < ID_SB_MAX_ID; i++) { // Check that all icons are okay.
