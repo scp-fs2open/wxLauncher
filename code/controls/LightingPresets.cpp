@@ -22,6 +22,7 @@
 
 #include "global/ids.h"
 #include "global/MemoryDebugging.h"
+#include "global/ModDefaults.h"
 
 #include "generated/configure_launcher.h"
 
@@ -58,7 +59,9 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 		new wxButton(this, ID_COPY_PRESET_BUTTON, _T("Copy selected preset to custom flags"));
 	wxRadioButton* radioButton1 = new wxRadioButton (this, ID_PRESETS_OFF, _T("Presets off"),
 													 wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	wxRadioButton* radioButton2 = new wxRadioButton (this, ID_PRESET_BASELINE, _T("Baseline recommended"));
+	wxRadioButton* radioButton2 =
+		new wxRadioButton (this, ID_PRESET_BASELINE,
+						   DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET.GetName());
 	wxRadioButton* radioButton3 = new wxRadioButton (this, ID_PRESET_DABRAIN, _T("DaBrain's"));
 	wxRadioButton* radioButton4 = new wxRadioButton (this, ID_PRESET_HERRA_TOHTORI, _T("Herra Tohtori's"));
 	wxRadioButton* radioButton5 = new wxRadioButton (this, ID_PRESET_CKID, _T("CKid's"));
@@ -94,9 +97,7 @@ void LightingPresets::InitializePresets() {
 	wxASSERT_MSG(presets.size() == 0, _T("presets have already been initialized"));
 
 	presets[ID_PRESETS_OFF] = Preset(_T("Off"), ID_PRESETS_OFF, wxEmptyString);
-	presets[ID_PRESET_BASELINE] =
-		Preset(_T("BaselineRecommended"), ID_PRESET_BASELINE,
-			   _T("-ambient_factor 75 -spec_exp 11 -spec_point 0.6 -spec_static 0.8 -spec_tube 0.4 -ogl_spec 60"));
+	presets[ID_PRESET_BASELINE] = DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
 	presets[ID_PRESET_DABRAIN] =
 		Preset(_T("DaBrain"), ID_PRESET_DABRAIN,
 			   _T("-ambient_factor 10 -no_emissive_light -spec_exp 7.0 -spec_point 8.6 -spec_static 12.8 -spec_tube 5.0"));

@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "apis/SkinManager.h"
+#include "global/SkinDefaults.h"
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include "generated/configure_launcher.h"
@@ -66,11 +67,11 @@ SkinSystem::SkinSystem(Skin *defaultSkin)
 
 	if ( this->defaultSkin->windowTitle == NULL ) {
 		this->defaultSkin->windowTitle = 
-			new wxString(_("wxLauncher for the FreeSpace 2 Source Code Project"));
+			new wxString(DEFAULT_SKIN_WINDOW_TITLE);
 	}
 
 	if ( this->defaultSkin->windowIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("wxlauncher.ico"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_WINDOW_ICON);
 		wxIcon* temp = new wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		if (!temp->IsOk())
 			wxLogFatalError( _T("Icon not valid") );
@@ -79,14 +80,14 @@ SkinSystem::SkinSystem(Skin *defaultSkin)
 	}
 
 	if ( this->defaultSkin->welcomeHeader == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("SCP_Header.png"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_BANNER);
 		this->defaultSkin->welcomeHeader = 
 			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->welcomeHeader->IsOk());
 	}
 
 	if ( this->defaultSkin->idealIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("recommended.png"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_IDEAL);
 		this->defaultSkin->idealIcon = 
 			new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->idealIcon->IsOk());
@@ -94,18 +95,17 @@ SkinSystem::SkinSystem(Skin *defaultSkin)
 
 	if ( this->defaultSkin->welcomePageText == NULL ) {
 		this->defaultSkin->welcomePageText =
-			new wxString(
-_("<p><center><b><font size='3'>Welcome to wxLauncher, the next-generation launcher for FS2 Open games</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=63609.0'>Multiplayer Setup</a> = <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = </center></p>"));
+			new wxString(DEFAULT_SKIN_WELCOME_TEXT);
 	}
 
 	if ( this->defaultSkin->warningIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("icon_warning.png"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING);
 		this->defaultSkin->warningIcon = new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		wxASSERT(this->defaultSkin->warningIcon->IsOk());
 	}
 
 	if ( this->defaultSkin->bigWarningIcon == NULL ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("warning_big.png"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING_BIG);
 		this->defaultSkin->bigWarningIcon = new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
 		if ( !this->defaultSkin->bigWarningIcon->IsOk() ) {
 			delete this->defaultSkin->bigWarningIcon;
@@ -326,7 +326,7 @@ ArtProvider::ArtProvider(SkinSystem *skinSystem) {
 wxBitmap ArtProvider::CreateBitmap(const wxArtID &id, const wxArtClient &client, const wxSize &size) {
 	wxBitmap bitmap;
 	if ( id == wxART_HELP ) {
-		wxFileName filename(_T(RESOURCES_PATH), _T("helpicon.png"));
+		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP);
 		if ( bitmap.LoadFile(filename.GetFullPath(), wxBITMAP_TYPE_ANY) ) {
 			return bitmap;
 		} else {
