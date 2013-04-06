@@ -130,7 +130,8 @@ of the failue.  Returns true otherwise.
 bool displaySplash(wxSplashScreen **splashWindow)
 {
 	wxBitmap splash;
-	wxFileName splashFile(_T(RESOURCES_PATH),_T("SCP_Header.png"));
+	// splash image location is fixed so that it's known at compile time
+	wxFileName splashFile(_T(RESOURCES_PATH), _T("wxL_Splash.png"));
 	if (splash.LoadFile(splashFile.GetFullPath(), wxBITMAP_TYPE_ANY)) {
 #if NDEBUG
 		(*splashWindow) = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
