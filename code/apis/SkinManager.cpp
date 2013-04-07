@@ -52,13 +52,39 @@ Skin::~Skin() {
 	if (this->bigWarningIcon != NULL) delete this->bigWarningIcon;
 }
 
-SkinSystem::SkinSystem(Skin *defaultSkin)
+SkinSystem* SkinSystem::skinSystem = NULL;
+
+bool SkinSystem::Initialize() {
+	wxASSERT(!SkinSystem::IsInitialized());
+	
+	SkinSystem::skinSystem = new SkinSystem();
+	return true;
+}
+
+void SkinSystem::DeInitialize() {
+	wxASSERT(SkinSystem::IsInitialized());
+	
+	SkinSystem* temp = SkinSystem::skinSystem;
+	SkinSystem::skinSystem = NULL;
+	delete temp;
+}
+
+bool SkinSystem::IsInitialized() {
+	return (SkinSystem::skinSystem != NULL); 
+}
+
+SkinSystem* SkinSystem::GetSkinSystem() {
+	wxCHECK_MSG(SkinSystem::IsInitialized(),
+		NULL,
+		_T("Attempt to get skin system when it has not been initialized."));
+	
+	return SkinSystem::skinSystem;
+}
+
+SkinSystem::SkinSystem()
 : font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)) {
-	if ( defaultSkin != NULL ) {
-		this->defaultSkin = defaultSkin;
-	} else {
-		this->defaultSkin = new Skin();
-	}
+
+	this->defaultSkin = new Skin();
 	this->TCSkin = NULL;
 
 	wxArtProvider::Push(new ArtProvider(this));

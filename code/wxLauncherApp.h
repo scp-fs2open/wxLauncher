@@ -32,8 +32,6 @@ public:
 	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
-	SkinSystem* skin;
-
 	wxString mFileOperand;
 	wxString mProfileOperand;
 	ProManOperator::profileOperator mProfileOperator;

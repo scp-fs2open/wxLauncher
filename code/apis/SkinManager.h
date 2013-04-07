@@ -42,7 +42,11 @@ be updated if needed.  The classes can also register a callback so that they
 can run arbitary code when the skin changes. */
 class SkinSystem {
 public:
-	SkinSystem(Skin* defaultSkin = NULL);
+	static bool Initialize();
+	static void DeInitialize();
+	static bool IsInitialized();
+	static SkinSystem* GetSkinSystem();
+	
 	~SkinSystem();
 
 	wxString GetTitle();
@@ -75,6 +79,9 @@ public:
 
 
 private:
+	SkinSystem();
+	static SkinSystem* skinSystem;
+	
 	Skin* defaultSkin;
 	Skin* TCSkin;
 	
