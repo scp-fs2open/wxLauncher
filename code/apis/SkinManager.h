@@ -82,7 +82,9 @@ private:
 	SkinSystem();
 	static SkinSystem* skinSystem;
 	
-	Skin* defaultSkin;
+	void InitializeDefaultSkin();
+	
+	Skin defaultSkin;
 	Skin* TCSkin;
 	
 	wxFont font;
