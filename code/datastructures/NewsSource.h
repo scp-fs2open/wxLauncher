@@ -31,7 +31,7 @@ class NewsSource {
 public:
 	NewsSource(NewsSourceId id, const wxString& newsURL, const wxString& label);
 	
-	const int GetId() const { return this->id; }
+	const NewsSourceId GetId() const { return this->id; }
 	const wxString& GetNewsUrl() const { return this->newsUrl; }
 	const wxString& GetLabel() const { return this->label; }
 	
