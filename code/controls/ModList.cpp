@@ -205,14 +205,14 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			continue;
 		}
 
-		wxMBConv* conv;
+		const wxMBConv* conv = NULL;
 		if ( isUTF8 ) {
-			conv = new wxMBConvUTF8();
+			conv = &wxConvUTF8;
 		} else {
-			conv = new wxCSConv(wxFONTENCODING_ISO8859_1);
+			conv = &wxConvISO8859_1;
 		}
 		wxString stringBuffer(characterBuffer, *conv);
-		delete conv;
+
 		// A hack to insert a backslash into the stream so that when
 		// wxFileConfig excapes the backslashes the one that is in 
 		// the file is returned
