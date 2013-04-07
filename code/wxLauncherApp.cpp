@@ -261,10 +261,11 @@ int wxLauncher::OnExit() {
 	if (mProfileOperator == ProManOperator::none)
 	{
 
-		SkinSystem::DeInitialize();
-		HelpManager::DeInitialize();
+		// deinitialize subsystems in the opposite order of initialization
 		ProfileProxy::DeInitialize();
 		FlagListManager::DeInitialize();
+		HelpManager::DeInitialize();
+		SkinSystem::DeInitialize();
 
 #if HAS_SDL == 1
 		SDL_Quit();
