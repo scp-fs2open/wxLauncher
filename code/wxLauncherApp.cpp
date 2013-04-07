@@ -112,8 +112,7 @@ bool wxLauncher::OnCmdLineParsed(wxCmdLineParser& parser)
 }
 
 wxLauncher::wxLauncher()
-	:skin(NULL),
-	mProfileOperator(ProManOperator::none),
+	:mProfileOperator(ProManOperator::none),
 	mKeepForSessionOnly(false),
 	mShowGUI(false)
 	// The strings init themselves sanely
@@ -221,8 +220,8 @@ bool wxLauncher::OnInit() {
 	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	wxFileSystem::AddHandler(new wxInternetFSHandler);
 
-	wxLogInfo(_T("Initializing Skin System..."));
-	this->skin = new SkinSystem();
+	wxLogInfo(_T("Initializing SkinSystem..."));
+	SkinSystem::Initialize();
 
 	wxLogInfo(_T("Initializing HelpManager..."));
 	HelpManager::Initialize();
@@ -236,7 +235,8 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("wxLauncher starting up."));
 
 
-	MainWindow* window = new MainWindow(skin);
+	// FIXME TODO: adjust so SkinSystem ptr is never passed around
+	MainWindow* window = new MainWindow(SkinSystem::GetSkinSystem());
 	wxLogStatus(_T("MainWindow is complete"));
 	window->Show(true);
 #if NDEBUG // will autodelete when timout runs out in debug
@@ -261,10 +261,7 @@ int wxLauncher::OnExit() {
 	if (mProfileOperator == ProManOperator::none)
 	{
 
-		if (this->skin != NULL) {
-			delete this->skin;
-		}
-
+		SkinSystem::DeInitialize();
 		HelpManager::DeInitialize();
 		ProfileProxy::DeInitialize();
 		FlagListManager::DeInitialize();
