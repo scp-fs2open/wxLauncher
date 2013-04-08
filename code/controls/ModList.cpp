@@ -176,8 +176,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 			continue;
 		}
 
-		wxFileConfig* config;
-
 		// check if the stream is a UTF-8 File
 		char header[3];
 		stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
@@ -219,7 +217,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		stringBuffer.Replace(_T("\\"), _T("\\\\"));
 		wxStringInputStream finalBuffer(stringBuffer);
 
-		config = new wxFileConfig(finalBuffer);
+		wxFileConfig* config = new wxFileConfig(finalBuffer);
 		delete[] characterBuffer;
 
 		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
