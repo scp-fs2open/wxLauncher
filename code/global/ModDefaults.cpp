@@ -20,8 +20,10 @@
 #include "global/ids.h"
 #include "controls/LightingPresets.h"
 
-const int DEFAULT_MOD_MIN_HORIZONTAL_RES =					640;
-const int DEFAULT_MOD_MIN_VERTICAL_RES =					480;
+const wxString DEFAULT_MOD_LAUNCHER_INFO_TEXT				(_("No information available."));
+
+const int DEFAULT_MOD_LAUNCHER_MIN_HORIZONTAL_RES =			640;
+const int DEFAULT_MOD_LAUNCHER_MIN_VERTICAL_RES =			480;
 
 const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME		(_T("Baseline recommended"));
 // internal constant for default recommended preset

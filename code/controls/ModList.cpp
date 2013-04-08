@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/SkinManager.h"
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
-#include "global/SkinDefaults.h"
+#include "global/ModDefaults.h"
 #include "global/Utils.h"
 #include "controls/ModList.h"
 #include "apis/ProfileManager.h"
@@ -1126,7 +1126,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	wxHtmlWindow* info = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
 	info->SetMinSize(wxSize(SkinSystem::InfoWindowImageWidth, 250));
 	if ( item->infotext == NULL ) {
-		info->SetPage(DEFAULT_SKIN_NO_MOD_MOD_DESC);
+		info->SetPage(DEFAULT_MOD_LAUNCHER_INFO_TEXT);
 	} else {
 		wxString infoText(*(item->infotext));
 		infoText.Replace(_T("\n"), _T("<br />"));
