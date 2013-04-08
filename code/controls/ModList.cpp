@@ -222,23 +222,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
 
-		// get the mod.ini's base directory
-		// <something>/modfolder/mod.ini
-		// <something>\modfolder\mod.ini
-		wxArrayString tokens = wxStringTokenize(foundInis.Item(i), _T("\\/"),
-			wxTOKEN_STRTOK); /* breakup on folder markers and never return an
-							 empty string. */
-		wxArrayString tcTokens = wxStringTokenize(tcPath, _T("\\/"), wxTOKEN_STRTOK);
-
-		size_t j = tcTokens.GetCount();
-		wxString shortname;
-		while ( j < (tokens.GetCount() - 1) ) { // -1 to skip mod.ini
-			if ( !shortname.IsEmpty() ) {
-				shortname += _T("/");
-			}
-			shortname += tokens[j];
-			j++;
-		}
+		wxString shortname(GetShortName(foundInis.Item(i), tcPath));
 
 		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
 
@@ -536,6 +520,28 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 	}
 }
 #endif
+
+/** get the mod.ini's short name (base directory) */
+/** <something>/modfolder/mod.ini
+    <something>\modfolder\mod.ini */
+wxString ModList::GetShortName(const wxString& modIniPath, const wxString& tcPath) {
+	wxArrayString tokens = wxStringTokenize(modIniPath, _T("\\/"),
+		wxTOKEN_STRTOK); /* breakup on folder markers and never return an
+						 empty string. */
+	wxArrayString tcTokens = wxStringTokenize(tcPath, _T("\\/"), wxTOKEN_STRTOK);
+
+	wxString shortname;
+
+	 // "tokens.GetCount() - 1" is to skip "mod.ini" at end
+	for ( size_t j = tcTokens.GetCount(); j < (tokens.GetCount() - 1); ++j ) {
+		if ( !shortname.IsEmpty() ) {
+			shortname += _T("/");
+		}
+		shortname += tokens[j];
+	}
+	
+	return shortname;
+}
 
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
