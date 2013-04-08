@@ -379,29 +379,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->SetItemCount(this->tableData->Count());
 
-	// set currently select mod as selected or
-	// set (No mod) if none or previous does not exist
-	wxString currentMod;
-	ProMan::GetProfileManager()->ProfileRead(
-		PRO_CFG_TC_CURRENT_MOD, &currentMod, NO_MOD);
-
-	{
-		size_t i;
-		for ( i = 0; i < this->tableData->size(); i++) {
-			if ( *(this->tableData->Item(i).shortname) == currentMod ) {
-				break;
-			}
-		}
-
-		if ( i < this->tableData->size() ) {
-			// found it
-			this->SetSelection(i);
-		} else {
-			this->SetSelection(0);
-		}
-		wxCommandEvent activateModEvent;
-		this->OnActivateMod(activateModEvent);
-	}
+	SetSelectedMod();
 
 
 	this->infoButton = 
@@ -520,6 +498,31 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 	}
 }
 #endif
+
+/** Set currently select mod as selected
+    or set (No mod) if none or previous does not exist. */
+void ModList::SetSelectedMod() {
+	wxString currentMod;
+	ProMan::GetProfileManager()->ProfileRead(
+		PRO_CFG_TC_CURRENT_MOD, &currentMod, NO_MOD);
+	
+	size_t i;
+	for ( i = 0; i < this->tableData->size(); ++i ) {
+		if ( *(this->tableData->Item(i).shortname) == currentMod ) {
+			break;
+		}
+	}
+	
+	if ( i < this->tableData->size() ) {
+		// found it
+		this->SetSelection(i);
+	} else {
+		this->SetSelection(0);
+	}
+	
+	wxCommandEvent activateModEvent;
+	this->OnActivateMod(activateModEvent);
+}
 
 /** get the mod.ini's short name (base directory) */
 /** <something>/modfolder/mod.ini

@@ -174,6 +174,7 @@ private:
 
 	ModItemArray* tableData;
 	
+	void SetSelectedMod();
 	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
 	wxString* prependmods, *appendmods;
