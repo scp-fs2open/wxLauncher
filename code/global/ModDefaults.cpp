@@ -23,8 +23,8 @@
 const int DEFAULT_MOD_MIN_HORIZONTAL_RES =					640;
 const int DEFAULT_MOD_MIN_VERTICAL_RES =					480;
 
-// internal constants for default recommended preset
 const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME		(_T("Baseline recommended"));
+// internal constant for default recommended preset
 const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET
 	(_T("-ambient_factor 75 -spec_exp 11 -spec_point 0.6 -spec_static 0.8 -spec_tube 0.4 -ogl_spec 60"));
 
