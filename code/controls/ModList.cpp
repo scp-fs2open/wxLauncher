@@ -167,66 +167,11 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	wxLogDebug(_T("Starting to parse mod.ini's..."));
 	for (size_t i = 0; i < foundInis.Count(); i++) {
-		wxLogDebug(_T("  Opening %s"), foundInis.Item(i).c_str());
-		wxFFileInputStream stream(foundInis.Item(i));
-		if ( stream.IsOk() ) {
-			wxLogDebug(_T("   Opened ok"));
-		} else {
-			wxLogDebug(_T("   Open failed!"));
-			continue;
+		wxLogDebug(_T("  Parsing %s"), foundInis.Item(i).c_str());
+
+		if (!ParseModIni(foundInis.Item(i), tcPath)) {
+			wxLogError(_T("  Parsing %s failed."), foundInis.Item(i).c_str());
 		}
-
-		// check if the stream is a UTF-8 File
-		char header[3];
-		stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
-		stream.SeekI(0);
-		bool isUTF8 = false;
-		if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
-			// is a UTF-8 file
-			isUTF8 = true;
-		}
-		wxMemoryOutputStream tempStream;
-		tempStream.Write(stream);
-
-		wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
-		size_t size = buf->GetBufferSize();
-
-		char* characterBuffer = new char[size+1];
-		characterBuffer[size] = '\0';
-
-		buf->Seek(0, wxFromStart);
-		// don't try to read in buffer because there is nothing to read.
-		size_t read = (size == 0)? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
-		if ( read != size ) {
-			wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
-			delete[] characterBuffer;
-			continue;
-		}
-
-		const wxMBConv* conv = NULL;
-		if ( isUTF8 ) {
-			conv = &wxConvUTF8;
-		} else {
-			conv = &wxConvISO8859_1;
-		}
-		wxString stringBuffer(characterBuffer, *conv);
-
-		// A hack to insert a backslash into the stream so that when
-		// wxFileConfig excapes the backslashes the one that is in 
-		// the file is returned
-		stringBuffer.Replace(_T("\\"), _T("\\\\"));
-		wxStringInputStream finalBuffer(stringBuffer);
-
-		wxFileConfig* config = new wxFileConfig(finalBuffer);
-		delete[] characterBuffer;
-
-		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
-
-		wxString shortname(GetShortName(foundInis.Item(i), tcPath));
-
-		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
-
-		this->configFiles->Add(new ConfigPair(shortname, config));
 	}
 
 	// create internal repesentation of the mod.ini's
@@ -498,6 +443,77 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 	}
 }
 #endif
+
+/** Parses the specified mod.ini file and adds it to configFiles.
+    Returns true on success, false otherwise. */
+bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath) {
+	wxFFileInputStream stream(modIniPath);
+
+	if ( stream.IsOk() ) {
+		wxLogDebug(_T("   Opened ok"));
+	} else {
+		wxLogError(_T("   Open failed!"));
+		return false;
+	}
+
+	// check if the stream is a UTF-8 File (has a BOM)
+	char header[3];
+	stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
+	stream.SeekI(0);
+	
+	bool isUTF8 = false;
+	if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
+		// is a UTF-8 file
+		isUTF8 = true;
+	}
+
+	wxMemoryOutputStream tempStream;
+	tempStream.Write(stream);
+
+	wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
+	const size_t size = buf->GetBufferSize();
+
+	char* characterBuffer = new char[size+1];
+	characterBuffer[size] = '\0';
+
+	buf->Seek(0, wxFromStart);
+
+	// don't try to read in buffer when there is nothing to read.
+	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
+	if ( read != size ) {
+		wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+		delete[] characterBuffer;
+		return false;
+	}
+
+	const wxMBConv* conv = NULL;
+	if ( isUTF8 ) {
+		conv = &wxConvUTF8;
+	} else {
+		conv = &wxConvISO8859_1;
+	}
+
+	wxString stringBuffer(characterBuffer, *conv);
+
+	// A hack to insert a backslash into the stream so that when
+	// wxFileConfig escapes the backslashes, the one that is in 
+	// the file is returned
+	stringBuffer.Replace(_T("\\"), _T("\\\\"));
+	wxStringInputStream finalBuffer(stringBuffer);
+
+	wxFileConfig* config = new wxFileConfig(finalBuffer);
+	delete[] characterBuffer;
+
+	wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
+
+	wxString shortname(GetShortName(modIniPath, tcPath));
+
+	wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
+
+	this->configFiles->Add(new ConfigPair(shortname, config));
+
+	return true;
+}
 
 /** Set currently select mod as selected
     or set (No mod) if none or previous does not exist. */
