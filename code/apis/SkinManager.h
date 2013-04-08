@@ -65,7 +65,7 @@ public:
 	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap MakeModsListImage(const wxBitmap &orig);
 
-	static bool SearchFile(wxFileName* filename, wxString currentTC,
+	static bool SearchFile(wxFileName& filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
 
 	static const unsigned int IdealIconWidth = 24;
