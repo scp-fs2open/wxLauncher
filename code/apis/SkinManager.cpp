@@ -240,7 +240,7 @@ on the mods page.
 wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 									   wxString filepath) {
 	wxFileName filename;
-	if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
+	if ( SkinSystem::SearchFile(filename, current, shortmodname, filepath) ) {
 		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 		wxImage image(filename.GetFullPath());
 		if ( image.IsOk() ) {
@@ -261,7 +261,7 @@ wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
 wxIcon* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 									   wxString filepath) {
    wxFileName filename;
-   if ( SkinSystem::SearchFile(&filename, current, shortmodname, filepath) ) {
+   if ( SkinSystem::SearchFile(filename, current, shortmodname, filepath) ) {
 	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 	   wxIcon icon(filename.GetFullPath()); // TODO: specify icon format? verify extension?
@@ -280,26 +280,26 @@ wxIcon* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
 
 /** Returns true if function is able to get a valid filename object for the
 passed paths.  Filename is returned via the param filename. */
-bool SkinSystem::SearchFile(wxFileName *filename, wxString currentTC,
+bool SkinSystem::SearchFile(wxFileName& filename, wxString currentTC,
 							wxString shortmodname, wxString filepath) {
 	if (shortmodname.IsEmpty()) { // indicates that the mod is (No mod)
-		filename->Assign(
+		filename.Assign(
 			wxString::Format(_T("%s"), filepath.c_str()));
 	} else {
-		filename->Assign(
+		filename.Assign(
 			wxString::Format(_T("%s/%s"), shortmodname.c_str(), filepath.c_str()));
 	}
 
-	if ( filename->Normalize(wxPATH_NORM_ALL, currentTC, wxPATH_UNIX) ) {
-		if ( filename->IsOk() ) {
-			if ( filename->FileExists() ) {
+	if ( filename.Normalize(wxPATH_NORM_ALL, currentTC, wxPATH_UNIX) ) {
+		if ( filename.IsOk() ) {
+			if ( filename.FileExists() ) {
 				return true;
 			} else {
 				wxLogDebug(_T("   File '%s' does not exist"),
-					filename->GetFullPath().c_str());
+					filename.GetFullPath().c_str());
 			}
 		} else {
-			wxLogDebug(_T("   File '%s' is not valid"), filename->GetFullPath().c_str());
+			wxLogDebug(_T("   File '%s' is not valid"), filename.GetFullPath().c_str());
 		}
 	} else {
 		wxLogDebug(_T("   Unable to normalize '%s' '%s' '%s'"),	currentTC.c_str(),
@@ -313,7 +313,7 @@ new wxBitmap allocated on the heap, otherwise returns NULL if any errors.*/
 wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 									  wxString filepath) {
 	  wxFileName filename;
-	  if ( SkinSystem::SearchFile(&filename, currentTC, shortname, filepath) ) {
+	  if ( SkinSystem::SearchFile(filename, currentTC, shortname, filepath) ) {
 		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
 
 		  wxImage image(filename.GetFullPath());
