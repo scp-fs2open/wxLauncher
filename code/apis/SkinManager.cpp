@@ -319,8 +319,8 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 		  wxImage image(filename.GetFullPath());
 
 		  if ( image.IsOk() ) {
-			  if ( image.GetWidth() == static_cast<int>(SkinSystem::IdealIconWidth)
-				  && image.GetHeight() == static_cast<int>(SkinSystem::IdealIconHeight) ) { 
+			  if ( image.GetWidth() == SkinSystem::IdealIconWidth
+				  && image.GetHeight() == SkinSystem::IdealIconHeight ) {
 					  return new wxBitmap(image);
 			  } else {
 				  wxLogDebug(_T("   Icon is incorrect size. Got (%d,%d); Need (%d,%d)"),
@@ -340,8 +340,8 @@ wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
 		SkinSystem::ModsListImageHeight,
 		wxIMAGE_QUALITY_HIGH);
 	wxBitmap outimg = wxBitmap(temp1);
-	wxASSERT( outimg.GetWidth() == static_cast<int>(SkinSystem::ModsListImageWidth));
-	wxASSERT( outimg.GetHeight() == static_cast<int>(SkinSystem::ModsListImageHeight));
+	wxASSERT( outimg.GetWidth() == SkinSystem::ModsListImageWidth );
+	wxASSERT( outimg.GetHeight() == SkinSystem::ModsListImageHeight );
 	return outimg;
 }
 
