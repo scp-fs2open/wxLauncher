@@ -156,7 +156,6 @@ private:
 	internal name. */
 	ConfigArray* configFiles;
 	SkinSystem* skinSystem;
-	wxString stringNoMod;
 	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;

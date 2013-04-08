@@ -126,8 +126,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->skinSystem = skin;
 
-	this->stringNoMod = NO_MOD;
-
 	this->appendmods = NULL;
 	this->prependmods = NULL;
 	
@@ -150,7 +148,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
 		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
-		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig(tcmodinistream)));
+		this->configFiles->Add(new ConfigPair(NO_MOD, new wxFileConfig(tcmodinistream)));
 		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath().c_str());
 
 		// make sure that a mod.ini in the root TC folder is not apart of this set
@@ -161,7 +159,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		}
 
 	} else {
-		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig()));
+		this->configFiles->Add(new ConfigPair(NO_MOD, new wxFileConfig()));
 		wxLogDebug(_T(" Using defaults for TC."));
 	}
 
@@ -193,7 +191,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		wxString *smallimagepath = NULL;
 		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
 		if ( smallimagepath != NULL ) {
-			if (shortname == this->stringNoMod) {
+			if (shortname == NO_MOD) {
 				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
 					*smallimagepath);				
 			} else {
@@ -577,7 +575,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	wxString activeMod;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod, true);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, NO_MOD, true);
 	wxBrush b;
 	wxRect selectedRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
 	wxRect activeRect(selectedRect.x+3, selectedRect.y+3, selectedRect.width-7, selectedRect.height-7);
