@@ -71,7 +71,7 @@ private:
 };
 
 
-ConfigPair::ConfigPair(wxString &shortname, wxFileConfig *config)  {
+ConfigPair::ConfigPair(const wxString &shortname, wxFileConfig *config)  {
 	this->shortname = shortname;
 	this->config = config;
 }
