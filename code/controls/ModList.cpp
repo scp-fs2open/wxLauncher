@@ -1112,8 +1112,11 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 
 	wxString tcPath;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
-	wxString modFolderString = 
-		wxString::Format(_T("%s%c%s"), tcPath.c_str(), wxFileName::GetPathSeparator(), item->shortname->c_str());
+	wxString modFolderString =
+		wxString::Format(_T("%s%s"),
+			tcPath.c_str(),
+			(*item->shortname == NO_MOD) ? wxEmptyString :
+				(wxString(wxFileName::GetPathSeparator()) + *item->shortname).c_str());
 	wxStaticText* modFolderBox = 
 		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
