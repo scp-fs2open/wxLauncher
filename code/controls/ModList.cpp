@@ -147,9 +147,12 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	wxLogDebug(_T("Inserting '(No mod)'"));
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
-		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
-		this->configFiles->Add(new ConfigPair(NO_MOD, new wxFileConfig(tcmodinistream)));
 		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath().c_str());
+
+		if (!ParseModIni(tcmodini.GetFullPath(), tcPath, true)) {
+			wxLogError(_T(" Error parsing mod.ini in the root TC folder. (%s)"),
+				tcmodini.GetFullPath().c_str());
+		}
 
 		// make sure that a mod.ini in the root TC folder is not apart of this set
 		// because it will be addressed shortly and specificly
@@ -444,7 +447,7 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 
 /** Parses the specified mod.ini file and adds it to configFiles.
     Returns true on success, false otherwise. */
-bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath) {
+bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, const bool isNoMod) {
 	wxFFileInputStream stream(modIniPath);
 
 	if ( stream.IsOk() ) {
@@ -502,11 +505,14 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath) {
 	wxFileConfig* config = new wxFileConfig(finalBuffer);
 	delete[] characterBuffer;
 
-	wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
+	wxString shortname(isNoMod ? NO_MOD : GetShortName(modIniPath, tcPath));
+	
+	if (!isNoMod) {
+		wxLogDebug(_T("   Mod fancy name is: %s"),
+			config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
 
-	wxString shortname(GetShortName(modIniPath, tcPath));
-
-	wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
+		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
+	} 
 
 	this->configFiles->Add(new ConfigPair(shortname, config));
 
