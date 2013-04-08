@@ -161,8 +161,8 @@ private:
 	wxStaticBitmap *warnBitmap;
 	wxBoxSizer *buttonSizer, *sizer;
 
-	void readIniFileString(wxFileConfig* config,
-		wxString keyvalue, wxString ** location);
+	void readIniFileString(const wxFileConfig* config,
+		const wxString& key, wxString ** location);
 	void readFlagSet(wxFileConfig* config,
 		wxString keyprefix, FlagSetItem * set);
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
