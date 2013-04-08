@@ -173,7 +173,6 @@ private:
 	wxString excapeSpecials(wxString toexcape);
 
 	ModItemArray* tableData;
-	wxButton * testbutton;
 
 	wxString* prependmods, *appendmods;
 	bool isAPrependMod(const wxString& mod) const;
