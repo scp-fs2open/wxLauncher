@@ -372,22 +372,24 @@ ModList::~ModList() {
 		delete this->sizer;
 	}
 }
-/** Function takes the keyvalue string to search for, and returns via location
-the pointer to value. If the keyvalue is not found *location will remain NULL.*/
-void ModList::readIniFileString(wxFileConfig* config,
-									 wxString keyvalue, wxString ** location) {
-	if ( config->Exists(keyvalue) ) {
+/** Function takes the key to search for, and returns via location
+the pointer to value. If the key is not found *location will remain NULL.*/
+void ModList::readIniFileString(const wxFileConfig* config,
+		const wxString& key, wxString ** location) {
+	wxASSERT(config != NULL);
+
+	if ( config->HasEntry(key) ) {
 			*location = new wxString();
-			config->Read(keyvalue, *location);
+			config->Read(key, *location);
 			if ( (*location)->EndsWith(_T(";")) ) {
 				(*location)->RemoveLast();
 			}
 	}
-	wxLogDebug(_T("  %s:'%s'"), keyvalue.c_str(),
+	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
 		((*location) == NULL) ? _T("Not Specified") : escapeSpecials(**location).c_str());
 
 	if ( (*location) != NULL && (*location)->empty() ) {
-		wxLogDebug(_T("  Nulled %s"), keyvalue.c_str());
+		wxLogDebug(_T("  Nulled %s"), key.c_str());
 		delete *location;
 		*location = NULL;
 	}
