@@ -68,12 +68,12 @@ public:
 	static bool SearchFile(wxFileName& filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
 
-	static const unsigned int IdealIconWidth = 24;
-	static const unsigned int IdealIconHeight = 24;
+	static const int IdealIconWidth = 24;
+	static const int IdealIconHeight = 24;
 	static const unsigned int InfoWindowImageWidth = 255;
 	static const unsigned int InfoWindowImageHeight = 112;
-	static const unsigned int ModsListImageWidth = 182;
-	static const unsigned int ModsListImageHeight = 80;
+	static const int ModsListImageWidth = 182;
+	static const int ModsListImageHeight = 80;
 	static const unsigned int BigWarningIconWidth = 64;
 	static const unsigned int BigWarningIconHeight = 64;
 
