@@ -384,7 +384,7 @@ void ModList::readIniFileString(wxFileConfig* config,
 			}
 	}
 	wxLogDebug(_T("  %s:'%s'"), keyvalue.c_str(),
-		((*location) == NULL) ? _T("Not Specified") : excapeSpecials(**location).c_str());
+		((*location) == NULL) ? _T("Not Specified") : escapeSpecials(**location).c_str());
 
 	if ( (*location) != NULL && (*location)->empty() ) {
 		wxLogDebug(_T("  Nulled %s"), keyvalue.c_str());
@@ -393,21 +393,27 @@ void ModList::readIniFileString(wxFileConfig* config,
 	}
 }
 
-/** reexcape the newlines in the mod.ini values. */
-wxString ModList::excapeSpecials(wxString toexcape) {
-	wxString::iterator iter;
-	for ( iter = toexcape.begin(); iter != toexcape.end(); iter++ ) {
+/** re-escape the newlines in the mod.ini values. */
+wxString ModList::escapeSpecials(const wxString& toEscape) {
+	wxString toEscapeTemp(toEscape);
+
+	wxString::iterator iter = toEscapeTemp.begin();
+
+	while (iter != toEscapeTemp.end() ) {
 		if ( *iter == wxChar('\n') ) {
 			wxString::iterator end = iter;
 			end++;
-			toexcape.replace(iter, end, _T("\\n"));
+			toEscapeTemp.replace(iter, end, _T("\\n"));
 
-			// have to start from the begining because we wrote to the string
-			// in invalidated the iterator.
-			iter = toexcape.begin();
+			// have to start over because we wrote to the string,
+			// which invalidated the iterator.
+			iter = toEscapeTemp.begin();
+		} else {
+			++iter;
 		}
 	}
-	return toexcape;
+
+	return toEscapeTemp;
 }
 
 

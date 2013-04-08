@@ -169,7 +169,7 @@ private:
 	void readTranslation(wxFileConfig* config,
 		wxString langaugename, I18nItem ** trans);
 #endif
-	wxString excapeSpecials(wxString toexcape);
+	wxString escapeSpecials(const wxString& toEscape);
 
 	ModItemArray* tableData;
 	
