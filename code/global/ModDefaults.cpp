@@ -29,6 +29,6 @@ const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET
 	(_T("-ambient_factor 75 -spec_exp 11 -spec_point 0.6 -spec_static 0.8 -spec_tube 0.4 -ogl_spec 60"));
 
 const Preset DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET(
-	DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME,
+	_T("BaselineRecommended"),
 	ID_PRESET_BASELINE,
 	DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET);
