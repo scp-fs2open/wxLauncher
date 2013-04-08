@@ -173,6 +173,8 @@ private:
 	wxString excapeSpecials(wxString toexcape);
 
 	ModItemArray* tableData;
+	
+	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
 	wxString* prependmods, *appendmods;
 	bool isAPrependMod(const wxString& mod) const;
