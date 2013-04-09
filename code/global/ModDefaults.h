@@ -26,9 +26,12 @@ class Preset;
 
 /** \defgroup moddefaults default values for mod-specific settings */
 /** @{*/
-extern const int DEFAULT_MOD_MIN_HORIZONTAL_RES;
-extern const int DEFAULT_MOD_MIN_VERTICAL_RES;
+extern const wxString DEFAULT_MOD_LAUNCHER_INFO_TEXT;
 
+extern const int DEFAULT_MOD_LAUNCHER_MIN_HORIZONTAL_RES;
+extern const int DEFAULT_MOD_LAUNCHER_MIN_VERTICAL_RES;
+
+extern const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME;
 extern const Preset DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
 /** @}*/
 

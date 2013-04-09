@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/SkinManager.h"
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
-#include "global/SkinDefaults.h"
+#include "global/ModDefaults.h"
 #include "global/Utils.h"
 #include "controls/ModList.h"
 #include "apis/ProfileManager.h"
@@ -71,7 +71,7 @@ private:
 };
 
 
-ConfigPair::ConfigPair(wxString &shortname, wxFileConfig *config)  {
+ConfigPair::ConfigPair(const wxString &shortname, wxFileConfig *config)  {
 	this->shortname = shortname;
 	this->config = config;
 }
@@ -126,8 +126,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->skinSystem = skin;
 
-	this->stringNoMod = NO_MOD;
-
 	this->appendmods = NULL;
 	this->prependmods = NULL;
 	
@@ -149,9 +147,12 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	wxLogDebug(_T("Inserting '(No mod)'"));
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
 	if ( tcmodini.IsOk() && tcmodini.FileExists() ) {
-		wxFFileInputStream tcmodinistream(tcmodini.GetFullPath());
-		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig(tcmodinistream)));
 		wxLogDebug(_T(" Found a mod.ini in the root TC folder. (%s)"), tcmodini.GetFullPath().c_str());
+
+		if (!ParseModIni(tcmodini.GetFullPath(), tcPath, true)) {
+			wxLogError(_T(" Error parsing mod.ini in the root TC folder. (%s)"),
+				tcmodini.GetFullPath().c_str());
+		}
 
 		// make sure that a mod.ini in the root TC folder is not apart of this set
 		// because it will be addressed shortly and specificly
@@ -161,90 +162,17 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		}
 
 	} else {
-		this->configFiles->Add(new ConfigPair(stringNoMod, new wxFileConfig()));
+		this->configFiles->Add(new ConfigPair(NO_MOD, new wxFileConfig()));
 		wxLogDebug(_T(" Using defaults for TC."));
 	}
 
 	wxLogDebug(_T("Starting to parse mod.ini's..."));
 	for (size_t i = 0; i < foundInis.Count(); i++) {
-		wxLogDebug(_T("  Opening %s"), foundInis.Item(i).c_str());
-		wxFFileInputStream stream(foundInis.Item(i));
-		if ( stream.IsOk() ) {
-			wxLogDebug(_T("   Opened ok"));
-		} else {
-			wxLogDebug(_T("   Open failed!"));
-			continue;
+		wxLogDebug(_T("  Parsing %s"), foundInis.Item(i).c_str());
+
+		if (!ParseModIni(foundInis.Item(i), tcPath)) {
+			wxLogError(_T("  Parsing %s failed."), foundInis.Item(i).c_str());
 		}
-
-		wxFileConfig* config;
-
-		// check if the stream is a UTF-8 File
-		char header[3];
-		stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
-		stream.SeekI(0);
-		bool isUTF8 = false;
-		if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
-			// is a UTF-8 file
-			isUTF8 = true;
-		}
-		wxMemoryOutputStream tempStream;
-		tempStream.Write(stream);
-
-		wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
-		size_t size = buf->GetBufferSize();
-
-		char* characterBuffer = new char[size+1];
-		characterBuffer[size] = '\0';
-
-		buf->Seek(0, wxFromStart);
-		// don't try to read in buffer because there is nothing to read.
-		size_t read = (size == 0)? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
-		if ( read != size ) {
-			wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
-			delete[] characterBuffer;
-			continue;
-		}
-
-		wxMBConv* conv;
-		if ( isUTF8 ) {
-			conv = new wxMBConvUTF8();
-		} else {
-			conv = new wxCSConv(wxFONTENCODING_ISO8859_1);
-		}
-		wxString stringBuffer(characterBuffer, *conv);
-		delete conv;
-		// A hack to insert a backslash into the stream so that when
-		// wxFileConfig excapes the backslashes the one that is in 
-		// the file is returned
-		stringBuffer.Replace(_T("\\"), _T("\\\\"));
-		wxStringInputStream finalBuffer(stringBuffer);
-
-		config = new wxFileConfig(finalBuffer);
-		delete[] characterBuffer;
-
-		wxLogDebug(_T("   Mod fancy name is: %s"), config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
-
-		// get the mod.ini's base directory
-		// <something>/modfolder/mod.ini
-		// <something>\modfolder\mod.ini
-		wxArrayString tokens = wxStringTokenize(foundInis.Item(i), _T("\\/"),
-			wxTOKEN_STRTOK); /* breakup on folder markers and never return an
-							 empty string. */
-		wxArrayString tcTokens = wxStringTokenize(tcPath, _T("\\/"), wxTOKEN_STRTOK);
-
-		size_t j = tcTokens.GetCount();
-		wxString shortname;
-		while ( j < (tokens.GetCount() - 1) ) { // -1 to skip mod.ini
-			if ( !shortname.IsEmpty() ) {
-				shortname += _T("/");
-			}
-			shortname += tokens[j];
-			j++;
-		}
-
-		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
-
-		this->configFiles->Add(new ConfigPair(shortname, config));
 	}
 
 	// create internal repesentation of the mod.ini's
@@ -266,7 +194,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		wxString *smallimagepath = NULL;
 		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
 		if ( smallimagepath != NULL ) {
-			if (shortname == this->stringNoMod) {
+			if (shortname == NO_MOD) {
 				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
 					*smallimagepath);				
 			} else {
@@ -397,29 +325,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 
 	this->SetItemCount(this->tableData->Count());
 
-	// set currently select mod as selected or
-	// set (No mod) if none or previous does not exist
-	wxString currentMod;
-	ProMan::GetProfileManager()->ProfileRead(
-		PRO_CFG_TC_CURRENT_MOD, &currentMod, NO_MOD);
-
-	{
-		size_t i;
-		for ( i = 0; i < this->tableData->size(); i++) {
-			if ( *(this->tableData->Item(i).shortname) == currentMod ) {
-				break;
-			}
-		}
-
-		if ( i < this->tableData->size() ) {
-			// found it
-			this->SetSelection(i);
-		} else {
-			this->SetSelection(0);
-		}
-		wxCommandEvent activateModEvent;
-		this->OnActivateMod(activateModEvent);
-	}
+	SetSelectedMod();
 
 
 	this->infoButton = 
@@ -466,42 +372,50 @@ ModList::~ModList() {
 		delete this->sizer;
 	}
 }
-/** Function takes the keyvalue string to search for, and returns via location
-the pointer to value. If the keyvalue is not found *location will remain NULL.*/
-void ModList::readIniFileString(wxFileConfig* config,
-									 wxString keyvalue, wxString ** location) {
-	if ( config->Exists(keyvalue) ) {
+/** Function takes the key to search for, and returns via location
+the pointer to value. If the key is not found *location will remain NULL.*/
+void ModList::readIniFileString(const wxFileConfig* config,
+		const wxString& key, wxString ** location) {
+	wxASSERT(config != NULL);
+
+	if ( config->HasEntry(key) ) {
 			*location = new wxString();
-			config->Read(keyvalue, *location);
+			config->Read(key, *location);
 			if ( (*location)->EndsWith(_T(";")) ) {
 				(*location)->RemoveLast();
 			}
 	}
-	wxLogDebug(_T("  %s:'%s'"), keyvalue.c_str(),
-		((*location) == NULL) ? _T("Not Specified") : excapeSpecials(**location).c_str());
+	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
+		((*location) == NULL) ? _T("Not Specified") : escapeSpecials(**location).c_str());
 
 	if ( (*location) != NULL && (*location)->empty() ) {
-		wxLogDebug(_T("  Nulled %s"), keyvalue.c_str());
+		wxLogDebug(_T("  Nulled %s"), key.c_str());
 		delete *location;
 		*location = NULL;
 	}
 }
 
-/** reexcape the newlines in the mod.ini values. */
-wxString ModList::excapeSpecials(wxString toexcape) {
-	wxString::iterator iter;
-	for ( iter = toexcape.begin(); iter != toexcape.end(); iter++ ) {
+/** re-escape the newlines in the mod.ini values. */
+wxString ModList::escapeSpecials(const wxString& toEscape) {
+	wxString toEscapeTemp(toEscape);
+
+	wxString::iterator iter = toEscapeTemp.begin();
+
+	while (iter != toEscapeTemp.end() ) {
 		if ( *iter == wxChar('\n') ) {
 			wxString::iterator end = iter;
 			end++;
-			toexcape.replace(iter, end, _T("\\n"));
+			toEscapeTemp.replace(iter, end, _T("\\n"));
 
-			// have to start from the begining because we wrote to the string
-			// in invalidated the iterator.
-			iter = toexcape.begin();
+			// have to start over because we wrote to the string,
+			// which invalidated the iterator.
+			iter = toEscapeTemp.begin();
+		} else {
+			++iter;
 		}
 	}
-	return toexcape;
+
+	return toEscapeTemp;
 }
 
 
@@ -539,6 +453,127 @@ void ModList::readTranslation(wxFileConfig* config, wxString langaugename, I18nI
 }
 #endif
 
+/** Parses the specified mod.ini file and adds it to configFiles.
+    Returns true on success, false otherwise. */
+bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, const bool isNoMod) {
+	wxFFileInputStream stream(modIniPath);
+
+	if ( stream.IsOk() ) {
+		wxLogDebug(_T("   Opened ok"));
+	} else {
+		wxLogError(_T("   Open failed!"));
+		return false;
+	}
+
+	// check if the stream is a UTF-8 File (has a BOM)
+	char header[3];
+	stream.Read(reinterpret_cast<void*>(&header), sizeof(header));
+	stream.SeekI(0);
+	
+	bool isUTF8 = false;
+	if ( header[0] == '\357' && header[1] == '\273' && header[2] == '\277' ) {
+		// is a UTF-8 file
+		isUTF8 = true;
+	}
+
+	wxMemoryOutputStream tempStream;
+	tempStream.Write(stream);
+
+	wxStreamBuffer* buf = tempStream.GetOutputStreamBuffer();
+	const size_t size = buf->GetBufferSize();
+
+	char* characterBuffer = new char[size+1];
+	characterBuffer[size] = '\0';
+
+	buf->Seek(0, wxFromStart);
+
+	// don't try to read in buffer when there is nothing to read.
+	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
+	if ( read != size ) {
+		wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+		delete[] characterBuffer;
+		return false;
+	}
+
+	const wxMBConv* conv = NULL;
+	if ( isUTF8 ) {
+		conv = &wxConvUTF8;
+	} else {
+		conv = &wxConvISO8859_1;
+	}
+
+	wxString stringBuffer(characterBuffer, *conv);
+
+	// A hack to insert a backslash into the stream so that when
+	// wxFileConfig escapes the backslashes, the one that is in 
+	// the file is returned
+	stringBuffer.Replace(_T("\\"), _T("\\\\"));
+	wxStringInputStream finalBuffer(stringBuffer);
+
+	wxFileConfig* config = new wxFileConfig(finalBuffer);
+	delete[] characterBuffer;
+
+	wxString shortname(isNoMod ? NO_MOD : GetShortName(modIniPath, tcPath));
+	
+	if (!isNoMod) {
+		wxLogDebug(_T("   Mod fancy name is: %s"),
+			config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
+
+		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
+	} 
+
+	this->configFiles->Add(new ConfigPair(shortname, config));
+
+	return true;
+}
+
+/** Set currently select mod as selected
+    or set (No mod) if none or previous does not exist. */
+void ModList::SetSelectedMod() {
+	wxString currentMod;
+	ProMan::GetProfileManager()->ProfileRead(
+		PRO_CFG_TC_CURRENT_MOD, &currentMod, NO_MOD);
+	
+	size_t i;
+	for ( i = 0; i < this->tableData->size(); ++i ) {
+		if ( *(this->tableData->Item(i).shortname) == currentMod ) {
+			break;
+		}
+	}
+	
+	if ( i < this->tableData->size() ) {
+		// found it
+		this->SetSelection(i);
+	} else {
+		this->SetSelection(0);
+	}
+	
+	wxCommandEvent activateModEvent;
+	this->OnActivateMod(activateModEvent);
+}
+
+/** get the mod.ini's short name (base directory) */
+/** <something>/modfolder/mod.ini
+    <something>\modfolder\mod.ini */
+wxString ModList::GetShortName(const wxString& modIniPath, const wxString& tcPath) {
+	wxArrayString tokens = wxStringTokenize(modIniPath, _T("\\/"),
+		wxTOKEN_STRTOK); /* breakup on folder markers and never return an
+						 empty string. */
+	wxArrayString tcTokens = wxStringTokenize(tcPath, _T("\\/"), wxTOKEN_STRTOK);
+
+	wxString shortname;
+
+	 // "tokens.GetCount() - 1" is to skip "mod.ini" at end
+	for ( size_t j = tcTokens.GetCount(); j < (tokens.GetCount() - 1); ++j ) {
+		if ( !shortname.IsEmpty() ) {
+			shortname += _T("/");
+		}
+		shortname += tokens[j];
+	}
+	
+	return shortname;
+}
+
 void ModList::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 	wxLogDebug(_T(" Draw %04d,%04d = %04d,%04d"), rect.x, rect.y, rect.width, rect.height);
 	this->tableData->Item(n).Draw(dc, rect, this->IsSelected(n), this->sizer, this->buttonSizer, this->warnBitmap);
@@ -554,7 +589,7 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	wxColour highlighted = wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT);
 	wxColour background = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	wxString activeMod;
-	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, this->stringNoMod, true);
+	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_MOD, &activeMod, NO_MOD, true);
 	wxBrush b;
 	wxRect selectedRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
 	wxRect activeRect(selectedRect.x+3, selectedRect.y+3, selectedRect.width-7, selectedRect.height-7);
@@ -1079,8 +1114,11 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 
 	wxString tcPath;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tcPath, wxEmptyString);
-	wxString modFolderString = 
-		wxString::Format(_T("%s%c%s"), tcPath.c_str(), wxFileName::GetPathSeparator(), item->shortname->c_str());
+	wxString modFolderString =
+		wxString::Format(_T("%s%s"),
+			tcPath.c_str(),
+			(*item->shortname == NO_MOD) ? wxEmptyString :
+				(wxString(wxFileName::GetPathSeparator()) + *item->shortname).c_str());
 	wxStaticText* modFolderBox = 
 		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
@@ -1090,7 +1128,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 	wxHtmlWindow* info = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
 	info->SetMinSize(wxSize(SkinSystem::InfoWindowImageWidth, 250));
 	if ( item->infotext == NULL ) {
-		info->SetPage(DEFAULT_SKIN_NO_MOD_MOD_DESC);
+		info->SetPage(DEFAULT_MOD_LAUNCHER_INFO_TEXT);
 	} else {
 		wxString infoText(*(item->infotext));
 		infoText.Replace(_T("\n"), _T("<br />"));

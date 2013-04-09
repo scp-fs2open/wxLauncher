@@ -35,6 +35,4 @@ const wxString DEFAULT_SKIN_ICON_HELP			(_T("helpicon.png"));
 const wxString DEFAULT_SKIN_ICON_HELP_BIG		(_T("questionmark.png"));
 const wxString DEFAULT_SKIN_ICON_IDEAL			(_T("recommended.png"));
 
-const wxString DEFAULT_SKIN_NO_MOD_MOD_DESC		(_("No information available."));
-
 const NewsSourceId DEFAULT_SKIN_NEWS_SOURCE		(NEWS_SOURCE_ID_HLP);

@@ -39,8 +39,6 @@ extern const wxString DEFAULT_SKIN_ICON_HELP;
 extern const wxString DEFAULT_SKIN_ICON_HELP_BIG;
 extern const wxString DEFAULT_SKIN_ICON_IDEAL;
 
-extern const wxString DEFAULT_SKIN_NO_MOD_MOD_DESC;
-
 extern const NewsSourceId DEFAULT_SKIN_NEWS_SOURCE;
 /** @}*/
 

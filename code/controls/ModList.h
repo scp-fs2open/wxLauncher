@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class ConfigPair {
 public:
-	ConfigPair(wxString &shortname, wxFileConfig* config);
+	ConfigPair(const wxString &shortname, wxFileConfig* config);
 	~ConfigPair();
 	wxString shortname;
 	wxFileConfig* config;
@@ -156,24 +156,26 @@ private:
 	internal name. */
 	ConfigArray* configFiles;
 	SkinSystem* skinSystem;
-	wxString stringNoMod;
 	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;
 	wxBoxSizer *buttonSizer, *sizer;
 
-	void readIniFileString(wxFileConfig* config,
-		wxString keyvalue, wxString ** location);
+	void readIniFileString(const wxFileConfig* config,
+		const wxString& key, wxString ** location);
 	void readFlagSet(wxFileConfig* config,
 		wxString keyprefix, FlagSetItem * set);
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	void readTranslation(wxFileConfig* config,
 		wxString langaugename, I18nItem ** trans);
 #endif
-	wxString excapeSpecials(wxString toexcape);
+	wxString escapeSpecials(const wxString& toEscape);
 
 	ModItemArray* tableData;
-	wxButton * testbutton;
+	
+	bool ParseModIni(const wxString& modIniPath, const wxString& tcPath, bool isNoMod = false);
+	void SetSelectedMod();
+	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
 	wxString* prependmods, *appendmods;
 	bool isAPrependMod(const wxString& mod) const;
