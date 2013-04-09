@@ -22,18 +22,41 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 
-/** Struct that holds the skin information.  */
+/** Holds a skin's information.  */
+/** The Set() functions return true on success, false otherwise. */
 class Skin {
 public:
-	Skin();
-	~Skin();
-	wxString* windowTitle;
-	wxIcon* windowIcon;
-	wxBitmap* welcomeHeader;
-	wxBitmap* idealIcon;
-	wxString* welcomePageText;
-	wxBitmap* warningIcon;
-	wxBitmap* bigWarningIcon;
+	Skin() { }
+	
+	const wxString& GetWindowTitle() const { return this->windowTitle; }
+	bool SetWindowTitle(const wxString& windowTitle);
+	
+	const wxIcon& GetWindowIcon() const { return this->windowIcon; }
+	bool SetWindowIcon(const wxIcon& windowIcon);
+	
+	const wxBitmap& GetBanner() const { return this->banner; }
+	bool SetBanner(const wxBitmap& banner);
+	
+	const wxBitmap& GetIdealIcon() const { return this->idealIcon; }
+	bool SetIdealIcon(const wxBitmap& idealIcon);
+	
+	const wxString& GetWelcomeText() const { return this->welcomeText; }
+	bool SetWelcomeText(const wxString& welcomeText);
+	
+	const wxBitmap& GetWarningIcon() const { return this->warningIcon; }
+	bool SetWarningIcon(const wxBitmap& warningIcon);
+	
+	const wxBitmap& GetBigWarningIcon() const { return this->bigWarningIcon; }
+	bool SetBigWarningIcon(const wxBitmap& bigWarningIcon);
+	
+private:
+	wxString windowTitle;
+	wxIcon windowIcon;
+	wxBitmap banner;
+	wxBitmap idealIcon;
+	wxString welcomeText;
+	wxBitmap warningIcon;
+	wxBitmap bigWarningIcon;
 };
 
 /** Class used to manage the skinning of the launcher.  The skinable parts of
@@ -49,14 +72,15 @@ public:
 	
 	~SkinSystem();
 
-	wxString GetTitle();
-	wxIcon GetIcon();
-	wxBitmap GetBanner();
-	wxBitmap GetIdealIcon();
-	wxBitmap GetWarningIcon();
-	wxBitmap GetBigWarningIcon();
+	const wxString& GetWindowTitle() const;
+	const wxIcon& GetWindowIcon() const;
+	const wxBitmap& GetBanner() const;
+	const wxBitmap& GetIdealIcon() const;
+	const wxBitmap& GetWarningIcon() const;
+	const wxBitmap& GetBigWarningIcon() const;
+	const wxString& GetWelcomeText() const;
+	
 	const wxFont& GetFont() const { return this->font; }
-	wxString GetWelcomePageText();
 
 	void SetTCSkin(Skin *skin = NULL);
 
@@ -74,8 +98,10 @@ public:
 	static const unsigned int InfoWindowImageHeight = 112;
 	static const int ModsListImageWidth = 182;
 	static const int ModsListImageHeight = 80;
-	static const unsigned int BigWarningIconWidth = 64;
-	static const unsigned int BigWarningIconHeight = 64;
+	static const int BigWarningIconWidth = 64;
+	static const int BigWarningIconHeight = 64;
+	static const int StatusBarIconWidth = 24;
+	static const int StatusBarIconHeight = 24;
 
 
 private:

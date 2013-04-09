@@ -138,7 +138,7 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
 	wxHtmlWindow* general = new wxHtmlWindow(this, ID_SUMMARY_HTML_PANEL, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
-	general->SetPage(skin->GetWelcomePageText());
+	general->SetPage(skin->GetWelcomeText());
 	general->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);
