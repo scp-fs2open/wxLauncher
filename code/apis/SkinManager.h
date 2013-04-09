@@ -83,7 +83,8 @@ public:
 	const wxFont& GetFont() const { return this->font; }
 	const wxFont& GetMessageFont() const { return this->messageFont; }
 
-	void SetTCSkin(Skin *skin = NULL);
+	void SetTCSkin(const Skin* skin);
+	void ResetTCSkin();
 
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
