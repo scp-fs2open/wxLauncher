@@ -81,6 +81,7 @@ public:
 	const wxString& GetWelcomeText() const;
 	
 	const wxFont& GetFont() const { return this->font; }
+	const wxFont& GetMessageFont() const { return this->messageFont; }
 
 	void SetTCSkin(Skin *skin = NULL);
 
@@ -114,6 +115,7 @@ private:
 	Skin* TCSkin;
 	
 	wxFont font;
+	wxFont messageFont;
 };
 
 #endif

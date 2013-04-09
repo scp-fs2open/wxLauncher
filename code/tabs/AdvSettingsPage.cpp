@@ -292,8 +292,7 @@ void AdvSettingsPage::UpdateErrorText() {
 	
 	this->errorText->SetLabel(msg);
 	
-	wxFont errorFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	this->errorText->SetFont(errorFont);
+	this->errorText->SetFont(SkinSystem::GetSkinSystem()->GetMessageFont());
 	
 	this->errorText->SetSize(rect, wxSIZE_FORCE);
 	this->errorText->Wrap(rect.width - 225); // to match mods page

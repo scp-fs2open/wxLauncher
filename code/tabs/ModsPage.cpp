@@ -32,7 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
-const int TEXT_FONT_SIZE = 14;
 const int TEXT_WRAP_WIDTH = TAB_AREA_WIDTH - 225;
 
 ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
@@ -61,8 +60,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 	if ( tcPath.IsEmpty()) {
 		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of an FS2 Open game on the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		noTC->SetFont(messageFont);
+		noTC->SetFont(SkinSystem::GetSkinSystem()->GetMessageFont());
 		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		noTC->Wrap(TEXT_WRAP_WIDTH);
 
@@ -87,8 +85,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
 			_("The selected root folder does not exist.\n\nSelect a valid root folder for an FS2 Open game on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		nonexistentTC->SetFont(messageFont);
+		nonexistentTC->SetFont(SkinSystem::GetSkinSystem()->GetMessageFont());
 		nonexistentTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		nonexistentTC->Wrap(TEXT_WRAP_WIDTH);
 
@@ -113,8 +110,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
 			_("The selected root folder does not contain any FS2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-		wxFont messageFont(TEXT_FONT_SIZE, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-		invalidTC->SetFont(messageFont);
+		invalidTC->SetFont(SkinSystem::GetSkinSystem()->GetMessageFont());
 		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		invalidTC->Wrap(TEXT_WRAP_WIDTH);
 		
