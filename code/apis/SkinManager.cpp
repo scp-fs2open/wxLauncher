@@ -292,13 +292,12 @@ void SkinSystem::SetTCSkin(const Skin* skin) {
 	this->TCSkin = skin;
 }
 
+// Does nothing if TCSkin is NULL.
 void SkinSystem::ResetTCSkin() {
 	if (this->TCSkin != NULL) {
 		const Skin* temp = this->TCSkin;
 		this->TCSkin = NULL;
 		delete temp;
-	} else {
-		wxLogWarning(_T("Attempt to reset TCSkin when it was NULL."));
 	}
 }
 
