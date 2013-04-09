@@ -61,7 +61,7 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 													 wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	wxRadioButton* radioButton2 =
 		new wxRadioButton (this, ID_PRESET_BASELINE,
-						   DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET.GetName());
+						   DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME);
 	wxRadioButton* radioButton3 = new wxRadioButton (this, ID_PRESET_DABRAIN, _T("DaBrain's"));
 	wxRadioButton* radioButton4 = new wxRadioButton (this, ID_PRESET_HERRA_TOHTORI, _T("Herra Tohtori's"));
 	wxRadioButton* radioButton5 = new wxRadioButton (this, ID_PRESET_CKID, _T("CKid's"));

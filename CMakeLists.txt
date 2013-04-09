@@ -109,6 +109,8 @@ if(IS_WIN32) # helper is only needed on windows
     code/global/ids.h
     code/global/BasicDefaults.h
     code/global/BasicDefaults.cpp
+    code/global/ModDefaults.h
+    code/global/ModDefaults.cpp
     code/global/ProfileKeys.h
     code/global/ProfileKeys.cpp
     code/global/RegistryKeys.h
