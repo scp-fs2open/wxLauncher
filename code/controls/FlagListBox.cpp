@@ -355,7 +355,6 @@ bool FlagListBox::SetFlag(
 }
 
 BEGIN_EVENT_TABLE(FlagListBox, wxVListBox)
-EVT_SIZE(FlagListBox::OnSize)
 EVT_LISTBOX_DCLICK(ID_FLAGLISTBOX, FlagListBox::OnDoubleClickFlag)
 END_EVENT_TABLE()
 
