@@ -32,25 +32,91 @@ private:
 	virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client, const wxSize& size);
 };
 
-Skin::Skin() {
-	this->windowTitle = NULL;
-	this->windowIcon = NULL;
-	this->welcomeHeader = NULL;
-	this->idealIcon = NULL;
-	this->welcomePageText = NULL;
-	this->warningIcon = NULL;
-	this->bigWarningIcon = NULL;
+
+bool Skin::SetWindowTitle(const wxString& windowTitle) {
+	if (!windowTitle.IsEmpty()) {
+		this->windowTitle = windowTitle;
+		return true;
+	} else {
+		wxLogWarning(_T("Provided window title is empty."));
+		return false;
+	}
 }
 
-Skin::~Skin() {
-	if (this->windowTitle != NULL) delete this->windowTitle;
-	if (this->windowIcon != NULL) delete this->windowIcon;
-	if (this->welcomeHeader != NULL) delete this->welcomeHeader;
-	if (this->idealIcon != NULL) delete this->idealIcon;
-	if (this->welcomePageText != NULL) delete this->welcomePageText;
-	if (this->warningIcon != NULL) delete this->warningIcon;
-	if (this->bigWarningIcon != NULL) delete this->bigWarningIcon;
+bool Skin::SetWindowIcon(const wxIcon& windowIcon) {
+	if (!windowIcon.IsOk()) {
+		wxLogWarning(_T("Provided window icon is not valid."));
+		return false;
+	// TODO size restrictions?
+	} else {
+		this->windowIcon = windowIcon;
+		return true;
+	}
 }
+
+bool Skin::SetBanner(const wxBitmap& banner) {
+	if (!banner.IsOk()) {
+		wxLogWarning(_T("Provided banner is not valid."));
+		return false;
+	// TODO size restrictions? Diaspora's is 630x150 vs. standard 600x150
+	} else {
+		this->banner = banner;
+		return true;
+	}
+}
+
+bool Skin::SetIdealIcon(const wxBitmap& idealIcon) {
+	if (!idealIcon.IsOk()) {
+		wxLogWarning(_T("Provided ideal icon is not valid."));
+		return false;
+	} else if ((idealIcon.GetWidth() != SkinSystem::IdealIconWidth) ||
+			   (idealIcon.GetHeight() != SkinSystem::IdealIconHeight)) {
+		wxLogWarning(_T("Provided ideal icon size is wrong."));
+		return false;
+	} else {
+		this->idealIcon = idealIcon;
+		return true;
+	}
+}
+
+bool Skin::SetWelcomeText(const wxString& welcomeText) {
+	if (!welcomeText.IsEmpty()) {
+		this->welcomeText = welcomeText;
+		return true;
+	} else {
+		wxLogWarning(_T("Provided welcome text is empty."));
+		return false;
+	}
+}
+
+bool Skin::SetWarningIcon(const wxBitmap& warningIcon) {
+	if (!warningIcon.IsOk()) {
+		wxLogWarning(_T("Provided warning icon is not valid."));
+		return false;
+	} else if ((warningIcon.GetWidth() != SkinSystem::StatusBarIconWidth) ||
+			   (warningIcon.GetHeight() != SkinSystem::StatusBarIconHeight)) {
+		wxLogWarning(_T("Provided warning icon size is wrong."));
+		return false;
+	} else {
+		this->warningIcon = warningIcon;
+		return true;
+	}
+}
+
+bool Skin::SetBigWarningIcon(const wxBitmap& bigWarningIcon) {
+	if (!bigWarningIcon.IsOk()) {
+		wxLogWarning(_T("Provided big warning icon is not valid."));
+		return false;
+	} else if ((bigWarningIcon.GetWidth() != SkinSystem::BigWarningIconWidth) ||
+			   (bigWarningIcon.GetHeight() != SkinSystem::BigWarningIconHeight)) {
+		wxLogWarning(_T("Provided big warning icon size is wrong."));
+		return false;
+	} else {
+		this->bigWarningIcon = bigWarningIcon;
+		return true;
+	}
+}
+
 
 SkinSystem* SkinSystem::skinSystem = NULL;
 
@@ -94,104 +160,123 @@ SkinSystem::~SkinSystem() {
 }
 
 void SkinSystem::InitializeDefaultSkin() {
-	this->defaultSkin.windowTitle = new wxString(DEFAULT_SKIN_WINDOW_TITLE);
-
+	// launcher can't function if any of the default skin is missing/invalid
+	bool success = false;
+	
+	success = this->defaultSkin.SetWindowTitle(DEFAULT_SKIN_WINDOW_TITLE);
+	if (!success) {
+		wxLogFatalError(_T("Setting default window title '%s' failed"),
+			DEFAULT_SKIN_WINDOW_TITLE.c_str());
+	}
+	
 	wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_WINDOW_ICON);
-	this->defaultSkin.windowIcon =
-		new wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-	if (!this->defaultSkin.windowIcon->IsOk()) {
-		wxLogFatalError(_T("Default window icon '%s' not valid"),
+	success = this->defaultSkin.SetWindowIcon(
+		wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default window icon '%s' failed"),
 			filename.GetFullPath().c_str());
 	}
 	
 	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_BANNER);
-	this->defaultSkin.welcomeHeader = 
-		new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-	if (!this->defaultSkin.welcomeHeader->IsOk()) {
-		wxLogFatalError(_T("Default welcome header '%s' not valid"),
-						filename.GetFullPath().c_str());
+	success = this->defaultSkin.SetBanner(
+		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default banner '%s' failed"),
+			filename.GetFullPath().c_str());
 	}
 
 	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_IDEAL);
-	this->defaultSkin.idealIcon = 
-		new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-	if (!this->defaultSkin.idealIcon->IsOk()) {
-		wxLogFatalError(_T("Default ideal icon '%s' not valid"),
-						filename.GetFullPath().c_str());
+	this->defaultSkin.SetIdealIcon( 
+		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default ideal icon '%s' failed"),
+			filename.GetFullPath().c_str());
 	}
 
-	this->defaultSkin.welcomePageText =
-		new wxString(DEFAULT_SKIN_WELCOME_TEXT);
+	success = this->defaultSkin.SetWelcomeText(DEFAULT_SKIN_WELCOME_TEXT);
+	if (!success) {
+		wxLogFatalError(_T("Setting default welcome text '%s' failed"),
+			DEFAULT_SKIN_WELCOME_TEXT.c_str());
+	}
 	
 	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING);
-	this->defaultSkin.warningIcon =
-		new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-	if (!this->defaultSkin.warningIcon->IsOk()) {
-		wxLogFatalError(_T("Default warning icon '%s' not valid"),
-						filename.GetFullPath().c_str());
+	success = this->defaultSkin.SetWarningIcon(
+		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default warning icon '%s' failed"),
+			filename.GetFullPath().c_str());
 	}
 	
 	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING_BIG);
-	this->defaultSkin.bigWarningIcon =
-		new wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY);
-	if (!this->defaultSkin.bigWarningIcon->IsOk()) {
-		wxLogFatalError(_T("Default big warning icon '%s' not valid"),
-						filename.GetFullPath().c_str());
+	success = this->defaultSkin.SetBigWarningIcon(
+		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default big warning icon '%s' failed"),
+			filename.GetFullPath().c_str());
 	}
 	
 }
 
-wxString SkinSystem::GetTitle() {
+const wxString& SkinSystem::GetWindowTitle() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->windowTitle != NULL ) {
-			return *(this->TCSkin->windowTitle);
+		&& !this->TCSkin->GetWindowTitle().IsEmpty() ) {
+			return this->TCSkin->GetWindowTitle();
 	} else {
-		return *(this->defaultSkin.windowTitle);
+		return this->defaultSkin.GetWindowTitle();
 	}
 }
 
-wxBitmap SkinSystem::GetIdealIcon() {
+const wxIcon& SkinSystem::GetWindowIcon() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->idealIcon != NULL ) {
-			return *(this->TCSkin->idealIcon);
+		&& this->TCSkin->GetWindowIcon().IsOk() ) {
+			return this->TCSkin->GetWindowIcon();
 	} else {
-		return *(this->defaultSkin.idealIcon);
+		return this->defaultSkin.GetWindowIcon();
 	}
 }
 
-wxBitmap SkinSystem::GetBanner() {
+const wxBitmap& SkinSystem::GetIdealIcon() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->welcomeHeader != NULL ) {
-			return *(this->TCSkin->welcomeHeader);
+		&& this->TCSkin->GetIdealIcon().IsOk() ) {
+			return this->TCSkin->GetIdealIcon();
 	} else {
-		return *(this->defaultSkin.welcomeHeader);
+		return this->defaultSkin.GetIdealIcon();
 	}
 }
 
-wxString SkinSystem::GetWelcomePageText() {
+const wxBitmap& SkinSystem::GetBanner() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->welcomePageText != NULL ) {
-			return *(this->TCSkin->welcomePageText);
+		&& this->TCSkin->GetBanner().IsOk() ) {
+			return this->TCSkin->GetBanner();
 	} else {
-		return *(this->defaultSkin.welcomePageText);
+		return this->defaultSkin.GetBanner();
 	}
 }
 
-wxBitmap SkinSystem::GetWarningIcon() {
+const wxString& SkinSystem::GetWelcomeText() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->warningIcon != NULL ) {
-			return *(this->TCSkin->warningIcon);
+		&& !this->TCSkin->GetWelcomeText().IsEmpty() ) {
+			return this->TCSkin->GetWelcomeText();
 	} else {
-		return *(this->defaultSkin.warningIcon);
+		return this->defaultSkin.GetWelcomeText();
 	}
 }
 
-wxBitmap SkinSystem::GetBigWarningIcon() {
+const wxBitmap& SkinSystem::GetWarningIcon() const {
 	if ( this->TCSkin != NULL
-		&& this->TCSkin->bigWarningIcon != NULL ) {
-			return *(this->TCSkin->bigWarningIcon);
+		&& this->TCSkin->GetWarningIcon().IsOk() ) {
+			return this->TCSkin->GetWarningIcon();
 	} else {
-			return *(this->defaultSkin.bigWarningIcon);
+		return this->defaultSkin.GetWarningIcon();
+	}
+}
+
+const wxBitmap& SkinSystem::GetBigWarningIcon() const {
+	if ( this->TCSkin != NULL
+		&& this->TCSkin->GetBigWarningIcon().IsOk() ) {
+			return this->TCSkin->GetBigWarningIcon();
+	} else {
+		return this->defaultSkin.GetBigWarningIcon();
 	}
 }
 

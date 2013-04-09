@@ -265,26 +265,40 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 		}
 
 		// skin
+		// TODO: If only TCs have skins and not mods, maybe rethink this.
+		// For example, does every mod item need a skin?
 		if ( config->Exists(_T("/skin")) ) {
 			item->skin = new Skin();
 
-			readIniFileString(config, _T("/skin/wtitle"), &(item->skin->windowTitle));
+			wxString* windowTitle = NULL;
+			readIniFileString(config, _T("/skin/wtitle"), &windowTitle);
+			if ( windowTitle != NULL ) {
+				item->skin->SetWindowTitle(*windowTitle);
+				delete windowTitle;
+			}
 			
 			wxString *windowIconFile = NULL;
 			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
 			if ( windowIconFile != NULL ) {
-				item->skin->windowIcon = SkinSystem::VerifyWindowIcon(tcPath,
-					shortname, *windowIconFile);
+				// TODO: let SetWindowIcon() do the image validation
+				item->skin->SetWindowIcon(*SkinSystem::VerifyWindowIcon(tcPath,
+					shortname, *windowIconFile));
 				delete windowIconFile;
 			}
 
-			readIniFileString(config, _T("/skin/welcometxt"), &(item->skin->welcomePageText));
+			wxString* welcomeText = NULL;
+			readIniFileString(config, _T("/skin/welcometxt"), &welcomeText);
+			if ( welcomeText != NULL ) {
+				item->skin->SetWelcomeText(*welcomeText);
+				delete welcomeText;
+			}
 
 			wxString *idealIconFile = NULL;
 			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
 			if ( idealIconFile != NULL ) {
-				item->skin->idealIcon = SkinSystem::VerifyIdealIcon(tcPath,
-					shortname, *idealIconFile);
+				// TODO: let SetIdealIcon() do the image validation
+				item->skin->SetIdealIcon(*SkinSystem::VerifyIdealIcon(tcPath,
+					shortname, *idealIconFile));
 				delete idealIconFile;
 			}
 
