@@ -282,7 +282,25 @@ const wxBitmap& SkinSystem::GetBigWarningIcon() const {
 	}
 }
 
+void SkinSystem::SetTCSkin(const Skin* skin) {
+	wxCHECK_RET(skin != NULL, _T("SetTCSkin() given null Skin"));
+	
+	if (this->TCSkin != NULL) {
+		ResetTCSkin();
+	}
+	
+	this->TCSkin = skin;
+}
 
+void SkinSystem::ResetTCSkin() {
+	if (this->TCSkin != NULL) {
+		const Skin* temp = this->TCSkin;
+		this->TCSkin = NULL;
+		delete temp;
+	} else {
+		wxLogWarning(_T("Attempt to reset TCSkin when it was NULL."));
+	}
+}
 
 
 
