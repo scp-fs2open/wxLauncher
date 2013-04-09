@@ -112,7 +112,7 @@ private:
 	void InitializeDefaultSkin();
 	
 	Skin defaultSkin;
-	Skin* TCSkin;
+	const Skin* TCSkin;
 	
 	wxFont font;
 	wxFont messageFont;
