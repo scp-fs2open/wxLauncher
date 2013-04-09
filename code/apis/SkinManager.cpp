@@ -148,7 +148,9 @@ SkinSystem* SkinSystem::GetSkinSystem() {
 }
 
 SkinSystem::SkinSystem()
-: TCSkin(NULL), font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)) {
+: TCSkin(NULL),
+  font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)),
+  messageFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) {
 
 	wxArtProvider::Push(new ArtProvider(this));
 
