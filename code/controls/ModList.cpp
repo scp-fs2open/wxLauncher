@@ -88,14 +88,11 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	wxASSERT(item1 != NULL);
 	wxASSERT(item2 != NULL);
 	
-	wxASSERT(item1->shortname != NULL);
-	wxASSERT(item2->shortname != NULL);
-	
 	wxString item1Name(
-		(item1->name != NULL) ? *item1->name : *item1->shortname);
+		(!item1->name.IsEmpty()) ? item1->name : item1->shortname);
 	
 	wxString item2Name(
-		(item2->name != NULL) ? *item2->name : *item2->shortname);
+		(!item2->name.IsEmpty()) ? item2->name : item2->shortname);
 
 	// ignore a leading "the" for comparison purposes
 	wxString temp;
@@ -109,9 +106,9 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 	
 	// (No mod) must come before all other mods
-	if (!item1->shortname->Cmp(NO_MOD)) {
+	if (!item1->shortname.Cmp(NO_MOD)) {
 		return true;
-	} else if (!item2->shortname->Cmp(NO_MOD)) {
+	} else if (!item2->shortname.Cmp(NO_MOD)) {
 		return false;
 	} else {
 		return item1Name.CmpNoCase(item2Name) < 0;
@@ -123,9 +120,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(10, 10);
 
-	this->appendmods = NULL;
-	this->prependmods = NULL;
-	
 	std::vector<ModItem*> modsTemp; // for use in presorting
 
 	this->tableData = new ModItemArray();
@@ -181,43 +175,42 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 		ModItem* item = new ModItem();
 		wxLogDebug(_T(" %s"), shortname.c_str());
 
-		item->shortname = new wxString(shortname);
+		item->shortname = shortname;
 
-		readIniFileString(config, _T("/launcher/modname"), &(item->name));
+		readIniFileString(config, _T("/launcher/modname"), item->name);
 
 		// TODO allow TC authors to specify a specific directory to load this image from,
 		// in case the TC author doesn't want the TC root folder to be cluttered
 		// with the images that they specify for the skin
-		wxString *smallimagepath = NULL;
-		readIniFileString(config, _T("/launcher/image255x112"), &smallimagepath);
-		if ( smallimagepath != NULL ) {
+		wxString smallimagepath;
+		readIniFileString(config, _T("/launcher/image255x112"), smallimagepath);
+		if ( !smallimagepath.IsEmpty() ) {
 			if (shortname == NO_MOD) {
 				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
-					*smallimagepath);				
+					smallimagepath);
 			} else {
 				item->image = SkinSystem::VerifySmallImage(tcPath, shortname,
-					*smallimagepath);
+					smallimagepath);
 			}
-			delete smallimagepath;
 		}
 		
-		readIniFileString(config, _T("/launcher/infotext"), &(item->infotext));
+		readIniFileString(config, _T("/launcher/infotext"), item->infotext);
 
-		readIniFileString(config, _T("/launcher/author"), &(item->author));
+		readIniFileString(config, _T("/launcher/author"), item->author);
 
-		readIniFileString(config, _T("/launcher/notes"), &(item->notes));
+		readIniFileString(config, _T("/launcher/notes"), item->notes);
 
 		config->Read(_T("/launcher/warn"), &(item->warn), false);
 
-		readIniFileString(config, _T("/launcher/website"), &(item->website));
-		readIniFileString(config, _T("/launcher/forum"), &(item->forum));
-		readIniFileString(config, _T("/launcher/bugs"), &(item->bugs));
-		readIniFileString(config, _T("/launcher/support"), &(item->support));
+		readIniFileString(config, _T("/launcher/website"), item->website);
+		readIniFileString(config, _T("/launcher/forum"), item->forum);
+		readIniFileString(config, _T("/launcher/bugs"), item->bugs);
+		readIniFileString(config, _T("/launcher/support"), item->support);
 
-		readIniFileString(config, _T("/extremeforce/forcedflagson"), &(item->forcedon));
-		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), &(item->forcedoff));
+		readIniFileString(config, _T("/extremeforce/forcedflagson"), item->forcedon);
+		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), item->forcedoff);
 
-		readIniFileString(config, _T("/multimod/primarylist"), &(item->primarylist));
+		readIniFileString(config, _T("/multimod/primarylist"), item->primarylist);
 		// Log the warning for any mod authors, specifically for those who indicate
 		// that they are mod authors by their having FRED launching enabled
 		bool fredEnabled;
@@ -227,8 +220,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
-		readIniFileString(config, _T("/multimod/secondrylist"), &(item->secondarylist));
-		readIniFileString(config, _T("/multimod/secondarylist"), &(item->secondarylist));
+		readIniFileString(config, _T("/multimod/secondrylist"), item->secondarylist);
+		readIniFileString(config, _T("/multimod/secondarylist"), item->secondarylist);
 
 		// flag sets
 		if ( config->Exists(_T("/flagsetideal")) ) {
@@ -267,36 +260,40 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 		if ( config->Exists(_T("/skin")) ) {
 			item->skin = new Skin();
 
-			wxString* windowTitle = NULL;
-			readIniFileString(config, _T("/skin/wtitle"), &windowTitle);
-			if ( windowTitle != NULL ) {
-				item->skin->SetWindowTitle(*windowTitle);
-				delete windowTitle;
+			wxString windowTitle;
+			readIniFileString(config, _T("/skin/wtitle"), windowTitle);
+			if ( !windowTitle.IsEmpty() ) {
+				item->skin->SetWindowTitle(windowTitle);
 			}
-			
-			wxString *windowIconFile = NULL;
-			readIniFileString(config, _T("/skin/wicon"), &windowIconFile);
-			if ( windowIconFile != NULL ) {
+
+			wxString windowIconFile;
+			readIniFileString(config, _T("/skin/wicon"), windowIconFile);
+			if ( !windowIconFile.IsEmpty() ) {
 				// TODO: let SetWindowIcon() do the image validation
-				item->skin->SetWindowIcon(*SkinSystem::VerifyWindowIcon(tcPath,
-					shortname, *windowIconFile));
-				delete windowIconFile;
+				wxIcon* windowIcon =
+					SkinSystem::VerifyWindowIcon(tcPath, shortname, windowIconFile);
+				if (windowIcon != NULL) {
+					item->skin->SetWindowIcon(*windowIcon);
+					delete windowIcon;
+				}
 			}
 
-			wxString* welcomeText = NULL;
-			readIniFileString(config, _T("/skin/welcometxt"), &welcomeText);
-			if ( welcomeText != NULL ) {
-				item->skin->SetWelcomeText(*welcomeText);
-				delete welcomeText;
+			wxString welcomeText;
+			readIniFileString(config, _T("/skin/welcometxt"), welcomeText);
+			if ( !welcomeText.IsEmpty() ) {
+				item->skin->SetWelcomeText(welcomeText);
 			}
 
-			wxString *idealIconFile = NULL;
-			readIniFileString(config, _T("/skin/idealicon"), &idealIconFile);
-			if ( idealIconFile != NULL ) {
+			wxString idealIconFile;
+			readIniFileString(config, _T("/skin/idealicon"), idealIconFile);
+			if ( !idealIconFile.IsEmpty() ) {
 				// TODO: let SetIdealIcon() do the image validation
-				item->skin->SetIdealIcon(*SkinSystem::VerifyIdealIcon(tcPath,
-					shortname, *idealIconFile));
-				delete idealIconFile;
+				wxBitmap* idealIcon =
+					SkinSystem::VerifyIdealIcon(tcPath, shortname, idealIconFile);
+				if (idealIcon != NULL) {
+					item->skin->SetIdealIcon(*idealIcon);
+					delete idealIcon;
+				}
 			}
 
 		} else {
@@ -383,27 +380,23 @@ ModList::~ModList() {
 		delete this->sizer;
 	}
 }
-/** Function takes the key to search for, and returns via location
-the pointer to value. If the key is not found *location will remain NULL.*/
+
+/** Takes the key to search for and sets location to key's value.
+    If the key is not found, location is unchanged. */
 void ModList::readIniFileString(const wxFileConfig* config,
-		const wxString& key, wxString ** location) {
+		const wxString& key, wxString& location) {
 	wxASSERT(config != NULL);
+	wxASSERT(location.IsEmpty());
 
 	if ( config->HasEntry(key) ) {
-			*location = new wxString();
-			config->Read(key, *location);
-			if ( (*location)->EndsWith(_T(";")) ) {
-				(*location)->RemoveLast();
-			}
+		config->Read(key, &location);
+		if ( location.EndsWith(_T(";")) ) {
+			location.RemoveLast();
+		}
 	}
-	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
-		((*location) == NULL) ? _T("Not Specified") : escapeSpecials(**location).c_str());
 
-	if ( (*location) != NULL && (*location)->empty() ) {
-		wxLogDebug(_T("  Nulled %s"), key.c_str());
-		delete *location;
-		*location = NULL;
-	}
+	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
+		location.IsEmpty() ? _T("Not Specified") : escapeSpecials(location).c_str());
 }
 
 /** re-escape the newlines in the mod.ini values. */
@@ -435,13 +428,13 @@ void ModList::readFlagSet(wxFileConfig* config,
 							   wxString keyprefix, FlagSetItem *set) {
 	readIniFileString(config,
     wxString::Format(_T("%s/name"), keyprefix.c_str()),
-    &(set->name));
+    set->name);
 	readIniFileString(config, 
     wxString::Format(_T("%s/flagset"), keyprefix.c_str()), 
-    &(set->flagset));
+    set->flagset);
 	readIniFileString(config, 
     wxString::Format(_T("%s/notes"), keyprefix.c_str()), 
-    &(set->notes));
+    set->notes);
 }
 
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
@@ -547,7 +540,7 @@ void ModList::SetSelectedMod() {
 	
 	size_t i;
 	for ( i = 0; i < this->tableData->size(); ++i ) {
-		if ( *(this->tableData->Item(i).shortname) == currentMod ) {
+		if ( this->tableData->Item(i).shortname == currentMod ) {
 			break;
 		}
 	}
@@ -608,10 +601,10 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	if ( this->IsSelected(n) ) {
 		b = wxBrush(highlighted, wxTRANSPARENT);
 		dc.SetPen(wxPen(highlighted, 4));
-	} else if ( this->isCurrentSelectionAnAppendMod(*(this->tableData->Item(n).shortname)) ) {
+	} else if ( this->isCurrentSelectionAnAppendMod(this->tableData->Item(n).shortname) ) {
 		b = wxBrush(highlighted, wxBDIAGONAL_HATCH);
 		dc.SetPen(wxPen(highlighted, 1));
-	} else if ( this->isCurrentSelectionAPrependMod(*(this->tableData->Item(n).shortname)) ) {
+	} else if ( this->isCurrentSelectionAPrependMod(this->tableData->Item(n).shortname) ) {
 		b = wxBrush(highlighted, wxFDIAGONAL_HATCH);
 		dc.SetPen(wxPen(highlighted, 1));
 	} else {
@@ -622,13 +615,13 @@ void ModList::OnDrawBackground(wxDC &dc, const wxRect& rect, size_t n) const {
 	dc.SetBrush(b);
 	dc.DrawRoundedRectangle(selectedRect, 10.0);
 
-	if ( activeMod == *(this->tableData->Item(n).shortname) ) {
+	if ( activeMod == this->tableData->Item(n).shortname ) {
 		b = wxBrush(highlighted, wxSOLID);
 		dc.SetPen(wxPen(highlighted, 1));
-	} else if ( this->isAnAppendMod(*(this->tableData->Item(n).shortname)) ) {
+	} else if ( this->isAnAppendMod(this->tableData->Item(n).shortname) ) {
 		b = wxBrush(highlighted, wxBDIAGONAL_HATCH);
 		dc.SetPen(wxPen(highlighted, 1));
-	} else if ( this->isAPrependMod(*(this->tableData->Item(n).shortname)) ) {
+	} else if ( this->isAPrependMod(this->tableData->Item(n).shortname) ) {
 		b = wxBrush(highlighted, wxFDIAGONAL_HATCH);
 		dc.SetPen(wxPen(highlighted, 1));
 	} else {
@@ -647,7 +640,7 @@ wxCoord ModList::OnMeasureItem(size_t WXUNUSED(n)) const {
 void ModList::OnSelectionChange(wxCommandEvent &event) {
 	wxLogDebug(_T("Selection changed to %d (%s)."),
 		event.GetInt(),
-		this->tableData->Item(event.GetInt()).shortname->c_str());
+		this->tableData->Item(event.GetInt()).shortname.c_str());
 	this->Refresh();
 }
 
@@ -656,12 +649,12 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
 
 	wxString modline;
-	wxString* shortname = this->tableData->Item(selected).shortname;
+	const wxString& shortname(this->tableData->Item(selected).shortname);
 	this->prependmods = this->tableData->Item(selected).primarylist;
 	this->appendmods = this->tableData->Item(selected).secondarylist;
 
-	if ( this->prependmods != NULL ) {
-		wxStringTokenizer prependtokens(*(this->prependmods), _T(","), wxTOKEN_STRTOK); // no empty tokens
+	if ( !this->prependmods.IsEmpty() ) {
+		wxStringTokenizer prependtokens(this->prependmods, _T(","), wxTOKEN_STRTOK); // no empty tokens
 		while ( prependtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -670,17 +663,17 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		}
 	}
 
-	wxCHECK_RET( shortname != NULL, _T("Mod shortname is NULL!"));
+	wxCHECK_RET( !shortname.IsEmpty(), _T("Mod shortname is empty!"));
 	if ( !modline.IsEmpty() ) {
 		modline += _T(",");
 	}
 	if ( selected != 0 ) {
 		// put current mods name into the list unless it is (No mod)
-		modline += *shortname;
+		modline += shortname;
 	}
 
-	if ( this->appendmods != NULL ) {
-		wxStringTokenizer appendtokens(*(this->appendmods), _T(","), wxTOKEN_STRTOK);
+	if ( !this->appendmods.IsEmpty() ) {
+		wxStringTokenizer appendtokens(this->appendmods, _T(","), wxTOKEN_STRTOK);
 		while ( appendtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -692,7 +685,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	wxLogDebug(_T("New modline is %s"), modline.c_str());
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MODLINE, modline);
-	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MOD, *shortname);
+	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MOD, shortname);
 
 	TCManager::GenerateTCSelectedModChanged();
 	this->Refresh();
@@ -720,31 +713,31 @@ bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
 
 
 bool ModList::isAnAppendMod(const wxString &mod) const {
-	if ( this->appendmods == NULL ) return false; // no append mods, mod cannot be one
-	return ModList::isADependency(mod, *(this->appendmods));
+	if ( this->appendmods.IsEmpty() ) return false; // no append mods, mod cannot be one
+	return ModList::isADependency(mod, this->appendmods);
 }
 
 bool ModList::isAPrependMod(const wxString &mod) const {
-	if ( this->prependmods == NULL ) return false;	// no prepend mods, mod cannot be one
-	return ModList::isADependency(mod, *(this->prependmods));
+	if ( this->prependmods.IsEmpty() ) return false;	// no prepend mods, mod cannot be one
+	return ModList::isADependency(mod, this->prependmods);
 }
 
 bool ModList::isCurrentSelectionAnAppendMod(const wxString &mod) const {
 	int selection = this->GetSelection();
 	if ( selection == wxNOT_FOUND
-		|| this->tableData->Item(selection).secondarylist == NULL) {
+		|| this->tableData->Item(selection).secondarylist.IsEmpty()) {
 			return false;
 	}
-	return ModList::isADependency(mod, *(this->tableData->Item(selection).secondarylist));
+	return ModList::isADependency(mod, this->tableData->Item(selection).secondarylist);
 }
 
 bool ModList::isCurrentSelectionAPrependMod(const wxString &mod) const {
 	int selection = this->GetSelection();
 	if ( selection == wxNOT_FOUND
-		|| this->tableData->Item(selection).primarylist == NULL) {
+		|| this->tableData->Item(selection).primarylist.IsEmpty()) {
 		return false;
 	}
-	return ModList::isADependency(mod, *(this->tableData->Item(selection).primarylist));
+	return ModList::isADependency(mod, this->tableData->Item(selection).primarylist);
 }
 
 
@@ -762,23 +755,11 @@ are not NULL when structure is destroyed will be deleted by the structure. */
 /** Constructor. Only makes sure that the members are nulled. Does nothing
 else.*/
 FlagSetItem::FlagSetItem() {
-	this->name = NULL;
-	this->flagset = NULL;
-	this->notes = NULL;
 }
 
 /** Destructor.  Deletes any non NULL pointers that are contained in the
 structure. */
 FlagSetItem::~FlagSetItem() {
-	if ( this->name != NULL ) {
-		delete this->name;
-	}
-	if ( this->flagset != NULL ) {
-		delete this->flagset;
-	}
-	if ( this->notes != NULL ) {
-		delete this->notes;
-	}
 }
 
 #include <wx/arrimpl.cpp>
@@ -828,23 +809,8 @@ Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
 ModItem::ModItem() {
-	this->name = NULL;
-	this->shortname = NULL;
 	this->image = NULL;
-	this->infotext = NULL;
-	this->author = NULL;
-	this->notes = NULL;
 	warn = false;
-	this->website = NULL;
-	this->forum = NULL;
-	this->bugs = NULL;
-	this->support = NULL;
-
-	this->forcedon = NULL;
-	this->forcedoff = NULL;
-
-	this->primarylist = NULL;
-	this->secondarylist = NULL;
 
 	this->flagsets = NULL;
 	this->skin = NULL;
@@ -860,20 +826,7 @@ ModItem::ModItem() {
 
 /** Destructor.  Deletes all memory pointed to by non NULL internal pointers. */
 ModItem::~ModItem() {
-	if (this->name != NULL) delete this->name;
-	if (this->shortname != NULL) delete this->shortname;
 	if (this->image != NULL) delete this->image;
-	if (this->infotext != NULL) delete this->infotext;
-	if (this->author != NULL) delete this->author;
-	if (this->notes != NULL) delete this->notes;
-	if (this->website != NULL) delete this->website;
-	if (this->forum != NULL) delete this->forum;
-	if (this->bugs != NULL) delete this->bugs;
-	if (this->support != NULL) delete this->support;
-	if (this->forcedon != NULL) delete this->forcedon;
-	if (this->forcedoff != NULL) delete this->forcedoff;
-	if (this->primarylist != NULL) delete this->primarylist;
-	if (this->secondarylist != NULL) delete this->secondarylist;
 	if (this->flagsets != NULL) delete this->flagsets;
 	if (this->skin != NULL) delete this->skin;
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
@@ -940,8 +893,8 @@ ModItem::InfoText::InfoText(ModItem *myData) {
 }
 
 void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
-	if ( this->myData->infotext != NULL ) {
-		wxStringTokenizer tokens(*(this->myData->infotext));
+	if ( !this->myData->infotext.IsEmpty() ) {
+		wxStringTokenizer tokens(this->myData->infotext);
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
 
@@ -991,10 +944,10 @@ ModItem::ModName::ModName(ModItem *myData) {
 void ModItem::ModName::Draw(wxDC &dc, const wxRect &rect) {
 	wxString name;
 
-	if ( this->myData->name != NULL ) {
-		name = *this->myData->name;
+	if ( !this->myData->name.IsEmpty() ) {
+		name = this->myData->name;
 	} else {
-		name = *this->myData->shortname;
+		name = this->myData->shortname;
 	}
 
 	wxCoord width, height;
@@ -1104,10 +1057,10 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	wxASSERT(item != NULL);
 	this->item = item;
 
-	wxASSERT(item->name != NULL || item->shortname != NULL);
+	wxASSERT(!item->name.IsEmpty() || !item->shortname.IsEmpty());
 	wxString modName = 
 		wxString::Format(_T("%s"),
-			(item->name == NULL)? item->shortname->c_str(): item->name->c_str());
+			item->name.IsEmpty() ? item->shortname.c_str(): item->name.c_str());
 	wxDialog::Create(parent, wxID_ANY, modName, wxDefaultPosition, wxDefaultSize, wxBORDER_RAISED | wxBORDER_DOUBLE );
 	this->SetBackgroundColour(wxColour(_T("WHITE")));
 
@@ -1123,8 +1076,8 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	wxString modFolderString =
 		wxString::Format(_T("%s%s"),
 			tcPath.c_str(),
-			(*item->shortname == NO_MOD) ? wxEmptyString :
-				(wxString(wxFileName::GetPathSeparator()) + *item->shortname).c_str());
+			(item->shortname == NO_MOD) ? wxEmptyString :
+				(wxString(wxFileName::GetPathSeparator()) + item->shortname).c_str());
 	wxStaticText* modFolderBox = 
 		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
@@ -1133,10 +1086,10 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 
 	wxHtmlWindow* info = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
 	info->SetMinSize(wxSize(SkinSystem::InfoWindowImageWidth, 250));
-	if ( item->infotext == NULL ) {
+	if ( item->infotext.IsEmpty() ) {
 		info->SetPage(DEFAULT_MOD_LAUNCHER_INFO_TEXT);
 	} else {
-		wxString infoText(*(item->infotext));
+		wxString infoText(item->infotext);
 		infoText.Replace(_T("\n"), _T("<br />"));
 		info->SetPage(infoText);
 	}
@@ -1144,26 +1097,26 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	wxHtmlWindow* links = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxHW_SCROLLBAR_NEVER );
 	links->SetSize(SkinSystem::InfoWindowImageWidth, 40);
 	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
-		(item->website != NULL) ? 
-			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website->c_str(), _("Website")).c_str():wxEmptyString,
-		wxString::Format(_T("<a href='%s'>%s</a>"), (item->forum != NULL) ?
-			item->forum->c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
-		(item->bugs != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs->c_str(), _("Bugs")).c_str() : wxEmptyString,
-		(item->support != NULL) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support->c_str(), _("Support")).c_str() : wxEmptyString
+		(!item->website.IsEmpty()) ? 
+			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website.c_str(), _("Website")).c_str():wxEmptyString,
+		wxString::Format(_T("<a href='%s'>%s</a>"), (!item->forum.IsEmpty()) ?
+			item->forum.c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
+		(!item->bugs.IsEmpty()) ?
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs.c_str(), _("Bugs")).c_str() : wxEmptyString,
+		(!item->support.IsEmpty()) ?
+			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support.c_str(), _("Support")).c_str() : wxEmptyString
 		));
 	links->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ModInfoDialog::OnLinkClicked));
 
 	wxStaticBitmap* warning = NULL;
 	wxHtmlWindow* notesText = NULL;
 
-	if ( item->notes != NULL ) {
+	if ( !item->notes.IsEmpty() ) {
 		if ( item->warn ) {
 			warning = new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 		}
 		notesText = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
-		notesText->SetPage(*(item->notes));
+		notesText->SetPage(item->notes);
 		notesText->SetMinSize(wxSize(200, 64));
 	}
 

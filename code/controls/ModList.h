@@ -40,9 +40,9 @@ class FlagSetItem {
 public:
 	FlagSetItem();
 	~FlagSetItem();
-	wxString* name;
-	wxString* flagset;
-	wxString* notes;
+	wxString name;
+	wxString flagset;
+	wxString notes;
 };
 
 WX_DECLARE_OBJARRAY(FlagSetItem, FlagSets);
@@ -66,23 +66,23 @@ class ModItem{
 public:
 	ModItem();
 	~ModItem();
-	wxString* name;
-	wxString* shortname;
+	wxString name;
+	wxString shortname;
 	wxBitmap* image;
-	wxString* infotext;
-	wxString* author;
-	wxString* notes;
+	wxString infotext;
+	wxString author;
+	wxString notes;
 	bool warn;
-	wxString* website;
-	wxString* forum;
-	wxString* bugs;
-	wxString* support;
+	wxString website;
+	wxString forum;
+	wxString bugs;
+	wxString support;
 
-	wxString* forcedon;
-	wxString* forcedoff;
+	wxString forcedon;
+	wxString forcedoff;
 
-	wxString* primarylist;
-	wxString* secondarylist;
+	wxString primarylist;
+	wxString secondarylist;
 
 	FlagSets* flagsets;	// set 0 is the ideal set.
 	
@@ -158,7 +158,7 @@ private:
 	wxBoxSizer *buttonSizer, *sizer;
 
 	void readIniFileString(const wxFileConfig* config,
-		const wxString& key, wxString ** location);
+		const wxString& key, wxString& location);
 	void readFlagSet(wxFileConfig* config,
 		wxString keyprefix, FlagSetItem * set);
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
@@ -173,7 +173,7 @@ private:
 	void SetSelectedMod();
 	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
-	wxString* prependmods, *appendmods;
+	wxString prependmods, appendmods;
 	bool isAPrependMod(const wxString& mod) const;
 	bool isAnAppendMod(const wxString& mod) const;
 
