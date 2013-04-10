@@ -287,7 +287,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 					_T("Token ending in 'r' is not a number (%s) in executable %s"),
 						token.c_str(), binaryname.c_str());
 			}
-		} else if ( token.Lower().StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
+		} else if ( token.StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
 			// must be a revision number from SirKnightly's builds
 			if ( tempVersion > 0 ) {
 				ver.build = (int)tempVersion;
