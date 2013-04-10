@@ -30,7 +30,7 @@ enum NewsSourceId {
 
 class NewsSource {
 public:
-	NewsSource(NewsSourceId id, const wxString& newsURL, const wxString& label);
+	NewsSource(NewsSourceId id, const wxString& newsUrl, const wxString& label);
 	
 	const NewsSourceId GetId() const { return this->id; }
 	const wxString& GetNewsUrl() const { return this->newsUrl; }

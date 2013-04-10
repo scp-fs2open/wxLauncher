@@ -24,7 +24,7 @@ using std::vector;
 
 vector<NewsSource> NewsSource::newsSources;
 
-NewsSource::NewsSource(const NewsSourceId id, const wxString& newsURL, const wxString& label)
+NewsSource::NewsSource(const NewsSourceId id, const wxString& newsUrl, const wxString& label)
 : id(id), newsUrl(newsUrl), label(label) {
 	wxASSERT(!newsUrl.IsEmpty());
 	wxASSERT(!label.IsEmpty());
