@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef WXLAUNCHERAPP_H
 #define WXLAUNCHERAPP_H
 #include <wx/wx.h>
-#include "apis/SkinManager.h"
 #include "apis/ProfileManagerOperator.h"
 
 class wxLauncher: public wxApp {

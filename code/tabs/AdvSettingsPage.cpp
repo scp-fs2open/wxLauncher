@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileProxy.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
+#include "apis/SkinManager.h"
 #include "controls/LightingPresets.h"
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
@@ -41,10 +42,7 @@ const size_t WIKI_LINK_SIZER_INDEX = 1;
 const size_t TOP_RIGHT_SIZER_INDEX = 1;
 const size_t BOTTOM_SIZER_INDEX = 1;
 
-AdvSettingsPage::AdvSettingsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY), flagListBox(NULL) {
-	wxASSERT(skin != NULL);
-	this->skin = skin;
-
+AdvSettingsPage::AdvSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY), flagListBox(NULL) {
 	this->errorText =
 		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
 			wxDefaultSize, wxALIGN_CENTER);
@@ -88,7 +86,7 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	}
 
 	// top left components
-	this->flagListBox = new FlagListBox(this, this->skin);
+	this->flagListBox = new FlagListBox(this);
 	this->flagListBox->RegisterFlagListBoxReady(this);
 	FlagListManager::GetFlagListManager()->BeginFlagFileProcessing();
 

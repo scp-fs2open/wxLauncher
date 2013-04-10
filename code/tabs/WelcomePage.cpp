@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 #include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "apis/HelpManager.h"
+#include "apis/SkinManager.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
@@ -63,14 +64,11 @@ public:
 /** Class that manages the header image for the welcome tab. */
 class HeaderBitmap: public wxPanel {
 public:
-	HeaderBitmap(wxWindow* parent, int width, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
-		this->bitmap = skin->GetBanner();
+	HeaderBitmap(wxWindow* parent): wxPanel(parent, wxID_ANY) {
+		this->bitmap = SkinSystem::GetSkinSystem()->GetBanner();
 		wxASSERT_MSG(this->bitmap.IsOk(), _("Loaded bitmap is invalid."));
 
-		wxASSERT_MSG(this->bitmap.GetWidth() <= width,
-			(wxString::Format(_("Header bitmap is larger than %d pixels!"), width)));
-
-		this->SetMinSize(wxSize(width, bitmap.GetHeight()));
+		this->SetMinSize(wxSize(bitmap.GetWidth(), bitmap.GetHeight()));
 	}
 	virtual void OnPaint(wxPaintEvent& WXUNUSED(event)) {
 		wxPaintDC dc(this);
@@ -112,7 +110,7 @@ EVT_TEXT_ENTER(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnPressEnterKey)
 EVT_CHECKBOX(ID_CLONE_PROFILE_CHECKBOX, CloneProfileDialog::OnClickCloneCheckbox)
 END_EVENT_TABLE()
 
-WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wxID_ANY) {
+WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	// member varirable init
 	this->lastLinkInfo = NULL;
 	ProMan* proman = ProMan::GetProfileManager();
@@ -133,12 +131,12 @@ WelcomePage::WelcomePage(wxWindow* parent, SkinSystem* skin): wxPanel(parent, wx
 	languageSizer->Add(launcherLanguageCombo);
 #endif
 	// header image
-	HeaderBitmap* header = new HeaderBitmap(this, skin->GetBanner().GetWidth(), skin);
+	HeaderBitmap* header = new HeaderBitmap(this);
 	
 	// Info
 	wxStaticBox* generalBox = new wxStaticBox(this, wxID_ANY, _(""));
 	wxHtmlWindow* general = new wxHtmlWindow(this, ID_SUMMARY_HTML_PANEL, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_NEVER );
-	general->SetPage(skin->GetWelcomeText());
+	general->SetPage(SkinSystem::GetSkinSystem()->GetWelcomeText());
 	general->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
 	
 	wxStaticBoxSizer* generalSizer = new wxStaticBoxSizer(generalBox, wxVERTICAL);

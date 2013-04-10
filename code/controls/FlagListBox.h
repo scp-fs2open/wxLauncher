@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/vlbox.h>
 
 #include "apis/FlagListManager.h"
-#include "apis/SkinManager.h"
 
 class FlagListCheckBox: public wxCheckBox {
 public:
@@ -69,7 +68,7 @@ WX_DECLARE_LIST(wxEvtHandler, FlagListBoxReadyEventHandlers);
 
 class FlagListBox: public wxVListBox {
 public:
-	FlagListBox(wxWindow* parent, SkinSystem* skin);
+	FlagListBox(wxWindow* parent);
 	~FlagListBox();
 	
 	void RegisterFlagListBoxReady(wxEvtHandler *handler);
@@ -109,8 +108,6 @@ private:
 	 returns true on successful set, returns false if cannot find flag.
 	 Will update the proxy if updateProxy is true. */
 	bool SetFlag(const wxString& flagString, bool state, bool updateProxy = false);
-	
-	SkinSystem* skin;
 	
 	FlagFileData* flagData;
 	FlagListCheckBoxItems checkBoxes;

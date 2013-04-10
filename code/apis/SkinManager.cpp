@@ -26,9 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class ArtProvider: public wxArtProvider {
 public:
-	ArtProvider(SkinSystem *skinSystem);
+	ArtProvider();
 private:
-	SkinSystem *skinSystem;
 	virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client, const wxSize& size);
 };
 
@@ -152,7 +151,7 @@ SkinSystem::SkinSystem()
   font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)),
   messageFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) {
 
-	wxArtProvider::Push(new ArtProvider(this));
+	wxArtProvider::Push(new ArtProvider());
 
 	InitializeDefaultSkin();
 }
@@ -415,8 +414,7 @@ wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
 	return outimg;
 }
 
-ArtProvider::ArtProvider(SkinSystem *skinSystem) {
-	this->skinSystem = skinSystem;
+ArtProvider::ArtProvider() {
 }
 
 wxBitmap ArtProvider::CreateBitmap(const wxArtID &id, const wxArtClient &client, const wxSize &size) {

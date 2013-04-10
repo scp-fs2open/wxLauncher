@@ -64,7 +64,7 @@ WX_DECLARE_STRING_HASH_MAP(I18nItem*, I18nData);
 
 class ModItem{
 public:
-	ModItem(SkinSystem* skin);
+	ModItem();
 	~ModItem();
 	wxString* name;
 	wxString* shortname;
@@ -95,9 +95,6 @@ public:
 	void Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer *mainSizer, wxSizer *buttons, wxStaticBitmap* warn);
 
 private:
-	SkinSystem* skinSystem;
-
-
 	class InfoText{
 	public:
 		InfoText(ModItem *myData);
@@ -137,7 +134,7 @@ WX_DECLARE_OBJARRAY(ModItem, ModItemArray);
 
 class ModList: public wxVListBox {
 public:
-	ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath);
+	ModList(wxWindow *parent, wxSize& size, wxString tcPath);
 	~ModList();
 
 	// overrides for wxVListBox
@@ -155,7 +152,6 @@ private:
 	each mod.  The key is the the mod's folder name which is used as the mod's
 	internal name. */
 	ConfigArray* configFiles;
-	SkinSystem* skinSystem;
 	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;

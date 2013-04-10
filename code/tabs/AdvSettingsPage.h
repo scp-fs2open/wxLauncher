@@ -20,12 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define ADVSETTINGSPAGE_H
 
 #include <wx/wx.h>
-#include "apis/SkinManager.h"
 #include "controls/FlagListBox.h"
 
 class AdvSettingsPage: public wxPanel {
 public:
-	AdvSettingsPage(wxWindow* parent, SkinSystem* skin);
+	AdvSettingsPage(wxWindow* parent);
 
 	void OnNeedUpdateCommandLine(wxCommandEvent &event);
 
@@ -35,7 +34,6 @@ private:
 	void UpdateFlagSetsBox();
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
-	SkinSystem *skin;
 	FlagListBox* flagListBox;
 	wxStaticText* errorText;
 	

@@ -235,8 +235,7 @@ bool wxLauncher::OnInit() {
 	wxLogInfo(_T("wxLauncher starting up."));
 
 
-	// FIXME TODO: adjust so SkinSystem ptr is never passed around
-	MainWindow* window = new MainWindow(SkinSystem::GetSkinSystem());
+	MainWindow* window = new MainWindow();
 	wxLogStatus(_T("MainWindow is complete"));
 	window->Show(true);
 #if NDEBUG // will autodelete when timout runs out in debug

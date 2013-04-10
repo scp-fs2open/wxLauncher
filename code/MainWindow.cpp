@@ -44,14 +44,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 const int WINDOW_WIDTH = TAB_AREA_WIDTH;
 
-MainWindow::MainWindow(SkinSystem* skin) {
-	this->Create((wxFrame*)NULL, wxID_ANY, skin->GetWindowTitle(),
+MainWindow::MainWindow() {
+	this->Create((wxFrame*)NULL, wxID_ANY, SkinSystem::GetSkinSystem()->GetWindowTitle(),
 		wxDefaultPosition, wxSize(WINDOW_WIDTH, 550), MAINWINDOW_STYLE);
 
 	this->FS2_pid = 0;
 	this->FRED2_pid = 0;
 
-	this->SetFont(skin->GetFont());
+	this->SetFont(SkinSystem::GetSkinSystem()->GetFont());
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 
 	this->SetStatusBar(new StatusBar(this));
@@ -70,10 +70,10 @@ MainWindow::MainWindow(SkinSystem* skin) {
 	this->mainTab = new wxNotebook();
 	this->mainTab->Create(this, ID_MAINTAB, wxPoint(0,0), wxSize(WINDOW_WIDTH,-1), wxNB_TOP);
 
-	this->mainTab->AddPage(new WelcomePage(this->mainTab, skin), _("Welcome"), true);
-	this->mainTab->AddPage(new ModsPage(this->mainTab, skin), _("Mods"), false);
+	this->mainTab->AddPage(new WelcomePage(this->mainTab), _("Welcome"), true);
+	this->mainTab->AddPage(new ModsPage(this->mainTab), _("Mods"), false);
 	this->mainTab->AddPage(new BasicSettingsPage(this->mainTab), _("Basic Settings"), false);
-	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab, skin), _("Advanced Settings"), false);
+	this->mainTab->AddPage(new AdvSettingsPage(this->mainTab), _("Advanced Settings"), false);
 #if 0
 	this->mainTab->AddPage(new InstallPage(this->mainTab), _("Install/Update"), false);
 #endif
