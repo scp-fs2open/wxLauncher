@@ -173,11 +173,17 @@ private:
 	void SetSelectedMod();
 	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
+	/** The active mod's prepend mods and append mods. */
 	wxString prependmods, appendmods;
+	
+	/** Tests whether a mod is a prepend/append mod of the active mod. */
 	bool isAPrependMod(const wxString& mod) const;
 	bool isAnAppendMod(const wxString& mod) const;
 
+	/** Tests whether a mod appears in the specified mod list. */
 	static bool isADependency(const wxString& mod, const wxString& modlist);
+	
+	/** Tests whether a mod is a prepend/append mod of the selected mod. */
 	bool isCurrentSelectionAPrependMod(const wxString &mod) const;
 	bool isCurrentSelectionAnAppendMod(const wxString &mod) const;
 
