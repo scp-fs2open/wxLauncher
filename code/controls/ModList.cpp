@@ -49,7 +49,7 @@ const wxString NO_MOD(_("(No mod)"));
 
 class ModInfoDialog: wxDialog {
 public:
-	ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent);
+	ModInfoDialog(ModItem* item, wxWindow* parent);
 	void OnLinkClicked(wxHtmlLinkEvent &event);
 
 private:
@@ -66,7 +66,6 @@ private:
 	};
 	friend class ImageDrawer;
 
-	SkinSystem* skin;
 	ModItem* item;
 };
 
@@ -119,12 +118,10 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 }
 
-ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPath) {
+ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(10, 10);
-
-	this->skinSystem = skin;
 
 	this->appendmods = NULL;
 	this->prependmods = NULL;
@@ -181,7 +178,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	for(size_t i = 0; i < this->configFiles->size(); i++) {
 		wxString shortname = this->configFiles->Item(i).shortname;
 		wxFileConfig* config = this->configFiles->Item(i).config;
-		ModItem* item = new ModItem(this->skinSystem);
+		ModItem* item = new ModItem();
 		wxLogDebug(_T(" %s"), shortname.c_str());
 
 		item->shortname = new wxString(shortname);
@@ -347,7 +344,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, SkinSystem *skin, wxString tcPa
 	this->activateButton = 
 		new wxButton(this, ID_MODLISTBOX_ACTIVATE_BUTTON, _("Activate"));
 	this->warnBitmap =
-		new wxStaticBitmap(this, wxID_ANY, this->skinSystem->GetWarningIcon());
+		new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetWarningIcon());
 	this->warnBitmap->SetToolTip(_("This mod requires your attention before playing it. Click Info for more details."));
 
 	this->buttonSizer = new wxBoxSizer(wxVERTICAL);
@@ -704,7 +701,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 	int selected = this->GetSelection();
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
-	new ModInfoDialog(this->skinSystem, new ModItem(this->tableData->Item(selected)), this);
+	new ModInfoDialog(new ModItem(this->tableData->Item(selected)), this);
 }
 
 // comparison is case-insensitive, and mod names containing spaces are preserved
@@ -830,9 +827,7 @@ wxSortedArrayString SupportedLanguages = wxArrayString(sizeof(__SupportedLanguag
 Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
-ModItem::ModItem(SkinSystem* skin) {
-	this->skinSystem = skin;
-
+ModItem::ModItem() {
 	this->name = NULL;
 	this->shortname = NULL;
 	this->image = NULL;
@@ -909,12 +904,12 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSiz
 	infotextrect.x = titlerect.width + imgrect.width + 5;
 	infotextrect.width = rect.width - infotextrect.x;
 
-	wxFont titlefont = this->skinSystem->GetFont();
+	wxFont titlefont = SkinSystem::GetSkinSystem()->GetFont();
 	titlefont.SetPointSize(titlefont.GetPointSize() + 2);
 	titlefont.SetWeight(wxFONTWEIGHT_BOLD);
 	dc.SetFont(titlefont);
 	this->modNamePanel->Draw(dc, titlerect);
-	dc.SetFont(this->skinSystem->GetFont());
+	dc.SetFont(SkinSystem::GetSkinSystem()->GetFont());
 	this->modImagePanel->Draw(dc, imgrect);
 
 	if ( selected ) { /* If I am selected do not have info panel draw because 
@@ -1105,10 +1100,7 @@ void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
 	}
 }
 
-ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) {
-	wxASSERT(skin != NULL);
-	this->skin = skin;
-
+ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	wxASSERT(item != NULL);
 	this->item = item;
 
@@ -1168,7 +1160,7 @@ ModInfoDialog::ModInfoDialog(SkinSystem* skin, ModItem* item, wxWindow* parent) 
 
 	if ( item->notes != NULL ) {
 		if ( item->warn ) {
-			warning = new wxStaticBitmap(this, wxID_ANY, skin->GetBigWarningIcon());
+			warning = new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 		}
 		notesText = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
 		notesText->SetPage(*(item->notes));

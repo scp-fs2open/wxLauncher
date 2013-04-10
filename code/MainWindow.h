@@ -22,11 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/notebook.h>
 #include <wx/process.h>
-#include "apis/SkinManager.h"
 
 class MainWindow: public wxFrame {
 public:
-	MainWindow(SkinSystem* skin);
+	MainWindow();
 	~MainWindow();
 
 	void OnQuit(wxCommandEvent& event);

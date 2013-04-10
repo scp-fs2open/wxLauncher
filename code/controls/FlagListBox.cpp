@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "controls/FlagListBox.h"
 #include "apis/ProfileProxy.h"
+#include "apis/SkinManager.h"
 #include "global/ids.h"
 
 #include "global/MemoryDebugging.h"
@@ -123,15 +124,13 @@ const int VERTICAL_OFFSET_MULTIPLIER = 2; // in pixels
 const int VERTICAL_OFFSET_MULTIPLIER = 1; // in pixels
 #endif
 
-FlagListBox::FlagListBox(wxWindow* parent, SkinSystem *skin)
+FlagListBox::FlagListBox(wxWindow* parent)
 : wxVListBox(parent,ID_FLAGLISTBOX),
   isReadyEventGenerated(false),
   isReady(false),
   flagsLoaded(false),
   flagData(NULL),
   areCheckBoxesGenerated(false) {
-	wxASSERT(skin != NULL);
-	this->skin = skin;
 }
 
 void FlagListBox::AcceptFlagData(FlagFileData* flagData) {
@@ -225,7 +224,10 @@ void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 		
 		if (item->GetCheckBox() != NULL) {
 			if (item->IsRecommendedFlag()) {
-				dc.DrawBitmap(this->skin->GetIdealIcon(), rect.x, rect.y);
+				dc.DrawBitmap(
+					SkinSystem::GetSkinSystem()->GetIdealIcon(),
+					rect.x,
+					rect.y);
 			}
 			
 			item->GetCheckBox()->Show();

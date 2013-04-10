@@ -20,16 +20,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define MODSPAGE_H
 
 #include <wx/wx.h>
-#include "apis/SkinManager.h"
 
 class ModsPage: public wxPanel {
 public:
-	ModsPage(wxWindow* parent, SkinSystem *skin);
+	ModsPage(wxWindow* parent);
 
 	void OnTCChanged(wxCommandEvent &event);
 
 private:
-	SkinSystem* skin;
 	DECLARE_EVENT_TABLE();
 };
 

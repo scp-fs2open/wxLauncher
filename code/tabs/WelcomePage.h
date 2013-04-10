@@ -21,13 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 
-#include "apis/SkinManager.h"
 #include "global/ids.h"
 #include "apis/ProfileManager.h"
 
 class WelcomePage: public wxPanel {
 public:
-	WelcomePage(wxWindow* parent, SkinSystem* skin);
+	WelcomePage(wxWindow* parent);
 	void LinkClicked(wxHtmlLinkEvent& event);
 	void LinkHover(wxHtmlCellEvent& event);
 	void OnMouseOut(wxMouseEvent& event);

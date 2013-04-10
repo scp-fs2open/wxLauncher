@@ -34,9 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 const int TEXT_WRAP_WIDTH = TAB_AREA_WIDTH - 225;
 
-ModsPage::ModsPage(wxWindow* parent, SkinSystem *skin): wxPanel(parent, wxID_ANY) {
-	this->skin = skin;
-
+ModsPage::ModsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxLogDebug(_T("ModsPage is at %p."), this);
 
 	TCManager::RegisterTCChanged(this);
@@ -138,7 +136,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		header->Wrap(TAB_AREA_WIDTH);
 #endif
 		wxSize modGridSize(TAB_AREA_WIDTH - 20, TAB_AREA_HEIGHT); // FIXME for left and right borders of 5 pixels each -- but why does it have to be 20?
-		ModList* modGrid = new ModList(this, modGridSize, skin, tcPath);
+		ModList* modGrid = new ModList(this, modGridSize, tcPath);
 		modGrid->SetMinSize(modGridSize);
 
 		wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
