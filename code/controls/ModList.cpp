@@ -696,7 +696,10 @@ void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 }
 
 // comparison is case-insensitive, and mod names containing spaces are preserved
-bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
+bool ModList::isADependency(const wxString &mod, const wxString& modlist) {
+	wxCHECK_MSG(!mod.IsEmpty(), false, _T("isADependency() called with empty mod!"));
+	wxCHECK_MSG(!modlist.IsEmpty(), false, _T("isADependency() called with empty modlist!"));
+	
 	wxString normalizedModName(mod);
 	normalizedModName.Trim(true).Trim(false).MakeLower();
 
