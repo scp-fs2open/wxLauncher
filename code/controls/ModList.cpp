@@ -115,14 +115,14 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 }
 
-ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
+ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
+: configFiles(new ConfigArray()), tableData(new ModItemArray()) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(10, 10);
 
 	std::vector<ModItem*> modsTemp; // for use in presorting
 
-	this->tableData = new ModItemArray();
 	// scan for mods in the current TCs directory
 	wxArrayString foundInis;
 	wxDir::GetAllFiles(tcPath, &foundInis, _("mod.ini"));
@@ -133,7 +133,6 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath) {
 	}
 
 	// parse mod.ini's in all of the directories that contain one
-	this->configFiles = new ConfigArray();
 
 	wxLogDebug(_T("Inserting '(No mod)'"));
 	wxFileName tcmodini(tcPath, _T("mod.ini"));
