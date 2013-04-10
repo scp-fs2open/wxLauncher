@@ -17,6 +17,7 @@
  */
 
 #include <wx/intl.h> // for _()
+#include <wx/log.h>
 #include "NewsSource.h"
 
 using std::vector;
@@ -30,6 +31,9 @@ NewsSource::NewsSource(const NewsSourceId id, const wxString& newsURL, const wxS
 }
 
 const NewsSource* NewsSource::FindSource(const NewsSourceId id) {
+	wxCHECK_MSG(id != NEWS_SOURCE_ID_INVALID, NULL,
+		_T("FindSource given NEWS_SOURCE_ID_INVALID!"));
+	
 	if (newsSources.empty()) {
 		InitializeSources();
 	}
@@ -40,6 +44,8 @@ const NewsSource* NewsSource::FindSource(const NewsSourceId id) {
 			return &(*it);
 		}
 	}
+	
+	wxLogWarning(_T("FindSource(): Unknown news source ID %d, returning NULL"), id);
 	
 	return NULL;
 }
