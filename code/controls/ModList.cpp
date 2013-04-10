@@ -650,11 +650,9 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 
 	wxString modline;
 	const wxString& shortname(this->tableData->Item(selected).shortname);
-	this->prependmods = this->tableData->Item(selected).primarylist;
-	this->appendmods = this->tableData->Item(selected).secondarylist;
 
-	if ( !this->prependmods.IsEmpty() ) {
-		wxStringTokenizer prependtokens(this->prependmods, _T(","), wxTOKEN_STRTOK); // no empty tokens
+	if ( !this->GetPrependMods().IsEmpty() ) {
+		wxStringTokenizer prependtokens(this->GetPrependMods(), _T(","), wxTOKEN_STRTOK); // no empty tokens
 		while ( prependtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -672,8 +670,8 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 		modline += shortname;
 	}
 
-	if ( !this->appendmods.IsEmpty() ) {
-		wxStringTokenizer appendtokens(this->appendmods, _T(","), wxTOKEN_STRTOK);
+	if ( !this->GetAppendMods().IsEmpty() ) {
+		wxStringTokenizer appendtokens(this->GetAppendMods(), _T(","), wxTOKEN_STRTOK);
 		while ( appendtokens.HasMoreTokens() ) {
 			if ( !modline.IsEmpty() ) {
 				modline += _T(",");
@@ -711,15 +709,36 @@ bool ModList::isADependency(const wxString &mod, const wxString&modlist) {
 	return false;
 }
 
+const wxString& ModList::GetPrependMods() const {
+	const int selection = this->GetSelection();
+	
+	wxASSERT_MSG(selection != wxNOT_FOUND,
+		_T("GetPrependMods() called with no mod selected!"));
+	
+	return this->tableData->Item(selection).primarylist;
+}
+
+const wxString& ModList::GetAppendMods() const {
+	const int selection = this->GetSelection();
+	
+	wxASSERT_MSG(selection != wxNOT_FOUND,
+		_T("GetAppendMods() called with no mod selected!"));
+	
+	return this->tableData->Item(selection).secondarylist;
+}
 
 bool ModList::isAnAppendMod(const wxString &mod) const {
-	if ( this->appendmods.IsEmpty() ) return false; // no append mods, mod cannot be one
-	return ModList::isADependency(mod, this->appendmods);
+	wxCHECK_MSG(this->GetSelection() != wxNOT_FOUND, false,
+		_T("isAnAppendMod() called with no mod selected!"));
+	if ( this->GetAppendMods().IsEmpty() ) return false; // no append mods, mod cannot be one
+	return ModList::isADependency(mod, this->GetAppendMods());
 }
 
 bool ModList::isAPrependMod(const wxString &mod) const {
-	if ( this->prependmods.IsEmpty() ) return false;	// no prepend mods, mod cannot be one
-	return ModList::isADependency(mod, this->prependmods);
+	wxCHECK_MSG(this->GetSelection() != wxNOT_FOUND, false,
+		_T("isAPrependMod() called with no mod selected!"));
+	if ( this->GetPrependMods().IsEmpty() ) return false;	// no prepend mods, mod cannot be one
+	return ModList::isADependency(mod, this->GetPrependMods());
 }
 
 bool ModList::isCurrentSelectionAnAppendMod(const wxString &mod) const {

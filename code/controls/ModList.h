@@ -173,7 +173,9 @@ private:
 	void SetSelectedMod();
 	static wxString GetShortName(const wxString& modIniPath, const wxString& tcPath);
 
-	wxString prependmods, appendmods;
+	const wxString& GetPrependMods() const;
+	const wxString& GetAppendMods() const;
+	
 	bool isAPrependMod(const wxString& mod) const;
 	bool isAnAppendMod(const wxString& mod) const;
 
