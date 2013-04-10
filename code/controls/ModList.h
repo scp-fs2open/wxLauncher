@@ -153,6 +153,8 @@ private:
 	internal name. */
 	ConfigArray* configFiles;
 	
+	ModItemArray* tableData;
+	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;
 	wxBoxSizer *buttonSizer, *sizer;
@@ -166,8 +168,6 @@ private:
 		wxString langaugename, I18nItem ** trans);
 #endif
 	wxString escapeSpecials(const wxString& toEscape);
-
-	ModItemArray* tableData;
 	
 	bool ParseModIni(const wxString& modIniPath, const wxString& tcPath, bool isNoMod = false);
 	void SetSelectedMod();
