@@ -85,8 +85,6 @@ public:
 	wxString secondarylist;
 
 	FlagSets* flagsets;	// set 0 is the ideal set.
-	
-	Skin* skin;
 
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	I18nData* i18n;
@@ -154,6 +152,8 @@ private:
 	ConfigArray* configFiles;
 	
 	ModItemArray* tableData;
+	
+	Skin* TCSkin;
 	
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;

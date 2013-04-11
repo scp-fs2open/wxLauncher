@@ -116,7 +116,7 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 }
 
 ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
-: configFiles(new ConfigArray()), tableData(new ModItemArray()) {
+: configFiles(new ConfigArray()), tableData(new ModItemArray()), TCSkin(NULL) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(10, 10);
@@ -254,15 +254,15 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		}
 
 		// skin
-		// TODO: If only TCs have skins and not mods, maybe rethink this.
-		// For example, does every mod item need a skin?
 		if ( config->Exists(_T("/skin")) ) {
-			item->skin = new Skin();
+			// deleting any existing TCSkin will be handled by SkinSystem::ResetTCSkin()
+			// so it shouldn't be deleted here
+			this->TCSkin = new Skin();
 
 			wxString windowTitle;
 			readIniFileString(config, _T("/skin/wtitle"), windowTitle);
 			if ( !windowTitle.IsEmpty() ) {
-				item->skin->SetWindowTitle(windowTitle);
+				this->TCSkin->SetWindowTitle(windowTitle);
 			}
 
 			wxString windowIconFile;
@@ -272,7 +272,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				wxIcon* windowIcon =
 					SkinSystem::VerifyWindowIcon(tcPath, shortname, windowIconFile);
 				if (windowIcon != NULL) {
-					item->skin->SetWindowIcon(*windowIcon);
+					this->TCSkin->SetWindowIcon(*windowIcon);
 					delete windowIcon;
 				}
 			}
@@ -280,7 +280,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			wxString welcomeText;
 			readIniFileString(config, _T("/skin/welcometxt"), welcomeText);
 			if ( !welcomeText.IsEmpty() ) {
-				item->skin->SetWelcomeText(welcomeText);
+				this->TCSkin->SetWelcomeText(welcomeText);
 			}
 
 			wxString idealIconFile;
@@ -290,7 +290,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				wxBitmap* idealIcon =
 					SkinSystem::VerifyIdealIcon(tcPath, shortname, idealIconFile);
 				if (idealIcon != NULL) {
-					item->skin->SetIdealIcon(*idealIcon);
+					this->TCSkin->SetIdealIcon(*idealIcon);
 					delete idealIcon;
 				}
 			}
@@ -375,6 +375,8 @@ ModList::~ModList() {
 	if ( this->tableData != NULL ) {
 		delete this->tableData;
 	}
+	// deleting any existing TCSkin will be handled by SkinSystem::ResetTCSkin()
+	// so it shouldn't be deleted here
 	if ( this->sizer != NULL ) {
 		delete this->sizer;
 	}
@@ -815,7 +817,6 @@ ModItem::ModItem() {
 	warn = false;
 
 	this->flagsets = NULL;
-	this->skin = NULL;
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	this->i18n = NULL;
 #endif
@@ -830,7 +831,6 @@ ModItem::ModItem() {
 ModItem::~ModItem() {
 	if (this->image != NULL) delete this->image;
 	if (this->flagsets != NULL) delete this->flagsets;
-	if (this->skin != NULL) delete this->skin;
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	if (this->i18n != NULL) {
 		I18nData::iterator i18niter = this->i18n->begin();
