@@ -208,6 +208,8 @@ set(GLOBAL_CODE_FILES
   code/global/MemoryDebugging.h
   code/global/ModDefaults.h
   code/global/ModDefaults.cpp
+  code/global/ModIniKeys.h
+  code/global/ModIniKeys.cpp
   code/global/ProfileKeys.h
   code/global/ProfileKeys.cpp
   code/global/RegistryKeys.h
