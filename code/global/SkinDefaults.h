@@ -29,6 +29,8 @@ extern const wxString DEFAULT_SKIN_WINDOW_ICON;
 extern const wxString DEFAULT_SKIN_BANNER;
 extern const wxString DEFAULT_SKIN_WELCOME_TEXT;
 
+extern const wxString DEFAULT_SKIN_MOD_IMAGE;
+
 extern const wxString DEFAULT_SKIN_ICON_OK;
 extern const wxString DEFAULT_SKIN_ICON_WARNING;
 extern const wxString DEFAULT_SKIN_ICON_WARNING_BIG;

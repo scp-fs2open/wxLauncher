@@ -25,6 +25,8 @@ const wxString DEFAULT_SKIN_BANNER				(_T("SCP_Header.png"));
 const wxString DEFAULT_SKIN_WELCOME_TEXT
 	(_("<p><center><b><font size='3'>Welcome to wxLauncher, the next-generation launcher for FS2 Open games</font></b><br><br>New to FreeSpace 2? Check out these links:<br><br> = <a href='http://www.hard-light.net/wiki/index.php/Main_Page'>FreeSpace Wiki</a> = <a href='http://www.hard-light.net/forums/'>Hard Light Productions Forums</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=63609.0'>Multiplayer Setup</a> = <a href='http://www.hard-light.net/forums/index.php?board=151.0'>Support Forum</a> = <br> = <a href='http://www.hard-light.net/forums/index.php?topic=56279.0'>Troubleshooting FAQ</a> = </center></p>"));
 
+const wxString DEFAULT_SKIN_MOD_IMAGE			(_T("modimg.png"));
+
 const wxString DEFAULT_SKIN_ICON_OK				(_T("icon_ok.png"));
 const wxString DEFAULT_SKIN_ICON_WARNING		(_T("icon_warning.png"));
 const wxString DEFAULT_SKIN_ICON_WARNING_BIG	(_T("warning_big.png"));
