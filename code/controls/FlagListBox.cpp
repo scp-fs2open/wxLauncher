@@ -213,7 +213,8 @@ FlagListCheckBoxItem* FlagListBox::FindFlagAt(size_t n) const {
 
 void FlagListBox::OnDrawItem(wxDC &dc, const wxRect &rect, size_t n) const {
 #if IS_WIN32 // replace the ugly default font with one based on the system default
-	dc.SetFont(SkinSystem::GetSkinSystem()->GetFont());
+	wxFont font(SkinSystem::GetSkinSystem()->GetFont());
+	dc.SetFont(font);
 #endif
 	
 	if (this->IsReady()) {
