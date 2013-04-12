@@ -814,6 +814,7 @@ Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
 ModItem::ModItem() {
+	this->recommendedlightingpreset = DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
 	this->image = NULL;
 	warn = false;
 
