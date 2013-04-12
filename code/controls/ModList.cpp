@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
 #include "global/ModDefaults.h"
+#include "global/ModIniKeys.h"
 #include "global/Utils.h"
 #include "controls/ModList.h"
 #include "apis/ProfileManager.h"
@@ -176,13 +177,13 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 
 		item->shortname = shortname;
 
-		readIniFileString(config, _T("/launcher/modname"), item->name);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_MOD_NAME, item->name);
 
 		// TODO allow TC authors to specify a specific directory to load this image from,
 		// in case the TC author doesn't want the TC root folder to be cluttered
 		// with the images that they specify for the skin
 		wxString smallimagepath;
-		readIniFileString(config, _T("/launcher/image255x112"), smallimagepath);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_IMAGE_255X112, smallimagepath);
 		if ( !smallimagepath.IsEmpty() ) {
 			if (shortname == NO_MOD) {
 				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
@@ -193,34 +194,34 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			}
 		}
 		
-		readIniFileString(config, _T("/launcher/infotext"), item->infotext);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_INFO_TEXT, item->infotext);
 
-		readIniFileString(config, _T("/launcher/author"), item->author);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_AUTHOR, item->author);
 
-		readIniFileString(config, _T("/launcher/notes"), item->notes);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_NOTES, item->notes);
 
-		config->Read(_T("/launcher/warn"), &(item->warn), false);
+		config->Read(MOD_INI_KEY_LAUNCHER_WARN, &(item->warn), false);
 
-		readIniFileString(config, _T("/launcher/website"), item->website);
-		readIniFileString(config, _T("/launcher/forum"), item->forum);
-		readIniFileString(config, _T("/launcher/bugs"), item->bugs);
-		readIniFileString(config, _T("/launcher/support"), item->support);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_WEBSITE, item->website);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_FORUM, item->forum);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_BUGS, item->bugs);
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_SUPPORT, item->support);
 
-		readIniFileString(config, _T("/extremeforce/forcedflagson"), item->forcedon);
-		readIniFileString(config, _T("/extremeforce/forcedflagsoff"), item->forcedoff);
+		readIniFileString(config, MOD_INI_KEY_EXTREMEFORCE_FORCED_FLAGS_ON, item->forcedon);
+		readIniFileString(config, MOD_INI_KEY_EXTREMEFORCE_FORCED_FLAGS_OFF, item->forcedoff);
 
-		readIniFileString(config, _T("/multimod/primarylist"), item->primarylist);
+		readIniFileString(config, MOD_INI_KEY_MULTIMOD_PRIMARY_LIST, item->primarylist);
 		// Log the warning for any mod authors, specifically for those who indicate
 		// that they are mod authors by their having FRED launching enabled
 		bool fredEnabled;
 		ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
 		
-		if ( config->Exists(_T("/multimod/secondrylist")) && fredEnabled) {
+		if ( config->Exists(MOD_INI_KEY_MULTIMOD_SECONDRY_LIST) && fredEnabled) {
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
-		readIniFileString(config, _T("/multimod/secondrylist"), item->secondarylist);
-		readIniFileString(config, _T("/multimod/secondarylist"), item->secondarylist);
+		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDRY_LIST, item->secondarylist);
+		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDARY_LIST, item->secondarylist);
 
 		// flag sets
 		if ( config->Exists(_T("/flagsetideal")) ) {
@@ -260,13 +261,13 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			this->TCSkin = new Skin();
 
 			wxString windowTitle;
-			readIniFileString(config, _T("/skin/wtitle"), windowTitle);
+			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_TITLE, windowTitle);
 			if ( !windowTitle.IsEmpty() ) {
 				this->TCSkin->SetWindowTitle(windowTitle);
 			}
 
 			wxString windowIconFile;
-			readIniFileString(config, _T("/skin/wicon"), windowIconFile);
+			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_ICON, windowIconFile);
 			if ( !windowIconFile.IsEmpty() ) {
 				// TODO: let SetWindowIcon() do the image validation
 				wxIcon* windowIcon =
@@ -278,13 +279,13 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			}
 
 			wxString welcomeText;
-			readIniFileString(config, _T("/skin/welcometxt"), welcomeText);
+			readIniFileString(config, MOD_INI_KEY_SKIN_WELCOME_TEXT, welcomeText);
 			if ( !welcomeText.IsEmpty() ) {
 				this->TCSkin->SetWelcomeText(welcomeText);
 			}
 
 			wxString idealIconFile;
-			readIniFileString(config, _T("/skin/idealicon"), idealIconFile);
+			readIniFileString(config, MOD_INI_KEY_SKIN_ICON_IDEAL, idealIconFile);
 			if ( !idealIconFile.IsEmpty() ) {
 				// TODO: let SetIdealIcon() do the image validation
 				wxBitmap* idealIcon =
@@ -522,7 +523,7 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, co
 	
 	if (!isNoMod) {
 		wxLogDebug(_T("   Mod fancy name is: %s"),
-			config->Read(_T("/launcher/modname"), _T("Not specified")).c_str());
+			config->Read(MOD_INI_KEY_LAUNCHER_MOD_NAME, _T("Not specified")).c_str());
 
 		wxLogDebug(_T("   Mod short name is: %s"), shortname.c_str());
 	} 
