@@ -1092,7 +1092,7 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 		info->SetPage(DEFAULT_MOD_LAUNCHER_INFO_TEXT);
 	} else {
 		wxString infoText(item->infotext);
-		infoText.Replace(_T("\n"), _T("<br />"));
+		infoText.Replace(_T("\\n"), _T("<br />"));
 		info->SetPage(infoText);
 	}
 
