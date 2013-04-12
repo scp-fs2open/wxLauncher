@@ -28,6 +28,7 @@ public:
 	const wxString& GetName() const { return this->name; }
 	const int GetButtonId() const { return this->buttonId; }
 	const wxString& GetPreset() const { return this->preset; }
+	void SetPreset(const wxString& preset);
 private:
 	wxString name;
 	int buttonId;

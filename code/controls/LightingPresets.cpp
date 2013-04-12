@@ -33,6 +33,12 @@ Preset::Preset(const wxString& name, const int buttonId, const wxString& preset)
 	name(name), buttonId(buttonId), preset(preset) {
 }
 
+void Preset::SetPreset(const wxString& preset) {
+	wxCHECK_RET(!preset.IsEmpty(), _T("SetPreset() given empty preset string!"));
+	
+	this->preset = preset;
+}
+
 // vertical spacing between radio buttons is platform-specific
 #if IS_WIN32
 const int RADIOBUTTON_SPACING = 20;
