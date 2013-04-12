@@ -96,10 +96,10 @@ public:
 
 	static const int IdealIconWidth = 24;
 	static const int IdealIconHeight = 24;
-	static const unsigned int InfoWindowImageWidth = 255;
-	static const unsigned int InfoWindowImageHeight = 112;
-	static const int ModsListImageWidth = 182;
-	static const int ModsListImageHeight = 80;
+	static const int ModInfoDialogImageWidth = 255;
+	static const int ModInfoDialogImageHeight = 112;
+	static const int ModListImageWidth = 182;
+	static const int ModListImageHeight = 80;
 	static const int BigWarningIconWidth = 64;
 	static const int BigWarningIconHeight = 64;
 	static const int StatusBarIconWidth = 24;

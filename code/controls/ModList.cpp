@@ -851,7 +851,7 @@ void ModItem::Draw(wxDC &dc, const wxRect &rect, bool selected, wxSizer* mainSiz
 	titlerect.width = 150;
 
 	wxRect imgrect = rect;
-	imgrect.width = SkinSystem::ModsListImageWidth;
+	imgrect.width = SkinSystem::ModListImageWidth;
 	imgrect.x = titlerect.width;
 
 	wxRect infotextrect = rect;
@@ -1084,10 +1084,10 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 		new wxStaticText(this, wxID_ANY, modFolderString, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
 	wxPanel* modImage = new ModInfoDialog::ImageDrawer(this);
-	modImage->SetMaxSize(wxSize(SkinSystem::InfoWindowImageWidth, SkinSystem::InfoWindowImageHeight));
+	modImage->SetMaxSize(wxSize(SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight));
 
 	wxHtmlWindow* info = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN);
-	info->SetMinSize(wxSize(SkinSystem::InfoWindowImageWidth, 250));
+	info->SetMinSize(wxSize(SkinSystem::ModInfoDialogImageWidth, 250));
 	if ( item->infotext.IsEmpty() ) {
 		info->SetPage(DEFAULT_MOD_LAUNCHER_INFO_TEXT);
 	} else {
@@ -1097,7 +1097,7 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	}
 
 	wxHtmlWindow* links = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxHW_SCROLLBAR_NEVER );
-	links->SetSize(SkinSystem::InfoWindowImageWidth, 40);
+	links->SetSize(SkinSystem::ModInfoDialogImageWidth, 40);
 	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
 		(!item->website.IsEmpty()) ? 
 			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website.c_str(), _("Website")).c_str():wxEmptyString,
@@ -1159,7 +1159,7 @@ wxPanel(parent) {
 	this->parent = parent;
 
 	if (parent->item->image == NULL) {
-		this->SetSize(SkinSystem::InfoWindowImageWidth, SkinSystem::InfoWindowImageHeight);
+		this->SetSize(SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight);
 	} else {
 		this->SetSize(
 			parent->item->image->GetWidth(),
@@ -1176,8 +1176,8 @@ void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &WXUNUSED(event)) {
 		wxCoord textWidth, textHeight;
 		dc.GetTextExtent(_("NO IMAGE"), &textWidth, &textHeight);
 
-		wxCoord drawLocationX = SkinSystem::InfoWindowImageWidth/2 - textWidth/2;
-		wxCoord drawLocationY = SkinSystem::InfoWindowImageHeight/2 - textHeight/2;
+		wxCoord drawLocationX = SkinSystem::ModInfoDialogImageWidth/2 - textWidth/2;
+		wxCoord drawLocationY = SkinSystem::ModInfoDialogImageHeight/2 - textHeight/2;
 		
 		dc.DrawText(_("NO IMAGE"), drawLocationX, drawLocationY);
 	}

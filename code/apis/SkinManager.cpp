@@ -405,12 +405,12 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 
 wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
 	wxImage temp = orig.ConvertToImage();
-	wxImage temp1 = temp.Scale(SkinSystem::ModsListImageWidth,
-		SkinSystem::ModsListImageHeight,
+	wxImage temp1 = temp.Scale(SkinSystem::ModListImageWidth,
+		SkinSystem::ModListImageHeight,
 		wxIMAGE_QUALITY_HIGH);
 	wxBitmap outimg = wxBitmap(temp1);
-	wxASSERT( outimg.GetWidth() == SkinSystem::ModsListImageWidth );
-	wxASSERT( outimg.GetHeight() == SkinSystem::ModsListImageHeight );
+	wxASSERT( outimg.GetWidth() == SkinSystem::ModListImageWidth );
+	wxASSERT( outimg.GetHeight() == SkinSystem::ModListImageHeight );
 	return outimg;
 }
 
