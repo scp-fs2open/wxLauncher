@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/SkinManager.h"
 
+#include "controls/LightingPresets.h"
+
 class ConfigPair {
 public:
 	ConfigPair(const wxString &shortname, wxFileConfig* config);
@@ -77,12 +79,18 @@ public:
 	wxString forum;
 	wxString bugs;
 	wxString support;
+	
+	long minhorizontalres;
+	long minverticalres;
 
 	wxString forcedon;
 	wxString forcedoff;
 
 	wxString primarylist;
 	wxString secondarylist;
+	
+	wxString recommendedlightingname;
+	Preset recommendedlightingpreset;
 
 	FlagSets* flagsets;	// set 0 is the ideal set.
 
