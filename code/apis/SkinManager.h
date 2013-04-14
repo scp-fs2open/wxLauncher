@@ -22,11 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 
+#include "datastructures/NewsSource.h"
+
 /** Holds a skin's information.  */
 /** The Set() functions return true on success, false otherwise. */
 class Skin {
 public:
-	Skin() { }
+	Skin();
 	
 	const wxString& GetWindowTitle() const { return this->windowTitle; }
 	bool SetWindowTitle(const wxString& windowTitle);
@@ -37,11 +39,14 @@ public:
 	const wxBitmap& GetBanner() const { return this->banner; }
 	bool SetBanner(const wxBitmap& banner);
 	
-	const wxBitmap& GetIdealIcon() const { return this->idealIcon; }
-	bool SetIdealIcon(const wxBitmap& idealIcon);
-	
 	const wxString& GetWelcomeText() const { return this->welcomeText; }
 	bool SetWelcomeText(const wxString& welcomeText);
+	
+	const wxBitmap& GetModImage() const { return this->modImage; }
+	bool SetModImage(const wxBitmap& modImage);
+	
+	const wxBitmap& GetOkIcon() const { return this->okIcon; }
+	bool SetOkIcon(const wxBitmap& okIcon);
 	
 	const wxBitmap& GetWarningIcon() const { return this->warningIcon; }
 	bool SetWarningIcon(const wxBitmap& warningIcon);
@@ -49,20 +54,54 @@ public:
 	const wxBitmap& GetBigWarningIcon() const { return this->bigWarningIcon; }
 	bool SetBigWarningIcon(const wxBitmap& bigWarningIcon);
 	
+	const wxBitmap& GetErrorIcon() const { return this->errorIcon; }
+	bool SetErrorIcon(const wxBitmap& errorIcon);
+	
+	const wxBitmap& GetInfoIcon() const { return this->infoIcon; }
+	bool SetInfoIcon(const wxBitmap& infoIcon);
+	
+	const wxBitmap& GetBigInfoIcon() const { return this->bigInfoIcon; }
+	bool SetBigInfoIcon(const wxBitmap& bigInfoIcon);
+	
+	const wxBitmap& GetHelpIcon() const { return this->helpIcon; }
+	bool SetHelpIcon(const wxBitmap& helpIcon);
+	
+	const wxBitmap& GetBigHelpIcon() const { return this->bigHelpIcon; }
+	bool SetBigHelpIcon(const wxBitmap& bigHelpIcon);
+	
+	const wxBitmap& GetIdealIcon() const { return this->idealIcon; }
+	bool SetIdealIcon(const wxBitmap& idealIcon);
+	
+	const NewsSource* GetNewsSource() const { return this->newsSource; }
+	bool SetNewsSource(const NewsSource* newsSource);
+	
 private:
+	static bool CheckStatusBarIconDimensions(const wxBitmap& icon);
+	static bool CheckBigIconDimensions(const wxBitmap& icon);
+	
 	wxString windowTitle;
 	wxIcon windowIcon;
 	wxBitmap banner;
-	wxBitmap idealIcon;
 	wxString welcomeText;
+	
+	wxBitmap modImage;
+
+	wxBitmap okIcon;
 	wxBitmap warningIcon;
 	wxBitmap bigWarningIcon;
+	wxBitmap errorIcon;
+	wxBitmap infoIcon;
+	wxBitmap bigInfoIcon;
+	wxBitmap helpIcon;
+	wxBitmap bigHelpIcon;
+	wxBitmap idealIcon;
+	
+	const NewsSource* newsSource;
 };
 
-/** Class used to manage the skinning of the launcher.  The skinable parts of
-the app registers with the skin class so that when the skin changes they can 
-be updated if needed.  The classes can also register a callback so that they 
-can run arbitary code when the skin changes. */
+/** Class used to manage the skinning of the launcher.  The skinnable parts of
+the app register with the skin system, so that when the skin changes, they can
+be updated if needed. */
 class SkinSystem {
 public:
 	static bool Initialize();
@@ -75,10 +114,21 @@ public:
 	const wxString& GetWindowTitle() const;
 	const wxIcon& GetWindowIcon() const;
 	const wxBitmap& GetBanner() const;
-	const wxBitmap& GetIdealIcon() const;
+	const wxString& GetWelcomeText() const;
+	
+	const wxBitmap& GetModImage() const;
+	
+	const wxBitmap& GetOkIcon() const;
 	const wxBitmap& GetWarningIcon() const;
 	const wxBitmap& GetBigWarningIcon() const;
-	const wxString& GetWelcomeText() const;
+	const wxBitmap& GetErrorIcon() const;
+	const wxBitmap& GetInfoIcon() const;
+	const wxBitmap& GetBigInfoIcon() const;
+	const wxBitmap& GetHelpIcon() const;
+	const wxBitmap& GetBigHelpIcon() const;
+	const wxBitmap& GetIdealIcon() const;
+	
+	const NewsSource& GetNewsSource() const;
 	
 	const wxFont& GetFont() const { return this->font; }
 	const wxFont& GetMessageFont() const { return this->messageFont; }
@@ -94,17 +144,23 @@ public:
 	static bool SearchFile(wxFileName& filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
 
-	static const int IdealIconWidth = 24;
-	static const int IdealIconHeight = 24;
+	/** For the banner, only the width is validated. */
+	static const int BannerWidth = 600;
+	
+	/** Dimensions for mod images, depending on where the image appears. */
 	static const int ModInfoDialogImageWidth = 255;
 	static const int ModInfoDialogImageHeight = 112;
 	static const int ModListImageWidth = 182;
 	static const int ModListImageHeight = 80;
-	static const int BigWarningIconWidth = 64;
-	static const int BigWarningIconHeight = 64;
+	
 	static const int StatusBarIconWidth = 24;
 	static const int StatusBarIconHeight = 24;
-
+	static const int BigIconWidth = 64;
+	static const int BigIconHeight = 64;
+	static const int HelpIconWidth = 32;
+	static const int HelpIconHeight = 32;
+	static const int IdealIconWidth = 24;
+	static const int IdealIconHeight = 24;
 
 private:
 	SkinSystem();
