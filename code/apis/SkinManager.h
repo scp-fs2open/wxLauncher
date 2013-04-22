@@ -45,6 +45,9 @@ public:
 	const wxBitmap& GetModImage() const { return this->modImage; }
 	bool SetModImage(const wxBitmap& modImage);
 	
+	const wxBitmap& GetSmallModImage() const { return this->smallModImage; }
+	// there's no SetSmallModImage() because it's set in SetModImage()
+	
 	const wxBitmap& GetOkIcon() const { return this->okIcon; }
 	bool SetOkIcon(const wxBitmap& okIcon);
 	
@@ -85,6 +88,8 @@ private:
 	wxString welcomeText;
 	
 	wxBitmap modImage;
+	/** A scaled down version of modImage for display in the mod list. */
+	wxBitmap smallModImage;
 
 	wxBitmap okIcon;
 	wxBitmap warningIcon;
@@ -117,6 +122,7 @@ public:
 	const wxString& GetWelcomeText() const;
 	
 	const wxBitmap& GetModImage() const;
+	const wxBitmap& GetSmallModImage() const;
 	
 	const wxBitmap& GetOkIcon() const;
 	const wxBitmap& GetWarningIcon() const;

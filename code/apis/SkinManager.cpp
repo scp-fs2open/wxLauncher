@@ -91,6 +91,7 @@ bool Skin::SetModImage(const wxBitmap& modImage) {
 		return false;
 	} else {
 		this->modImage = modImage;
+		this->smallModImage = SkinSystem::MakeModListImage(modImage);
 		return true;
 	}
 }
@@ -458,6 +459,15 @@ const wxBitmap& SkinSystem::GetModImage() const {
 			return this->TCSkin->GetModImage();
 	} else {
 		return this->defaultSkin.GetModImage();
+	}
+}
+
+const wxBitmap& SkinSystem::GetSmallModImage() const {
+	if ( this->TCSkin != NULL
+		&& this->TCSkin->GetSmallModImage().IsOk() ) {
+		return this->TCSkin->GetSmallModImage();
+	} else {
+		return this->defaultSkin.GetSmallModImage();
 	}
 }
 
