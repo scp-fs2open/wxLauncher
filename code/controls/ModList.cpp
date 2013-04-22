@@ -185,13 +185,17 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		wxString smallimagepath;
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_IMAGE_255X112, smallimagepath);
 		if ( !smallimagepath.IsEmpty() ) {
+			// TODO: Remove imagePtr once VerifySmallImage() is gone
+			wxBitmap* imagePtr = NULL;
 			if (shortname == NO_MOD) {
-				item->image = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
+				imagePtr = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
 					smallimagepath);
 			} else {
-				item->image = SkinSystem::VerifySmallImage(tcPath, shortname,
+				imagePtr = SkinSystem::VerifySmallImage(tcPath, shortname,
 					smallimagepath);
 			}
+			item->image = *imagePtr;
+			delete imagePtr;
 		}
 		
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_INFO_TEXT, item->infotext);
@@ -815,7 +819,6 @@ Structure that holds all of the information for a single line in the mod table.
 /** Constructor.*/
 ModItem::ModItem() {
 	this->recommendedlightingpreset = DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
-	this->image = NULL;
 	warn = false;
 
 	this->flagsets = NULL;
@@ -831,7 +834,6 @@ ModItem::ModItem() {
 
 /** Destructor.  Deletes all memory pointed to by non NULL internal pointers. */
 ModItem::~ModItem() {
-	if (this->image != NULL) delete this->image;
 	if (this->flagsets != NULL) delete this->flagsets;
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	if (this->i18n != NULL) {
@@ -1044,8 +1046,8 @@ ModItem::ModImage::ModImage(ModItem *myData) {
 }
 
 void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
-	if ( this->myData->image != NULL ) {
-		dc.DrawBitmap(SkinSystem::MakeModListImage(*this->myData->image), rect.x, rect.y);
+	if ( this->myData->image.IsOk() ) {
+		dc.DrawBitmap(SkinSystem::MakeModListImage(this->myData->image), rect.x, rect.y);
 	} else {
 		dc.DrawRectangle(rect);
 		wxPen pen(dc.GetPen());
@@ -1160,20 +1162,20 @@ ModInfoDialog::ImageDrawer::ImageDrawer(ModInfoDialog* parent):
 wxPanel(parent) {
 	this->parent = parent;
 
-	if (parent->item->image == NULL) {
+	if (!parent->item->image.IsOk()) {
 		this->SetSize(SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight);
 	} else {
 		this->SetSize(
-			parent->item->image->GetWidth(),
-			parent->item->image->GetHeight());
+			parent->item->image.GetWidth(),
+			parent->item->image.GetHeight());
 	}
 	this->GetEventHandler()->Connect(wxEVT_PAINT, wxPaintEventHandler(ModInfoDialog::ImageDrawer::OnDraw));
 }
 
 void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &WXUNUSED(event)) {
 	wxPaintDC dc(this);
-	if ( parent->item->image != NULL ) {
-		dc.DrawBitmap(*(parent->item->image), 0, 0);
+	if ( parent->item->image.IsOk() ) {
+		dc.DrawBitmap(parent->item->image, 0, 0);
 	} else {
 		wxCoord textWidth, textHeight;
 		dc.GetTextExtent(_("NO IMAGE"), &textWidth, &textHeight);

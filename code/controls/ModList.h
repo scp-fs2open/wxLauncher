@@ -70,7 +70,7 @@ public:
 	~ModItem();
 	wxString name;
 	wxString shortname;
-	wxBitmap* image;
+	wxBitmap image;
 	wxString infotext;
 	wxString author;
 	wxString notes;
