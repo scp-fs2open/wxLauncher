@@ -693,7 +693,7 @@ void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MODLINE, modline);
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_TC_CURRENT_MOD, shortname);
 
-	TCManager::GenerateTCSelectedModChanged();
+	TCManager::GenerateTCActiveModChanged();
 	this->Refresh();
 }
 
