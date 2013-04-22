@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/html/htmlwin.h>
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
-#include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "generated/configure_launcher.h"
 #include "MainWindow.h"
 #include "tabs/WelcomePage.h"
@@ -56,13 +55,8 @@ MainWindow::MainWindow() {
 
 	this->SetStatusBar(new StatusBar(this));
 
-	// from http://stackoverflow.com/questions/6852413/
-#if IS_WIN32 // set the titlebar/alt-tab icon
-	this->SetIcon(wxICON(IDI_SMALL));
-#elif IS_LINUX
-	wxFileName iconFilename(_T(RESOURCES_PATH), DEFAULT_SKIN_WINDOW_ICON);
-	wxIcon icon(iconFilename.GetFullPath(), wxBITMAP_TYPE_ICO);
-	this->SetIcon(icon);
+#if IS_WIN32 || IS_LINUX
+	this->SetIcon(SkinSystem::GetSkinSystem()->GetWindowIcon());
 #endif
 
 	// setup tabs
