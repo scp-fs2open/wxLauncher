@@ -1045,7 +1045,7 @@ ModItem::ModImage::ModImage(ModItem *myData) {
 
 void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
 	if ( this->myData->image != NULL ) {
-		dc.DrawBitmap(SkinSystem::MakeModsListImage(*this->myData->image), rect.x, rect.y);
+		dc.DrawBitmap(SkinSystem::MakeModListImage(*this->myData->image), rect.x, rect.y);
 	} else {
 		dc.DrawRectangle(rect);
 		wxPen pen(dc.GetPen());

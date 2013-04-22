@@ -673,14 +673,35 @@ wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
 	  return NULL;
 }
 
-wxBitmap SkinSystem::MakeModsListImage(const wxBitmap &orig) {
-	wxImage temp = orig.ConvertToImage();
-	wxImage temp1 = temp.Scale(SkinSystem::ModListImageWidth,
+wxBitmap SkinSystem::MakeModListImage(const wxBitmap &orig) {
+	wxASSERT(orig.GetWidth() == SkinSystem::ModInfoDialogImageWidth);
+	wxASSERT(orig.GetHeight() == SkinSystem::ModInfoDialogImageHeight);
+	
+	wxImage temp(orig.ConvertToImage());
+	wxImage scaledTemp(temp.Scale(SkinSystem::ModListImageWidth,
 		SkinSystem::ModListImageHeight,
-		wxIMAGE_QUALITY_HIGH);
-	wxBitmap outimg = wxBitmap(temp1);
-	wxASSERT( outimg.GetWidth() == SkinSystem::ModListImageWidth );
-	wxASSERT( outimg.GetHeight() == SkinSystem::ModListImageHeight );
+		wxIMAGE_QUALITY_HIGH));
+	
+	wxBitmap outimg(scaledTemp);
+	wxASSERT(outimg.GetWidth() == SkinSystem::ModListImageWidth);
+	wxASSERT(outimg.GetHeight() == SkinSystem::ModListImageHeight);
+	
+	return outimg;
+}
+
+wxBitmap SkinSystem::MakeModInfoDialogImage(const wxBitmap &orig) {
+	wxASSERT(orig.GetWidth() == SkinSystem::ModListImageWidth);
+	wxASSERT(orig.GetHeight() == SkinSystem::ModListImageHeight);
+	
+	wxImage temp(orig.ConvertToImage());
+	wxImage scaledTemp(temp.Scale(SkinSystem::ModInfoDialogImageWidth,
+		SkinSystem::ModInfoDialogImageHeight,
+		wxIMAGE_QUALITY_HIGH));
+	
+	wxBitmap outimg(scaledTemp);
+	wxASSERT(outimg.GetWidth() == SkinSystem::ModInfoDialogImageWidth);
+	wxASSERT(outimg.GetHeight() == SkinSystem::ModInfoDialogImageHeight);
+	
 	return outimg;
 }
 

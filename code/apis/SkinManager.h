@@ -139,7 +139,8 @@ public:
 	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxBitmap MakeModsListImage(const wxBitmap &orig);
+	static wxBitmap MakeModListImage(const wxBitmap &orig);
+	static wxBitmap MakeModInfoDialogImage(const wxBitmap &orig);
 
 	static bool SearchFile(wxFileName& filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
