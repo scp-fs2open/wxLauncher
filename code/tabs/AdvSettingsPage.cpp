@@ -52,7 +52,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY), f
 	CmdLineManager::RegisterCmdLineChanged(this);
 	CmdLineManager::RegisterCustomFlagsChanged(this);
 	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
-	TCManager::RegisterTCSelectedModChanged(this);
+	TCManager::RegisterTCActiveModChanged(this);
 	ProfileProxy::GetProxy()->RegisterProxyReset(this);
 	ProfileProxy::GetProxy()->RegisterProxyFlagDataReady(this);
 }
@@ -60,7 +60,7 @@ AdvSettingsPage::AdvSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY), f
 BEGIN_EVENT_TABLE(AdvSettingsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_PROXY_RESET, AdvSettingsPage::OnExeChanged)
 EVT_COMMAND(wxID_NONE, EVT_PROXY_FLAG_DATA_READY, AdvSettingsPage::OnProxyFlagDataReady)
-EVT_COMMAND(wxID_NONE, EVT_TC_SELECTED_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
+EVT_COMMAND(wxID_NONE, EVT_TC_ACTIVE_MOD_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, AdvSettingsPage::OnFlagFileProcessingStatusChanged)
 EVT_COMMAND(wxID_NONE, EVT_CMD_LINE_CHANGED, AdvSettingsPage::OnNeedUpdateCommandLine)
 EVT_COMMAND(wxID_NONE, EVT_CUSTOM_FLAGS_CHANGED, AdvSettingsPage::OnNeedUpdateCustomFlags)

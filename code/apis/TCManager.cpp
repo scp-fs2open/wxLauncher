@@ -41,7 +41,7 @@ TCManager::~TCManager() {
 TCManager* TCManager::manager = NULL;
 TCEventHandlers TCManager::TCChangedHandlers;
 TCEventHandlers TCManager::TCBinaryChangedHandlers;
-TCEventHandlers TCManager::TCSelectedModChangedHandlers;
+TCEventHandlers TCManager::TCActiveModChangedHandlers;
 TCEventHandlers TCManager::TCFredBinaryChangedHandlers;
 
 void TCManager::Initialize() {
@@ -73,7 +73,7 @@ END_EVENT_TABLE()
 
 DEFINE_EVENT_TYPE(EVT_TC_CHANGED);
 DEFINE_EVENT_TYPE(EVT_TC_BINARY_CHANGED);
-DEFINE_EVENT_TYPE(EVT_TC_SELECTED_MOD_CHANGED);
+DEFINE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED);
 DEFINE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED);
 
 #include <wx/listimpl.cpp> // required magic incatation
@@ -107,19 +107,19 @@ void TCManager::UnRegisterTCChanged(wxEvtHandler *handler) {
 			handler));
 	TCChangedHandlers.DeleteObject(handler);
 }
-void TCManager::RegisterTCSelectedModChanged(wxEvtHandler *handler) {
-	wxASSERT_MSG(TCSelectedModChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+void TCManager::RegisterTCActiveModChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCActiveModChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
 		wxString::Format(
-			_T("RegisterTCSelectedModChanged(): Handler at %p already registered."),
+			_T("RegisterTCActiveModChanged(): Handler at %p already registered."),
 			handler));
-	TCSelectedModChangedHandlers.Append(handler);
+	TCActiveModChangedHandlers.Append(handler);
 }
-void TCManager::UnRegisterTCSelectedModChanged(wxEvtHandler *handler) {
-	wxASSERT_MSG(TCSelectedModChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+void TCManager::UnRegisterTCActiveModChanged(wxEvtHandler *handler) {
+	wxASSERT_MSG(TCActiveModChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
 		wxString::Format(
-			_T("UnRegisterTCSelectedModChanged(): Handler at %p not registered."),
+			_T("UnRegisterTCActiveModChanged(): Handler at %p not registered."),
 			handler));
-	TCSelectedModChangedHandlers.DeleteObject(handler);
+	TCActiveModChangedHandlers.DeleteObject(handler);
 }
 void TCManager::RegisterTCFredBinaryChanged(wxEvtHandler *handler) {
 	wxASSERT_MSG(TCFredBinaryChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
@@ -157,14 +157,14 @@ void TCManager::GenerateTCBinaryChanged() {
 		iter++;
 	}
 }
-void TCManager::GenerateTCSelectedModChanged() {
-	wxCommandEvent event(EVT_TC_SELECTED_MOD_CHANGED, wxID_NONE);
-	wxLogDebug(_T("Generating EVT_TC_SELECTED_MOD_CHANGED event"));
-	TCEventHandlers::iterator iter = TCSelectedModChangedHandlers.begin();
-	while (iter != TCSelectedModChangedHandlers.end()) {
+void TCManager::GenerateTCActiveModChanged() {
+	wxCommandEvent event(EVT_TC_ACTIVE_MOD_CHANGED, wxID_NONE);
+	wxLogDebug(_T("Generating EVT_TC_ACTIVE_MOD_CHANGED event"));
+	TCEventHandlers::iterator iter = TCActiveModChangedHandlers.begin();
+	while (iter != TCActiveModChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent EVT_TC_SELECTED_MOD_CHANGED event to %p"), current);
+		wxLogDebug(_T(" Sent EVT_TC_ACTIVE_MOD_CHANGED event to %p"), current);
 		iter++;
 	}
 }

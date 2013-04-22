@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 DECLARE_EVENT_TYPE(EVT_TC_CHANGED, wxID_ANY);
 /** Selected binary has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_BINARY_CHANGED, wxID_ANY);
-/** Selected mod has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_SELECTED_MOD_CHANGED, wxID_ANY);
+/** Active mod has changed. */
+DECLARE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED, wxID_ANY);
 /** Selected FRED binary has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED, wxID_ANY);
 
@@ -54,18 +54,18 @@ public:
 	static void UnRegisterTCChanged(wxEvtHandler *handler);
 	static void RegisterTCBinaryChanged(wxEvtHandler *handler);
 	static void UnRegisterTCBinaryChanged(wxEvtHandler *handler);
-	static void RegisterTCSelectedModChanged(wxEvtHandler *handler);
-	static void UnRegisterTCSelectedModChanged(wxEvtHandler *handler);
+	static void RegisterTCActiveModChanged(wxEvtHandler *handler);
+	static void UnRegisterTCActiveModChanged(wxEvtHandler *handler);
 	static void RegisterTCFredBinaryChanged(wxEvtHandler *handler);
 	static void UnRegisterTCFredBinaryChanged(wxEvtHandler *handler);
 	static void GenerateTCChanged();
 	static void GenerateTCBinaryChanged();
-	static void GenerateTCSelectedModChanged();
+	static void GenerateTCActiveModChanged();
 	static void GenerateTCFredBinaryChanged();
 private:
 	static TCEventHandlers TCChangedHandlers,
 		TCBinaryChangedHandlers,
-		TCSelectedModChangedHandlers,
+		TCActiveModChangedHandlers,
 		TCFredBinaryChangedHandlers;
 	DECLARE_EVENT_TABLE();
 };
