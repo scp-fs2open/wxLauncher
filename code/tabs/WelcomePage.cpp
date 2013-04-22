@@ -28,7 +28,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "tabs/WelcomePage.h"
 #include "controls/StatusBar.h"
 #include "global/ProfileKeys.h"
-#include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "apis/HelpManager.h"
 #include "apis/SkinManager.h"
 
@@ -510,13 +509,10 @@ bool WelcomePage::getOrPromptUpdateNews() {
 			wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxDIALOG_NO_PARENT);
 		updateNewsQuestion->SetBackgroundColour(
 			wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-		wxFileName updateNewsQuestionIconLocation(
-			_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP);
-		wxIcon updateNewsQuestionIcon(
-			updateNewsQuestionIconLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(updateNewsQuestionIcon.IsOk());
 
-		updateNewsQuestion->SetIcon(updateNewsQuestionIcon);
+		wxIcon helpIcon;
+		helpIcon.CopyFromBitmap(SkinSystem::GetSkinSystem()->GetHelpIcon());
+		updateNewsQuestion->SetIcon(helpIcon);
 
 		wxStaticText* updateNewsText1 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
@@ -548,13 +544,8 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		wxBoxSizer* bodySizer= new wxBoxSizer(wxVERTICAL);
 		wxBoxSizer* choiceSizer = new wxBoxSizer(wxHORIZONTAL);
 
-		wxFileName questionMarkLocation(
-			_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP_BIG);
-		wxBitmap questionMark(
-			questionMarkLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(questionMark.IsOk());
 		wxStaticBitmap* questionImage = 
-			new wxStaticBitmap(updateNewsQuestion, wxID_ANY, questionMark);
+			new wxStaticBitmap(updateNewsQuestion, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigHelpIcon());
 
 		choiceSizer->Add(allowNewsUpdate, wxSizerFlags().Border(wxRIGHT, 5));
 		choiceSizer->Add(denyNewsUpdate);

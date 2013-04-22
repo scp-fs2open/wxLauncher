@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "tabs/ModsPage.h"
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
-#include "global/SkinDefaults.h" // TODO: remove once icons are handled in skin system
 #include "controls/ModList.h"
 #include "apis/SkinManager.h"
 #include "apis/ProfileManager.h"
@@ -62,10 +61,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		noTC->Wrap(TEXT_WRAP_WIDTH);
 
-		wxFileName infoLocation(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_INFO_BIG);
-		wxBitmap infoIcon(infoLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(infoIcon.IsOk());
-		wxStaticBitmap* infoImage = new wxStaticBitmap(this, wxID_ANY, infoIcon);
+		wxStaticBitmap* infoImage =
+			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigInfoIcon());
 
 		wxBoxSizer* noTCSizer = new wxBoxSizer(wxVERTICAL);
 		noTCSizer->AddStretchSpacer(1);
@@ -87,10 +84,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		nonexistentTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		nonexistentTC->Wrap(TEXT_WRAP_WIDTH);
 
-		wxFileName warningLocation(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING_BIG);
-		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(warningIcon.IsOk());
-		wxStaticBitmap* warningImage = new wxStaticBitmap(this, wxID_ANY, warningIcon);
+		wxStaticBitmap* warningImage =
+			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 
 		wxBoxSizer* nonexistentTCSizer = new wxBoxSizer(wxVERTICAL);
 		nonexistentTCSizer->AddStretchSpacer(1);
@@ -112,10 +107,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTC->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
 		invalidTC->Wrap(TEXT_WRAP_WIDTH);
 		
-		wxFileName warningLocation(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_WARNING_BIG);
-		wxBitmap warningIcon(warningLocation.GetFullPath(), wxBITMAP_TYPE_ANY);
-		wxASSERT(warningIcon.IsOk());
-		wxStaticBitmap* warningImage = new wxStaticBitmap(this, wxID_ANY, warningIcon);
+		wxStaticBitmap* warningImage =
+			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 		
 		wxBoxSizer* invalidTCSizer = new wxBoxSizer(wxVERTICAL);
 		invalidTCSizer->AddStretchSpacer(1);
