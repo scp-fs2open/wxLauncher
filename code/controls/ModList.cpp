@@ -194,7 +194,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				imagePtr = SkinSystem::VerifySmallImage(tcPath, shortname,
 					smallimagepath);
 			}
-			item->image = *imagePtr;
+			item->image255x112 = *imagePtr;
 			delete imagePtr;
 		}
 		
@@ -1046,8 +1046,8 @@ ModItem::ModImage::ModImage(ModItem *myData) {
 }
 
 void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
-	if ( this->myData->image.IsOk() ) {
-		dc.DrawBitmap(SkinSystem::MakeModListImage(this->myData->image), rect.x, rect.y);
+	if ( this->myData->image255x112.IsOk() ) {
+		dc.DrawBitmap(SkinSystem::MakeModListImage(this->myData->image255x112), rect.x, rect.y);
 	} else {
 		dc.DrawRectangle(rect);
 		wxPen pen(dc.GetPen());
@@ -1162,20 +1162,20 @@ ModInfoDialog::ImageDrawer::ImageDrawer(ModInfoDialog* parent):
 wxPanel(parent) {
 	this->parent = parent;
 
-	if (!parent->item->image.IsOk()) {
+	if (!parent->item->image255x112.IsOk()) {
 		this->SetSize(SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight);
 	} else {
 		this->SetSize(
-			parent->item->image.GetWidth(),
-			parent->item->image.GetHeight());
+			parent->item->image255x112.GetWidth(),
+			parent->item->image255x112.GetHeight());
 	}
 	this->GetEventHandler()->Connect(wxEVT_PAINT, wxPaintEventHandler(ModInfoDialog::ImageDrawer::OnDraw));
 }
 
 void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &WXUNUSED(event)) {
 	wxPaintDC dc(this);
-	if ( parent->item->image.IsOk() ) {
-		dc.DrawBitmap(parent->item->image, 0, 0);
+	if ( parent->item->image255x112.IsOk() ) {
+		dc.DrawBitmap(parent->item->image255x112, 0, 0);
 	} else {
 		wxCoord textWidth, textHeight;
 		dc.GetTextExtent(_("NO IMAGE"), &textWidth, &textHeight);
