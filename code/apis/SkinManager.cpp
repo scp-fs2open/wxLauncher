@@ -309,7 +309,7 @@ void SkinSystem::InitializeDefaultSkin() {
 	
 	wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_WINDOW_ICON);
 	success = this->defaultSkin.SetWindowIcon(
-		wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+		wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ICO));
 	if (!success) {
 		wxLogFatalError(_T("Setting default window icon '%s' failed"),
 			filename.GetFullPath().c_str());
