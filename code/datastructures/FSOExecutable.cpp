@@ -235,7 +235,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			}
 		} else if ( token.ToLong(&tempVersion) && ver.minor == 0 ) {
 			// must be minor version number
-			if ( tempVersion < 1000 && tempVersion > 0 ) {
+			if ( tempVersion < 1000 && tempVersion >= 0 ) {
 				ver.minor = (int)tempVersion;
 			} else {
 				wxLogWarning(
@@ -244,7 +244,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			}
 		} else if ( token.ToLong(&tempVersion) && ver.revision == 0) {
 			// must be revision version number
-			if ( tempVersion < 1000 && tempVersion > 0 ) {
+			if ( tempVersion < 1000 && tempVersion >= 0 ) {
 				ver.revision = (int)tempVersion;
 			} else {
 				wxLogWarning(
@@ -256,7 +256,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		} else if ( token.Lower().EndsWith(_T("d"), &temp) ) {
 			if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
-				if ( tempVersion < 1000 && tempVersion > 0 ) {
+				if ( tempVersion < 1000 && tempVersion >= 0 ) {
 					ver.revision = (int)tempVersion;
 					ver.debug = true;
 				} else {
@@ -274,7 +274,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				// do nothing, the 'r' wasn't preceded by a number
 			} else if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
-				if ( tempVersion < 1000 && tempVersion > 0 ) {
+				if ( tempVersion < 1000 && tempVersion >= 0 ) {
 					ver.revision = (int)tempVersion;
 					ver.debug = false;
 				} else {
