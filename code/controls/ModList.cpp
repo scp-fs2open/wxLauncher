@@ -116,6 +116,44 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 }
 
+void ModList::SetSkinBitmap(
+		const wxFileConfig& config,
+		const wxString& modIniKey,
+		const wxString& tcPath,
+		const wxString& bitmapName,
+		bool (Skin::* setFnPtr)(const wxBitmap&)) {
+	wxCHECK_RET(!modIniKey.IsEmpty(), _T("SetSkinBitmap(): modIniKey is empty!"));
+	wxCHECK_RET(!tcPath.IsEmpty(), _T("SetSkinBitmap(): tcPath is empty!"));
+	wxCHECK_RET(!bitmapName.IsEmpty(), _T("SetSkinBitmap(): bitmapName is empty!"));
+	wxCHECK_RET(setFnPtr != NULL, _T("SetSkinBitmap(): setFnPtr is NULL!"));
+	wxCHECK_RET(this->TCSkin != NULL, _T("SetSkinBitmap(): TCSkin is NULL!"));
+
+	wxString bitmapPath;
+	readIniFileString(&config, modIniKey, bitmapPath);
+	
+	if ( !bitmapPath.IsEmpty() ) {
+		wxFileName filename;
+		
+		if (SkinSystem::SearchFile(filename, tcPath, wxEmptyString, bitmapPath)) {
+			if ((this->TCSkin->*setFnPtr)(wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY))) {
+				wxLogDebug(_T("Set skin %s to '%s'"),
+					bitmapName.c_str(),
+					filename.GetFullPath().c_str());
+			} else {
+				wxLogWarning(_T("Could not set skin %s to '%s'"),
+					bitmapName.c_str(),
+					filename.GetFullPath().c_str());
+			}
+		} else {
+			wxLogWarning(_T("Could not find skin %s file '%s%c%s'."),
+				bitmapName.c_str(),
+				tcPath.c_str(),
+				wxFileName::GetPathSeparator(),
+				bitmapPath.c_str());
+		}
+	}
+}
+
 ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 : configFiles(new ConfigArray()), tableData(new ModItemArray()), TCSkin(NULL) {
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
@@ -179,24 +217,76 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_MOD_NAME, item->name);
 
-		// TODO allow TC authors to specify a specific directory to load this image from,
-		// in case the TC author doesn't want the TC root folder to be cluttered
-		// with the images that they specify for the skin
-		wxString smallimagepath;
-		readIniFileString(config, MOD_INI_KEY_LAUNCHER_IMAGE_255X112, smallimagepath);
-		if ( !smallimagepath.IsEmpty() ) {
-			// TODO: Remove imagePtr once VerifySmallImage() is gone
-			wxBitmap* imagePtr = NULL;
-			if (shortname == NO_MOD) {
-				imagePtr = SkinSystem::VerifySmallImage(tcPath, wxEmptyString,
-					smallimagepath);
+		wxString image255x112path;
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_IMAGE_255X112, image255x112path);
+		
+		if (!image255x112path.IsEmpty()) {
+			wxFileName filename;
+			wxString searchShortname((i == 0) ? wxString(wxEmptyString) : shortname);
+			
+			if (SkinSystem::SearchFile(filename, tcPath, searchShortname, image255x112path)) {
+				wxImage image(filename.GetFullPath());
+				
+				if (image.IsOk()) {
+					if ((image.GetWidth() == SkinSystem::ModInfoDialogImageWidth) &&
+						(image.GetHeight() == SkinSystem::ModInfoDialogImageHeight)) {
+						item->image255x112 = wxBitmap(image);
+					} else {
+						wxLogWarning(_T("image255x112 has invalid dimensions %dx%d"),
+							image.GetWidth(), image.GetHeight());
+					}
+				} else {
+					wxLogWarning(_T("Could not set image255x112 file to '%s'"),
+						filename.GetFullPath().c_str());
+				}
 			} else {
-				imagePtr = SkinSystem::VerifySmallImage(tcPath, shortname,
-					smallimagepath);
+				wxLogWarning(_T("Could not find image255x112 file %s%s"),
+					(searchShortname.IsEmpty() ? wxEmptyString :
+						wxString(searchShortname + wxFileName::GetPathSeparator()).c_str()),
+					image255x112path.c_str());
 			}
-			item->image255x112 = *imagePtr;
-			delete imagePtr;
 		}
+		
+		wxString image182x80path;
+		readIniFileString(config, MOD_INI_KEY_LAUNCHER_IMAGE_182X80, image182x80path);
+		
+		if (!image182x80path.IsEmpty()) {
+			wxFileName filename;
+			wxString searchShortname((i == 0) ? wxString(wxEmptyString) : shortname);
+			
+			if (SkinSystem::SearchFile(filename, tcPath, searchShortname, image182x80path)) {
+				wxImage image(filename.GetFullPath());
+				
+				if (image.IsOk()) {
+					if ((image.GetWidth() == SkinSystem::ModListImageWidth) &&
+						(image.GetHeight() == SkinSystem::ModListImageHeight)) {
+						item->image182x80 = wxBitmap(image);
+					} else {
+						wxLogWarning(_T("image182x80 has invalid dimensions %dx%d"),
+							image.GetWidth(), image.GetHeight());
+					}
+				} else {
+					wxLogWarning(_T("Could not set image182x80 file to '%s'"),
+						filename.GetFullPath().c_str());
+				}
+			} else {
+				wxLogWarning(_T("Could not find image182x80 file %s%s"),
+					(searchShortname.IsEmpty() ? wxEmptyString :
+						wxString(searchShortname + wxFileName::GetPathSeparator()).c_str()),
+							image182x80path.c_str());
+			}
+		}
+
+		// other cases, which don't require handling here:
+		// if both images are Ok, then we just use them
+		// if both images are not Ok, then we use SkinSystem::modImage/smallModImage
+		if (item->image255x112.IsOk() && !item->image182x80.IsOk()) {
+			item->image182x80 = SkinSystem::MakeModListImage(item->image255x112);
+		} else if (!item->image255x112.IsOk() && item->image182x80.IsOk()) {
+			item->image255x112 = SkinSystem::MakeModInfoDialogImage(item->image182x80);
+		}
+
+		wxASSERT(item->image255x112.IsOk() == item->image182x80.IsOk());
 		
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_INFO_TEXT, item->infotext);
 
@@ -210,6 +300,39 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_FORUM, item->forum);
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_BUGS, item->bugs);
 		readIniFileString(config, MOD_INI_KEY_LAUNCHER_SUPPORT, item->support);
+		
+		config->Read(
+			MOD_INI_KEY_RESOLUTION_MIN_HORIZONTAL_RES,
+			&item->minhorizontalres,
+			DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES);
+		config->Read(
+			MOD_INI_KEY_RESOLUTION_MIN_VERTICAL_RES,
+			&item->minverticalres,
+			DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
+		
+		// disallow minimum resolutions below the default
+		item->minhorizontalres =
+			std::max(item->minhorizontalres, DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES);
+		item->minverticalres =
+			std::max(item->minverticalres, DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
+		
+		if (config->HasEntry(MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET)) {
+			wxString flagset;
+			readIniFileString(config,
+				MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET, flagset);
+			
+			if (!flagset.IsEmpty()) {
+				item->recommendedlightingpreset.SetPreset(flagset);
+				
+				readIniFileString(config,
+					MOD_INI_KEY_RECOMMENDED_LIGHTING_NAME, item->recommendedlightingname);
+				
+				if (item->recommendedlightingname.IsEmpty()) {
+					item->recommendedlightingname =
+						(i == 0) ? _("TC recommended") : _("Mod recommended");
+				}
+			}
+		}
 
 		readIniFileString(config, MOD_INI_KEY_EXTREMEFORCE_FORCED_FLAGS_ON, item->forcedon);
 		readIniFileString(config, MOD_INI_KEY_EXTREMEFORCE_FORCED_FLAGS_OFF, item->forcedoff);
@@ -258,48 +381,92 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 #endif
 		}
 
-		// skin
-		if ( config->Exists(_T("/skin")) ) {
+		// skin (only available to TCs)
+		if ( config->Exists(_T("/skin")) && (i == 0) ) {
 			// deleting any existing TCSkin will be handled by SkinSystem::ResetTCSkin()
 			// so it shouldn't be deleted here
 			this->TCSkin = new Skin();
-
+			
 			wxString windowTitle;
 			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_TITLE, windowTitle);
-			if ( !windowTitle.IsEmpty() ) {
+			
+			if (!windowTitle.IsEmpty()) {
 				this->TCSkin->SetWindowTitle(windowTitle);
 			}
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_BANNER,
+				tcPath, _T("banner"), &Skin::SetBanner);
 
-			wxString windowIconFile;
-			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_ICON, windowIconFile);
-			if ( !windowIconFile.IsEmpty() ) {
-				// TODO: let SetWindowIcon() do the image validation
-				wxIcon* windowIcon =
-					SkinSystem::VerifyWindowIcon(tcPath, shortname, windowIconFile);
-				if (windowIcon != NULL) {
-					this->TCSkin->SetWindowIcon(*windowIcon);
-					delete windowIcon;
+			wxString windowIconPath;
+			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_ICON, windowIconPath);
+			
+			if (!windowIconPath.IsEmpty()) {
+				wxFileName filename;
+				
+				if (SkinSystem::SearchFile(filename, tcPath, wxEmptyString, windowIconPath)) {
+					if (this->TCSkin->SetWindowIcon(wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ICO))) {
+						wxLogDebug(_T("Set skin window icon to '%s'"),
+							filename.GetFullPath().c_str());
+					} else {
+						wxLogWarning(_T("Could not set skin window icon to '%s'"),
+							filename.GetFullPath().c_str());
+					}
+				} else {
+					wxLogWarning(_T("Could not find skin window icon file."));
 				}
 			}
 
 			wxString welcomeText;
 			readIniFileString(config, MOD_INI_KEY_SKIN_WELCOME_TEXT, welcomeText);
-			if ( !welcomeText.IsEmpty() ) {
+			
+			if (!welcomeText.IsEmpty()) {
 				this->TCSkin->SetWelcomeText(welcomeText);
 			}
-
-			wxString idealIconFile;
-			readIniFileString(config, MOD_INI_KEY_SKIN_ICON_IDEAL, idealIconFile);
-			if ( !idealIconFile.IsEmpty() ) {
-				// TODO: let SetIdealIcon() do the image validation
-				wxBitmap* idealIcon =
-					SkinSystem::VerifyIdealIcon(tcPath, shortname, idealIconFile);
-				if (idealIcon != NULL) {
-					this->TCSkin->SetIdealIcon(*idealIcon);
-					delete idealIcon;
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE,
+				tcPath, _T("mod image"), &Skin::SetModImage);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_OK,
+				tcPath, _T("ok icon"), &Skin::SetOkIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING,
+				tcPath, _T("warning icon"), &Skin::SetWarningIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING_BIG,
+				tcPath, _T("big warning icon"), &Skin::SetBigWarningIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_ERROR,
+				tcPath, _T("error icon"), &Skin::SetErrorIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO,
+				tcPath, _T("info icon"), &Skin::SetInfoIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO_BIG,
+				tcPath, _T("big info icon"), &Skin::SetBigInfoIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP,
+				tcPath, _T("help icon"), &Skin::SetHelpIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP_BIG,
+				tcPath, _T("big help icon"), &Skin::SetBigHelpIcon);
+			
+			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_IDEAL,
+				tcPath, _T("ideal icon"), &Skin::SetIdealIcon);
+			
+			wxString newsSourceName;
+			readIniFileString(config, MOD_INI_KEY_SKIN_NEWS_SOURCE, newsSourceName);
+			
+			if (!newsSourceName.IsEmpty()) {
+				const NewsSource* source = NewsSource::FindSource(newsSourceName);
+				
+				if (source != NULL) {
+					this->TCSkin->SetNewsSource(source);
 				}
 			}
 
+			SkinSystem::GetSkinSystem()->SetTCSkin(this->TCSkin);
+			this->TCSkin = NULL;
+			
 		} else {
 #if 0 // preprocessing out until this functionality is complete
 			wxLogDebug(_T("  Does Not Contain An skin Section."));

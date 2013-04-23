@@ -71,6 +71,7 @@ public:
 	wxString name;
 	wxString shortname;
 	wxBitmap image255x112;
+	wxBitmap image182x80;
 	wxString infotext;
 	wxString author;
 	wxString notes;
@@ -166,6 +167,14 @@ private:
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;
 	wxBoxSizer *buttonSizer, *sizer;
+	
+	/** Sets a bitmap of the ModList's TCSkin. */
+	void SetSkinBitmap(
+		const wxFileConfig& config,
+		const wxString& modIniKey,
+		const wxString& tcPath,
+		const wxString& bitmapName,
+		bool (Skin::* setFnPtr)(const wxBitmap&));
 
 	void readIniFileString(const wxFileConfig* config,
 		const wxString& key, wxString& location);
