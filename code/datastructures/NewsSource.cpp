@@ -76,6 +76,9 @@ void NewsSource::InitializeSources() {
 		wxASSERT_MSG(newsSources.empty(),
 			_T("news sources have already been initialized"));
 	
+	// NOTE: According to http://docs.wxwidgets.org/stable/wx_wxcontrol.html#wxcontrolsetlabel ,
+	// individual '&'s will be interpreted to indicate keyboard shortcuts
+	// so if anyone wants a & to appear in the news box label, write it as &&
 	newsSources.push_back(
 		NewsSource(
 			NEWS_SOURCE_ID_HLP,
