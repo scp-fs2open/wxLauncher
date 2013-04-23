@@ -178,8 +178,8 @@ private:
 
 	void readIniFileString(const wxFileConfig* config,
 		const wxString& key, wxString& location);
-	void readFlagSet(wxFileConfig* config,
-		wxString keyprefix, FlagSetItem * set);
+	void readFlagSet(const wxFileConfig* config,
+		const wxString& keyprefix, FlagSetItem& set);
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
 	void readTranslation(wxFileConfig* config,
 		wxString langaugename, I18nItem ** trans);

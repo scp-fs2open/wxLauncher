@@ -356,7 +356,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 
 			FlagSetItem* flagset = new FlagSetItem();
 
-			readFlagSet(config, _T("/flagsetideal"), flagset);
+			readFlagSet(config, _T("/flagsetideal"), *flagset);
 
 			item->flagsets->Add(flagset);
 
@@ -367,7 +367,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				if ( config->Exists( sectionname )) {
 					FlagSetItem* numberedflagset = new FlagSetItem();
 
-					readFlagSet(config, sectionname, numberedflagset);
+					readFlagSet(config, sectionname, *numberedflagset);
 					
 					item->flagsets->Add(numberedflagset);
 				} else {
@@ -597,17 +597,19 @@ wxString ModList::escapeSpecials(const wxString& toEscape) {
 
 
 /** */
-void ModList::readFlagSet(wxFileConfig* config,
-							   wxString keyprefix, FlagSetItem *set) {
+void ModList::readFlagSet(const wxFileConfig* config,
+		const wxString& keyprefix, FlagSetItem& set) {
+	wxCHECK_RET(config != NULL, _T("readFlagSet(): config is NULL!"));
+	
 	readIniFileString(config,
-    wxString::Format(_T("%s/name"), keyprefix.c_str()),
-    set->name);
+		wxString::Format(_T("%s/name"), keyprefix.c_str()),
+		set.name);
 	readIniFileString(config, 
-    wxString::Format(_T("%s/flagset"), keyprefix.c_str()), 
-    set->flagset);
+		wxString::Format(_T("%s/flagset"), keyprefix.c_str()),
+		set.flagset);
 	readIniFileString(config, 
-    wxString::Format(_T("%s/notes"), keyprefix.c_str()), 
-    set->notes);
+		wxString::Format(_T("%s/notes"), keyprefix.c_str()),
+		set.notes);
 }
 
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
