@@ -150,9 +150,6 @@ public:
 	void SetTCSkin(const Skin* skin);
 	void ResetTCSkin();
 
-	static wxBitmap* VerifySmallImage(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxIcon* VerifyWindowIcon(wxString currentTC, wxString shortmodname, wxString filepath);
-	static wxBitmap* VerifyIdealIcon(wxString currentTC, wxString shortmodname, wxString filepath);
 	static wxBitmap MakeModListImage(const wxBitmap &orig);
 	static wxBitmap MakeModInfoDialogImage(const wxBitmap &orig);
 

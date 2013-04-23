@@ -628,53 +628,6 @@ void SkinSystem::ResetTCSkin() {
 	}
 }
 
-
-
-
-/** Opens, verifies and resizes (if nessisary) the 255x112 image that is needed
-on the mods page. 
-\note Does allocate memory.*/
-wxBitmap* SkinSystem::VerifySmallImage(wxString current, wxString shortmodname,
-									   wxString filepath) {
-	wxFileName filename;
-	if ( SkinSystem::SearchFile(filename, current, shortmodname, filepath) ) {
-		wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
-		wxImage image(filename.GetFullPath());
-		if ( image.IsOk() ) {
-			if ( image.GetWidth() > 255 || image.GetHeight() > 112 ) {
-				wxLogDebug(_T("   Resizing."));
-				image = image.Scale(255, 112, wxIMAGE_QUALITY_HIGH);
-			}
-			return new wxBitmap(image);
-		} else {
-			wxLogDebug(_T("   Image is not Ok!"));
-		}
-	}
-	return NULL;
-}
-
-/** Opens, verifies, the window icon, returning NULL if anything is not valid.
-\note Does allocate memory. */
-wxIcon* SkinSystem::VerifyWindowIcon(wxString current, wxString shortmodname,
-									   wxString filepath) {
-   wxFileName filename;
-   if ( SkinSystem::SearchFile(filename, current, shortmodname, filepath) ) {
-	   wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
-
-	   wxIcon icon(filename.GetFullPath()); // TODO: specify icon format? verify extension?
-	   if ( icon.IsOk() ) { // FIXME: check correct width/height to use
-		   if ( icon.GetWidth() == 32 && icon.GetHeight() == 32 ) {
-			   return new wxIcon(icon);
-		   } else {
-			   wxLogDebug(_T("   Icon size wrong"));
-		   }
-	   } else {
-		   wxLogDebug(_T("   Icon not valid."));
-	   }
-   }
-   return NULL;
-}
-
 /** Returns true if function is able to get a valid filename object for the
 passed paths.  Filename is returned via the param filename. */
 bool SkinSystem::SearchFile(wxFileName& filename, wxString currentTC,
@@ -703,32 +656,6 @@ bool SkinSystem::SearchFile(wxFileName& filename, wxString currentTC,
 			shortmodname.c_str(), filepath.c_str());
 	}
 	return false;
-}
-
-/** Verifies that the ideal icon exists and is the correct size. Returns a
-new wxBitmap allocated on the heap, otherwise returns NULL if any errors.*/
-wxBitmap* SkinSystem::VerifyIdealIcon(wxString currentTC, wxString shortname,
-									  wxString filepath) {
-	  wxFileName filename;
-	  if ( SkinSystem::SearchFile(filename, currentTC, shortname, filepath) ) {
-		  wxLogDebug(_T("   Opening: %s"), filename.GetFullPath().c_str());
-
-		  wxImage image(filename.GetFullPath());
-
-		  if ( image.IsOk() ) {
-			  if ( image.GetWidth() == SkinSystem::IdealIconWidth
-				  && image.GetHeight() == SkinSystem::IdealIconHeight ) {
-					  return new wxBitmap(image);
-			  } else {
-				  wxLogDebug(_T("   Icon is incorrect size. Got (%d,%d); Need (%d,%d)"),
-					  image.GetWidth(), image.GetHeight(),
-					  SkinSystem::IdealIconWidth, SkinSystem::IdealIconHeight);
-			  }
-		  } else {
-			  wxLogDebug(_T("   Icon is not valid."));
-		  }
-	  }
-	  return NULL;
 }
 
 wxBitmap SkinSystem::MakeModListImage(const wxBitmap &orig) {
