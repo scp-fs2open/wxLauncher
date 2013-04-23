@@ -308,6 +308,17 @@ bool SkinSystem::Initialize() {
 void SkinSystem::DeInitialize() {
 	wxASSERT(SkinSystem::IsInitialized());
 	
+	if (!SkinSystem::TCSkinChangedHandlers.IsEmpty()) {
+		wxLogDebug(_T("SkinSystem::DeInitialize(): contents of handler list:"));
+		for (TCSkinEventHandlers::const_iterator
+			 iter = SkinSystem::TCSkinChangedHandlers.begin(),
+			 end = SkinSystem::TCSkinChangedHandlers.end();
+			 iter != end; ++iter) {
+			wxLogDebug(_T(" handler at %p"), *iter);
+		}
+		SkinSystem::TCSkinChangedHandlers.Clear();
+	}
+	
 	SkinSystem* temp = SkinSystem::skinSystem;
 	SkinSystem::skinSystem = NULL;
 	delete temp;
