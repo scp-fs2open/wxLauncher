@@ -55,6 +55,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		currentSizer->Clear(true);
 	}
 	if ( tcPath.IsEmpty()) {
+		SkinSystem::GetSkinSystem()->ResetTCSkin();
+		
 		wxStaticText* noTC = new wxStaticText(this, wxID_ANY, _("To view a list of available mods, you must first select the root folder of an FS2 Open game on the Basic Settings page."),
 											  wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		noTC->SetFont(SkinSystem::GetSkinSystem()->GetMessageFont());
@@ -77,6 +79,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->SetSizer(noTCSizer);
 #endif
 	} else if ( !wxFileName::DirExists(tcPath)  ) {
+		SkinSystem::GetSkinSystem()->ResetTCSkin();
+		
 		wxStaticText* nonexistentTC = new wxStaticText(this, wxID_ANY,
 			_("The selected root folder does not exist.\n\nSelect a valid root folder for an FS2 Open game on the Basic Settings page."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
@@ -100,6 +104,8 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->SetSizer(nonexistentTCSizer);
 #endif
 	} else if ( !FSOExecutable::HasFSOExecutables(wxFileName(tcPath, wxEmptyString)) ) {
+		SkinSystem::GetSkinSystem()->ResetTCSkin();
+		
 		wxStaticText* invalidTC = new wxStaticText(this, wxID_ANY,
 			_("The selected root folder does not contain any FS2 Open executables.\n\nOn the Basic Settings page, either select a different root folder, or add FS2 Open executables to the selected root folder and press the Refresh button."),
 			wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
