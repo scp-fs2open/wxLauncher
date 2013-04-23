@@ -24,8 +24,10 @@ using std::vector;
 
 vector<NewsSource> NewsSource::newsSources;
 
-NewsSource::NewsSource(const NewsSourceId id, const wxString& newsUrl, const wxString& label)
-: id(id), newsUrl(newsUrl), label(label) {
+NewsSource::NewsSource(const NewsSourceId id, const wxString& name,
+	const wxString& newsUrl, const wxString& label)
+: id(id), name(name), newsUrl(newsUrl), label(label) {
+	wxASSERT(!name.IsEmpty());
 	wxASSERT(!newsUrl.IsEmpty());
 	wxASSERT(!label.IsEmpty());
 }
@@ -50,6 +52,26 @@ const NewsSource* NewsSource::FindSource(const NewsSourceId id) {
 	return NULL;
 }
 
+const NewsSource* NewsSource::FindSource(const wxString& name) {
+	wxCHECK_MSG(!name.IsEmpty(), NULL,
+		_T("FindSource() given empty name!"));
+	
+	if (newsSources.empty()) {
+		InitializeSources();
+	}
+	
+	for (vector<NewsSource>::const_iterator it = newsSources.begin(),
+			end = newsSources.end(); it != end; ++it) {
+		if (!it->GetName().CmpNoCase(name)) {
+			return &(*it);
+		}
+	}
+	
+	wxLogWarning(_T("FindSource(): Unknown name %s, returning NULL"), name.c_str());
+	
+	return NULL;
+}
+
 void NewsSource::InitializeSources() {
 		wxASSERT_MSG(newsSources.empty(),
 			_T("news sources have already been initialized"));
@@ -57,11 +79,13 @@ void NewsSource::InitializeSources() {
 	newsSources.push_back(
 		NewsSource(
 			NEWS_SOURCE_ID_HLP,
+			_T("hlp"),
 			_T("http://www.audiozone.ro/hl/"),
 			_("Latest highlights from Hard Light Productions")));
 	newsSources.push_back(
 		NewsSource(
 			NEWS_SOURCE_ID_DIASPORA,
+			_T("diaspora"),
 			_T("http://diaspora.hard-light.net/hl.htm"),
 			_("Latest Diaspora news")));
 }
