@@ -24,6 +24,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "datastructures/NewsSource.h"
 
+/** TC skin has changed. */
+DECLARE_EVENT_TYPE(EVT_TC_SKIN_CHANGED, wxID_ANY);
+
+WX_DECLARE_LIST(wxEvtHandler, TCSkinEventHandlers);
+
 /** Holds a skin's information.  */
 /** The Set() functions return true on success, false otherwise. */
 class Skin {
@@ -115,6 +120,9 @@ public:
 	static SkinSystem* GetSkinSystem();
 	
 	~SkinSystem();
+	
+	static void RegisterTCSkinChanged(wxEvtHandler *handler);
+	static void UnRegisterTCSkinChanged(wxEvtHandler *handler);
 
 	const wxString& GetWindowTitle() const;
 	const wxIcon& GetWindowIcon() const;
@@ -172,6 +180,10 @@ public:
 private:
 	SkinSystem();
 	static SkinSystem* skinSystem;
+	
+	static TCSkinEventHandlers TCSkinChangedHandlers;
+	
+	static void GenerateTCSkinChanged();
 	
 	void InitializeDefaultSkin();
 	

@@ -31,6 +31,48 @@ private:
 	virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client, const wxSize& size);
 };
 
+DEFINE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
+
+#include <wx/listimpl.cpp> // required magic incantation
+WX_DEFINE_LIST(TCSkinEventHandlers);
+
+TCSkinEventHandlers SkinSystem::TCSkinChangedHandlers;
+
+void SkinSystem::RegisterTCSkinChanged(wxEvtHandler *handler) {
+	wxASSERT(SkinSystem::IsInitialized());
+	wxASSERT_MSG(TCSkinChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
+		wxString::Format(
+			_T("RegisterTCSkinChanged(): Handler at %p already registered."),
+			handler));
+	SkinSystem::TCSkinChangedHandlers.Append(handler);
+}
+
+void SkinSystem::UnRegisterTCSkinChanged(wxEvtHandler *handler) {
+	wxASSERT(SkinSystem::IsInitialized());
+	wxASSERT_MSG(TCSkinChangedHandlers.IndexOf(handler) != wxNOT_FOUND,
+		wxString::Format(
+			_T("UnRegisterTCSkinChanged(): Handler at %p not registered."),
+			handler));
+	SkinSystem::TCSkinChangedHandlers.DeleteObject(handler);
+}
+
+void SkinSystem::GenerateTCSkinChanged() {
+	wxASSERT(SkinSystem::IsInitialized());
+	
+	wxCommandEvent event(EVT_TC_SKIN_CHANGED, wxID_NONE);
+	
+	wxLogDebug(_T("Generating EVT_TC_SKIN_CHANGED event"));
+	for (TCSkinEventHandlers::iterator
+		 iter = SkinSystem::TCSkinChangedHandlers.begin(),
+		 end = SkinSystem::TCSkinChangedHandlers.end();
+		 iter != end; ++iter) {
+		wxEvtHandler* current = *iter;
+		current->AddPendingEvent(event);
+		wxLogDebug(_T(" Sent EVT_TC_SKIN_CHANGED event to %p"), current);
+	}
+}
+
+
 Skin::Skin()
 : newsSource(NULL) {
 }
@@ -564,11 +606,14 @@ const NewsSource& SkinSystem::GetNewsSource() const {
 void SkinSystem::SetTCSkin(const Skin* skin) {
 	wxCHECK_RET(skin != NULL, _T("SetTCSkin() given null Skin"));
 	
+	// FIXME: Must confirm that generating the event twice isn't problematic
 	if (this->TCSkin != NULL) {
 		ResetTCSkin();
 	}
 	
 	this->TCSkin = skin;
+	
+	GenerateTCSkinChanged();
 }
 
 // Does nothing if TCSkin is NULL.
@@ -577,6 +622,8 @@ void SkinSystem::ResetTCSkin() {
 		const Skin* temp = this->TCSkin;
 		this->TCSkin = NULL;
 		delete temp;
+		
+		GenerateTCSkinChanged();
 	}
 }
 
