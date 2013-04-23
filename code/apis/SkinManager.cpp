@@ -18,18 +18,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "apis/SkinManager.h"
 #include "global/SkinDefaults.h"
-#include <wx/artprov.h>
 #include <wx/filename.h>
 #include "generated/configure_launcher.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
-
-class ArtProvider: public wxArtProvider {
-public:
-	ArtProvider();
-private:
-	virtual wxBitmap CreateBitmap(const wxArtID& id, const wxArtClient& client, const wxSize& size);
-};
 
 DEFINE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
 
@@ -340,8 +332,6 @@ SkinSystem::SkinSystem()
 : TCSkin(NULL),
   font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)),
   messageFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) {
-
-	wxArtProvider::Push(new ArtProvider());
 
 	InitializeDefaultSkin();
 }
@@ -771,21 +761,4 @@ wxBitmap SkinSystem::MakeModInfoDialogImage(const wxBitmap &orig) {
 	wxASSERT(outimg.GetHeight() == SkinSystem::ModInfoDialogImageHeight);
 	
 	return outimg;
-}
-
-ArtProvider::ArtProvider() {
-}
-
-wxBitmap ArtProvider::CreateBitmap(const wxArtID &id, const wxArtClient &client, const wxSize &size) {
-	wxBitmap bitmap;
-	if ( id == wxART_HELP ) {
-		wxFileName filename(_T(RESOURCES_PATH), DEFAULT_SKIN_ICON_HELP);
-		if ( bitmap.LoadFile(filename.GetFullPath(), wxBITMAP_TYPE_ANY) ) {
-			return bitmap;
-		} else {
-			return wxNullBitmap;
-		}
-	} else {
-		return wxNullBitmap;
-	}
 }
