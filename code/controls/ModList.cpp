@@ -382,95 +382,95 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		}
 
 		// skin (only available to TCs)
-		if ( config->Exists(_T("/skin")) && (i == 0) ) {
-			// deleting any existing TCSkin will be handled by SkinSystem::ResetTCSkin()
-			// so it shouldn't be deleted here
-			this->TCSkin = new Skin();
-			
-			wxString windowTitle;
-			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_TITLE, windowTitle);
-			
-			if (!windowTitle.IsEmpty()) {
-				this->TCSkin->SetWindowTitle(windowTitle);
-			}
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_BANNER,
-				tcPath, _T("banner"), &Skin::SetBanner);
-
-			wxString windowIconPath;
-			readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_ICON, windowIconPath);
-			
-			if (!windowIconPath.IsEmpty()) {
-				wxFileName filename;
+		if ( i == 0 ) {
+			if ( config->Exists(_T("/skin")) ) {
+				// deleting any existing TCSkin will be handled by SkinSystem::ResetTCSkin()
+				// so it shouldn't be deleted here
+				this->TCSkin = new Skin();
 				
-				if (SkinSystem::SearchFile(filename, tcPath, wxEmptyString, windowIconPath)) {
-					if (this->TCSkin->SetWindowIcon(wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ICO))) {
-						wxLogDebug(_T("Set skin window icon to '%s'"),
-							filename.GetFullPath().c_str());
+				wxString windowTitle;
+				readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_TITLE, windowTitle);
+				
+				if (!windowTitle.IsEmpty()) {
+					this->TCSkin->SetWindowTitle(windowTitle);
+				}
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_BANNER,
+					tcPath, _T("banner"), &Skin::SetBanner);
+				
+				wxString windowIconPath;
+				readIniFileString(config, MOD_INI_KEY_SKIN_WINDOW_ICON, windowIconPath);
+				
+				if (!windowIconPath.IsEmpty()) {
+					wxFileName filename;
+					
+					if (SkinSystem::SearchFile(filename, tcPath, wxEmptyString, windowIconPath)) {
+						if (this->TCSkin->SetWindowIcon(wxIcon(filename.GetFullPath(), wxBITMAP_TYPE_ICO))) {
+							wxLogDebug(_T("Set skin window icon to '%s'"),
+								filename.GetFullPath().c_str());
+						} else {
+							wxLogWarning(_T("Could not set skin window icon to '%s'"),
+								filename.GetFullPath().c_str());
+						}
 					} else {
-						wxLogWarning(_T("Could not set skin window icon to '%s'"),
-							filename.GetFullPath().c_str());
+						wxLogWarning(_T("Could not find skin window icon file."));
 					}
-				} else {
-					wxLogWarning(_T("Could not find skin window icon file."));
 				}
-			}
-
-			wxString welcomeText;
-			readIniFileString(config, MOD_INI_KEY_SKIN_WELCOME_TEXT, welcomeText);
-			
-			if (!welcomeText.IsEmpty()) {
-				this->TCSkin->SetWelcomeText(welcomeText);
-			}
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE,
-				tcPath, _T("mod image"), &Skin::SetModImage);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_OK,
-				tcPath, _T("ok icon"), &Skin::SetOkIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING,
-				tcPath, _T("warning icon"), &Skin::SetWarningIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING_BIG,
-				tcPath, _T("big warning icon"), &Skin::SetBigWarningIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_ERROR,
-				tcPath, _T("error icon"), &Skin::SetErrorIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO,
-				tcPath, _T("info icon"), &Skin::SetInfoIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO_BIG,
-				tcPath, _T("big info icon"), &Skin::SetBigInfoIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP,
-				tcPath, _T("help icon"), &Skin::SetHelpIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP_BIG,
-				tcPath, _T("big help icon"), &Skin::SetBigHelpIcon);
-			
-			SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_IDEAL,
-				tcPath, _T("ideal icon"), &Skin::SetIdealIcon);
-			
-			wxString newsSourceName;
-			readIniFileString(config, MOD_INI_KEY_SKIN_NEWS_SOURCE, newsSourceName);
-			
-			if (!newsSourceName.IsEmpty()) {
-				const NewsSource* source = NewsSource::FindSource(newsSourceName);
 				
-				if (source != NULL) {
-					this->TCSkin->SetNewsSource(source);
+				wxString welcomeText;
+				readIniFileString(config, MOD_INI_KEY_SKIN_WELCOME_TEXT, welcomeText);
+				
+				if (!welcomeText.IsEmpty()) {
+					this->TCSkin->SetWelcomeText(welcomeText);
 				}
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE,
+					tcPath, _T("mod image"), &Skin::SetModImage);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_OK,
+					tcPath, _T("ok icon"), &Skin::SetOkIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING,
+					tcPath, _T("warning icon"), &Skin::SetWarningIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_WARNING_BIG,
+					tcPath, _T("big warning icon"), &Skin::SetBigWarningIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_ERROR,
+					tcPath, _T("error icon"), &Skin::SetErrorIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO,
+					tcPath, _T("info icon"), &Skin::SetInfoIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_INFO_BIG,
+					tcPath, _T("big info icon"), &Skin::SetBigInfoIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP,
+					tcPath, _T("help icon"), &Skin::SetHelpIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_HELP_BIG,
+					tcPath, _T("big help icon"), &Skin::SetBigHelpIcon);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_IDEAL,
+					tcPath, _T("ideal icon"), &Skin::SetIdealIcon);
+				
+				wxString newsSourceName;
+				readIniFileString(config, MOD_INI_KEY_SKIN_NEWS_SOURCE, newsSourceName);
+				
+				if (!newsSourceName.IsEmpty()) {
+					const NewsSource* source = NewsSource::FindSource(newsSourceName);
+					
+					if (source != NULL) {
+						this->TCSkin->SetNewsSource(source);
+					}
+				}
+				
+				SkinSystem::GetSkinSystem()->SetTCSkin(this->TCSkin);
+				this->TCSkin = NULL;
+			} else {
+				wxLogDebug(_T("  Does Not Contain A skin Section."));
+				SkinSystem::GetSkinSystem()->ResetTCSkin();
 			}
-
-			SkinSystem::GetSkinSystem()->SetTCSkin(this->TCSkin);
-			this->TCSkin = NULL;
-			
-		} else {
-#if 0 // preprocessing out until this functionality is complete
-			wxLogDebug(_T("  Does Not Contain An skin Section."));
-#endif
 		}
 
 #ifdef MOD_TEXT_LOCALIZATION // mod text localization is not supported for now
