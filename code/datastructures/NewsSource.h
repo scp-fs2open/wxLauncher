@@ -30,15 +30,19 @@ enum NewsSourceId {
 
 class NewsSource {
 public:
-	NewsSource(NewsSourceId id, const wxString& newsUrl, const wxString& label);
+	NewsSource(NewsSourceId id, const wxString& name,
+		const wxString& newsUrl, const wxString& label);
 	
 	const NewsSourceId GetId() const { return this->id; }
+	const wxString& GetName() const { return this->name; }
 	const wxString& GetNewsUrl() const { return this->newsUrl; }
 	const wxString& GetLabel() const { return this->label; }
 	
 	static const NewsSource* FindSource(NewsSourceId id);
+	static const NewsSource* FindSource(const wxString& name);
 private:
 	NewsSourceId id;
+	wxString name;
 	wxString newsUrl;
 	wxString label;
 	
