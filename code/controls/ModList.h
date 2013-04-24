@@ -153,6 +153,8 @@ public:
 	void OnSelectionChange(wxCommandEvent &event);
 	void OnActivateMod(wxCommandEvent &event);
 	void OnInfoMod(wxCommandEvent &event);
+	
+	static const ModItem* GetActiveMod() { return ModList::activeMod; }
 
 private:
 	/** A hash map of the wxFileConfigs that represent the mod.ini files for
@@ -167,6 +169,8 @@ private:
 	wxButton *infoButton, *activateButton;
 	wxStaticBitmap *warnBitmap;
 	wxBoxSizer *buttonSizer, *sizer;
+	
+	static const ModItem* activeMod;
 	
 	/** Sets a bitmap of the ModList's TCSkin. */
 	void SetSkinBitmap(
