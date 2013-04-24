@@ -331,6 +331,10 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 					item->recommendedlightingname =
 						(i == 0) ? _("TC recommended") : _("Mod recommended");
 				}
+				
+				// required because & is interpreted as setting keyboard shortcut
+				// see http://docs.wxwidgets.org/stable/wx_wxcontrol.html#wxcontrolsetlabel
+				item->recommendedlightingname.Replace(_T("&"), _T("&&"));
 			}
 		}
 
