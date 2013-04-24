@@ -32,9 +32,9 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
 	
 	wxString presetName;
-	wxString lightingPresetString;
+	wxString lightingPresetFlagSet;
 	if (cfg->Read(PRO_CFG_LIGHTING_PRESET, &presetName)) {
-		lightingPresetString = LightingPresets::PresetNameToPresetString(presetName);
+		lightingPresetFlagSet = LightingPresets::PresetNameToPresetFlagSet(presetName);
 	}
 
 	wxString cmdLineString;
@@ -108,9 +108,9 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 		outStream.Write(" ", 1);
 		outStream.Write(flagLine.char_str(), flagLine.size());
 	}
-	if ( !lightingPresetString.IsEmpty()) {
+	if ( !lightingPresetFlagSet.IsEmpty()) {
 		outStream.Write(" ", 1);
-		outStream.Write(lightingPresetString.char_str(), lightingPresetString.size());
+		outStream.Write(lightingPresetFlagSet.char_str(), lightingPresetFlagSet.size());
 	}
 	if ( !outStream.Close() ) {
 		return ProMan::UnknownError;

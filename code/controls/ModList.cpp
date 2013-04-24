@@ -322,7 +322,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET, flagset);
 			
 			if (!flagset.IsEmpty()) {
-				item->recommendedlightingpreset.SetPreset(flagset);
+				item->recommendedlightingpreset.SetFlagSet(flagset);
 				
 				readIniFileString(config,
 					MOD_INI_KEY_RECOMMENDED_LIGHTING_NAME, item->recommendedlightingname);

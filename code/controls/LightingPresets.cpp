@@ -29,14 +29,14 @@
 #include <wx/gbsizer.h>
 #include <wx/hyperlink.h>
 
-Preset::Preset(const wxString& name, const int buttonId, const wxString& preset):
-	name(name), buttonId(buttonId), preset(preset) {
+Preset::Preset(const wxString& name, const int buttonId, const wxString& flagSet):
+	name(name), buttonId(buttonId), flagSet(flagSet) {
 }
 
-void Preset::SetPreset(const wxString& preset) {
-	wxCHECK_RET(!preset.IsEmpty(), _T("SetPreset() given empty preset string!"));
+void Preset::SetFlagSet(const wxString& flagSet) {
+	wxCHECK_RET(!flagSet.IsEmpty(), _T("SetFlagSet() given empty flag set!"));
 	
-	this->preset = preset;
+	this->flagSet = flagSet;
 }
 
 // vertical spacing between radio buttons is platform-specific
@@ -177,20 +177,20 @@ void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 	this->Reset();
 }
 
-const wxString& LightingPresets::PresetNameToPresetString(const wxString& presetName) {
+const wxString& LightingPresets::PresetNameToPresetFlagSet(const wxString& presetName) {
 	if (presets.size() == 0) { // for registry_helper, so that it can write cmdline_fso.cfg
 		InitializePresets();
 	}
 
 	for (PresetHashMap::iterator it = presets.begin(), end = presets.end(); it != end; ++it) {
 		if (it->second.GetName() == presetName) {
-			return it->second.GetPreset();
+			return it->second.GetFlagSet();
 		}
 	}
 	
-	wxLogWarning(_T("PresetNameToPresetString: unknown preset name %s, returning default (%s)"),
+	wxLogWarning(_T("PresetNameToPresetFlagSet: unknown preset name %s, returning default (%s)"),
 		presetName.c_str(), presets[DEFAULT_PRESET_ID].GetName().c_str());
-	return presets[DEFAULT_PRESET_ID].GetPreset();
+	return presets[DEFAULT_PRESET_ID].GetFlagSet();
 }
 	
 void LightingPresets::Initialize() {

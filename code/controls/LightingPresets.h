@@ -27,12 +27,12 @@ public:
 	Preset(const wxString& name, const int buttonId, const wxString& preset);
 	const wxString& GetName() const { return this->name; }
 	const int GetButtonId() const { return this->buttonId; }
-	const wxString& GetPreset() const { return this->preset; }
-	void SetPreset(const wxString& preset);
+	const wxString& GetFlagSet() const { return this->flagSet; }
+	void SetFlagSet(const wxString& flagSet);
 private:
 	wxString name;
 	int buttonId;
-	wxString preset;
+	wxString flagSet;
 };
 
 // from wxWidgets window IDs to Presets
@@ -45,7 +45,7 @@ public:
 	void OnSelectLightingPreset(wxCommandEvent &event);
 	void OnCopyLightingPreset(wxCommandEvent &event);
 
-	static const wxString& PresetNameToPresetString(const wxString& presetName);
+	static const wxString& PresetNameToPresetFlagSet(const wxString& presetName);
 
 private:
 	void Initialize();
