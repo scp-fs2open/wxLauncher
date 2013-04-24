@@ -103,7 +103,9 @@ void LightingPresets::InitializePresets() {
 	wxASSERT_MSG(presets.size() == 0, _T("presets have already been initialized"));
 
 	presets[ID_PRESETS_OFF] = Preset(_T("Off"), ID_PRESETS_OFF, wxEmptyString);
-	presets[ID_PRESET_BASELINE] = DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
+	presets[ID_PRESET_BASELINE] =
+		Preset(_T("BaselineRecommended"), ID_PRESET_BASELINE,
+			   DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET);
 	presets[ID_PRESET_DABRAIN] =
 		Preset(_T("DaBrain"), ID_PRESET_DABRAIN,
 			   _T("-ambient_factor 10 -no_emissive_light -spec_exp 7.0 -spec_point 8.6 -spec_static 12.8 -spec_tube 5.0"));

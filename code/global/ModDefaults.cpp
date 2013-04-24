@@ -17,8 +17,10 @@
  */
 
 #include "ModDefaults.h"
+
+#include <wx/intl.h>
+
 #include "global/ids.h"
-#include "controls/LightingPresets.h"
 
 const wxString DEFAULT_MOD_LAUNCHER_INFO_TEXT				(_("No information available."));
 
@@ -26,11 +28,5 @@ const long DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES =		640;
 const long DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES =		480;
 
 const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME		(_T("Baseline recommended"));
-// internal constant for default recommended preset
 const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET
 	(_T("-ambient_factor 75 -spec_exp 11 -spec_point 0.6 -spec_static 0.8 -spec_tube 0.4 -ogl_spec 60"));
-
-const Preset DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET(
-	_T("BaselineRecommended"),
-	ID_PRESET_BASELINE,
-	DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET);

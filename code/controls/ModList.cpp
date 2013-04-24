@@ -316,26 +316,28 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		item->minverticalres =
 			std::max(item->minverticalres, DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
 		
-		if (config->HasEntry(MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET)) {
-			wxString flagset;
-			readIniFileString(config,
-				MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET, flagset);
-			
-			if (!flagset.IsEmpty()) {
-				item->recommendedlightingpreset.SetFlagSet(flagset);
-				
-				readIniFileString(config,
-					MOD_INI_KEY_RECOMMENDED_LIGHTING_NAME, item->recommendedlightingname);
-				
-				if (item->recommendedlightingname.IsEmpty()) {
-					item->recommendedlightingname =
-						(i == 0) ? _("TC recommended") : _("Mod recommended");
-				}
+		readIniFileString(
+			config,
+			MOD_INI_KEY_RECOMMENDED_LIGHTING_NAME,
+			item->recommendedlightingname);
+		readIniFileString(
+			config,
+			MOD_INI_KEY_RECOMMENDED_LIGHTING_FLAGSET,
+			item->recommendedlightingflagset);
+		
+		if (!item->recommendedlightingflagset.IsEmpty()) {
+			if (item->recommendedlightingname.IsEmpty()) {
+				item->recommendedlightingname =
+					(i == 0) ? _("TC recommended") : _("Mod recommended");
 				
 				// required because & is interpreted as setting keyboard shortcut
 				// see http://docs.wxwidgets.org/stable/wx_wxcontrol.html#wxcontrolsetlabel
 				item->recommendedlightingname.Replace(_T("&"), _T("&&"));
 			}
+		} else {
+			wxLogDebug(_T("Recommended lighting flagset is missing or empty; using defaults."));
+			item->recommendedlightingname = DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME;
+			item->recommendedlightingflagset = DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET;
 		}
 
 		readIniFileString(config, MOD_INI_KEY_EXTREMEFORCE_FORCED_FLAGS_ON, item->forcedon);
@@ -991,7 +993,6 @@ Structure that holds all of the information for a single line in the mod table.
 */
 /** Constructor.*/
 ModItem::ModItem() {
-	this->recommendedlightingpreset = DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
 	warn = false;
 
 	this->flagsets = NULL;
