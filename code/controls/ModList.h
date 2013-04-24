@@ -91,7 +91,7 @@ public:
 	wxString secondarylist;
 	
 	wxString recommendedlightingname;
-	Preset recommendedlightingpreset;
+	wxString recommendedlightingflagset;
 
 	FlagSets* flagsets;	// set 0 is the ideal set.
 

@@ -21,9 +21,6 @@
 
 #include <wx/string.h>
 
-// from LightingPresets.h
-class Preset;
-
 /** \defgroup moddefaults default values for mod-specific settings */
 /** @{*/
 extern const wxString DEFAULT_MOD_LAUNCHER_INFO_TEXT;
@@ -32,7 +29,7 @@ extern const long DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES;
 extern const long DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES;
 
 extern const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_NAME;
-extern const Preset DEFAULT_MOD_RECOMMENDED_LIGHTING_PRESET;
+extern const wxString DEFAULT_MOD_RECOMMENDED_LIGHTING_FLAGSET;
 /** @}*/
 
 #endif
