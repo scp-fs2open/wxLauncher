@@ -182,7 +182,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 5);
 
 	// Latest headlines
-	wxStaticBox* headlinesBox = new wxStaticBox(this, wxID_ANY, _("Latest highlights from Hard Light Productions"));
+	wxStaticBox* headlinesBox = new wxStaticBox(this, ID_HEADLINES_BOX, _("Latest highlights from Hard Light Productions"));
 	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
 	headlinesView->SetPage(_T(""));
 	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));

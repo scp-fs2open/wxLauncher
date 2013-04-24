@@ -64,7 +64,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		noTC->Wrap(TEXT_WRAP_WIDTH);
 
 		wxStaticBitmap* infoImage =
-			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigInfoIcon());
+			new wxStaticBitmap(this, ID_MODS_PAGE_INFO_IMAGE, SkinSystem::GetSkinSystem()->GetBigInfoIcon());
 
 		wxBoxSizer* noTCSizer = new wxBoxSizer(wxVERTICAL);
 		noTCSizer->AddStretchSpacer(1);
@@ -89,7 +89,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		nonexistentTC->Wrap(TEXT_WRAP_WIDTH);
 
 		wxStaticBitmap* warningImage =
-			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
+			new wxStaticBitmap(this, ID_MODS_PAGE_WARNING_IMAGE, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 
 		wxBoxSizer* nonexistentTCSizer = new wxBoxSizer(wxVERTICAL);
 		nonexistentTCSizer->AddStretchSpacer(1);
@@ -114,7 +114,7 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		invalidTC->Wrap(TEXT_WRAP_WIDTH);
 		
 		wxStaticBitmap* warningImage =
-			new wxStaticBitmap(this, wxID_ANY, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
+			new wxStaticBitmap(this, ID_MODS_PAGE_WARNING_IMAGE, SkinSystem::GetSkinSystem()->GetBigWarningIcon());
 		
 		wxBoxSizer* invalidTCSizer = new wxBoxSizer(wxVERTICAL);
 		invalidTCSizer->AddStretchSpacer(1);
