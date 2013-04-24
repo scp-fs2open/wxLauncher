@@ -380,7 +380,7 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 
 	wxString lightingPresetString;
 	if (ProfileProxy::GetProxy()->HasLightingPreset()) {
-		lightingPresetString = LightingPresets::PresetNameToPresetString(
+		lightingPresetString = LightingPresets::PresetNameToPresetFlagSet(
 			ProfileProxy::GetProxy()->GetLightingPresetName());
 	}
 	

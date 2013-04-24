@@ -271,13 +271,13 @@ void ProfileProxy::CopyPresetToCustomFlags() {
 	wxCHECK_RET(!presetName.IsEmpty(),
 		_T("CopyPresetToCustomFlags(): preset name is empty."));
 	
-	const wxString& preset = LightingPresets::PresetNameToPresetString(presetName);
+	const wxString& flagSet = LightingPresets::PresetNameToPresetFlagSet(presetName);
 	
-	if (!preset.IsEmpty()) {
-		this->SetCustomFlags(preset + _T(" ") + this->GetCustomFlags());
+	if (!flagSet.IsEmpty()) {
+		this->SetCustomFlags(flagSet + _T(" ") + this->GetCustomFlags());
 	} else {
 		wxLogError(
-			_T("CopyPresetToCustomFlags(): retrieved preset was empty for name %s"),
+			_T("CopyPresetToCustomFlags(): retrieved flag set was empty for name %s"),
 				presetName.c_str());
 	}
 }
