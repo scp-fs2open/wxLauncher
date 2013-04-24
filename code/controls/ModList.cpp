@@ -116,6 +116,8 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 	}
 }
 
+const ModItem* ModList::activeMod = NULL;
+
 void ModList::SetSkinBitmap(
 		const wxFileConfig& config,
 		const wxString& modIniKey,
@@ -550,6 +552,9 @@ ModList::~ModList() {
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
 	}
+	
+	ModList::activeMod = NULL;
+	
 	if ( this->tableData != NULL ) {
 		delete this->tableData;
 	}
@@ -828,6 +833,8 @@ void ModList::OnSelectionChange(wxCommandEvent &event) {
 void ModList::OnActivateMod(wxCommandEvent &WXUNUSED(event)) {
 	int selected = this->GetSelection();
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
+	
+	ModList::activeMod = &this->tableData->Item(selected);
 
 	wxString modline;
 	const wxString& shortname(this->tableData->Item(selected).shortname);
