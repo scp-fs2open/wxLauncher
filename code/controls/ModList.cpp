@@ -1081,7 +1081,11 @@ ModItem::InfoText::InfoText(ModItem *myData) {
 
 void ModItem::InfoText::Draw(wxDC &dc, const wxRect &rect) {
 	if ( !this->myData->infotext.IsEmpty() ) {
-		wxStringTokenizer tokens(this->myData->infotext);
+		// to keep "\n" from appearing in the mod list info text
+		wxString escapedInfoText(this->myData->infotext);
+		escapedInfoText.Replace(_T("\\n"), _T(" "));
+		
+		wxStringTokenizer tokens(escapedInfoText);
 		ArrayOfWords words;
 		words.Alloc(tokens.CountTokens());
 
