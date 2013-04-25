@@ -19,6 +19,9 @@
 #include "controls/LightingPresets.h"
 
 #include "apis/ProfileProxy.h"
+#include "apis/TCManager.h"
+
+#include "controls/ModList.h"
 
 #include "global/ids.h"
 #include "global/MemoryDebugging.h"
@@ -56,6 +59,7 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 		InitializePresets();
 	}
 	
+	TCManager::RegisterTCActiveModChanged(this);
 	ProfileProxy::GetProxy()->RegisterProxyFlagDataReady(this);
 	
 	wxStaticBox* lightingPresetsBox = new wxStaticBox(this, wxID_ANY, _("Lighting presets"));
@@ -142,6 +146,7 @@ EVT_RADIOBUTTON(ID_PRESET_COLECAMPBELL666, LightingPresets::OnSelectLightingPres
 EVT_RADIOBUTTON(ID_PRESET_CASTOR, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_SPIDEY, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_WOOLIE_WOOL, LightingPresets::OnSelectLightingPreset)
+EVT_COMMAND(wxID_NONE, EVT_TC_ACTIVE_MOD_CHANGED, LightingPresets::OnActiveModChanged)
 EVT_COMMAND(wxID_NONE, EVT_PROXY_FLAG_DATA_READY, LightingPresets::OnProxyFlagDataReady)
 END_EVENT_TABLE()
 
@@ -180,6 +185,21 @@ void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 	ProfileProxy::GetProxy()->CopyPresetToCustomFlags();
 
 	this->Reset();
+}
+
+void LightingPresets::OnActiveModChanged(wxCommandEvent &WXUNUSED(event)) {
+	const ModItem* activeMod = ModList::GetActiveMod();
+	wxCHECK_RET(activeMod != NULL,
+		_T("LightingPresets::OnActiveModChanged(): activeMod is NULL!"));
+	
+	presets[ID_PRESET_BASELINE].SetFlagSet(activeMod->recommendedlightingflagset);
+	
+	wxRadioButton* radioButtonRecommended = dynamic_cast<wxRadioButton*>(
+		wxWindow::FindWindowById(ID_PRESET_BASELINE, this));
+	wxCHECK_RET(radioButtonRecommended != NULL,
+		_T("Could not find recommended preset radio button"));
+	
+	radioButtonRecommended->SetLabel(activeMod->recommendedlightingname);
 }
 
 void LightingPresets::OnProxyFlagDataReady(wxCommandEvent &WXUNUSED(event)) {
