@@ -43,6 +43,7 @@ const size_t TOP_RIGHT_SIZER_INDEX = 1;
 const size_t BOTTOM_SIZER_INDEX = 1;
 
 AdvSettingsPage::AdvSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY), flagListBox(NULL) {
+	this->lightingPresets = new LightingPresets(this);
 	this->errorText =
 		new wxStaticText(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
 			wxDefaultSize, wxALIGN_CENTER);
@@ -82,6 +83,9 @@ const int FLAG_LIST_BOX_HEIGHT = 363;
 
 void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	if (this->GetSizer() != NULL) {
+		// detach it so it won't be deleted when we clear the sizer
+		this->lightingPresets->GetContainingSizer()->Detach(this->lightingPresets);
+		
 		this->GetSizer()->Clear(true);
 	}
 
@@ -117,10 +121,8 @@ void AdvSettingsPage::OnExeChanged(wxCommandEvent& event) {
 	topLeftSizer->Add(wikiLinkSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5);
 
 	// top right components
-	LightingPresets* lightingPresets = new LightingPresets(this);
-	
 	wxBoxSizer* lightingPresetsSizer = new wxBoxSizer(wxVERTICAL);
-	lightingPresetsSizer->Add(lightingPresets, wxSizerFlags().Proportion(1).Expand());
+	lightingPresetsSizer->Add(this->lightingPresets, wxSizerFlags().Proportion(1).Expand());
 
 	wxStaticText* flagSetChoiceLabel = new wxStaticText(this, wxID_ANY, _T("Flag sets:"));
 	wxChoice* flagSetChoice = new wxChoice(this, ID_SELECT_FLAG_SET);
