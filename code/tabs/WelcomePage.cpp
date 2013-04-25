@@ -182,7 +182,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 5);
 
 	// Latest news
-	wxStaticBox* newsBox = new wxStaticBox(this, ID_NEWS_BOX, _("Latest highlights from Hard Light Productions"));
+	wxStaticBox* newsBox = new wxStaticBox(this, ID_NEWS_BOX, SkinSystem::GetSkinSystem()->GetNewsSource().GetLabel());
 	wxHtmlWindow* newsView = new wxHtmlWindow(this, ID_NEWS_HTML_PANEL);
 	newsView->SetPage(_T(""));
 	newsView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
