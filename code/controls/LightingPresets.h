@@ -44,6 +44,7 @@ public:
 
 	void OnSelectLightingPreset(wxCommandEvent &event);
 	void OnCopyLightingPreset(wxCommandEvent &event);
+	void OnActiveModChanged(wxCommandEvent &event);
 	void OnProxyFlagDataReady(wxCommandEvent &event);
 
 	static const wxString& PresetNameToPresetFlagSet(const wxString& presetName);
