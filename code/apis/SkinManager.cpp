@@ -93,9 +93,13 @@ bool Skin::SetBanner(const wxBitmap& banner) {
 	if (!banner.IsOk()) {
 		wxLogWarning(_T("Provided banner is not valid."));
 		return false;
-	} else if (banner.GetWidth() > SkinSystem::BannerWidth) {
+	} else if (banner.GetWidth() > SkinSystem::BannerMaxWidth) {
 		wxLogWarning(_T("Provided banner is too wide (%d vs. %d pixels)."),
-			banner.GetWidth(), SkinSystem::BannerWidth);
+			banner.GetWidth(), SkinSystem::BannerMaxWidth);
+		return false;
+	} else if (banner.GetHeight() != SkinSystem::BannerHeight) {
+		wxLogWarning(_T("Provided banner is incorrect height (%d vs. %d pixels)."),
+			banner.GetHeight(), SkinSystem::BannerHeight);
 		return false;
 	} else {
 		this->banner = banner;

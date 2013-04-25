@@ -156,8 +156,9 @@ public:
 	static bool SearchFile(wxFileName& filename, wxString currentTC,
 		wxString shortmodname, wxString filepath);
 
-	/** For the banner, only the width is validated. */
-	static const int BannerWidth = 600;
+	/** Dimensions for banner image on welcome page. */
+	static const int BannerMaxWidth = 630;
+	static const int BannerHeight   = 150;
 	
 	/** Dimensions for mod images, depending on where the image appears. */
 	static const int ModInfoDialogImageWidth = 255;
