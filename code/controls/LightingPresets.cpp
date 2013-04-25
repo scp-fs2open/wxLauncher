@@ -56,6 +56,8 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 		InitializePresets();
 	}
 	
+	ProfileProxy::GetProxy()->RegisterProxyFlagDataReady(this);
+	
 	wxStaticBox* lightingPresetsBox = new wxStaticBox(this, wxID_ANY, _("Lighting presets"));
 	
 	wxHyperlinkCtrl* presetDescsUrl =
@@ -140,6 +142,7 @@ EVT_RADIOBUTTON(ID_PRESET_COLECAMPBELL666, LightingPresets::OnSelectLightingPres
 EVT_RADIOBUTTON(ID_PRESET_CASTOR, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_SPIDEY, LightingPresets::OnSelectLightingPreset)
 EVT_RADIOBUTTON(ID_PRESET_WOOLIE_WOOL, LightingPresets::OnSelectLightingPreset)
+EVT_COMMAND(wxID_NONE, EVT_PROXY_FLAG_DATA_READY, LightingPresets::OnProxyFlagDataReady)
 END_EVENT_TABLE()
 
 void LightingPresets::OnSelectLightingPreset(wxCommandEvent &event) {
@@ -177,6 +180,10 @@ void LightingPresets::OnCopyLightingPreset(wxCommandEvent &WXUNUSED(event)) {
 	ProfileProxy::GetProxy()->CopyPresetToCustomFlags();
 
 	this->Reset();
+}
+
+void LightingPresets::OnProxyFlagDataReady(wxCommandEvent &WXUNUSED(event)) {
+	this->Initialize();
 }
 
 const wxString& LightingPresets::PresetNameToPresetFlagSet(const wxString& presetName) {

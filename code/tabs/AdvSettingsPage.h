@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <wx/wx.h>
 #include "controls/FlagListBox.h"
+#include "controls/LightingPresets.h"
 
 class AdvSettingsPage: public wxPanel {
 public:
@@ -35,6 +36,7 @@ private:
 	wxString FormatCommandLineString(const wxString& origCmdLine,
 									 const int textAreaWidth);
 	FlagListBox* flagListBox;
+	LightingPresets* lightingPresets;
 	wxStaticText* errorText;
 	
 public:
