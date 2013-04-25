@@ -29,7 +29,7 @@ const wxString GBL_CFG_PROXY_PORT				(_T("/proxy/port"));
 const wxString GBL_CFG_NET_DOWNLOAD_NEWS		(_T("/net/downloadnews"));
 const wxString NEWS_LAST_TIME_FORMAT			(_T("%Y %j %H %M %S"));
 const wxString GBL_CFG_NET_NEWS_LAST_TIME		(_T("/net/lastdownloadnews"));
-const wxString GBL_CFG_NET_THE_NEWS				(_T("/net/thenews)"));
+const wxString GBL_CFG_NET_THE_NEWS				(_T("/net/thenews"));
 
 const wxString GBL_CFG_OPT_CONFIG_FRED			(_T("/opt/configfred"));
 
