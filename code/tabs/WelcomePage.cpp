@@ -85,8 +85,8 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(WelcomePage, wxPanel)
 EVT_HTML_LINK_CLICKED(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkClicked)
 EVT_HTML_CELL_HOVER(ID_SUMMARY_HTML_PANEL, WelcomePage::LinkHover)
-EVT_HTML_LINK_CLICKED(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkClicked)
-EVT_HTML_CELL_HOVER(ID_HEADLINES_HTML_PANEL, WelcomePage::LinkHover)
+EVT_HTML_LINK_CLICKED(ID_NEWS_HTML_PANEL, WelcomePage::LinkClicked)
+EVT_HTML_CELL_HOVER(ID_NEWS_HTML_PANEL, WelcomePage::LinkHover)
 
 EVT_COMMAND( wxID_NONE, EVT_PROFILE_CHANGE, WelcomePage::ProfileCountChanged)
 EVT_COMMAND( wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, WelcomePage::ProfileCountChanged)
@@ -181,23 +181,23 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	profileVerticalSizer->Add(profileCombo, 0, wxALL | wxEXPAND, 5);
 	profileVerticalSizer->Add(profileButtonsSizer, 0, wxALL | wxEXPAND, 5);
 
-	// Latest headlines
-	wxStaticBox* headlinesBox = new wxStaticBox(this, ID_HEADLINES_BOX, _("Latest highlights from Hard Light Productions"));
-	wxHtmlWindow* headlinesView = new wxHtmlWindow(this, ID_HEADLINES_HTML_PANEL);
-	headlinesView->SetPage(_T(""));
-	headlinesView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
-	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Automatically retrieve highlights at startup"));
-	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the Hard Light Productions highlights the next time it runs"));
+	// Latest news
+	wxStaticBox* newsBox = new wxStaticBox(this, ID_NEWS_BOX, _("Latest highlights from Hard Light Productions"));
+	wxHtmlWindow* newsView = new wxHtmlWindow(this, ID_NEWS_HTML_PANEL);
+	newsView->SetPage(_T(""));
+	newsView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
+	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Automatically retrieve news at startup"));
+	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the news the next time it runs"));
 	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
 	this->needToUpdateNews = true;
 
-	wxStaticBoxSizer* headlines = new wxStaticBoxSizer(headlinesBox, wxVERTICAL);
-	headlines->Add(headlinesView, 
+	wxStaticBoxSizer* newsSizer = new wxStaticBoxSizer(newsBox, wxVERTICAL);
+	newsSizer->Add(newsView, 
 		wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT, 5));
-	headlines->Add(updateNewsCheck,
+	newsSizer->Add(updateNewsCheck,
 #if IS_WIN32
 		wxSizerFlags().Right().Border(wxTOP|wxRIGHT|wxBOTTOM,5));
-#else // helps ensure that all four highlights appear without having to scroll
+#else // helps ensure that all four news items appear without having to scroll
 		wxSizerFlags().Right().Border(wxTOP|wxRIGHT,5));
 #endif
 
@@ -209,7 +209,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Center().Border(wxTOP, 5));
 	sizer->Add(generalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-	sizer->Add(headlines, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
+	sizer->Add(newsSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 
 	// mildly hackish way of ensuring a minimum launcher window size on all platforms
 #if IS_WIN32
@@ -438,8 +438,8 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 		return;
 	}
 	this->needToUpdateNews = false;
-	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_HEADLINES_HTML_PANEL, this));
-	wxCHECK_RET(newsWindow != NULL, _T("Update highlights called, but can't find the highlights window"));
+	wxHtmlWindow* newsWindow = dynamic_cast<wxHtmlWindow*>(wxWindow::FindWindowById(ID_NEWS_HTML_PANEL, this));
+	wxCHECK_RET(newsWindow != NULL, _T("Update news called, but can't find the news window"));
 
 	ProMan* proman = ProMan::GetProfileManager();
 
@@ -466,12 +466,12 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			wxFileSystem filesystem;
 			wxFSFile* news = filesystem.OpenFile(_("http://www.audiozone.ro/hl/"), wxFS_READ);
 			if ( news == NULL ) {
-				wxLogError(_("Error in retrieving highlights"));
+				wxLogError(_("Error in retrieving news"));
 				return;
 			}
 
 			wxInputStream* theNews = news->GetStream();
-			wxLogDebug(_T("highlights loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
+			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
 
 			wxString newsData;
 			wxStringOutputStream newsDataStream(&newsData);
@@ -480,9 +480,9 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			wxStringTokenizer tok(newsData, _T("\t"), wxTOKEN_STRTOK);
 			while(tok.HasMoreTokens()) {
 				wxString title(tok.GetNextToken());
-				wxCHECK_RET(tok.HasMoreTokens(), _T("highlights formatter has run out of tokens at wrong time"));
+				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
 				wxString link(tok.GetNextToken());
-				wxCHECK_RET(tok.HasMoreTokens(), _T("highlights formatter has run out of tokens at wrong time"));
+				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
 				wxString imglink(tok.GetNextToken());
 				
 				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
@@ -495,7 +495,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 			proman->GlobalWrite(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
 		}
 	} else {
-		newsWindow->SetPage(_("Automatic highlights retrieval disabled."));
+		newsWindow->SetPage(_("Automatic news retrieval disabled."));
 	}
 }
 
@@ -516,7 +516,7 @@ bool WelcomePage::getOrPromptUpdateNews() {
 
 		wxStaticText* updateNewsText1 = 
 			new wxStaticText(updateNewsQuestion, wxID_ANY, 
-				_("Should wxLauncher automatically retrieve the highlights from Hard Light Productions?"),
+				_("Should wxLauncher automatically retrieve the latest news?"),
 				wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 		
 		wxStaticText* updateNewsText2 = 
