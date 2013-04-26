@@ -92,6 +92,12 @@ void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
 	this->eventHandlers.DeleteObject(handler);
 }
 
+NewsData::NewsData(const wxString& theNews, const wxDateTime& lastDownloadNews)
+: theNews(theNews), lastDownloadNews(lastDownloadNews) {
+	wxASSERT(!theNews.IsEmpty());
+	wxASSERT(lastDownloadNews.IsValid());
+}
+
 /** Load a profile from a fully quaified path.  Returns NULL on failure
 or a pointer to a wxFileConfig that you must delete when done. */
 wxFileConfig* LoadProfileFromFile(const wxFileName &file)
@@ -127,6 +133,7 @@ bool ProMan::Initialize(Flags flags) {
 	}
 
 	ProMan::proman->globalProfile = LoadProfileFromFile(file);
+	ProMan::proman->LoadNewsMapFromGlobalProfile();
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
@@ -245,6 +252,8 @@ ProMan::~ProMan() {
 void ProMan::SaveProfilesBeforeExiting() {
 	if ( this->globalProfile != NULL ) {
 		wxLogInfo(_T("saving global profile before exiting."));
+		SaveNewsMapToGlobalProfile();
+		
 		wxFileName file;
 		file.Assign(GetProfileStorageFolder(), GLOBAL_INI_FILE_NAME);
 		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
@@ -278,6 +287,63 @@ void ProMan::SaveProfilesBeforeExiting() {
 		wxLogInfo(_T("Current profile %s has no unsaved changes. Exiting."),
 			this->GetCurrentName().c_str());
 	}
+}
+
+void ProMan::LoadNewsMapFromGlobalProfile() {
+	wxASSERT(newsMap.empty());
+	
+	globalProfile->SetPath(_T("/net"));
+	
+	// inspired by CopyConfig()
+	wxString groupName;
+	long groupIndex;
+	bool groupKeepGoing;
+	
+	wxString theNews;
+	wxString lastDownloadNewsStr;
+	wxDateTime lastDownloadNews;
+	
+	groupKeepGoing = globalProfile->GetFirstGroup(groupName, groupIndex);
+	
+	while (groupKeepGoing) {
+		globalProfile->SetPath(groupName);
+		
+		if (globalProfile->Read(_T("thenews"), theNews) &&
+			(globalProfile->Read(_T("lastdownloadnews"), lastDownloadNewsStr))) {
+			if ((!theNews.IsEmpty()) &&
+				(NULL != lastDownloadNews.ParseFormat(
+					lastDownloadNewsStr, NEWS_LAST_TIME_FORMAT))) {
+				newsMap[groupName] = NewsData(theNews, lastDownloadNews);
+				
+				wxLogDebug(_T("Created news map entry for source %s"),
+					groupName.c_str());
+			}
+		}
+		
+		globalProfile->SetPath(_T(".."));
+		
+		groupKeepGoing = globalProfile->GetNextGroup(groupName, groupIndex);
+	}
+	
+	globalProfile->SetPath(_T("/"));
+}
+
+void ProMan::SaveNewsMapToGlobalProfile() {
+	globalProfile->SetPath(_T("/net"));
+	
+	for (NewsMap::const_iterator it = newsMap.begin(), end = newsMap.end();
+		 it != end; ++it) {
+		const wxString& newsSource = it->first;
+		const NewsData& newsData = it->second;
+		
+		globalProfile->SetPath(newsSource);
+		globalProfile->Write(_T("thenews"), newsData.theNews);
+		globalProfile->Write(_T("lastdownloadnews"),
+			newsData.lastDownloadNews.Format(NEWS_LAST_TIME_FORMAT));
+		globalProfile->SetPath(_T(".."));
+	}
+	
+	globalProfile->SetPath(_T("/"));
 }
 
 /** Resets the private copy so that it contains a copy
@@ -755,6 +821,25 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 		}
 		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
 	}
+}
+
+const NewsData* ProMan::NewsRead(const wxString& newsSource) const {
+	wxCHECK_MSG(!newsSource.IsEmpty(), NULL, _T("NewsRead: newsSource is empty!"));
+	
+	NewsMap::const_iterator it = newsMap.find(newsSource);
+	
+	if (it == newsMap.end()) {
+		return NULL;
+	} else {
+		return &(it->second);
+	}
+}
+
+void ProMan::NewsWrite(const wxString& newsSource, const NewsData& data) {
+	wxCHECK_RET(!newsSource.IsEmpty(), _T("NewsWrite: newsSource is empty!"));
+	wxCHECK_RET(data.IsValid(), _T("NewsWrite: data is not valid!"));
+	
+	newsMap[newsSource] = data;
 }
 
 /** Returns the text to use in the "save changes?" dialog's caption (window title) */
