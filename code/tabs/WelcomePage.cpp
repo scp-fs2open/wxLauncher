@@ -470,14 +470,15 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 				return;
 			}
 
-			wxInputStream* theNews = news->GetStream();
+			wxInputStream* rawNewsStream = news->GetStream();
 			wxLogDebug(_T("news loaded from %s with type %s"), news->GetLocation().c_str(), news->GetMimeType().c_str());
 
-			wxString newsData;
-			wxStringOutputStream newsDataStream(&newsData);
-			theNews->Read(newsDataStream);
+			wxString newsStr;
+			wxStringOutputStream newsStrStream(&newsStr);
+			rawNewsStream->Read(newsStrStream);
 			wxString formattedData(_T("<ul>"));
-			wxStringTokenizer tok(newsData, _T("\t"), wxTOKEN_STRTOK);
+			wxStringTokenizer tok(newsStr, _T("\t"), wxTOKEN_STRTOK);
+			
 			while(tok.HasMoreTokens()) {
 				wxString title(tok.GetNextToken());
 				wxCHECK_RET(tok.HasMoreTokens(), _T("news formatter has run out of tokens at wrong time"));
