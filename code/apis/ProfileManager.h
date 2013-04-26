@@ -31,6 +31,18 @@ DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE, -1);
 /** Event is generated anytime the currently selected profile is changed. */
 DECLARE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED, -1);
 
+/** Stores data about downloaded news. */
+struct NewsData {
+	NewsData() { } // required for wxHashMap, unfortunately
+	NewsData(const wxString& theNews, const wxDateTime& lastDownloadNews);
+	bool IsValid() const { return (!theNews.IsEmpty()) && lastDownloadNews.IsValid(); }
+	wxString theNews;
+	wxDateTime lastDownloadNews;
+};
+
+/** Maps a news source by name to the locally stored data on it. */
+WX_DECLARE_STRING_HASH_MAP(NewsData, NewsMap);
+
 class ProMan {
 public:
 	enum Flags
@@ -77,6 +89,10 @@ public:
 	bool ProfileWrite(const wxString& key, bool value);
 	
 	bool ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty = true);
+	
+	/** Returns NULL if not found in global profile (or found but invalid). */
+	const NewsData* NewsRead(const wxString& newsSource) const;
+	void NewsWrite(const wxString& newsSource, const NewsData& data);
 	
 	enum SaveDialogContext {
 		ON_PROFILE_SWITCH,
@@ -145,6 +161,10 @@ private:
 	
 	ProMan();
 	void SaveProfilesBeforeExiting();
+	
+	NewsMap newsMap;
+	void LoadNewsMapFromGlobalProfile();
+	void SaveNewsMapToGlobalProfile();
 
 	ProfileMap profiles; //!< The profiles. Indexed by Name;
 	wxFileConfig* globalProfile;  //!< Global profile settings, like language, or proxy
