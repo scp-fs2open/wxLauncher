@@ -448,23 +448,19 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 		return;
 	}
 	if (allowedToUpdateNews) {
-		wxString lastTimeString;
-		proman->GlobalRead(GBL_CFG_NET_NEWS_LAST_TIME, &lastTimeString);
-		wxDateTime lasttime;
-		if ( (NULL != lasttime.ParseFormat(lastTimeString, NEWS_LAST_TIME_FORMAT) )
-			&& (wxDateTime::Now() - lasttime < TIME_BETWEEN_NEWS_UPDATES) 
-			&& (proman->GlobalExists(GBL_CFG_NET_THE_NEWS)) ) {
+		const NewsSource& newsSource(SkinSystem::GetSkinSystem()->GetNewsSource());
+		const NewsData* newsData =
+			proman->NewsRead(newsSource.GetName());
+		
+		wxASSERT((newsData == NULL) || newsData->IsValid());
+		
+		if ((newsData != NULL) &&
+				(wxDateTime::Now() - newsData->lastDownloadNews < TIME_BETWEEN_NEWS_UPDATES) ) {
 			// post the news that we have on file for now
-			wxString theNews;
-			if ( proman->GlobalRead(GBL_CFG_NET_THE_NEWS, &theNews) ){ 
-				newsWindow->SetPage(theNews);
-			} else {
-				wxLogFatalError(_T("%s does not exist but the exists function says it does"),
-					GBL_CFG_NET_THE_NEWS.c_str());
-			}
+			newsWindow->SetPage(newsData->theNews);
 		} else {
 			wxFileSystem filesystem;
-			wxFSFile* news = filesystem.OpenFile(_("http://www.audiozone.ro/hl/"), wxFS_READ);
+			wxFSFile* news = filesystem.OpenFile(newsSource.GetNewsUrl(), wxFS_READ);
 			if ( news == NULL ) {
 				wxLogError(_("Error in retrieving news"));
 				return;
@@ -489,11 +485,12 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 				formattedData += wxString::Format(_T("\n<li><a href='%s'>%s</a><!-- %s --></li>"), link.c_str(), title.c_str(), imglink.c_str());
 			}
 			formattedData += _T("\n</ul>");
-			proman->GlobalWrite(GBL_CFG_NET_THE_NEWS, formattedData);
+			
 			newsWindow->SetPage(formattedData);
 
-			wxString currentTime(wxDateTime::Now().Format(NEWS_LAST_TIME_FORMAT));
-			proman->GlobalWrite(GBL_CFG_NET_NEWS_LAST_TIME, currentTime);
+			proman->NewsWrite(
+				newsSource.GetName(),
+				NewsData(formattedData, wxDateTime::Now()));
 		}
 	} else {
 		newsWindow->SetPage(_("Automatic news retrieval disabled."));

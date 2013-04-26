@@ -41,8 +41,10 @@ extern const wxString GBL_CFG_PROXY_TYPE;				//!< string
 extern const wxString GBL_CFG_PROXY_SERVER;				//!< string
 extern const wxString GBL_CFG_PROXY_PORT;				//!< int
 
+extern const wxString GBL_CFG_NET_FOLDER;				//!< string (folder name)
 extern const wxString GBL_CFG_NET_DOWNLOAD_NEWS;		//!< bool, true means autodownload
 extern const wxString NEWS_LAST_TIME_FORMAT;
+// these two are entries relative to news source folders, not absolute paths
 extern const wxString GBL_CFG_NET_NEWS_LAST_TIME;		//!< string, formated time as NEWS_LAST_TIME_FORMAT
 extern const wxString GBL_CFG_NET_THE_NEWS;				//!< string, the formatted text (workin' for a livin'!)
 

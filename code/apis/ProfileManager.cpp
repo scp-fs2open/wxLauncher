@@ -292,7 +292,7 @@ void ProMan::SaveProfilesBeforeExiting() {
 void ProMan::LoadNewsMapFromGlobalProfile() {
 	wxASSERT(newsMap.empty());
 	
-	globalProfile->SetPath(_T("/net"));
+	globalProfile->SetPath(GBL_CFG_NET_FOLDER);
 	
 	// inspired by CopyConfig()
 	wxString groupName;
@@ -308,8 +308,8 @@ void ProMan::LoadNewsMapFromGlobalProfile() {
 	while (groupKeepGoing) {
 		globalProfile->SetPath(groupName);
 		
-		if (globalProfile->Read(_T("thenews"), theNews) &&
-			(globalProfile->Read(_T("lastdownloadnews"), lastDownloadNewsStr))) {
+		if (globalProfile->Read(GBL_CFG_NET_THE_NEWS, theNews) &&
+			(globalProfile->Read(GBL_CFG_NET_NEWS_LAST_TIME, lastDownloadNewsStr))) {
 			if ((!theNews.IsEmpty()) &&
 				(NULL != lastDownloadNews.ParseFormat(
 					lastDownloadNewsStr, NEWS_LAST_TIME_FORMAT))) {
@@ -329,7 +329,7 @@ void ProMan::LoadNewsMapFromGlobalProfile() {
 }
 
 void ProMan::SaveNewsMapToGlobalProfile() {
-	globalProfile->SetPath(_T("/net"));
+	globalProfile->SetPath(GBL_CFG_NET_FOLDER);
 	
 	for (NewsMap::const_iterator it = newsMap.begin(), end = newsMap.end();
 		 it != end; ++it) {
@@ -337,8 +337,8 @@ void ProMan::SaveNewsMapToGlobalProfile() {
 		const NewsData& newsData = it->second;
 		
 		globalProfile->SetPath(newsSource);
-		globalProfile->Write(_T("thenews"), newsData.theNews);
-		globalProfile->Write(_T("lastdownloadnews"),
+		globalProfile->Write(GBL_CFG_NET_THE_NEWS, newsData.theNews);
+		globalProfile->Write(GBL_CFG_NET_NEWS_LAST_TIME,
 			newsData.lastDownloadNews.Format(NEWS_LAST_TIME_FORMAT));
 		globalProfile->SetPath(_T(".."));
 	}
