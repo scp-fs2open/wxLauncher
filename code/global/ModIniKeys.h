@@ -53,7 +53,8 @@ extern const wxString MOD_INI_KEY_SKIN_WINDOW_ICON;
 extern const wxString MOD_INI_KEY_SKIN_BANNER;
 extern const wxString MOD_INI_KEY_SKIN_WELCOME_TEXT;
 
-extern const wxString MOD_INI_KEY_SKIN_MOD_IMAGE;
+extern const wxString MOD_INI_KEY_SKIN_MOD_IMAGE_255X112;
+extern const wxString MOD_INI_KEY_SKIN_MOD_IMAGE_182X80;
 
 extern const wxString MOD_INI_KEY_SKIN_ICON_OK;
 extern const wxString MOD_INI_KEY_SKIN_ICON_WARNING;

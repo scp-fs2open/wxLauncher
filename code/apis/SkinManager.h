@@ -51,7 +51,7 @@ public:
 	bool SetModImage(const wxBitmap& modImage);
 	
 	const wxBitmap& GetSmallModImage() const { return this->smallModImage; }
-	// there's no SetSmallModImage() because it's set in SetModImage()
+	bool SetSmallModImage(const wxBitmap& smallModImage);
 	
 	const wxBitmap& GetOkIcon() const { return this->okIcon; }
 	bool SetOkIcon(const wxBitmap& okIcon);
@@ -92,8 +92,8 @@ private:
 	wxBitmap banner;
 	wxString welcomeText;
 	
+	/** The 255x112 and 182x80 versions of the default mod image. */
 	wxBitmap modImage;
-	/** A scaled down version of modImage for display in the mod list. */
 	wxBitmap smallModImage;
 
 	wxBitmap okIcon;
