@@ -111,10 +111,16 @@ if(IS_WIN32) # helper is only needed on windows
     code/global/BasicDefaults.cpp
     code/global/ModDefaults.h
     code/global/ModDefaults.cpp
+    code/global/ModIniKeys.h
+    code/global/ModIniKeys.cpp
     code/global/ProfileKeys.h
     code/global/ProfileKeys.cpp
     code/global/RegistryKeys.h
     code/global/RegistryKeys.cpp
+    code/global/SkinDefaults.h
+    code/global/SkinDefaults.cpp
+    code/global/Utils.h
+    code/global/Utils.cpp
     code/apis/RegistryProfileManager.cpp
     platform/win32/registry_helper.cpp
     code/apis/PlatformProfileManagerShared.cpp
@@ -126,14 +132,20 @@ if(IS_WIN32) # helper is only needed on windows
     code/apis/ProfileManager.cpp
     code/apis/ProfileProxy.h
     code/apis/ProfileProxy.cpp
+    code/apis/SkinManager.h
+    code/apis/SkinManager.cpp
     code/apis/TCManager.h
     code/apis/TCManager.cpp
     code/controls/LightingPresets.h
     code/controls/LightingPresets.cpp
+    code/controls/ModList.h
+    code/controls/ModList.cpp
     code/datastructures/FlagFileData.h
     code/datastructures/FlagFileData.cpp
     code/datastructures/FSOExecutable.h
     code/datastructures/FSOExecutable.cpp
+    code/datastructures/NewsSource.h
+    code/datastructures/NewsSource.cpp
     )
   set_target_properties(registry_helper
     PROPERTIES LINKER_LANGUAGE CXX
