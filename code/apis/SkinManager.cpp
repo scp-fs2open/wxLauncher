@@ -129,7 +129,22 @@ bool Skin::SetModImage(const wxBitmap& modImage) {
 		return false;
 	} else {
 		this->modImage = modImage;
-		this->smallModImage = SkinSystem::MakeModListImage(modImage);
+		return true;
+	}
+}
+
+bool Skin::SetSmallModImage(const wxBitmap& smallModImage) {
+	if (!smallModImage.IsOk()) {
+		wxLogWarning(_T("Provided small mod image is not valid."));
+		return false;
+	} else if ((smallModImage.GetWidth() != SkinSystem::ModListImageWidth) ||
+			   (smallModImage.GetHeight() != SkinSystem::ModListImageHeight)) {
+		wxLogWarning(_T("Provided small mod image size %dx%d is not expected size %dx%d."),
+			smallModImage.GetWidth(), smallModImage.GetHeight(),
+			SkinSystem::ModListImageWidth, SkinSystem::ModListImageHeight);
+		return false;
+	} else {
+		this->smallModImage = smallModImage;
 		return true;
 	}
 }
@@ -376,11 +391,19 @@ void SkinSystem::InitializeDefaultSkin() {
 			DEFAULT_SKIN_WELCOME_TEXT.c_str());
 	}
 	
-	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_MOD_IMAGE);
+	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_MOD_IMAGE_255X112);
 	success = this->defaultSkin.SetModImage(
 		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
 	if (!success) {
 		wxLogFatalError(_T("Setting default mod image '%s' failed"),
+			filename.GetFullPath().c_str());
+	}
+	
+	filename = wxFileName(_T(RESOURCES_PATH), DEFAULT_SKIN_MOD_IMAGE_182X80);
+	success = this->defaultSkin.SetSmallModImage(
+		wxBitmap(filename.GetFullPath(), wxBITMAP_TYPE_ANY));
+	if (!success) {
+		wxLogFatalError(_T("Setting default small mod image '%s' failed"),
 			filename.GetFullPath().c_str());
 	}
 	

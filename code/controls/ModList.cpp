@@ -432,8 +432,20 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 					this->TCSkin->SetWelcomeText(welcomeText);
 				}
 				
-				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE,
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE_255X112,
 					tcPath, _T("mod image"), &Skin::SetModImage);
+				
+				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_MOD_IMAGE_182X80,
+					tcPath, _T("small mod image"), &Skin::SetSmallModImage);
+				
+				// if one mod image is missing, create it by scaling the other one
+				if (this->TCSkin->GetModImage().IsOk() && !this->TCSkin->GetSmallModImage().IsOk()) {
+					this->TCSkin->SetSmallModImage(
+						SkinSystem::MakeModListImage(this->TCSkin->GetModImage()));
+				} else if (!this->TCSkin->GetModImage().IsOk() && this->TCSkin->GetSmallModImage().IsOk()) {
+					this->TCSkin->SetModImage(
+						SkinSystem::MakeModInfoDialogImage(this->TCSkin->GetSmallModImage()));
+				}
 				
 				SetSkinBitmap(*config, MOD_INI_KEY_SKIN_ICON_OK,
 					tcPath, _T("ok icon"), &Skin::SetOkIcon);

@@ -46,7 +46,8 @@ const wxString MOD_INI_KEY_SKIN_WINDOW_ICON					(_T("/skin/windowicon"));
 const wxString MOD_INI_KEY_SKIN_BANNER						(_T("/skin/banner"));
 const wxString MOD_INI_KEY_SKIN_WELCOME_TEXT				(_T("/skin/welcometext"));
 
-const wxString MOD_INI_KEY_SKIN_MOD_IMAGE					(_T("/skin/modimage"));
+const wxString MOD_INI_KEY_SKIN_MOD_IMAGE_255X112			(_T("/skin/modimage255x112"));
+const wxString MOD_INI_KEY_SKIN_MOD_IMAGE_182X80			(_T("/skin/modimage182x80"));
 
 const wxString MOD_INI_KEY_SKIN_ICON_OK						(_T("/skin/iconok"));
 const wxString MOD_INI_KEY_SKIN_ICON_WARNING				(_T("/skin/iconwarn"));
