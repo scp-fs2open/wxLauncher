@@ -31,6 +31,7 @@ public:
 	virtual ~StatusBar();
 
 	void OnSize(wxSizeEvent& event);
+	void OnTCSkinChanged(wxCommandEvent& event);
 
 	void SetMainStatusText(wxString msg, int icon=ID_SB_NO_CHANGE);
 	void SetJobStatusText(int value, wxString msg=_T(""));

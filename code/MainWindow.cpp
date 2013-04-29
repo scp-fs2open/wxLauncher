@@ -46,6 +46,8 @@ const int WINDOW_WIDTH = TAB_AREA_WIDTH;
 MainWindow::MainWindow() {
 	this->Create((wxFrame*)NULL, wxID_ANY, SkinSystem::GetSkinSystem()->GetWindowTitle(),
 		wxDefaultPosition, wxSize(WINDOW_WIDTH, 550), MAINWINDOW_STYLE);
+	
+	SkinSystem::RegisterTCSkinChanged(this);
 
 	this->FS2_pid = 0;
 	this->FRED2_pid = 0;
@@ -100,6 +102,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_HELP(wxID_ANY, MainWindow::OnContextHelp)
 	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
 	EVT_END_PROCESS(ID_FRED2_PROCESS, MainWindow::OnFRED2Exited)
+	EVT_COMMAND(wxID_NONE, EVT_TC_SKIN_CHANGED, MainWindow::OnTCSkinChanged)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -293,4 +296,9 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 	wxCHECK_RET(fred != NULL, _T("Unable to find FRED button"));
 	fred->SetLabel(_T("FRED"));
 	fred->Enable();
+}
+
+void MainWindow::OnTCSkinChanged(wxCommandEvent& event) {
+	this->SetTitle(SkinSystem::GetSkinSystem()->GetWindowTitle());
+	this->SetIcon(SkinSystem::GetSkinSystem()->GetWindowIcon());
 }

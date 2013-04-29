@@ -64,22 +64,30 @@ public:
 class HeaderBitmap: public wxPanel {
 public:
 	HeaderBitmap(wxWindow* parent): wxPanel(parent, wxID_ANY) {
-		this->bitmap = SkinSystem::GetSkinSystem()->GetBanner();
-		wxASSERT_MSG(this->bitmap.IsOk(), _("Loaded bitmap is invalid."));
-
-		this->SetMinSize(wxSize(bitmap.GetWidth(), bitmap.GetHeight()));
+		SkinSystem::GetSkinSystem()->RegisterTCSkinChanged(this);
+		UpdateBanner();
 	}
 	virtual void OnPaint(wxPaintEvent& WXUNUSED(event)) {
 		wxPaintDC dc(this);
 		dc.DrawBitmap(this->bitmap, (this->GetSize().GetWidth()/2) - (this->bitmap.GetWidth()/2), 0);
 	}
 private:
+	void UpdateBanner() {
+		this->bitmap = SkinSystem::GetSkinSystem()->GetBanner();
+		wxASSERT_MSG(this->bitmap.IsOk(), _("Loaded bitmap is invalid."));
+		
+		this->SetMinSize(wxSize(bitmap.GetWidth(), bitmap.GetHeight()));
+	}
+	void OnTCSkinChanged(wxCommandEvent &WXUNUSED(event)) {
+		UpdateBanner();
+	}
 	wxBitmap bitmap;
 	DECLARE_EVENT_TABLE();
 };
 
 BEGIN_EVENT_TABLE(HeaderBitmap, wxPanel)
 	EVT_PAINT(HeaderBitmap::OnPaint)
+	EVT_COMMAND(wxID_NONE, EVT_TC_SKIN_CHANGED, HeaderBitmap::OnTCSkinChanged)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(WelcomePage, wxPanel)
@@ -90,6 +98,7 @@ EVT_HTML_CELL_HOVER(ID_NEWS_HTML_PANEL, WelcomePage::LinkHover)
 
 EVT_COMMAND( wxID_NONE, EVT_PROFILE_CHANGE, WelcomePage::ProfileCountChanged)
 EVT_COMMAND( wxID_NONE, EVT_CURRENT_PROFILE_CHANGED, WelcomePage::ProfileCountChanged)
+EVT_COMMAND( wxID_NONE, EVT_TC_SKIN_CHANGED, WelcomePage::OnTCSkinChanged)
 
 // Profile controls
 EVT_BUTTON(ID_NEW_PROFILE, WelcomePage::ProfileButtonClicked)
@@ -115,6 +124,8 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	ProMan* proman = ProMan::GetProfileManager();
 
 	wxLogDebug(_T("WelcomePage is at %p."), this);
+	
+	SkinSystem::RegisterTCSkinChanged(this);
 
 #if 0
 	// language
@@ -582,6 +593,20 @@ void WelcomePage::OnDownloadNewsCheck(wxCommandEvent& event) {
 
 void WelcomePage::OnUpdateNewsHelp(wxCommandEvent &WXUNUSED(event)) {
 	HelpManager::OpenHelpById(ID_MORE_INFO_PRIVACY);
+}
+
+void WelcomePage::OnTCSkinChanged(wxCommandEvent &WXUNUSED(event)) {
+	wxHtmlWindow* general = dynamic_cast<wxHtmlWindow*>(
+		wxWindow::FindWindowById(ID_SUMMARY_HTML_PANEL, this));
+	wxCHECK_RET(general != NULL, _T("Unable to find welcome text area"));
+	general->SetPage(SkinSystem::GetSkinSystem()->GetWelcomeText());
+	
+	wxStaticBox* newsBox = dynamic_cast<wxStaticBox*>(
+		wxWindow::FindWindowById(ID_NEWS_BOX, this));
+	wxCHECK_RET(newsBox != NULL, _T("Unable to find news box"));
+	newsBox->SetLabel(SkinSystem::GetSkinSystem()->GetNewsSource().GetLabel());
+
+	this->needToUpdateNews = true;
 }
 
 

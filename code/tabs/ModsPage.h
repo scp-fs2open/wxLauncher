@@ -26,6 +26,7 @@ public:
 	ModsPage(wxWindow* parent);
 
 	void OnTCChanged(wxCommandEvent &event);
+	void OnTCSkinChanged(wxCommandEvent &event);
 
 private:
 	DECLARE_EVENT_TABLE();
