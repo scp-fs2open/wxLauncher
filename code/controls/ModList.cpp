@@ -312,11 +312,13 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			&item->minverticalres,
 			DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
 		
-		// disallow minimum resolutions below the default
-		item->minhorizontalres =
-			std::max(item->minhorizontalres, DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES);
-		item->minverticalres =
-			std::max(item->minverticalres, DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
+		if ((item->minhorizontalres < DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES) ||
+				(item->minverticalres < DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES)) {
+			wxLogWarning(_T("Invalid minimum resolution %dx%d, using default"),
+				item->minhorizontalres, item->minverticalres);
+			item->minhorizontalres = DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES;
+			item->minverticalres = DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES;
+		}
 		
 		readIniFileString(
 			config,
