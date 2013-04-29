@@ -35,6 +35,8 @@ const int TEXT_WRAP_WIDTH = TAB_AREA_WIDTH - 225;
 
 ModsPage::ModsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxLogDebug(_T("ModsPage is at %p."), this);
+	
+	SkinSystem::RegisterTCSkinChanged(this);
 
 	TCManager::RegisterTCChanged(this);
 	wxCommandEvent nullEvent;
@@ -43,6 +45,7 @@ ModsPage::ModsPage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 
 BEGIN_EVENT_TABLE(ModsPage, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, ModsPage::OnTCChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_SKIN_CHANGED, ModsPage::OnTCSkinChanged)
 END_EVENT_TABLE()
 
 void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
@@ -148,4 +151,20 @@ void ModsPage::OnTCChanged(wxCommandEvent &WXUNUSED(event)) {
 		this->SetSizer(sizer);
 	}
 	this->Layout();
+}
+
+void ModsPage::OnTCSkinChanged(wxCommandEvent &WXUNUSED(event)) {
+	wxStaticBitmap* infoImage = dynamic_cast<wxStaticBitmap*>(
+		wxWindow::FindWindowById(ID_MODS_PAGE_INFO_IMAGE, this));
+	
+	if (infoImage != NULL) {
+		infoImage->SetBitmap(SkinSystem::GetSkinSystem()->GetBigInfoIcon());
+	}
+	
+	wxStaticBitmap* warningImage = dynamic_cast<wxStaticBitmap*>(
+		wxWindow::FindWindowById(ID_MODS_PAGE_WARNING_IMAGE, this));
+	
+	if (warningImage != NULL) {
+		warningImage->SetBitmap(SkinSystem::GetSkinSystem()->GetBigWarningIcon());
+	}
 }

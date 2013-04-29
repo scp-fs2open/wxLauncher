@@ -153,6 +153,7 @@ public:
 	void OnSelectionChange(wxCommandEvent &event);
 	void OnActivateMod(wxCommandEvent &event);
 	void OnInfoMod(wxCommandEvent &event);
+	void OnTCSkinChanged(wxCommandEvent &event);
 	
 	static const ModItem* GetActiveMod() { return ModList::activeMod; }
 

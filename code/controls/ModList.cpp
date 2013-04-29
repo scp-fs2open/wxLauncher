@@ -161,6 +161,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 	this->Create(parent, ID_MODLISTBOX, wxDefaultPosition, size, 
 		wxLB_SINGLE | wxLB_ALWAYS_SB | wxBORDER);
 	this->SetMargins(10, 10);
+	
+	SkinSystem::RegisterTCSkinChanged(this);
 
 	std::vector<ModItem*> modsTemp; // for use in presorting
 
@@ -563,6 +565,8 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 
 /** the dtor.  Cleans up stuff. */
 ModList::~ModList() {
+	SkinSystem::UnRegisterTCSkinChanged(this);
+	
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
 	}
@@ -897,6 +901,10 @@ void ModList::OnInfoMod(wxCommandEvent &WXUNUSED(event)) {
 	int selected = this->GetSelection();
 	wxCHECK_RET(selected != wxNOT_FOUND, _T("Do not have a valid selection."));
 	new ModInfoDialog(new ModItem(this->tableData->Item(selected)), this);
+}
+
+void ModList::OnTCSkinChanged(wxCommandEvent &WXUNUSED(event)) {
+	Refresh();
 }
 
 // comparison is case-insensitive, and mod names containing spaces are preserved
@@ -1247,6 +1255,8 @@ ModItem::ModImage::ModImage(ModItem *myData) {
 void ModItem::ModImage::Draw(wxDC &dc, const wxRect &rect) {
 	if ( this->myData->image182x80.IsOk() ) {
 		dc.DrawBitmap(this->myData->image182x80, rect.x, rect.y);
+	} else if ( this->myData->shortname != NO_MOD ) {
+		dc.DrawBitmap(SkinSystem::GetSkinSystem()->GetSmallModImage(), rect.x, rect.y);
 	} else {
 		dc.DrawRectangle(rect);
 		wxPen pen(dc.GetPen());
@@ -1375,6 +1385,8 @@ void ModInfoDialog::ImageDrawer::OnDraw(wxPaintEvent &WXUNUSED(event)) {
 	wxPaintDC dc(this);
 	if ( parent->item->image255x112.IsOk() ) {
 		dc.DrawBitmap(parent->item->image255x112, 0, 0);
+	} else if ( parent->item->shortname != NO_MOD ) {
+		dc.DrawBitmap(SkinSystem::GetSkinSystem()->GetModImage(), 0, 0);
 	} else {
 		wxCoord textWidth, textHeight;
 		dc.GetTextExtent(_("NO IMAGE"), &textWidth, &textHeight);

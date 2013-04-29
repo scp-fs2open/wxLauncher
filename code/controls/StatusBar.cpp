@@ -42,27 +42,18 @@ const int ICON_FIELD_WIDTH = 25;
 
 BEGIN_EVENT_TABLE(StatusBar, wxStatusBar)
 EVT_SIZE(StatusBar::OnSize)
+EVT_COMMAND(wxID_NONE, EVT_TC_SKIN_CHANGED, StatusBar::OnTCSkinChanged)
 END_EVENT_TABLE()
 
 StatusBar::StatusBar(wxWindow *parent)
 		:wxStatusBar(parent) {
 	this->parent = parent;
 	this->showingToolTip = false;
-
-	this->icons[ID_SB_OK] = SkinSystem::GetSkinSystem()->GetOkIcon();
 	
-	this->icons[ID_SB_WARNING] = SkinSystem::GetSkinSystem()->GetWarningIcon();
+	SkinSystem::RegisterTCSkinChanged(this);
 	
-	this->icons[ID_SB_ERROR] = SkinSystem::GetSkinSystem()->GetErrorIcon();
-
-	this->icons[ID_SB_INFO] = SkinSystem::GetSkinSystem()->GetInfoIcon();
-
-	for( int i = 0; i < ID_SB_MAX_ID; i++) { // Check that all icons are okay.
-		if ( !this->icons[i].IsOk() ) {
-			this->icons[i] = wxNullBitmap;
-			wxLogWarning(_T("Icon ID: %d is not okay"), i);
-		}
-	}
+	wxCommandEvent nullEvent;
+	OnTCSkinChanged(nullEvent);
 
 	// Just creating these now, will place them in the OnSize event handler
 	new wxStaticBitmap(this, ID_STATUSBAR_STATUS_ICON, this->icons[ID_SB_OK]);
@@ -110,6 +101,23 @@ void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
 	this->GetFieldRect(SB_FIELD_PROGRESS_BAR, barrect);
 	bar->SetSize(barrect);
 #endif
+}
+
+void StatusBar::OnTCSkinChanged(wxCommandEvent &WXUNUSED(event)) {
+	this->icons[ID_SB_OK] = SkinSystem::GetSkinSystem()->GetOkIcon();
+	
+	this->icons[ID_SB_WARNING] = SkinSystem::GetSkinSystem()->GetWarningIcon();
+	
+	this->icons[ID_SB_ERROR] = SkinSystem::GetSkinSystem()->GetErrorIcon();
+	
+	this->icons[ID_SB_INFO] = SkinSystem::GetSkinSystem()->GetInfoIcon();
+	
+	for( int i = 0; i < ID_SB_MAX_ID; i++) { // Check that all icons are okay.
+		if ( !this->icons[i].IsOk() ) {
+			this->icons[i] = wxNullBitmap;
+			wxLogWarning(_T("Icon ID: %d is not okay"), i);
+		}
+	}	
 }
 
 void StatusBar::SetMainStatusText(wxString msg, int icon) {

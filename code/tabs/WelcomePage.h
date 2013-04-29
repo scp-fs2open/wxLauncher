@@ -37,6 +37,7 @@ public:
 	void UpdateNews(wxIdleEvent& event);
 	void OnDownloadNewsCheck(wxCommandEvent& event);
 	void OnUpdateNewsHelp(wxCommandEvent& event);
+	void OnTCSkinChanged(wxCommandEvent& event);
 	
 private:
 	/** The width of the items on the welcome tab. */

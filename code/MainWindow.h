@@ -39,6 +39,7 @@ public:
 	void OnContextHelp(wxHelpEvent& event);
 	void OnFS2Exited(wxProcessEvent& event);
 	void OnFRED2Exited(wxProcessEvent& event);
+	void OnTCSkinChanged(wxCommandEvent& event);
 
 private:
 	wxProcess* process;
