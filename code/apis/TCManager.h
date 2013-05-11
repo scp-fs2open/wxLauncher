@@ -36,7 +36,6 @@ WX_DECLARE_LIST(wxEvtHandler, TCEventHandlers);
 
 class TCManager: public wxEvtHandler {
 public:
-	TCManager();
 	~TCManager();
 
 	static void Initialize();
@@ -44,6 +43,7 @@ public:
 	static bool IsInitialized();
 	static TCManager* Get();
 private:
+	TCManager();
 	static TCManager *manager;
 
 public:
