@@ -120,6 +120,32 @@ bool CompareModItems(ModItem* item1, ModItem* item2) {
 
 const ModItem* ModList::activeMod = NULL;
 
+class ModIniFinder: public wxDirTraverser {
+public:
+	const wxArrayString& GetFiles() const {
+		return files;
+	}
+	virtual wxDirTraverseResult OnDir(const wxString& dirname) {
+		if (ShouldIgnore(dirname)) {
+			return wxDIR_IGNORE;
+		} else {
+			return wxDIR_CONTINUE;
+		}
+	}
+	virtual wxDirTraverseResult OnFile(const wxString& filename) {
+		if (filename.EndsWith(_T("mod.ini"))) {
+			files.Add(filename);
+		}
+		return wxDIR_CONTINUE;
+	}
+private:
+	bool ShouldIgnore(const wxString& dirname) {
+		const wxString realDirName(dirname.AfterLast(wxFileName::GetPathSeparator()));
+		return realDirName.EndsWith(_T(".app")) || realDirName.StartsWith(_T("."));
+	}
+	wxArrayString files;
+};
+
 void ModList::SetSkinBitmap(
 		const wxFileConfig& config,
 		const wxString& modIniKey,
@@ -169,8 +195,14 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 	std::vector<ModItem*> modsTemp; // for use in presorting
 
 	// scan for mods in the current TCs directory
-	wxArrayString foundInis;
-	wxDir::GetAllFiles(tcPath, &foundInis, _("mod.ini"));
+	ModIniFinder iniFinder;
+	
+	wxASSERT(wxDir::Exists(tcPath));
+	wxDir dir(tcPath);
+	dir.Traverse(iniFinder, _T("mod.ini"));
+	
+	wxArrayString foundInis(iniFinder.GetFiles());
+	
 	if ( foundInis.Count() > 0 ) {
 		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
 	} else {
