@@ -90,7 +90,7 @@ LightingPresets::LightingPresets(wxWindow* parent) : wxPanel(parent, wxID_ANY) {
 	lightingInsideSizer->Add(customFlagsCopyButton, wxGBPosition(1,0), wxGBSpan(1,1),
 		wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, RADIOBUTTON_SPACING + 5);
 	lightingInsideSizer->Add(radioButton1, wxGBPosition(2,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
-	lightingInsideSizer->Add(radioButton2, wxGBPosition(3,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
+	lightingInsideSizer->Add(radioButton2, wxGBPosition(3,0), wxGBSpan(1,1), wxEXPAND|wxBOTTOM, RADIOBUTTON_SPACING);
 	lightingInsideSizer->Add(radioButton3, wxGBPosition(4,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
 	lightingInsideSizer->Add(radioButton4, wxGBPosition(5,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);
 	lightingInsideSizer->Add(radioButton5, wxGBPosition(6,0), wxGBSpan(1,1), wxBOTTOM, RADIOBUTTON_SPACING);

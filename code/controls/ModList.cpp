@@ -47,6 +47,8 @@ using TextUtils::Words;
 using TextUtils::ArrayOfWords;
 
 const wxString NO_MOD(_("(No mod)"));
+// to keep the presets box from overlapping with flag list
+const size_t MAX_PRESET_NAME_LENGTH = 32;
 
 class ModInfoDialog: wxDialog {
 public:
@@ -339,6 +341,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 				// required because & is interpreted as setting keyboard shortcut
 				// see http://docs.wxwidgets.org/stable/wx_wxcontrol.html#wxcontrolsetlabel
 				item->recommendedlightingname.Replace(_T("&"), _T("&&"));
+			} else {
+				item->recommendedlightingname.Trim(true).Trim(false);
+				item->recommendedlightingname.Truncate(MAX_PRESET_NAME_LENGTH);
 			}
 		} else {
 			wxLogDebug(_T("Recommended lighting flagset is missing or empty; using defaults."));
