@@ -20,7 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
 #include "controls/BottomButtons.h"
+#include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
+#include "datastructures/ResolutionMap.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 
@@ -74,15 +76,19 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 
 		TCManager::RegisterTCBinaryChanged(this);
 		TCManager::RegisterTCChanged(this);
+		TCManager::RegisterTCActiveModChanged(this);
 		TCManager::RegisterTCFredBinaryChanged(this);
+		ResolutionMap::RegisterResolutionMapChanged(this);
 		wxCommandEvent nullEvent;
 		this->OnTCChanges(nullEvent);
 }
 
 BEGIN_EVENT_TABLE(BottomButtons, wxPanel)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BottomButtons::OnTCChanges)
+EVT_COMMAND(wxID_NONE, EVT_TC_ACTIVE_MOD_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BottomButtons::OnTCChanges)
+EVT_COMMAND(wxID_NONE, EVT_RESOLUTION_MAP_CHANGED, BottomButtons::OnTCChanges)
 END_EVENT_TABLE()
 
 /** remove the text after ".app" in the executable name.
@@ -105,7 +111,7 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 	wxString tc, binary, fredBinary;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &tc, wxEmptyString);
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_TC_CURRENT_BINARY, &binary, wxEmptyString);
-	if ( tc.IsEmpty() || binary.IsEmpty() ) {
+	if ( tc.IsEmpty() || binary.IsEmpty() || ModList::GetActiveMod() == NULL || !ResolutionMap::HasEntryForActiveMod()) {
 		this->play->Disable();
 	} else if ( wxFileName(tc + wxFileName::GetPathSeparator() + binary).FileExists() ) {
 		this->play->Enable();

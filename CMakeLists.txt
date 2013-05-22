@@ -243,6 +243,8 @@ set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FSOExecutable.cpp
   code/datastructures/NewsSource.h
   code/datastructures/NewsSource.cpp
+  code/datastructures/ResolutionMap.h
+  code/datastructures/ResolutionMap.cpp
   )
 source_group("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
 set(API_CODE_FILES
