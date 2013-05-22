@@ -41,7 +41,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/OpenALManager.h"
 #include "apis/JoystickManager.h"
 #include "apis/HelpManager.h"
+#include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
+#include "datastructures/ResolutionMap.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
@@ -149,6 +151,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	
 	TCManager::Initialize();
 	TCManager::RegisterTCChanged(this);
+	TCManager::RegisterTCActiveModChanged(this);
 	TCManager::RegisterTCBinaryChanged(this);
 	TCManager::RegisterTCFredBinaryChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
@@ -225,34 +228,8 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticText* resolutionText = 
 		new wxStaticText(this, wxID_ANY, _("Resolution:"));
 	wxChoice* resolutionCombo = new wxChoice(this, ID_RESOLUTION_COMBO);
-	this->FillResolutionDropBox(resolutionCombo);
-	long width, height;
-	bool hasResWidth = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width);
-	bool hasResHeight = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height);
-
-	if ((!hasResWidth) || (!hasResHeight)) {
-		wxLogDebug(_T("initializing resolution to maximum supported resolution"));
-		int maxResIndex = GetMaxSupportedResolution(*resolutionCombo, width, height);
-		wxCHECK_RET(maxResIndex != wxNOT_FOUND, _T("could not get max supported resolution"));
-		resolutionCombo->SetSelection(maxResIndex);
-	}
-
-	const wxString resString = wxString::Format(CFG_RES_FORMAT_STRING,
-		static_cast<int>(width), static_cast<int>(height));
-	bool resFound = resolutionCombo->SetStringSelection(resString);
-
-	if (!resFound) {
-		wxLogWarning(_T("resolution %s not found, resetting to maximum supported resolution"),
-			resString.c_str());
-		int maxResIndex = GetMaxSupportedResolution(*resolutionCombo, width, height);
-		wxCHECK_RET(maxResIndex != wxNOT_FOUND, _T("could not get max supported resolution"));
-		resolutionCombo->SetSelection(maxResIndex);
-	}
-
-	if ((!hasResWidth) || (!hasResHeight) || (!resFound)) {
-		proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_WIDTH, width);
-		proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, height);
-	}
+	
+	SetUpResolution();
 
 	wxStaticText* depthText = 
 		new wxStaticText(this, wxID_ANY, _("Depth:"));
@@ -770,6 +747,7 @@ EVT_BUTTON(ID_EXE_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressExecutableCho
 EVT_CHOICE(ID_EXE_FRED_CHOICE_BOX, BasicSettingsPage::OnSelectFredExecutable)
 EVT_BUTTON(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, BasicSettingsPage::OnPressFredExecutableChoiceRefreshButton)
 EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BasicSettingsPage::OnTCChanged)
+EVT_COMMAND(wxID_NONE, EVT_TC_ACTIVE_MOD_CHANGED, BasicSettingsPage::OnActiveModChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED,
@@ -1244,6 +1222,110 @@ void BasicSettingsPage::DisableExecutableChoiceControls(const ReasonForExecutabl
 	}
 }
 
+void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVertRes) {
+	ProMan* proman = ProMan::GetProfileManager();
+	
+	wxChoice* resolutionCombo = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
+	wxCHECK_RET(resolutionCombo != NULL, _T("Unable to find resolution combo"));
+	
+	FillResolutionDropBox(resolutionCombo, minHorizRes, minVertRes);
+	
+	long width = 0, height = 0;
+	
+	const ModItem* activeMod = ModList::GetActiveMod();
+	wxCHECK_RET(activeMod != NULL, _T("SetUpResolution: activeMod is NULL!"));
+	const wxString& shortname(activeMod->shortname);
+	
+	bool hasValidRes = false;
+	wxString resString;
+	
+	// first try reading from ResolutionMap
+	const ResolutionData* resDataPtr = ResolutionMap::ResolutionRead(shortname);
+		
+	if (resDataPtr != NULL) {
+		width = resDataPtr->width;
+		height = resDataPtr->height;
+		
+		resString =
+			wxString::Format(
+				CFG_RES_FORMAT_STRING,
+				static_cast<int>(width),
+				static_cast<int>(height));
+		hasValidRes = resolutionCombo->SetStringSelection(resString);
+	}
+
+	// then try reading resolution from profile
+	if (!hasValidRes) {
+		if (!resString.IsEmpty()) {
+			wxLogDebug(_T("map resolution %s not found, attempting to use profile value"),
+				resString.c_str());
+			resString.Clear();
+		} else {
+			wxLogDebug(_T("no resolution found in map, attempting to use profile value"));
+		}
+
+		bool hasResWidth = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width);
+		bool hasResHeight = proman->ProfileRead(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height);
+		
+		if (hasResWidth && hasResHeight) {
+			resString =
+				wxString::Format(
+					CFG_RES_FORMAT_STRING,
+					static_cast<int>(width),
+					static_cast<int>(height));
+			hasValidRes = resolutionCombo->SetStringSelection(resString);
+		}
+	}
+	
+	// last resort, use default (max supported resolution)
+	if (!hasValidRes) {
+		if (!resString.IsEmpty()) {
+			wxLogDebug(_T("resolution map value %s not found, using default max supported resolution"),
+				resString.c_str());
+		} else {
+			wxLogDebug(_T("no resolution found in map, using default max supported resolution"));
+		}
+		
+		int maxResIndex = GetMaxSupportedResolution(*resolutionCombo, width, height);
+		
+		if (maxResIndex != wxNOT_FOUND) {
+			resolutionCombo->SetSelection(maxResIndex);
+		} else {
+			const wxString InsufficientResolutionMsg(
+				wxString::Format(
+					_T("Your system does not support the minimum resolution needed to play this mod (%dx%d)."),
+						minHorizRes, minVertRes));
+			
+			wxLogError(InsufficientResolutionMsg);
+			wxMessageBox(InsufficientResolutionMsg, _T("Mod not supported"), wxOK | wxICON_ERROR);
+			
+			return;
+		}
+	}
+	
+	// update profile and ResolutionMap
+	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_WIDTH, width);
+	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, height);
+	
+	ResolutionMap::ResolutionWrite(shortname, ResolutionData(width, height));
+}
+
+/** Adjust the resolution drop down box according to the active mod's restrictions. */
+void BasicSettingsPage::OnActiveModChanged(wxCommandEvent& event) {
+	wxChoice* resChoice = dynamic_cast<wxChoice*>(
+		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
+	wxCHECK_RET(resChoice != NULL, _T("Unable to find resolution combo"));
+	
+	resChoice->Clear();
+	
+	const ModItem* activeMod = ModList::GetActiveMod();
+	wxCHECK_RET(activeMod != NULL,
+		_T("BSP::OnActiveModChanged(): activeMod is NULL!"));
+	
+	SetUpResolution(activeMod->minhorizontalres, activeMod->minverticalres);
+}
+
 /** Updates the status of whether the currently selected FSO binary is valid. */
 void BasicSettingsPage::OnCurrentBinaryChanged(wxCommandEvent& event) {
 	wxString tcPath, binaryName;
@@ -1413,7 +1495,10 @@ int ComputeGCD(int a, int b) {
 
 // Assumed resolutions has been sorted using CompareResolutions
 void AddHeaders(ResolutionArray &resolutions) {
-	wxASSERT_MSG(!resolutions.IsEmpty(), _T("AddHeaders: provided ResolutionArray is empty"));
+	if (resolutions.IsEmpty()) {
+		wxLogWarning(_T("AddHeaders: provided ResolutionArray is empty"));
+		return;
+	}
 
 	ResolutionArray headers;
 	wxArrayInt headerIndexes;
@@ -1454,7 +1539,8 @@ void AddHeaders(ResolutionArray &resolutions) {
 	}
 }
 
-void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
+void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
+	const long minHorizontalRes, const long minVerticalRes) {
 	
 	ResolutionArray resolutions;
 	
@@ -1490,7 +1576,9 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 				}
 			}
 
-			if ( !resExists ) {
+			if ( !resExists &&
+					(deviceMode.dmPelsWidth >= static_cast<DWORD>(minHorizontalRes)) &&
+					(deviceMode.dmPelsHeight >= static_cast<DWORD>(minVerticalRes))) {
 				resolutions.Add(new Resolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight, false));
 			}
 		}
@@ -1511,7 +1599,9 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
 	  for(int i = 0; modes[i]; i++) {
 	    wxLogDebug(_T(" %d x %d"), modes[i]->w, modes[i]->h);
 		// FIXME why is "check to see if resolution has already been added" not used here?
-		resolutions.Add(new Resolution(modes[i]->w, modes[i]->h, false));
+		  if ((modes[i]->w >= minHorizontalRes) && (modes[i]->h >= minVerticalRes)) {
+			  resolutions.Add(new Resolution(modes[i]->w, modes[i]->h, false));
+		  }
 	  }
 	}
 #else
@@ -1530,6 +1620,11 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice) {
     width and height variables, and returns the index at which the maximum resolution
     was found, returning wxNOT_FOUND on error. */
 int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height) {
+	if (resChoice.IsEmpty()) {
+		wxLogError(_T("GetMaxSupportedResolution() given empty resChoice."));
+		return wxNOT_FOUND;
+	}
+	
 	int maxResIndex = -1;
 	int maxResProduct = 0;
 	Resolution* res;
@@ -1576,12 +1671,21 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 	res = dynamic_cast<Resolution*>(choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( res != NULL, _T("after adjusting selection from header, Choice does not have Resolution objects"));
 	
+	const long width = static_cast<long>(res->GetWidth());
+	const long height = static_cast<long>(res->GetHeight());
+	
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_RESOLUTION_WIDTH,
-		static_cast<long>(res->GetWidth()));
+		width);
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_RESOLUTION_HEIGHT,
-		static_cast<long>(res->GetHeight()));
+		height);
+	
+	// update ResolutionMap
+	const ModItem* activeMod = ModList::GetActiveMod();
+	wxCHECK_RET(activeMod != NULL, _T("OnSelectVideoResolution: activeMod is NULL!"));
+	
+	ResolutionMap::ResolutionWrite(activeMod->shortname, ResolutionData(width, height));
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {

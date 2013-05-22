@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "controls/TruncatableChoice.h"
 
+#include "global/ModDefaults.h"
+
 class BasicSettingsPage : public wxPanel {
 public:
 	BasicSettingsPage(wxWindow* parent);
@@ -73,12 +75,17 @@ public:
 
 	void ProfileChanged(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
+	void OnActiveModChanged(wxCommandEvent& event);
 
 private:
 	static void FillFSOExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillFredExecutableDropBox(wxChoice* exeChoice, wxFileName path);
 	static void FillExecutableDropBox(wxChoice* exeChoice, wxArrayString exes);
-	static void FillResolutionDropBox(wxChoice* resChoice);
+	
+	void SetUpResolution(
+		long minHorizRes = DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES,
+		long minVertRes  = DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
+	static void FillResolutionDropBox(wxChoice* resChoice, long minHorizRes, long minVertRes);
 	static int GetMaxSupportedResolution(const wxChoice& resChoice, long& width, long& height);
 	
 	enum ReasonForExecutableDisabling {
