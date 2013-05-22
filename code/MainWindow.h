@@ -40,6 +40,9 @@ public:
 	void OnFS2Exited(wxProcessEvent& event);
 	void OnFRED2Exited(wxProcessEvent& event);
 	void OnTCSkinChanged(wxCommandEvent& event);
+	
+	/** F3 toggles FRED launching. */
+	void OnF3Pressed(wxCommandEvent& event);
 
 private:
 	wxProcess* process;

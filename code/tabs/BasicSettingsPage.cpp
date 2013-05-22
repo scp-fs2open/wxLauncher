@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ids.h"
 #include "global/ProfileKeys.h"
 #include "apis/FlagListManager.h"
+#include "apis/FREDManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/SpeechManager.h"
@@ -156,6 +157,7 @@ BasicSettingsPage::BasicSettingsPage(wxWindow* parent): wxPanel(parent, wxID_ANY
 	TCManager::RegisterTCFredBinaryChanged(this);
 	ProMan::GetProfileManager()->AddEventHandler(this);
 	FlagListManager::GetFlagListManager()->RegisterFlagFileProcessingStatusChanged(this);
+	FREDManager::RegisterFREDEnabledChanged(this);
 	wxCommandEvent event(this->GetId());
 	this->ProfileChanged(event);
 }
@@ -169,9 +171,6 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	
 	ProMan* proman = ProMan::GetProfileManager();
 	// exe Selection
-	bool fredEnabled;
-	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
-
 	wxStaticBox* exeBox = new wxStaticBox(this, wxID_ANY, _("FS2 Open game root folder and executable"));
 
 	wxStaticText* rootFolderText = new wxStaticText(this, ID_EXE_ROOT_FOLDER_BOX_TEXT, _("Game root folder:"));
@@ -184,26 +183,18 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	ExeChoice* useExeChoice = new ExeChoice(this, ID_EXE_CHOICE_BOX);
 	wxButton* exeChoiceRefreshButton = new wxButton(this, ID_EXE_CHOICE_REFRESH_BUTTON, _("Refresh"));
 
-	wxStaticText* useFredText = NULL;
-	ExeChoice* useFredChoice = NULL;
-	wxButton* exeFredChoiceRefreshButton = NULL;
-	if ( fredEnabled ) {
-		useFredText = new wxStaticText(this, wxID_ANY, _("FRED2 Open executable:"));
-		useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
-		exeFredChoiceRefreshButton = new wxButton(this, ID_EXE_FRED_CHOICE_REFRESH_BUTTON, _("Refresh"));
-	}
-
+	wxStaticText* useFredText = new wxStaticText(this, ID_EXE_FRED_CHOICE_TEXT, _("FRED2 Open executable:"));
+	ExeChoice* useFredChoice = new ExeChoice(this, ID_EXE_FRED_CHOICE_BOX);
+	wxButton* exeFredChoiceRefreshButton = new wxButton(this, ID_EXE_FRED_CHOICE_REFRESH_BUTTON, _("Refresh"));
+	
+	wxCommandEvent nullEvent;
+	OnFREDEnabledChanged(nullEvent);
 	
 	// new sizer layout that should line things up nicely
 	// inspired by the thread http://markmail.org/message/rlgv6y6xbw5dkvyy#query:+page:1+mid:5cqagz2jbygwqt2x+state:results
 	// or "RE: [wxPython-users] wx.FlexGridSizer..." Mar 31, 2005 in com.googlegroups.wxpython-users
 	// this idea could also work on, say, the video box, if you needed, for Windows
-	wxFlexGridSizer* exeInsideSizer;
-	if (useFredText != NULL && useFredChoice != NULL) {
-		exeInsideSizer = new wxFlexGridSizer(3,3,0,0);
-	} else {
-		exeInsideSizer = new wxFlexGridSizer(2,3,0,0);
-	}
+	wxFlexGridSizer* exeInsideSizer = new wxFlexGridSizer(3,3,0,0);
 	exeInsideSizer->AddGrowableCol(1);
 
 	exeInsideSizer->Add(rootFolderText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
@@ -213,11 +204,9 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	exeInsideSizer->Add(useExeChoice, wxSizerFlags().Proportion(1).Expand());
 	exeInsideSizer->Add(exeChoiceRefreshButton, wxSizerFlags().Expand().Border(wxLEFT, 5));
 
-	if ((useFredText != NULL) && (useFredChoice != NULL) && (exeFredChoiceRefreshButton != NULL)) {
-		exeInsideSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5);
-		exeInsideSizer->Add(useFredChoice, wxSizerFlags().Proportion(1).Expand());
-		exeInsideSizer->Add(exeFredChoiceRefreshButton, wxSizerFlags().Expand().Border(wxLEFT, 5));
-	}
+	exeInsideSizer->Add(useFredText, 0, wxALIGN_CENTER_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN|wxRIGHT, 5);
+	exeInsideSizer->Add(useFredChoice, wxSizerFlags().Proportion(1).Expand().ReserveSpaceEvenIfHidden());
+	exeInsideSizer->Add(exeFredChoiceRefreshButton, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden().Border(wxLEFT, 5));
 
 	wxStaticBoxSizer* exeSizer = new wxStaticBoxSizer(exeBox, wxHORIZONTAL);
 	exeSizer->Add(exeInsideSizer, wxSizerFlags().Proportion(1).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
@@ -752,6 +741,7 @@ EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BasicSettingsPage::OnCurrentBinary
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BasicSettingsPage::OnCurrentFredBinaryChanged)
 EVT_COMMAND(wxID_NONE, EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED,
 	BasicSettingsPage::OnFlagFileProcessingStatusChanged)
+EVT_COMMAND(wxID_NONE, EVT_FRED_ENABLED_CHANGED, BasicSettingsPage::OnFREDEnabledChanged)
 
 // Video controls
 EVT_CHOICE(ID_RESOLUTION_COMBO, BasicSettingsPage::OnSelectVideoResolution)
@@ -803,6 +793,30 @@ void BasicSettingsPage::OnFlagFileProcessingStatusChanged(wxCommandEvent& event)
 	if (status == FlagListManager::FLAG_FILE_PROCESSING_OK) {
 		this->SetupOpenALSection();
 	}
+}
+
+void BasicSettingsPage::OnFREDEnabledChanged(wxCommandEvent& WXUNUSED(event)) {
+	wxStaticText* useFredText = dynamic_cast<wxStaticText*>(
+		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_TEXT, this));
+	wxCHECK_RET(useFredText != NULL, 
+		_T("Cannot find use FRED text"));
+	
+	ExeChoice* useFredChoice = dynamic_cast<ExeChoice*>(
+		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_BOX, this));
+	wxCHECK_RET(useFredChoice != NULL, 
+		_T("Cannot find use FRED choice"));
+	
+	wxButton* exeFredChoiceRefreshButton = dynamic_cast<wxButton*>(
+		wxWindow::FindWindowById(ID_EXE_FRED_CHOICE_REFRESH_BUTTON, this));
+	wxCHECK_RET(exeFredChoiceRefreshButton != NULL, 
+		_T("Cannot find FRED exe choice refresh button"));
+	
+	bool fredEnabled;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+	
+	useFredText->Show(fredEnabled);
+	useFredChoice->Show(fredEnabled);
+	exeFredChoiceRefreshButton->Show(fredEnabled);
 }
 
 void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {

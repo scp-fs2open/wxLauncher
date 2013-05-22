@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
 #include "datastructures/ResolutionMap.h"
+#include "apis/FREDManager.h"
 #include "apis/TCManager.h"
 #include "apis/ProfileManager.h"
 
@@ -41,11 +42,9 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		this->close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
 #endif
 		this->help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
-		if ( showFred ) {
-			this->fred = new wxButton(this, ID_FRED_BUTTON, _("FRED"));
-		} else {
-			this->fred = NULL;
-		}
+		this->fred = new wxButton(this, ID_FRED_BUTTON, _("FRED"));
+		this->fred->Show(showFred);
+
 #if 0
 		this->update = new wxButton(this, ID_UPDATE_BUTTON, _("Update Available"));
 		this->update->Hide();
@@ -64,9 +63,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		sizer->Add(this->update, wxSizerFlags().ReserveSpaceEvenIfHidden());
 		sizer->AddStretchSpacer(1);
 #endif
-		if ( this->fred != NULL ) {
-			sizer->Add(this->fred);
-		}
+		sizer->Add(this->fred, wxSizerFlags().ReserveSpaceEvenIfHidden());
 		sizer->Add(this->play);
 
 		this->SetSizerAndFit(sizer);
@@ -78,6 +75,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		TCManager::RegisterTCChanged(this);
 		TCManager::RegisterTCActiveModChanged(this);
 		TCManager::RegisterTCFredBinaryChanged(this);
+		FREDManager::RegisterFREDEnabledChanged(this);
 		ResolutionMap::RegisterResolutionMapChanged(this);
 		wxCommandEvent nullEvent;
 		this->OnTCChanges(nullEvent);
@@ -88,6 +86,7 @@ EVT_COMMAND(wxID_NONE, EVT_TC_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_ACTIVE_MOD_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_BINARY_CHANGED, BottomButtons::OnTCChanges)
 EVT_COMMAND(wxID_NONE, EVT_TC_FRED_BINARY_CHANGED, BottomButtons::OnTCChanges)
+EVT_COMMAND(wxID_NONE, EVT_FRED_ENABLED_CHANGED, BottomButtons::OnFREDEnabledChanged)
 EVT_COMMAND(wxID_NONE, EVT_RESOLUTION_MAP_CHANGED, BottomButtons::OnTCChanges)
 END_EVENT_TABLE()
 
@@ -135,4 +134,11 @@ void BottomButtons::OnTCChanges(wxCommandEvent &WXUNUSED(event)) {
 		wxLogWarning(_("FRED executable %s does not exist"), FixBinaryName(fredBinary).c_str());
 		this->fred->Disable();
 	}
+}
+
+void BottomButtons::OnFREDEnabledChanged(wxCommandEvent &WXUNUSED(event)) {
+	bool showFred;
+	ProMan::GetProfileManager()->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &showFred, false);
+	
+	this->fred->Show(showFred);
 }

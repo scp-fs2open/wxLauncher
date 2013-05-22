@@ -29,6 +29,7 @@ private:
 
 public:
 	void OnTCChanges(wxCommandEvent &event);
+	void OnFREDEnabledChanged(wxCommandEvent &event);
 
 	DECLARE_EVENT_TABLE()
 
