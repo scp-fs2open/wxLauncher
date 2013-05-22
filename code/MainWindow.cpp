@@ -35,6 +35,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/Logger.h"
 #include "controls/StatusBar.h"
 #include "apis/HelpManager.h"
+#include "apis/FREDManager.h"
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
@@ -61,6 +62,12 @@ MainWindow::MainWindow() {
 	this->SetIcon(SkinSystem::GetSkinSystem()->GetWindowIcon());
 #endif
 
+	// setup keyboard shortcuts
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(wxACCEL_NORMAL, WXK_F3, ID_F3_PRESSED);
+	wxAcceleratorTable accel(1, entries);
+	SetAcceleratorTable(accel);
+	
 	// setup tabs
 
 	this->mainTab = new wxNotebook();
@@ -103,6 +110,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_END_PROCESS(ID_FS2_PROCESS, MainWindow::OnFS2Exited)
 	EVT_END_PROCESS(ID_FRED2_PROCESS, MainWindow::OnFRED2Exited)
 	EVT_COMMAND(wxID_NONE, EVT_TC_SKIN_CHANGED, MainWindow::OnTCSkinChanged)
+	EVT_MENU(ID_F3_PRESSED, MainWindow::OnF3Pressed)
 END_EVENT_TABLE()
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -301,4 +309,15 @@ void MainWindow::OnFRED2Exited(wxProcessEvent &event) {
 void MainWindow::OnTCSkinChanged(wxCommandEvent& event) {
 	this->SetTitle(SkinSystem::GetSkinSystem()->GetWindowTitle());
 	this->SetIcon(SkinSystem::GetSkinSystem()->GetWindowIcon());
+}
+
+void MainWindow::OnF3Pressed(wxCommandEvent& WXUNUSED(event)) {
+	ProMan* proman = ProMan::GetProfileManager();
+	wxCHECK_RET(proman != NULL, _T("OnF3Pressed(): proman is NULL!"));
+	
+	bool fredEnabled;
+	proman->GlobalRead(GBL_CFG_OPT_CONFIG_FRED, &fredEnabled, false);
+
+	proman->GlobalWrite(GBL_CFG_OPT_CONFIG_FRED, !fredEnabled);
+	FREDManager::GenerateFREDEnabledChanged();
 }

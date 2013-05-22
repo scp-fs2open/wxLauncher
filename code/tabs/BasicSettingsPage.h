@@ -75,6 +75,7 @@ public:
 
 	void ProfileChanged(wxCommandEvent& event);
 	void OnFlagFileProcessingStatusChanged(wxCommandEvent& event);
+	void OnFREDEnabledChanged(wxCommandEvent& event);
 	void OnActiveModChanged(wxCommandEvent& event);
 
 private:

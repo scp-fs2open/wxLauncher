@@ -252,6 +252,8 @@ set(API_CODE_FILES
   code/apis/CmdLineManager.cpp
   code/apis/FlagListManager.h
   code/apis/FlagListManager.cpp
+  code/apis/FREDManager.h
+  code/apis/FREDManager.cpp
   code/apis/HelpManager.h
   code/apis/HelpManager.cpp
   code/apis/JoystickManager.h
