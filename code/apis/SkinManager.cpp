@@ -121,12 +121,31 @@ bool Skin::SetModImage(const wxBitmap& modImage) {
 	if (!modImage.IsOk()) {
 		wxLogWarning(_T("Provided mod image is not valid."));
 		return false;
-	} else if ((modImage.GetWidth() != SkinSystem::ModInfoDialogImageWidth) ||
-			   (modImage.GetHeight() != SkinSystem::ModInfoDialogImageHeight)) {
-		wxLogWarning(_T("Provided mod image size %dx%d is not expected size %dx%d."),
+	} else if ((modImage.GetWidth() > SkinSystem::ModInfoDialogImageWidth) ||
+			   (modImage.GetHeight() > SkinSystem::ModInfoDialogImageHeight)) {
+		wxLogDebug(_T("Provided mod image size %dx%d is larger than expected size %dx%d. Resizing."),
 			modImage.GetWidth(), modImage.GetHeight(),
 			SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight);
-		return false;
+		
+		wxImage tempModImage(modImage.ConvertToImage());
+		wxImage scaledTempModImage(
+			tempModImage.Scale(
+				SkinSystem::ModListImageWidth,
+				SkinSystem::ModListImageHeight,
+				wxIMAGE_QUALITY_HIGH));
+		
+		wxBitmap newModImage(scaledTempModImage);
+		wxASSERT(newModImage.GetWidth() == SkinSystem::ModListImageWidth);
+		wxASSERT(newModImage.GetHeight() == SkinSystem::ModListImageHeight);
+		
+		this->modImage = wxBitmap(newModImage);
+		return true;
+	} else if ((modImage.GetWidth() < SkinSystem::ModInfoDialogImageWidth) ||
+			   (modImage.GetHeight() < SkinSystem::ModInfoDialogImageHeight)) {
+		wxLogDebug(_T("Provided mod image size %dx%d is smaller than expected size %dx%d. Using as is."),
+			modImage.GetWidth(), modImage.GetHeight(),
+			SkinSystem::ModInfoDialogImageWidth, SkinSystem::ModInfoDialogImageHeight);
+		return true;
 	} else {
 		this->modImage = modImage;
 		return true;
