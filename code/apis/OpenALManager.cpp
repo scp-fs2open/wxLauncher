@@ -216,7 +216,7 @@ wxArrayString GetAvailableDevices(const ALenum deviceType) {
 			do {
 				len = strlen(devices+offset);
 				if ( len > 0 ) {
-					wxString device(devices+offset, wxConvUTF8);
+					wxString device(devices+offset, *wxConvCurrent);
 					arr.Add(device);
 				}
 				offset += len+1;
@@ -284,7 +284,12 @@ wxString GetSystemDefaultDevice(const ALenum deviceType) {
 					_T("capture ") : wxEmptyString));
 			return wxEmptyString;
 		} else {
-			return wxString(defaultDevice, wxConvUTF8);
+			wxString defaultDeviceStr(defaultDevice, *wxConvCurrent);
+			wxLogDebug(_("System default OpenAL %sdevice: %s"),
+				(deviceType == ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER ?
+					_T("capture ") : wxEmptyString),
+				defaultDeviceStr.c_str());
+			return defaultDeviceStr;
 		}
 	}
 #else
