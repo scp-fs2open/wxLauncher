@@ -1248,7 +1248,13 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	long width = 0, height = 0;
 	
 	const ModItem* activeMod = ModList::GetActiveMod();
-	wxCHECK_RET(activeMod != NULL, _T("SetUpResolution: activeMod is NULL!"));
+	if (activeMod == NULL) {
+		// activeMod is only NULL when there is no FSO root available
+		// thus nothing to show on here either
+		// This would be better handled by not trying to set this combobox up when
+		// it can not possibly be needed.
+		return;
+	}
 	const wxString& shortname(activeMod->shortname);
 	
 	bool hasValidRes = false;
