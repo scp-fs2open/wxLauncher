@@ -179,7 +179,16 @@ add_custom_target(helpmaker ALL
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp)
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${helphtblocation})
 file(GLOB_RECURSE helpmaker_temp_files ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker/*.*)
-set_source_files_properties(${helphtblocation} ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp PROPERTIES GENERATED true EXTERNAL_OBJECT true)
+
+# Call out the files that are built a part of the build
+# The HTBs do not need to be run through a complier
+set_source_files_properties(
+	${helphtblocation}
+	PROPERTIES GENERATED true EXTERNAL_OBJECT true)
+set_source_files_properties(
+	${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp
+	PROPERTIES GENERATED true)
 
 set(TAB_CODE_FILES
   code/tabs/AdvSettingsPage.h
