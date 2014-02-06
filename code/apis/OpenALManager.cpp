@@ -335,12 +335,12 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	alcOpenDeviceType OpenDevice = 
 		GetOALFuncPtr(alcOpenDeviceType,alcOpenDevice);
-	if ( OpenDevice == NULL || checkForALError() == false) {
-		return _("Unable to open device");
+	if ( OpenDevice == NULL) {
+		return _("Unable to get open device function");
 	}
 
 	ALCdevice* device = (*OpenDevice)(selectedDevice.char_str());
-	if ( device == NULL || checkForALError() == false ) {
+	if ( device == NULL) {
 		wxLogError(_T("alcOpenDevice returned NULL for selected device '%s'"),
 			selectedDevice.c_str());
 		return _("Error opening device");
@@ -348,20 +348,20 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	alcCreateContextType CreateContext =
 		GetOALFuncPtr(alcCreateContextType,alcCreateContext);
-	if ( CreateContext == NULL || checkForALError() == false ) {
-		return _("Unable to open context on device");
+	if ( CreateContext == NULL) {
+		return _("Unable to get open context on device function");
 	}
 
 	ALCint attributes = 0;
 	ALCcontext* context = (*CreateContext)(device,NULL);
-	if ( context == NULL || checkForALError() == false) {
+	if ( context == NULL) {
 		return _("Error in opening context");
 	}
 
 	alcMakeContextCurrentType MakeContextCurrent =
 		GetOALFuncPtr(alcMakeContextCurrentType,alcMakeContextCurrent);
-	if ( MakeContextCurrent == NULL || checkForALError() == false) {
-		return _("Unable to set context as current");
+	if ( MakeContextCurrent == NULL) {
+		return _("Unable to get the set context as current function");
 	}
 
 	if ( (*MakeContextCurrent)(context) != ALC_TRUE || checkForALError() == false ) {
@@ -386,9 +386,6 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	(*DestroyContext)(context);
 	context = NULL;
-	if ( checkForALError() == false ) {
-		return _("Error in destroying context");
-	}
 
 	alcCloseDeviceType CloseDevice =
 		GetOALFuncPtr(alcCloseDeviceType,alcCloseDevice);
@@ -397,9 +394,6 @@ wxString OpenALMan::GetCurrentVersion() {
 	}
 
 	(*CloseDevice)(device);
-	if ( checkForALError() == false ) {
-		return _("Error in closing device");
-	}
 
 	return wxString::Format(_("Detected OpenAL version: %s"), Version.c_str());
 #else
@@ -425,14 +419,14 @@ bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 	alcOpenDeviceType OpenDevice = 
 		GetOALFuncPtr(alcOpenDeviceType, alcOpenDevice);
 
-	if (OpenDevice == NULL || checkForALError() == false) {
+	if (OpenDevice == NULL) {
 		wxLogError(_T("IsEFXSupported: Unable to open device."));
 		return false;
 	}
 
 	ALCdevice* playbackDevice = (*OpenDevice)(playbackDeviceName.char_str());
 	
-	if (playbackDevice == NULL || checkForALError() == false) {
+	if (playbackDevice == NULL) {
 		wxLogError(
 			_T("IsEFXSupported: alcOpenDevice returned NULL when opening device '%s'"),
 			playbackDeviceName.c_str());
@@ -442,18 +436,13 @@ bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 	alcIsExtensionPresentType isExtensionPresent =
 		GetOALFuncPtr(alcIsExtensionPresentType, alcIsExtensionPresent);
 	
-	if (isExtensionPresent == NULL || checkForALError() == false) {
+	if (isExtensionPresent == NULL) {
 		wxLogError(
 			_T("IsEFXSupported: Could not get alcIsExtensionPresent function."));
 		return false;
 	}
 	
 	bool hasEFX = (*isExtensionPresent)(playbackDevice, "ALC_EXT_EFX") == AL_TRUE;
-	
-	if (checkForALError() == false) {
-		wxLogError(_T("IsEFXSupported: Error in checking for EFX extension"));
-		return false;
-	}
 
 	alcCloseDeviceType CloseDevice =
 		GetOALFuncPtr(alcCloseDeviceType, alcCloseDevice);
@@ -464,11 +453,6 @@ bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 	}
 
 	(*CloseDevice)(playbackDevice);
-	
-	if (checkForALError() == false) {
-		wxLogError(_T("IsEFXSupported: Error in closing device"));
-		return false;
-	}
 
 	return hasEFX;
 #else
