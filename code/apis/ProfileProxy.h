@@ -20,6 +20,7 @@
 #define PROFILEPROXY_H
 
 #include <wx/wx.h>
+#include <wx/event.h>
 
 #include "datastructures/FlagFileData.h"
 
