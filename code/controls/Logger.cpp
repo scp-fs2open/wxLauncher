@@ -68,8 +68,14 @@ Logger::~Logger() {
 }
 
 /** Overridden as per wxWidgets docs to implement a wxLog. */
-void Logger::DoLog(wxLogLevel level, const wxChar *msg, time_t time) {
-	wxString timestr = wxDateTime(time).Format(_T("%y%j%H%M%S"), wxDateTime::GMT0);
+void Logger::DoLogRecord(
+	wxLogLevel level,
+	const wxString& msg,
+	const wxLogRecordInfo& info)
+{
+	wxString timestr = wxDateTime(info.timestamp).Format(
+		_T("%y%j%H%M%S"),
+		wxDateTime::GMT0);
 	wxString str = wxString::Format(
     _T("%s:%s:"), timestr.c_str(), levels[level].c_str());
 	wxString buf(msg);

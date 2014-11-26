@@ -30,7 +30,10 @@ public:
 
 	void SetStatusBarTarget(StatusBar *bar);
 
-	virtual void DoLog(wxLogLevel level, const wxChar *msg, time_t time);
+	virtual void DoLogRecord(
+		wxLogLevel level,
+		const wxString& msg,
+		const wxLogRecordInfo& info);
 	
 	virtual void Flush();
 private:
