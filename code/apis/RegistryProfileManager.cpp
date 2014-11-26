@@ -146,7 +146,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_VIDEO_RESOLUTION_DEPTH,
 		0,
 		REG_SZ,
-		(BYTE*)videocardValue.c_str(),
+		(BYTE*)videocardValue.wc_str(),
 		(videocardValue.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -179,7 +179,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_VIDEO_ANISOTROPIC,
 		0,
 		REG_SZ,
-		(BYTE*)oglAnisotropicFilter.c_str(),
+		(BYTE*)oglAnisotropicFilter.wc_str(),
 		(oglAnisotropicFilter.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -206,7 +206,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_AUDIO_OPENAL_DEVICE,
 		0,
 		REG_SZ,
-		(BYTE*)soundDevice.c_str(),
+		(BYTE*)soundDevice.wc_str(),
 		(soundDevice.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -237,7 +237,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE,
 		0,
 		REG_SZ,
-		(BYTE*)playbackDevice.c_str(),
+		(BYTE*)playbackDevice.wc_str(),
 		(playbackDevice.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -254,7 +254,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE,
 			0,
 			REG_SZ,
-			(BYTE*)captureDevice.c_str(),
+			(BYTE*)captureDevice.wc_str(),
 			(captureDevice.size() + 1)*2);
 		ReturnChecker(ret, __LINE__);
 	}
@@ -418,7 +418,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_NETWORK_TYPE,
 		0,
 		REG_SZ,
-		(BYTE*)networkConnectionValue.c_str(),
+		(BYTE*)networkConnectionValue.wc_str(),
 		(networkConnectionValue.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -431,7 +431,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		REG_KEY_NETWORK_SPEED,
 		0,
 		REG_SZ,
-		(BYTE*)connectionSpeedValue.c_str(),
+		(BYTE*)connectionSpeedValue.wc_str(),
 		(connectionSpeedValue.size() + 1)*2);
 	ReturnChecker(ret, __LINE__);
 
@@ -484,7 +484,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			REG_KEY_NETWORK_IP,
 			0,
 			REG_SZ,
-			(BYTE*)networkIP.c_str(),
+			(BYTE*)networkIP.wc_str(),
 			(networkIP.size()+1)*2);
 		ReturnChecker(ret, __LINE__);
 	} else {
