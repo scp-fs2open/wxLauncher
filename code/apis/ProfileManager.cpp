@@ -308,8 +308,8 @@ void ProMan::LoadNewsMapFromGlobalProfile() {
 	while (groupKeepGoing) {
 		globalProfile->SetPath(groupName);
 		
-		if (globalProfile->Read(GBL_CFG_NET_THE_NEWS, theNews) &&
-			(globalProfile->Read(GBL_CFG_NET_NEWS_LAST_TIME, lastDownloadNewsStr))) {
+		if (globalProfile->Read(GBL_CFG_NET_THE_NEWS, &theNews) &&
+			(globalProfile->Read(GBL_CFG_NET_NEWS_LAST_TIME, &lastDownloadNewsStr))) {
 			if ((!theNews.IsEmpty()) &&
 				(NULL != lastDownloadNews.ParseFormat(
 					lastDownloadNewsStr, NEWS_LAST_TIME_FORMAT))) {
