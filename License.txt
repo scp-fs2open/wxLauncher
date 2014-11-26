@@ -23,7 +23,7 @@ THQ (Volition, Inc's current owner) and/or the
 Freespace 2 Source Code Project (SCP). **
 
 All source in the libraries folder is licensed under
-its repective license which is indicated by a License.txt
+its respective license which is indicated by a License.txt
 in its source folder and/or a header in the code file.
 
 The wxLauncher Team.
