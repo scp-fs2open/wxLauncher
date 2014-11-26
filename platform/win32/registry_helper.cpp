@@ -8,8 +8,8 @@
 #include <wx/wfstream.h>
 
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
-	{wxCMD_LINE_PARAM, NULL, NULL, _T("<operation>"), wxCMD_LINE_VAL_STRING, 0},
-	{wxCMD_LINE_PARAM, NULL, NULL, _T("<file>"), wxCMD_LINE_VAL_STRING, 0},
+	{wxCMD_LINE_PARAM, NULL, NULL, wxT_2("<operation>"), wxCMD_LINE_VAL_STRING, 0},
+	{wxCMD_LINE_PARAM, NULL, NULL, wxT_2("<file>"), wxCMD_LINE_VAL_STRING, 0},
 	{wxCMD_LINE_NONE},
 };
 
