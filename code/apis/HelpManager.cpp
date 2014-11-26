@@ -59,7 +59,7 @@ bool HelpManager::Initialize() {
 	if ( file.FileExists() ) {
 		controller->AddBook(file, false);
 	} else {
-		::wxLogWarning(_T("Unable to find help file %s"), file.GetFullName().c_str());
+		wxLogWarning(_T("Unable to find help file %s"), file.GetFullName().c_str());
 		delete controller;
 		controller = NULL;
 		return false;
@@ -93,7 +93,7 @@ void HelpManager::OpenHelpById(WindowIDS id) {
 			return;
 		}
 	}
-	::wxLogInfo(_T(" ID %d does not have more specific help"), id);
+	wxLogInfo(_(" ID %d does not have more specific help"), id);
 }
 
 void HelpManager::OpenMainHelpPage() {
