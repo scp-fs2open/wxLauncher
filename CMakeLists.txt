@@ -2,13 +2,16 @@
 # arbitrarily following http://techbase.kde.org/Policies/CMake_Coding_Style#Upper.2Flower_casing
 
 cmake_minimum_required(VERSION 2.8)
+# Continue to support compatiable interface for _DEBUG on targets
+# see: http://www.cmake.org/cmake/help/v3.0/policy/CMP0043.html
+cmake_policy(SET CMP0043 OLD)
 
 # We don't use C but CMake on linux complains if we don't have it enabled
 project(wxlauncher CXX C) 
 
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 9)
-set(VERSION_PATCH 4)
+set(VERSION_MINOR 10)
+set(VERSION_PATCH 0)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/include")
 
@@ -25,7 +28,11 @@ if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
 endif()
 
 find_package(wxWidgets 2.8.10
-  REQUIRED base core net xml html adv qa richtext)
+  COMPONENTS base core net xml html adv qa richtext)
+if(NOT wxWidgets_FOUND)
+  find_package(wxWidgets 3.0.2
+    COMPONENTS base core net xml html adv qa richtext)
+endif()
   
 if(NOT PYTHON_EXECUTABLE)
   # Only try to find python iff not already given
@@ -52,6 +59,7 @@ endif(onlinehelpmaker_debug)
 # version of the CRT, the one that is being distrubuted in the installer
 if(IS_WIN32)
   add_definitions("/D_BIND_TO_CURRENT_CRT_VERSION=1")
+  add_definitions("/D_CRT_SECURE_NO_WARNINGS")
 endif(IS_WIN32)
 
 set(helphtblocation ${CMAKE_CURRENT_BINARY_DIR}/generated/onlinehelp.htb)
