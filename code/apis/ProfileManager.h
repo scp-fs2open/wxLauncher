@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define PROFILEMANAGER_H
 
 #include <wx/wx.h>
+#include <wx/event.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 
