@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 
 #if USE_OPENAL
-#include <al.h>
-#include <alc.h>
+#include <al/al.h>
+#include <al/alc.h>
 #endif
 
 #include "global/MemoryDebugging.h"
