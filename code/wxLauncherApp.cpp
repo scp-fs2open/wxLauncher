@@ -50,18 +50,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 IMPLEMENT_APP(wxLauncher);
 
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
-	{wxCMD_LINE_SWITCH, NULL, _T("session-only"),
-	_T("Do not remember the profile that is selected at exit")},
-	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
-	_T("Add profile PROFILE from FILE. If PROFILE already exists ")
-	_T("it will not be overwritten. *Operator*")},
-	{wxCMD_LINE_SWITCH, NULL, _T("select-profile"),
-	_T("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
-	{wxCMD_LINE_OPTION, NULL, _T("profile"),
-	_T("The name of a profile to operate on. Operand PROFILE."),
+	{wxCMD_LINE_SWITCH, NULL, wxT_2("session-only"),
+	_("Do not remember the profile that is selected at exit")},
+	{wxCMD_LINE_SWITCH, NULL, wxT_2("add-profile"),
+	_("Add profile PROFILE from FILE. If PROFILE already exists"
+	" it will not be overwritten. *Operator*")},
+	{wxCMD_LINE_SWITCH, NULL, wxT_2("select-profile"),
+	_("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
+	{wxCMD_LINE_OPTION, NULL, wxT_2("profile"),
+	_("The name of a profile to operate on. Operand PROFILE."),
 	wxCMD_LINE_VAL_STRING, 0},
-	{wxCMD_LINE_OPTION, NULL, _T("file"),
-	_T("The path to a file to operate on. Operand FILE."),
+	{wxCMD_LINE_OPTION, NULL, wxT_2("file"),
+	_("The path to a file to operate on. Operand FILE."),
 	wxCMD_LINE_VAL_STRING, 0},
 	{wxCMD_LINE_NONE},
 };
@@ -79,31 +79,31 @@ bool wxLauncher::OnCmdLineParsed(wxCmdLineParser& parser)
 	if (!wxApp::OnCmdLineParsed(parser))
 		return false;
 
-	if (parser.Found(_T("session-only")))
+	if (parser.Found(wxT_2("session-only")))
 	{
 		mKeepForSessionOnly = true;
 	}
 	
-	if (parser.Found(_T("add-profile")))
+	if (parser.Found(wxT_2("add-profile")))
 	{
 		mProfileOperator = ProManOperator::add;
-		if (!parser.Found(_T("profile"), &mProfileOperand))
+		if (!parser.Found(wxT_2("profile"), &mProfileOperand))
 		{
-			wxLogError(_T("No profile specified to add"));
+			wxLogError(_("No profile specified to add"));
 			return false;
 		}
-		if (!parser.Found(_T("file"), &mFileOperand))
+		if (!parser.Found(wxT_2("file"), &mFileOperand))
 		{
-			wxLogError(_T("No file specified to add as profile"));
+			wxLogError(_("No file specified to add as profile"));
 			return false;
 		}
 	}
-	else if(parser.Found(_T("select-profile")))
+	else if(parser.Found(wxT_2("select-profile")))
 	{
 		mProfileOperator = ProManOperator::select;
-		if (!parser.Found(_T("profile"), &mProfileOperand))
+		if (!parser.Found(wxT_2("profile"), &mProfileOperand))
 		{
-			wxLogError(_T("No profile specified to select"));
+			wxLogError(_("No profile specified to select"));
 			return false;
 		}
 	}
@@ -130,7 +130,7 @@ bool displaySplash(wxSplashScreen **splashWindow)
 {
 	wxBitmap splash;
 	// splash image location is fixed so that it's known at compile time
-	wxFileName splashFile(_T(RESOURCES_PATH), _T("wxL_Splash.png"));
+	wxFileName splashFile(wxT_2(RESOURCES_PATH), wxT_2("wxL_Splash.png"));
 	if (splash.LoadFile(splashFile.GetFullPath(), wxBITMAP_TYPE_ANY)) {
 #if NDEBUG
 		(*splashWindow) = new wxSplashScreen(splash, wxSPLASH_CENTRE_ON_SCREEN, 0, NULL, wxID_ANY);
@@ -140,10 +140,10 @@ bool displaySplash(wxSplashScreen **splashWindow)
 		wxYield();
 	} else {
 		wxFileName expectedDir;
-		if (wxFileName(_T(RESOURCES_PATH)).IsAbsolute()) {
-			expectedDir = wxFileName(_T(RESOURCES_PATH));
+		if (wxFileName(wxT_2(RESOURCES_PATH)).IsAbsolute()) {
+			expectedDir = wxFileName(wxT_2(RESOURCES_PATH));
 		} else {
-			expectedDir = wxFileName(::wxGetCwd(), _T(RESOURCES_PATH));	
+			expectedDir = wxFileName(::wxGetCwd(), wxT_2(RESOURCES_PATH));	
 		}
 		wxLogFatalError(wxString::Format(
 			_T("Unable to load splash image. ")
