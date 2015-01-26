@@ -31,28 +31,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ////// Logger
 const wxString levels[] = {
-	_T("FATAL"),
-	_T("ERROR"),
-	_T("WARN "),
-	_T("MSG  "),
-	_T("STSBR"),
-	_T("INFO "),
-	_T("DEBUG"),
+	wxT_2("FATAL"),
+	wxT_2("ERROR"),
+	wxT_2("WARN "),
+	wxT_2("MSG  "),
+	wxT_2("STSBR"),
+	wxT_2("INFO "),
+	wxT_2("DEBUG"),
 };
 /** Constructor. */
 Logger::Logger() {
-	wxFileName outFileName(wxStandardPaths::Get().GetUserDataDir(), _T("wxLauncher.log"));
+	wxFileName outFileName(wxStandardPaths::Get().GetUserDataDir(), wxT_2("wxLauncher.log"));
 	if (!outFileName.DirExists() && 
 		!wxFileName::Mkdir(outFileName.GetPath(), 0700, wxPATH_MKDIR_FULL) ) {
-			wxLogFatalError(_T("Unable to create folder to place log in. (%s)"), outFileName.GetPath().c_str());
+			wxLogFatalError(_("Unable to create folder to place log in. (%s)"), outFileName.GetPath().c_str());
 	}
 
-	this->outFile = new wxFFile(outFileName.GetFullPath(), _T("wb"));
+	this->outFile = new wxFFile(outFileName.GetFullPath(), wxT_2("wb"));
 	if (!outFile->IsOpened()) {
-		wxLogFatalError(_T("Unable to open log output file. (%s)"), outFileName.GetFullPath().c_str());
+		wxLogFatalError(_("Unable to open log output file. (%s)"), outFileName.GetFullPath().c_str());
 	}
 	this->out = new wxFFileOutputStream(*outFile);
-	wxASSERT_MSG(out->IsOk(), _T("Log output file is not valid!"));
+	wxASSERT_MSG(out->IsOk(), wxT_2("Log output file is not valid!"));
 	this->out->Write("\357\273\277", 3);
 
 	this->statusBar = NULL;
@@ -68,16 +68,28 @@ Logger::~Logger() {
 }
 
 /** Overridden as per wxWidgets docs to implement a wxLog. */
+/* Compatiblity with 2.8.x */
+#if wxVERSION_NUMBER > 20899
 void Logger::DoLogRecord(
 	wxLogLevel level,
 	const wxString& msg,
 	const wxLogRecordInfo& info)
 {
 	wxString timestr = wxDateTime(info.timestamp).Format(
-		_T("%y%j%H%M%S"),
+		wxT_2("%y%j%H%M%S"),
 		wxDateTime::GMT0);
+#else
+void Logger::DoLog(
+		wxLogLevel level,
+		const wxChar *msg,
+		time_t time)
+{
+	wxString timestr = wxDateTime(time).Format(
+		wxT_2("%y%j%H%M%S"),
+		wxDateTime::GMT0);
+#endif
 	wxString str = wxString::Format(
-    _T("%s:%s:"), timestr.c_str(), levels[level].c_str());
+    wxT_2("%s:%s:"), timestr.c_str(), levels[level].c_str());
 	wxString buf(msg);
 	out->Write(str.mb_str(wxConvUTF8), str.size());
 	out->Write(buf.mb_str(wxConvUTF8), buf.size());
