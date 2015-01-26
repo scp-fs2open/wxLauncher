@@ -43,6 +43,10 @@ struct ResolutionData {
 	long height;
 };
 
+WX_DECLARE_STRING_HASH_MAP(
+	ResolutionData,
+	PreferredResolutionMap);
+
 class ResolutionMap {
 public:
 	static const ResolutionData* ResolutionRead(const wxString& shortname);
