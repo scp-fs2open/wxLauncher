@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/dir.h>
 
 #include "generated/configure_launcher.h"
+#include "apis/EventHandlers.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
 #include "wxLauncherApp.h"

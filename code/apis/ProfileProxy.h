@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012 wxLauncher Team
+ Copyright (C) 2012-2015 wxLauncher Team
  
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -22,10 +22,11 @@
 #include <wx/wx.h>
 #include <wx/event.h>
 
-#include "datastructures/FlagFileData.h"
-
 #include <map>
 #include <vector>
+
+#include "datastructures/FlagFileData.h"
+#include "apis/EventHandlers.h"
 
 /* ProfileProxy - a high-level API for the data in the current profile.
    Other classes should use the ProfileProxy instead of the ProfileManager
@@ -37,8 +38,6 @@ DECLARE_EVENT_TYPE(EVT_PROXY_RESET, wxID_ANY);
 /** Indicates the proxy has successfully processed flag data from the flag file
  and profile. */
 DECLARE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, ProxyEventHandlers);
 
 WX_DECLARE_STRING_HASH_MAP(int, FlagStringToIndexMap);
 
@@ -104,8 +103,8 @@ private:
 	static ProfileProxy* proxy;
 	ProfileProxy();
 	
-	ProxyEventHandlers resetEventHandlers;
-	ProxyEventHandlers readyEventHandlers;
+	EventHandlers resetEventHandlers;
+	EventHandlers readyEventHandlers;
 
 	void GenerateProxyReset();
 	void GenerateProxyFlagDataReady();

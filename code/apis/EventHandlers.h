@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2009-2013 wxLauncher Team
+ Copyright (C) 2015 wxLauncher Team
  
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -16,27 +16,12 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/** Manages the status of whether FRED launching is enabled. */
+#ifndef APIS_EVENTHANDLER_H
+#define APIS_EVENTHANDLER_H
 
-#ifndef FRED_MANAGER_H
-#define FRED_MANAGER_H
-
+#include <wx/wx.h>
 #include <wx/event.h>
 
-#include "apis/EventHandlers.h"
-
-/** FRED enabled status has changed. */
-DECLARE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED, wxID_ANY);
-
-class FREDManager {
-public:
-	static void RegisterFREDEnabledChanged(wxEvtHandler *handler);
-	static void UnRegisterFREDEnabledChanged(wxEvtHandler *handler);
-	static void GenerateFREDEnabledChanged();
-private:
-	FREDManager(); // prevents instantiation
-	
-	static EventHandlers FREDEnabledChangedHandlers;
-};
+WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
 
 #endif

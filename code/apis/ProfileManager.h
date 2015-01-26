@@ -24,8 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/fileconf.h>
 #include <wx/filename.h>
 
+#include "apis/EventHandlers.h"
+
 WX_DECLARE_STRING_HASH_MAP( wxFileConfig*, ProfileMap );
-WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
 
 /** event is generated anytime the number of profiles in the manager change. */
 DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE, -1);

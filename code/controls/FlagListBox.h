@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/vlbox.h>
 
+#include "apis/EventHandlers.h"
 #include "apis/FlagListManager.h"
 
 class FlagListCheckBox: public wxCheckBox {
@@ -64,8 +65,6 @@ WX_DECLARE_LIST(FlagListCheckBoxItem, FlagListCheckBoxItems);
 /** Flag list box is ready for use. */
 DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY, wxID_ANY);
 
-WX_DECLARE_LIST(wxEvtHandler, FlagListBoxReadyEventHandlers);
-
 class FlagListBox: public wxVListBox {
 public:
 	FlagListBox(wxWindow* parent);
@@ -98,7 +97,7 @@ public:
 	bool FlagsLoaded() const { return this->flagsLoaded; }
 
 private:
-	FlagListBoxReadyEventHandlers flagListBoxReadyHandlers;
+	EventHandlers flagListBoxReadyHandlers;
 	void GenerateFlagListBoxReady();
 	bool isReadyEventGenerated;
 	bool isReady;

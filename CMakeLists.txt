@@ -134,6 +134,8 @@ if(IS_WIN32) # helper is only needed on windows
     code/apis/PlatformProfileManagerShared.cpp
     code/apis/CmdLineManager.h
     code/apis/CmdLineManager.cpp
+    code/apis/EventHandlers.h
+    code/apis/EventHandlers.cpp
     code/apis/FlagListManager.h
     code/apis/FlagListManager.cpp
     code/apis/ProfileManager.h
@@ -267,6 +269,8 @@ source_group("Data Structures" FILES ${DATASTRUCTURE_CODE_FILES})
 set(API_CODE_FILES
   code/apis/CmdLineManager.h
   code/apis/CmdLineManager.cpp
+  code/apis/EventHandlers.h
+  code/apis/EventHandlers.cpp
   code/apis/FlagListManager.h
   code/apis/FlagListManager.cpp
   code/apis/FREDManager.h

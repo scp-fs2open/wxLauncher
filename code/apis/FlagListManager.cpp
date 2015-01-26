@@ -32,13 +32,10 @@
 
 DEFINE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
 
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(FlagFileProcessingEventHandlers);
-
 #include <wx/arrimpl.cpp> // Magic Incantation
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
-FlagFileProcessingEventHandlers FlagListManager::ffProcessingStatusChangedHandlers;
+EventHandlers FlagListManager::ffProcessingStatusChangedHandlers;
 
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
 	wxASSERT(FlagListManager::IsInitialized());
@@ -65,7 +62,7 @@ void FlagListManager::GenerateFlagFileProcessingStatusChanged(const FlagFileProc
 	event.SetInt(status);
 
 	wxLogDebug(_T("Generating EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED event"));
-	for (FlagFileProcessingEventHandlers::iterator
+	for (EventHandlers::iterator
 		 iter = FlagListManager::ffProcessingStatusChangedHandlers.begin(),
 		 end = FlagListManager::ffProcessingStatusChangedHandlers.end();
 		 iter != end; ++iter) {
@@ -89,7 +86,7 @@ void FlagListManager::DeInitialize() {
 	
 	if (!FlagListManager::ffProcessingStatusChangedHandlers.IsEmpty()) {
 		wxLogDebug(_T("FlagListManager::DeInitialize(): contents of handler list:"));
-		for (FlagFileProcessingEventHandlers::const_iterator
+		for (EventHandlers::const_iterator
 			 iter = FlagListManager::ffProcessingStatusChangedHandlers.begin(),
 			 end = FlagListManager::ffProcessingStatusChangedHandlers.end();
 			 iter != end; ++iter) {

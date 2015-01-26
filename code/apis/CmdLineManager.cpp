@@ -22,14 +22,11 @@
  CmdLineManager is used to notify controls that have registered with it
  that the command line or custom flags have changed. */
 
-CmdLineEventHandlers CmdLineManager::CmdLineChangedHandlers;
-CmdLineEventHandlers CmdLineManager::CustomFlagsChangedHandlers;
+EventHandlers CmdLineManager::CmdLineChangedHandlers;
+EventHandlers CmdLineManager::CustomFlagsChangedHandlers;
 
 DEFINE_EVENT_TYPE(EVT_CMD_LINE_CHANGED);
 DEFINE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED);
-
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(CmdLineEventHandlers);
 
 void CmdLineManager::RegisterCmdLineChanged(wxEvtHandler *handler) {
 	wxASSERT_MSG(CmdLineChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
@@ -63,7 +60,7 @@ void CmdLineManager::UnRegisterCustomFlagsChanged(wxEvtHandler *handler) {
 void CmdLineManager::GenerateCmdLineChanged() {
 	wxCommandEvent event(EVT_CMD_LINE_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_CMD_LINE_CHANGED event"));
-	for (CmdLineEventHandlers::iterator iter = CmdLineChangedHandlers.begin(),
+	for (EventHandlers::iterator iter = CmdLineChangedHandlers.begin(),
 		 end = CmdLineChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
@@ -74,7 +71,7 @@ void CmdLineManager::GenerateCmdLineChanged() {
 void CmdLineManager::GenerateCustomFlagsChanged() {
 	wxCommandEvent event(EVT_CUSTOM_FLAGS_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_CUSTOM_FLAGS_CHANGED event"));
-	for (CmdLineEventHandlers::iterator iter = CustomFlagsChangedHandlers.begin(),
+	for (EventHandlers::iterator iter = CustomFlagsChangedHandlers.begin(),
 		 end = CustomFlagsChangedHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);

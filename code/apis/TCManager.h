@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/clntdata.h>
 #include <wx/filename.h>
 
+#include "apis/EventHandlers.h"
+
 /** Selected TC has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_CHANGED, wxID_ANY);
 /** Selected binary has changed. */
@@ -31,8 +33,6 @@ DECLARE_EVENT_TYPE(EVT_TC_BINARY_CHANGED, wxID_ANY);
 DECLARE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED, wxID_ANY);
 /** Selected FRED binary has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, TCEventHandlers);
 
 class TCManager: public wxEvtHandler {
 public:
@@ -63,7 +63,7 @@ public:
 	static void GenerateTCActiveModChanged();
 	static void GenerateTCFredBinaryChanged();
 private:
-	static TCEventHandlers TCChangedHandlers,
+	static EventHandlers TCChangedHandlers,
 		TCBinaryChangedHandlers,
 		TCActiveModChangedHandlers,
 		TCFredBinaryChangedHandlers;

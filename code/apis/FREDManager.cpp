@@ -22,10 +22,7 @@
 
 DEFINE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED);
 
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(FREDEnabledEventHandlers);
-
-FREDEnabledEventHandlers FREDManager::FREDEnabledChangedHandlers;
+EventHandlers FREDManager::FREDEnabledChangedHandlers;
 
 void FREDManager::RegisterFREDEnabledChanged(wxEvtHandler *handler) {
 	wxASSERT_MSG(FREDEnabledChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
@@ -44,7 +41,7 @@ void FREDManager::UnRegisterFREDEnabledChanged(wxEvtHandler *handler) {
 void FREDManager::GenerateFREDEnabledChanged() {
 	wxCommandEvent event(EVT_FRED_ENABLED_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_FRED_ENABLED_CHANGED event"));
-	FREDEnabledEventHandlers::iterator iter = FREDEnabledChangedHandlers.begin();
+	EventHandlers::iterator iter = FREDEnabledChangedHandlers.begin();
 	while (iter != FREDEnabledChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
