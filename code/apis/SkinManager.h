@@ -22,12 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 
+#include "apis/EventHandlers.h"
 #include "datastructures/NewsSource.h"
 
 /** TC skin has changed. */
 DECLARE_EVENT_TYPE(EVT_TC_SKIN_CHANGED, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, TCSkinEventHandlers);
 
 /** Holds a skin's information.  */
 /** The Set() functions return true on success, false otherwise. */
@@ -179,7 +178,7 @@ private:
 	SkinSystem();
 	static SkinSystem* skinSystem;
 	
-	static TCSkinEventHandlers TCSkinChangedHandlers;
+	static EventHandlers TCSkinChangedHandlers;
 	
 	static void GenerateTCSkinChanged();
 	

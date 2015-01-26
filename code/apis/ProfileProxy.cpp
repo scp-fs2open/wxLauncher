@@ -31,9 +31,6 @@
 DEFINE_EVENT_TYPE(EVT_PROXY_RESET);
 DEFINE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY);
 
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(ProxyEventHandlers);
-
 void ProfileProxy::RegisterProxyReset(wxEvtHandler *handler) {
 	wxASSERT(ProfileProxy::IsInitialized());
 	wxASSERT_MSG(this->resetEventHandlers.IndexOf(handler) == wxNOT_FOUND,
@@ -76,7 +73,7 @@ void ProfileProxy::GenerateProxyReset() {
 	wxCommandEvent event(EVT_PROXY_RESET, wxID_NONE);
 	
 	wxLogDebug(_T("Generating EVT_PROXY_RESET event"));
-	for (ProxyEventHandlers::iterator
+	for (EventHandlers::iterator
 		 iter = this->resetEventHandlers.begin(),
 		 end = this->resetEventHandlers.end();
 		 iter != end; ++iter) {
@@ -92,7 +89,7 @@ void ProfileProxy::GenerateProxyFlagDataReady() {
 	wxCommandEvent event(EVT_PROXY_FLAG_DATA_READY, wxID_NONE);
 	
 	wxLogDebug(_T("Generating EVT_PROXY_FLAG_DATA_READY event"));
-	for (ProxyEventHandlers::iterator
+	for (EventHandlers::iterator
 		 iter = this->readyEventHandlers.begin(),
 		 end = this->readyEventHandlers.end();
 		 iter != end; ++iter) {

@@ -21,12 +21,12 @@
 
 #include <wx/wx.h>
 
+#include "apis/EventHandlers.h"
+
 /** Command line has changed. */
 DECLARE_EVENT_TYPE(EVT_CMD_LINE_CHANGED, wxID_ANY);
 /** Custom flags have changed. */
 DECLARE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, CmdLineEventHandlers);
 
 class CmdLineManager {
 private:
@@ -41,7 +41,7 @@ public:
 	static void GenerateCmdLineChanged();
 	static void GenerateCustomFlagsChanged();
 private:
-	static CmdLineEventHandlers CmdLineChangedHandlers;
-	static CmdLineEventHandlers CustomFlagsChangedHandlers;
+	static EventHandlers CmdLineChangedHandlers;
+	static EventHandlers CustomFlagsChangedHandlers;
 };
 #endif

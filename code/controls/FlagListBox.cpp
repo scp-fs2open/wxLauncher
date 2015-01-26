@@ -68,9 +68,6 @@ WX_DEFINE_LIST(FlagListCheckBoxItems);
 
 DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
 
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(FlagListBoxReadyEventHandlers);
-
 void FlagListBox::RegisterFlagListBoxReady(wxEvtHandler *handler) {
 	wxASSERT_MSG(flagListBoxReadyHandlers.IndexOf(handler) == wxNOT_FOUND,
 		wxString::Format(
@@ -95,7 +92,7 @@ void FlagListBox::GenerateFlagListBoxReady() {
 	wxCommandEvent event(EVT_FLAG_LIST_BOX_READY, wxID_NONE);
 	
 	wxLogDebug(_T("Generating EVT_FLAG_LIST_BOX_READY event"));
-	for (FlagListBoxReadyEventHandlers::iterator
+	for (EventHandlers::iterator
 		 iter = this->flagListBoxReadyHandlers.begin(),
 		 end = this->flagListBoxReadyHandlers.end(); iter != end; ++iter) {
 		wxEvtHandler* current = *iter;

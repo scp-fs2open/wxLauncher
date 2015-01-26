@@ -24,12 +24,11 @@
 #include <wx/process.h>
 
 #include "datastructures/FlagFileData.h"
+#include "apis/EventHandlers.h"
 
 /** Flag file processing status has changed.
  The event's int value indicates the FlagFileProcessingStatus. */
 DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, FlagFileProcessingEventHandlers);
 
 WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 
@@ -82,7 +81,7 @@ private:
 	
 	static FlagListManager* flagListManager;
 	
-	static FlagFileProcessingEventHandlers ffProcessingStatusChangedHandlers;
+	static EventHandlers ffProcessingStatusChangedHandlers;
 	
 	static void GenerateFlagFileProcessingStatusChanged(const FlagFileProcessingStatus& status);
 	

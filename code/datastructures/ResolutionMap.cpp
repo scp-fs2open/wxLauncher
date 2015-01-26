@@ -21,17 +21,11 @@
 #include <wx/hashmap.h>
 
 #include "controls/ModList.h"
+#include "apis/EventHandlers.h"
 
 DEFINE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED);
 
-#include <wx/listimpl.cpp> // required magic incatation
-WX_DEFINE_LIST(ResolutionMapEventHandlers);
-
-ResolutionMapEventHandlers ResolutionMap::resolutionMapChangedHandlers;
-
-WX_DECLARE_STRING_HASH_MAP(
-	ResolutionData,
-	PreferredResolutionMap);
+EventHandlers ResolutionMap::resolutionMapChangedHandlers;
 
 PreferredResolutionMap ResolutionMap::prefResMap;
 
@@ -76,7 +70,7 @@ void ResolutionMap::UnRegisterResolutionMapChanged(wxEvtHandler *handler) {
 void ResolutionMap::GenerateResolutionMapChanged() {
 	wxCommandEvent event(EVT_RESOLUTION_MAP_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_RESOLUTION_MAP_CHANGED event"));
-	ResolutionMapEventHandlers::iterator iter = resolutionMapChangedHandlers.begin();
+	EventHandlers::iterator iter = resolutionMapChangedHandlers.begin();
 	while (iter != resolutionMapChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);

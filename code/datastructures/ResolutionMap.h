@@ -23,6 +23,7 @@
 #include <wx/list.h>
 
 #include "global/ModDefaults.h"
+#include "apis/EventHandlers.h"
 
 /** Maps a mod shortname to its user-preferred resolution. */
 // TODO FIXME: Once the refresh button for the mod list is added,
@@ -30,10 +31,6 @@
 
 /** ResolutionMap has changed. */
 DECLARE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED, wxID_ANY);
-
-WX_DECLARE_LIST(wxEvtHandler, ResolutionMapEventHandlers);
-
-class PreferredResolutionMap; // in .cpp file
 
 struct ResolutionData {
 	ResolutionData() { } // required for wxHashMap, unfortunately
@@ -56,7 +53,7 @@ public:
 	static void UnRegisterResolutionMapChanged(wxEvtHandler *handler);
 private:
 	static void GenerateResolutionMapChanged();
-	static ResolutionMapEventHandlers resolutionMapChangedHandlers;
+	static EventHandlers resolutionMapChangedHandlers;
 	static PreferredResolutionMap prefResMap;
 };
 

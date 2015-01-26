@@ -25,10 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 DEFINE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
 
-#include <wx/listimpl.cpp> // required magic incantation
-WX_DEFINE_LIST(TCSkinEventHandlers);
-
-TCSkinEventHandlers SkinSystem::TCSkinChangedHandlers;
+EventHandlers SkinSystem::TCSkinChangedHandlers;
 
 void SkinSystem::RegisterTCSkinChanged(wxEvtHandler *handler) {
 	wxASSERT(SkinSystem::IsInitialized());
@@ -54,7 +51,7 @@ void SkinSystem::GenerateTCSkinChanged() {
 	wxCommandEvent event(EVT_TC_SKIN_CHANGED, wxID_NONE);
 	
 	wxLogDebug(_T("Generating EVT_TC_SKIN_CHANGED event"));
-	for (TCSkinEventHandlers::iterator
+	for (EventHandlers::iterator
 		 iter = SkinSystem::TCSkinChangedHandlers.begin(),
 		 end = SkinSystem::TCSkinChangedHandlers.end();
 		 iter != end; ++iter) {
@@ -340,7 +337,7 @@ void SkinSystem::DeInitialize() {
 	
 	if (!SkinSystem::TCSkinChangedHandlers.IsEmpty()) {
 		wxLogDebug(_T("SkinSystem::DeInitialize(): contents of handler list:"));
-		for (TCSkinEventHandlers::const_iterator
+		for (EventHandlers::const_iterator
 			 iter = SkinSystem::TCSkinChangedHandlers.begin(),
 			 end = SkinSystem::TCSkinChangedHandlers.end();
 			 iter != end; ++iter) {

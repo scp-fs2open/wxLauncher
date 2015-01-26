@@ -1590,7 +1590,8 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
 			bool resExists = false;
 			for (ResolutionArray::iterator it = resolutions.begin(), end = resolutions.end();
 				it != end; ++it) {
-				if ((*it)->IsSameResolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight)) {
+				Resolution* p = (Resolution*)(*it);
+				if ((p)->IsSameResolution(deviceMode.dmPelsWidth, deviceMode.dmPelsHeight)) {
 					resExists = true;
 					break; // no need to keep looking
 				}
@@ -1632,7 +1633,8 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
 	AddHeaders(resolutions);
 	for (ResolutionArray::iterator it = resolutions.begin(), end = resolutions.end();
 		 it != end; ++it) {
-		resChoice->Append((*it)->GetResString(), *it);
+		Resolution* p = (Resolution*)(*it);
+		resChoice->Append(p->GetResString(), p);
 	}
 }
 
