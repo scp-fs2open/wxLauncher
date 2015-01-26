@@ -9,11 +9,11 @@ import traceback
 import utilfunctions
 
 class VersionFileBuilder:
-  def __init__(self, workfile, outfile, hgpath="hg", out=sys.stdout,
+  def __init__(self, workfile, outfile, gitpath="git", out=sys.stdout,
   err=sys.stderr):
     self.workfile = workfile
     self.outfile = outfile
-    self.hgpath = hgpath
+    self.gitpath = gitpath
     self.out = out
     self.err = err
     
@@ -55,18 +55,19 @@ class VersionFileBuilder:
         self.out.write("  Directory already exists...\n")
       
       out = open(self.outfile, "wb")
-      out.write('const wchar_t *HGVersion = L"')
+      out.write('const wchar_t *GITVersion = L"')
       out.flush()
       
-      out.write(self.get_hg_id())
+      out.write(self.get_git_id())
       out.flush()
       out.write('";\n')
       
-      out.write('const wchar_t *HGDate = L"')
+      out.write('const wchar_t *GITDate = L"')
       out.flush()
       
-      datecmd = '%s parents --template {date|date}' % (self.hgpath)
+      datecmd = 'log --pretty=format:%cd -n 1'
       datecmd = datecmd.split()
+      datecmd.insert(0, self.gitpath)
       
       subprocess.Popen(datecmd, stdout=out).wait()
       out.flush()
@@ -77,12 +78,13 @@ class VersionFileBuilder:
     else:
       self.out.write(" Up to date.\n")
       
-  def get_hg_id(self):
-    """Return the hg id string after striping the newline from the end
+  def get_git_id(self):
+    """Return the git id string after striping the newline from the end
     of the command output"""
     id = tempfile.TemporaryFile()
-    s = "%s id -i -b -t" % (self.hgpath)
+    s = "describe --long --dirty --abbrev=10 --tags --always"
     s = s.split()
+    s.insert(0, self.gitpath)
     
     subprocess.Popen(s, stdout=id).wait()
     id.seek(0)
@@ -99,10 +101,10 @@ class VersionFileBuilder:
       if os.path.exists(self.outfile) == True:
         # check the id to see if it has changed
         workfile = open(self.workfile, 'rb')
-        if workfile.readline() == self.get_hg_id():
+        if workfile.readline() == self.get_git_id():
           return False
         else:
-          self.out.write(" hg id changed\n")
+          self.out.write(" git id changed\n")
       else:
         self.out.write(" %s does not exist\n" % (self.outfile))
     else:

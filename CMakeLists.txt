@@ -39,7 +39,7 @@ if(NOT PYTHON_EXECUTABLE)
   include(FindPythonInterp) #PYTHON_EXECUTABLE
 endif()
 
-find_program(HG_EXECUTABLE hg)
+find_program(GIT_EXECUTABLE git)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
@@ -163,12 +163,12 @@ if(IS_WIN32) # helper is only needed on windows
   target_link_libraries(registry_helper ${wxWidgets_LIBRARIES})
 endif()
 
-# Check to see if we have a HG executable so that we will be able to
+# Check to see if we have a GIT executable so that we will be able to
 # generate the version.cpp.  If we don't have a hg binary, notify and
 # create the target to copy a template version.
-if(HG_EXECUTABLE)
+if(GIT_EXECUTABLE)
   add_custom_target(version.cpp.maker ALL
-    COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp --hgpath=${HG_EXECUTABLE}
+    COMMAND ${PYTHON_EXECUTABLE} scripts/version.cpp.maker.py build ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp.maker.temp --gitpath=${GIT_EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 else()

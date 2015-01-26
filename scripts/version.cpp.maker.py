@@ -11,10 +11,10 @@ JOB=1
 def main(argv):
   parser = OptionParser(usage="%prog <jobtype> <outfile> <workfile> [options]")
   
-  parser.add_option("", "--hgpath",
-    help="use HGPATH as the executable that will be used to generate the version.cpp file.  Defaults to hg",
-    metavar="HGPATH", default="hg")
-  
+  parser.add_option("", "--gitpath",
+    help="use GITPATH as the executable that will be used to generate the version.cpp file.  Defaults to hg",
+    metavar="GITPATH", default="git")
+
   (options, args) = parser.parse_args(argv)
   
   if len(args) != 4:
@@ -23,7 +23,7 @@ def main(argv):
   work = os.path.normcase(os.path.normpath(args[WORKFILE]))
   file = os.path.normcase(os.path.normpath(args[OUTFILE]))
   
-  maker = VersionFileBuilder(work, file, options.hgpath)
+  maker = VersionFileBuilder(work, file, options.gitpath)
   
   if args[JOB] == "build":
     maker.build()
