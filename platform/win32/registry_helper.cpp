@@ -80,16 +80,16 @@ int RegistryHelper::OnRun() {
 }
 
 void RegistryHelper::OnInitCmdLine(wxCmdLineParser &parser) {
-	parser.SetSwitchChars(_T("-")); // always use - even on windows
-	parser.SetLogo(_T("wxLauncher Registry Tool"));
+	parser.SetSwitchChars(wxT_2("-")); // always use - even on windows
+	parser.SetLogo(wxT_2("wxLauncher Registry Tool"));
 	parser.SetDesc(CmdLineOptions);
 }
 
 bool RegistryHelper::OnCmdLineParsed(wxCmdLineParser &parser) {
 	wxString operation = parser.GetParam(0).MakeLower();
-	if (operation.StartsWith(_T("push")) ) {
+	if (operation.StartsWith(wxT_2("push")) ) {
 		this->op = Push;
-	} else if ( operation.StartsWith(_T("pull")) ) {
+	} else if ( operation.StartsWith(wxT_2("pull")) ) {
 		this->op = Pull;
 	} else {
 		parser.Usage();

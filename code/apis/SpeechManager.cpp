@@ -73,7 +73,7 @@ ISpVoice * comVoice = NULL;
 void enumerateObjectToken(ISpObjectToken * token) {
 	HRESULT valuesres = S_OK;
 	HRESULT datares = S_OK;
-	wxLogDebug(_T("Enumerating token:"));
+	wxLogDebug(wxT_2("Enumerating token:"));
 	ULONG valueIndex = 0;
 	LPWSTR value = NULL;
 	LPWSTR valuedata = NULL;
@@ -82,12 +82,12 @@ void enumerateObjectToken(ISpObjectToken * token) {
 		if ( valuesres == S_OK ) {
 			datares = token->GetStringValue(value, &valuedata);
 			if ( datares == S_OK ) {
-				wxLogDebug(_T(" %s=%s"), wxString(value, wxMBConvUTF16()),
-					wxString(valuedata, wxMBConvUTF16()));
+				wxLogDebug(wxT_2(" %s=%s"), wxString(value, wxMBConvUTF16()).c_str(),
+					wxString(valuedata, wxMBConvUTF16()).c_str());
 				CoTaskMemFree(valuedata);
 				valuedata = NULL;
 			} else {
-				wxLogDebug(_T(" %s= (NONE)"), wxString(value, wxMBConvUTF16()));
+				wxLogDebug(wxT_2(" %s= (NONE)"), wxString(value, wxMBConvUTF16()).c_str());
 			}
 			CoTaskMemFree(value);
 			value = NULL;

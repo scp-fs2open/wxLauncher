@@ -49,30 +49,26 @@ DEFINE_EVENT_TYPE(EVT_PROFILE_CHANGE);
 
 DEFINE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED);
 
-#include <wx/listimpl.cpp> // required magic incatation
-WX_DEFINE_LIST(EventHandlers);
-
-
 void ProMan::GenerateChangeEvent() {
 	wxCommandEvent event(EVT_PROFILE_CHANGE, wxID_NONE);
-	wxLogDebug(_T("Generating profile change event"));
+	wxLogDebug(wxT_2("Generating profile change event"));
 	EventHandlers::iterator iter = this->eventHandlers.begin();
 	while (iter != this->eventHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent Profile Change event to %p"), current);
+		wxLogDebug(wxT_2(" Sent Profile Change event to %p"), current);
 		iter++;
 	}
 }
 
 void ProMan::GenerateCurrentProfileChangedEvent() {
 	wxCommandEvent event(EVT_CURRENT_PROFILE_CHANGED, wxID_NONE);
-	wxLogDebug(_T("Generating current profile changed event"));
+	wxLogDebug(wxT_2("Generating current profile changed event"));
 	EventHandlers::iterator iter = this->eventHandlers.begin();
 	while (iter != this->eventHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
-		wxLogDebug(_T(" Sent current profile changed event to %p"), current);
+		wxLogDebug(wxT_2(" Sent current profile changed event to %p"), current);
 		iter++;
 	} 
 }
@@ -80,7 +76,7 @@ void ProMan::GenerateCurrentProfileChangedEvent() {
 void ProMan::AddEventHandler(wxEvtHandler *handler) {
 	wxASSERT_MSG(eventHandlers.IndexOf(handler) == wxNOT_FOUND,
 		wxString::Format(
-			_T("ProMan::AddEventHandler(): Handler at %p already registered."),
+			wxT_2("ProMan::AddEventHandler(): Handler at %p already registered."),
 			handler));
 	this->eventHandlers.Append(handler);
 }
@@ -88,7 +84,7 @@ void ProMan::AddEventHandler(wxEvtHandler *handler) {
 void ProMan::RemoveEventHandler(wxEvtHandler *handler) {
 	wxASSERT_MSG(eventHandlers.IndexOf(handler) != wxNOT_FOUND,
 		wxString::Format(
-			_T("ProMan::RemoveEventHandler(): Handler at %p not registered."),
+			wxT_2("ProMan::RemoveEventHandler(): Handler at %p not registered."),
 			handler));
 	this->eventHandlers.DeleteObject(handler);
 }
@@ -104,7 +100,7 @@ or a pointer to a wxFileConfig that you must delete when done. */
 wxFileConfig* LoadProfileFromFile(const wxFileName &file)
 {
 	wxFFileInputStream globalProfileInput(file.GetFullPath(),
-		(file.FileExists())?_T("rb"):_T("w+b"));
+		(file.FileExists())?wxT_2("rb"):wxT_2("w+b"));
 	return new wxFileConfig(globalProfileInput);
 }
 
@@ -122,14 +118,14 @@ bool ProMan::Initialize(Flags flags) {
 	file.Assign(GetProfileStorageFolder(), GLOBAL_INI_FILE_NAME);
 
 	if ( !file.IsOk() ) {
-		wxLogError(_T(" '%s' is not valid!"), file.GetFullPath().c_str());
+		wxLogError(_(" '%s' is not valid!"), file.GetFullPath().c_str());
 		return false;
 	}
 
-	wxLogInfo(_T(" My profiles file is: %s"), file.GetFullPath().c_str());
+	wxLogInfo(_(" My profiles file is: %s"), file.GetFullPath().c_str());
 	if ( !wxFileName::DirExists(file.GetPath())
 		&& !wxFileName::Mkdir(file.GetPath(), 0700, wxPATH_MKDIR_FULL ) ) {
-		wxLogError(_T(" Unable to make profile folder."));
+		wxLogError(_(" Unable to make profile folder."));
 		return false;
 	}
 
@@ -138,42 +134,42 @@ bool ProMan::Initialize(Flags flags) {
 
 	// fetch all profiles.
 	wxArrayString foundProfiles;
-	wxDir::GetAllFiles(GetProfileStorageFolder(), &foundProfiles, _T("pro?????.ini"));
+	wxDir::GetAllFiles(GetProfileStorageFolder(), &foundProfiles, wxT_2("pro?????.ini"));
 
-	wxLogInfo(_T(" Found %d profile(s)."), foundProfiles.Count());
+	wxLogInfo(wxT_2(" Found %d profile(s)."), foundProfiles.Count());
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
-		wxLogDebug(_T("  Opening %s"), foundProfiles[i].c_str());
+		wxLogDebug(wxT_2("  Opening %s"), foundProfiles[i].c_str());
 		wxFFileInputStream instream(foundProfiles[i]);
 		wxFileConfig *config = new wxFileConfig(instream);
 		
 		wxString name;
-		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(_T("Profile %05d"), i));
+		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(wxT_2("Profile %05d"), i));
 
 		ProMan::proman->profiles[name] = config;
-		wxLogDebug(_T("  Opened profile named: %s"), name.c_str());
+		wxLogDebug(wxT_2("  Opened profile named: %s"), name.c_str());
 	}
 
 	wxString currentProfile;
 	ProMan::proman->globalProfile->Read(
 		GBL_CFG_MAIN_LASTPROFILE, &currentProfile, ProMan::DEFAULT_PROFILE_NAME);
 	
-	wxLogDebug(_T(" Searching for profile: %s"), currentProfile.c_str());
+	wxLogDebug(wxT_2(" Searching for profile: %s"), currentProfile.c_str());
 	if ( ProMan::proman->profiles.find(currentProfile)
 	== ProMan::proman->profiles.end() ) {
 		// lastprofile does not exist
-		wxLogDebug(_T(" lastprofile '%s' does not exist!"), currentProfile.c_str());
+		wxLogDebug(wxT_2(" lastprofile '%s' does not exist!"), currentProfile.c_str());
 		if ( ProMan::proman->profiles.find(ProMan::DEFAULT_PROFILE_NAME)
 		== ProMan::proman->profiles.end() ) {
 			// default profile also does not exist.
 			// Means this is likely the first run this system
 			// Create a default profile
-			wxLogInfo(_T(" Default profile does not exist! Creating..."));
+			wxLogInfo(wxT_2(" Default profile does not exist! Creating..."));
 			ProMan::proman->CreateNewProfile(ProMan::DEFAULT_PROFILE_NAME);
 			// FIXME figure out how PullProfile is corrupting default profile (esp. on Windows)
-//			wxLogInfo(_T(" Priming profile..."));
+//			wxLogInfo(wxT_2(" Priming profile..."));
 //			PullProfile(ProMan::proman->profiles[ProMan::DEFAULT_PROFILE_NAME]);
 		}
-		wxLogInfo(_T(" Resetting lastprofile to Default."));
+		wxLogInfo(wxT_2(" Resetting lastprofile to Default."));
 		// Do not ignore updating last profile here because this is fixing bad data
 		ProMan::proman->globalProfile->Write(GBL_CFG_MAIN_LASTPROFILE, ProMan::DEFAULT_PROFILE_NAME);
 		wxFFileOutputStream globalProfileOutput(file.GetFullPath());
@@ -181,14 +177,14 @@ bool ProMan::Initialize(Flags flags) {
 		currentProfile = ProMan::DEFAULT_PROFILE_NAME;
 	}
 
-	wxLogDebug(_T(" Making '%s' the application profile"), currentProfile.c_str());
+	wxLogDebug(wxT_2(" Making '%s' the application profile"), currentProfile.c_str());
 	if ( !ProMan::proman->SwitchTo(currentProfile) ) {
-		wxLogError(_T("Unable to set current profile to '%s'"), currentProfile.c_str());
+		wxLogError(_("Unable to set current profile to '%s'"), currentProfile.c_str());
 		return false;
 	}
 
 	ProMan::isInitialized = true;
-	wxLogDebug(_T(" Profile Manager is set up"));
+	wxLogDebug(wxT_2(" Profile Manager is set up"));
 	return true;
 }
 
@@ -230,7 +226,7 @@ ProMan::ProMan() {
 	this->isAutoSaving = true;
 	this->currentProfile = NULL;
 	
-	this->privateCopyFilename = wxFileName::CreateTempFileName(_T("wxLtest"));
+	this->privateCopyFilename = wxFileName::CreateTempFileName(wxT_2("wxLtest"));
 	wxFFileInputStream instream(this->privateCopyFilename);
 	this->privateCopy = new wxFileConfig(instream);
 }
@@ -252,7 +248,7 @@ ProMan::~ProMan() {
 /** Saves changes to profiles according to autosave profiles checkbox. */
 void ProMan::SaveProfilesBeforeExiting() {
 	if ( this->globalProfile != NULL ) {
-		wxLogInfo(_T("saving global profile before exiting."));
+		wxLogInfo(wxT_2("saving global profile before exiting."));
 		SaveNewsMapToGlobalProfile();
 		
 		wxFileName file;
@@ -262,12 +258,12 @@ void ProMan::SaveProfilesBeforeExiting() {
 		
 		delete this->globalProfile;
 	} else {
-		wxLogWarning(_T("global profile is null, cannot save it"));
+		wxLogWarning(_("global profile is null, cannot save it"));
 	}
 	
 	if (this->HasUnsavedChanges()) {
 		if (this->isAutoSaving) {
-			wxLogInfo(_T("autosaving profile %s before exiting"),
+			wxLogInfo(_("autosaving profile %s before exiting"),
 				this->GetCurrentName().c_str()),
 			this->SaveCurrentProfile();
 		} else {
@@ -276,16 +272,16 @@ void ProMan::SaveProfilesBeforeExiting() {
 				GetSaveDialogCaptionText(ProMan::ON_EXIT, this->GetCurrentName()),
 				wxYES_NO);
 			if ( response == wxYES ) {
-				wxLogInfo(_T("saving profile %s before exiting"),
+				wxLogInfo(wxT_2("saving profile %s before exiting"),
 					this->GetCurrentName().c_str());
 				this->SaveCurrentProfile();
 			} else {
-				wxLogWarning(_T("exiting without saving changes to profile %s"),
+				wxLogWarning(wxT_2("exiting without saving changes to profile %s"),
 					this->GetCurrentName().c_str());
 			}
 		}
 	} else {
-		wxLogInfo(_T("Current profile %s has no unsaved changes. Exiting."),
+		wxLogInfo(wxT_2("Current profile %s has no unsaved changes. Exiting."),
 			this->GetCurrentName().c_str());
 	}
 }
@@ -316,17 +312,17 @@ void ProMan::LoadNewsMapFromGlobalProfile() {
 					lastDownloadNewsStr, NEWS_LAST_TIME_FORMAT))) {
 				newsMap[groupName] = NewsData(theNews, lastDownloadNews);
 				
-				wxLogDebug(_T("Created news map entry for source %s"),
+				wxLogDebug(wxT_2("Created news map entry for source %s"),
 					groupName.c_str());
 			}
 		}
 		
-		globalProfile->SetPath(_T(".."));
+		globalProfile->SetPath(wxT_2(".."));
 		
 		groupKeepGoing = globalProfile->GetNextGroup(groupName, groupIndex);
 	}
 	
-	globalProfile->SetPath(_T("/"));
+	globalProfile->SetPath(wxT_2("/"));
 }
 
 void ProMan::SaveNewsMapToGlobalProfile() {
@@ -341,16 +337,16 @@ void ProMan::SaveNewsMapToGlobalProfile() {
 		globalProfile->Write(GBL_CFG_NET_THE_NEWS, newsData.theNews);
 		globalProfile->Write(GBL_CFG_NET_NEWS_LAST_TIME,
 			newsData.lastDownloadNews.Format(NEWS_LAST_TIME_FORMAT));
-		globalProfile->SetPath(_T(".."));
+		globalProfile->SetPath(wxT_2(".."));
 	}
 	
-	globalProfile->SetPath(_T("/"));
+	globalProfile->SetPath(wxT_2("/"));
 }
 
 /** Resets the private copy so that it contains a copy
  of the current profile's contents. */
 void ProMan::ResetPrivateCopy() {
-	wxCHECK_RET(this->currentProfile != NULL, _T("ResetPrivateCopy called with null current profile!"));
+	wxCHECK_RET(this->currentProfile != NULL, wxT_2("ResetPrivateCopy called with null current profile!"));
 	ClearConfig(*(this->privateCopy));
 	CopyConfig(*(this->currentProfile), *(this->privateCopy));
 }
@@ -363,17 +359,17 @@ bool ProMan::CreateNewProfile(wxString newName) {
 		GetProfileStorageFolder(),
 		this->GenerateNewProfileFileName());
 
-	wxLogInfo(_T("New profile will be written to %s"), profile.GetFullPath().c_str());
+	wxLogInfo(wxT_2("New profile will be written to %s"), profile.GetFullPath().c_str());
 	
-	wxASSERT_MSG( profile.IsOk(), _T("Profile filename is invalid"));
+	wxASSERT_MSG( profile.IsOk(), wxT_2("Profile filename is invalid"));
 
 	if ( !wxFileName::DirExists(profile.GetPath())
 		&& !wxFileName::Mkdir( profile.GetPath(), wxPATH_MKDIR_FULL) ) {
-		wxLogWarning(_T("  Unable to create profile folder: %s"), profile.GetPath().c_str());
+		wxLogWarning(_("  Unable to create profile folder: %s"), profile.GetPath().c_str());
 		return false;
 	}
 
-	wxFFileInputStream configInput(profile.GetFullPath(), _T("w+b"));
+	wxFFileInputStream configInput(profile.GetFullPath(), wxT_2("w+b"));
 	wxFileConfig* config = new wxFileConfig(configInput);
 	config->Write(PRO_CFG_MAIN_NAME, newName);
 	config->Write(PRO_CFG_MAIN_FILENAME, profile.GetFullName());
@@ -388,14 +384,14 @@ bool ProMan::CreateNewProfile(wxString newName) {
  pro#####.ini with ##### being the least 5-digit number not yet taken. */
 wxString ProMan::GenerateNewProfileFileName() {
 	wxArrayString profileFiles;
-	wxDir::GetAllFiles(GetProfileStorageFolder(), &profileFiles, _T("pro*.ini"), wxDIR_FILES);
+	wxDir::GetAllFiles(GetProfileStorageFolder(), &profileFiles, wxT_2("pro*.ini"), wxDIR_FILES);
 	
 	long l;
 	
 	std::vector<long> proNums;
 	
 	for (int i = 0, n = profileFiles.GetCount(); i < n; ++i) {
-		profileFiles[i] = profileFiles[i].AfterLast(_T('o')).BeforeLast(_T('.'));
+		profileFiles[i] = profileFiles[i].AfterLast(wxT_2('o')).BeforeLast(wxT_2('.'));
 		profileFiles[i].ToLong(&l);
 		proNums.push_back(l);
 	}
@@ -421,11 +417,11 @@ wxString ProMan::GenerateNewProfileFileName() {
 		proIndex = proNums[n-1] + 1;
 	}
 
-	wxLogDebug(_T("new profile number: %ld"), proIndex);
+	wxLogDebug(wxT_2("new profile number: %ld"), proIndex);
 	
 	wxASSERT(proIndex <= 99999); // the maximum possible index given a 5-digit number
 	
-	return wxString::Format(_T("pro%05d.ini"), static_cast<int>(proIndex));
+	return wxString::Format(wxT_2("pro%05d.ini"), static_cast<int>(proIndex));
 }
 
 // global profile access functions
@@ -433,7 +429,7 @@ wxString ProMan::GenerateNewProfileFileName() {
 /** Tests whether the key strName is in the global profile. */
 bool ProMan::GlobalExists(wxString& strName) const {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to check existence of key %s in null global profile"),
+		wxLogWarning(wxT_2("attempt to check existence of key %s in null global profile"),
 			strName.c_str());
 		return false;
 	} else {
@@ -444,7 +440,7 @@ bool ProMan::GlobalExists(wxString& strName) const {
 /** Tests whether the key strName is in the global profile */
 bool ProMan::GlobalExists(const wxChar* strName) const {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to check existence of key %s in null global profile"),
+		wxLogWarning(wxT_2("attempt to check existence of key %s in null global profile"),
 			strName);
 		return false;
 	} else {
@@ -456,7 +452,7 @@ bool ProMan::GlobalExists(const wxChar* strName) const {
 bool ProMan::GlobalRead(const wxString& key, bool* b) const {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read bool for key %s from null global profile"),
+			wxT_2("attempt to read bool for key %s from null global profile"),
 			key.c_str());
 		return false;
 	} else {
@@ -472,14 +468,14 @@ bool ProMan::GlobalRead(const wxString& key, bool* b) const {
 bool ProMan::GlobalRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read bool for key %s with default value %s from null global profile"),
-			key.c_str(), defaultVal ? _T("true") : _T("false"));
+			wxT_2("attempt to read bool for key %s with default value %s from null global profile"),
+			key.c_str(), defaultVal ? wxT_2("true") : wxT_2("false"));
 		return false;
 	} else {
 		bool readSuccess = this->globalProfile->Read(key, b, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in global profile is absent. writing default value %s to it."),
-				key.c_str(), defaultVal ? _T("true") : _T("false"));
+			wxLogDebug(wxT_2("entry %s in global profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal ? wxT_2("true") : wxT_2("false"));
 			this->globalProfile->Write(key, defaultVal);
 		}
 		return readSuccess;
@@ -490,7 +486,7 @@ bool ProMan::GlobalRead(const wxString& key, bool* b, bool defaultVal, bool writ
 bool ProMan::GlobalRead(const wxString& key, wxString* str) const {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read string for key %s with from null global profile"),
+			wxT_2("attempt to read string for key %s with from null global profile"),
 			key.c_str());
 		return false;
 	} else {
@@ -506,13 +502,13 @@ Returns true on success. */
 bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read string for key %s with default value %s from null global profile"),
+			wxT_2("attempt to read string for key %s with default value %s from null global profile"),
 			key.c_str(), defaultVal.c_str());
 		return false;
 	} else {
 		bool readSuccess = this->globalProfile->Read(key, str, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in global profile is absent. writing default value %s to it."),
+			wxLogDebug(wxT_2("entry %s in global profile is absent. writing default value %s to it."),
 				key.c_str(), defaultVal.c_str());
 			this->globalProfile->Write(key, defaultVal);
 		}
@@ -528,13 +524,13 @@ bool ProMan::GlobalRead(const wxString& key, wxString* str, const wxString& defa
 bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent) {
 	if (this->globalProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read long for key %s with default value %ld from null global profile"),
+			wxT_2("attempt to read long for key %s with default value %ld from null global profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
 		bool readSuccess = this->globalProfile->Read(key, l, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in global profile is absent. writing default value %ld to it."),
+			wxLogDebug(wxT_2("entry %s in global profile is absent. writing default value %ld to it."),
 				key.c_str(), defaultVal);
 			this->globalProfile->Write(key, defaultVal);
 		}
@@ -546,7 +542,7 @@ bool ProMan::GlobalRead(const wxString& key, long* l, long defaultVal, bool writ
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, const wxString& value) {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
+		wxLogWarning(wxT_2("attempt to write %s to %s in null global profile"),
 			value.c_str(), key.c_str());
 		return false;
 	} else {
@@ -558,7 +554,7 @@ bool ProMan::GlobalWrite(const wxString& key, const wxString& value) {
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, const wxChar* value) {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
+		wxLogWarning(wxT_2("attempt to write %s to %s in null global profile"),
 					 value, key.c_str());
 		return false;
 	} else {
@@ -570,7 +566,7 @@ bool ProMan::GlobalWrite(const wxString& key, const wxChar* value) {
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, long value) {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to write %ld to %s in null global profile"),
+		wxLogWarning(wxT_2("attempt to write %ld to %s in null global profile"),
 			value, key.c_str());
 		return false;
 	} else {
@@ -582,8 +578,8 @@ bool ProMan::GlobalWrite(const wxString& key, long value) {
  Returns true on success. */
 bool ProMan::GlobalWrite(const wxString& key, bool value) {
 	if (this->globalProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null global profile"),
-			value ? _T("true") : _T("false"), key.c_str());
+		wxLogWarning(wxT_2("attempt to write %s to %s in null global profile"),
+			value ? wxT_2("true") : wxT_2("false"), key.c_str());
 		return false;
 	} else {
 		return this->globalProfile->Write(key, value);
@@ -595,7 +591,7 @@ bool ProMan::GlobalWrite(const wxString& key, bool value) {
 /** Tests whether the key strName is in the current profile. */
 bool ProMan::ProfileExists(wxString& strName) const {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to check existence of key %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to check existence of key %s in null current profile"),
 			strName.c_str());
 		return false;
 	} else {
@@ -606,7 +602,7 @@ bool ProMan::ProfileExists(wxString& strName) const {
 /** Tests whether the key strName is in the current profile. */
 bool ProMan::ProfileExists(const wxChar* strName) const {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to check existence of key %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to check existence of key %s in null current profile"),
 			strName);
 		return false;
 	} else {
@@ -618,7 +614,7 @@ bool ProMan::ProfileExists(const wxChar* strName) const {
 bool ProMan::ProfileRead(const wxString& key, bool* b) const {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read bool for key %s from null current profile"),
+			wxT_2("attempt to read bool for key %s from null current profile"),
 			key.c_str());
 		return false;
 	} else {
@@ -634,14 +630,14 @@ bool ProMan::ProfileRead(const wxString& key, bool* b) const {
 bool ProMan::ProfileRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read bool for key %s with default value %s from null current profile"),
-			key.c_str(), defaultVal ? _T("true") : _T("false"));
+			wxT_2("attempt to read bool for key %s with default value %s from null current profile"),
+			key.c_str(), defaultVal ? wxT_2("true") : wxT_2("false"));
 		return false;
 	} else {
 		bool readSuccess = this->currentProfile->Read(key, b, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in current profile is absent. writing default value %s to it."),
-				key.c_str(), defaultVal ? _T("true") : _T("false"));
+			wxLogDebug(wxT_2("entry %s in current profile is absent. writing default value %s to it."),
+				key.c_str(), defaultVal ? wxT_2("true") : wxT_2("false"));
 			this->currentProfile->Write(key, defaultVal);
 		}
 		return readSuccess;
@@ -652,7 +648,7 @@ bool ProMan::ProfileRead(const wxString& key, bool* b, bool defaultVal, bool wri
 bool ProMan::ProfileRead(const wxString& key, wxString* str) const {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read string for key %s with from null current profile"),
+			wxT_2("attempt to read string for key %s with from null current profile"),
 			key.c_str());
 		return false;
 	} else {
@@ -668,13 +664,13 @@ bool ProMan::ProfileRead(const wxString& key, wxString* str) const {
 bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read string for key %s with default value %s from null current profile"),
+			wxT_2("attempt to read string for key %s with default value %s from null current profile"),
 			key.c_str(), defaultVal.c_str());
 		return false;
 	} else {
 		bool readSuccess = this->currentProfile->Read(key, str, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in current profile is absent. writing default value %s to it."),
+			wxLogDebug(wxT_2("entry %s in current profile is absent. writing default value %s to it."),
 				key.c_str(), defaultVal.c_str());
 			this->currentProfile->Write(key, defaultVal);
 		}
@@ -686,7 +682,7 @@ bool ProMan::ProfileRead(const wxString& key, wxString* str, const wxString& def
 bool ProMan::ProfileRead(const wxString& key, long* l) const {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read long for key %s from null current profile"),
+			wxT_2("attempt to read long for key %s from null current profile"),
 			key.c_str());
 		return false;
 	} else {
@@ -702,13 +698,13 @@ bool ProMan::ProfileRead(const wxString& key, long* l) const {
 bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal, bool writeBackIfAbsent) {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(
-			_T("attempt to read long for key %s with default value %ld from null current profile"),
+			wxT_2("attempt to read long for key %s with default value %ld from null current profile"),
 			key.c_str(), defaultVal);
 		return false;
 	} else {
 		bool readSuccess = this->currentProfile->Read(key, l, defaultVal);
 		if (!readSuccess && writeBackIfAbsent) {
-			wxLogDebug(_T("entry %s in current profile is absent. writing default value %ld to it."),
+			wxLogDebug(wxT_2("entry %s in current profile is absent. writing default value %ld to it."),
 				key.c_str(), defaultVal);
 			this->currentProfile->Write(key, defaultVal);
 		}
@@ -720,17 +716,17 @@ bool ProMan::ProfileRead(const wxString& key, long* l, long defaultVal, bool wri
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to write %s to %s in null current profile"),
 			value.c_str(), key.c_str());
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
-			wxLogDebug(_T("adding entry %s with value %s to current profile"),
+			wxLogDebug(wxT_2("adding entry %s with value %s to current profile"),
 				key.c_str(), value.c_str());
 		} else {
 			wxString oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
-				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
+				wxLogDebug(wxT_2("replacing old value %s with value %s for current profile entry %s"),
 					oldValue.c_str(), value.c_str(), key.c_str());
 			}
 		}
@@ -742,17 +738,17 @@ bool ProMan::ProfileWrite(const wxString& key, const wxString& value) {
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to write %s to %s in null current profile"),
 					 value, key.c_str());
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
-			wxLogDebug(_T("adding entry %s with value %s to current profile"),
+			wxLogDebug(wxT_2("adding entry %s with value %s to current profile"),
 					   key.c_str(), value);
 		} else {
 			wxString oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
-				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
+				wxLogDebug(wxT_2("replacing old value %s with value %s for current profile entry %s"),
 						   oldValue.c_str(), value, key.c_str());
 			}
 		}
@@ -764,17 +760,17 @@ bool ProMan::ProfileWrite(const wxString& key, const wxChar* value) {
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, long value) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to write %ld to %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to write %ld to %s in null current profile"),
 			value, key.c_str());
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
-			wxLogDebug(_T("adding entry %s with value %ld to current profile"),
+			wxLogDebug(wxT_2("adding entry %s with value %ld to current profile"),
 				key.c_str(), value);
 		} else {
 			long oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
-				wxLogDebug(_T("replacing old value %ld with value %ld for current profile entry %s"),
+				wxLogDebug(wxT_2("replacing old value %ld with value %ld for current profile entry %s"),
 					oldValue, value, key.c_str());
 			}
 		}
@@ -786,19 +782,19 @@ bool ProMan::ProfileWrite(const wxString& key, long value) {
  Returns true on success. */
 bool ProMan::ProfileWrite(const wxString& key, bool value) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to write %s to %s in null current profile"),
-			value ? _T("true") : _T("false"), key.c_str());
+		wxLogWarning(wxT_2("attempt to write %s to %s in null current profile"),
+			value ? wxT_2("true") : wxT_2("false"), key.c_str());
 		return false;
 	} else {
 		if (!this->currentProfile->Exists(key)) {
-			wxLogDebug(_T("adding entry %s with value %s to current profile"),
-				key.c_str(), value ? _T("true") : _T("false"));
+			wxLogDebug(wxT_2("adding entry %s with value %s to current profile"),
+				key.c_str(), value ? wxT_2("true") : wxT_2("false"));
 		} else {
 			bool oldValue;
 			if (this->currentProfile->Read(key, &oldValue) && (value != oldValue)) {
-				wxLogDebug(_T("replacing old value %s with value %s for current profile entry %s"),
-					oldValue ? _T("true") : _T("false"),
-					value ? _T("true") : _T("false"),
+				wxLogDebug(wxT_2("replacing old value %s with value %s for current profile entry %s"),
+					oldValue ? wxT_2("true") : wxT_2("false"),
+					value ? wxT_2("true") : wxT_2("false"),
 					key.c_str());
 			}
 		}
@@ -812,12 +808,12 @@ bool ProMan::ProfileWrite(const wxString& key, bool value) {
  and the second parameter is true. */
 bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 	if (this->currentProfile == NULL) {
-		wxLogWarning(_T("attempt to delete entry %s in null current profile"),
+		wxLogWarning(wxT_2("attempt to delete entry %s in null current profile"),
 			key.c_str());
 		return false;
 	} else {
 		if (this-currentProfile->Exists(key)) {
-			wxLogDebug(_T("deleting key %s in profile"),
+			wxLogDebug(wxT_2("deleting key %s in profile"),
 				key.c_str());
 		}
 		return this->currentProfile->DeleteEntry(key, bDeleteGroupIfEmpty);
@@ -825,7 +821,7 @@ bool ProMan::ProfileDeleteEntry(const wxString& key, bool bDeleteGroupIfEmpty) {
 }
 
 const NewsData* ProMan::NewsRead(const wxString& newsSource) const {
-	wxCHECK_MSG(!newsSource.IsEmpty(), NULL, _T("NewsRead: newsSource is empty!"));
+	wxCHECK_MSG(!newsSource.IsEmpty(), NULL, wxT_2("NewsRead: newsSource is empty!"));
 	
 	NewsMap::const_iterator it = newsMap.find(newsSource);
 	
@@ -837,8 +833,8 @@ const NewsData* ProMan::NewsRead(const wxString& newsSource) const {
 }
 
 void ProMan::NewsWrite(const wxString& newsSource, const NewsData& data) {
-	wxCHECK_RET(!newsSource.IsEmpty(), _T("NewsWrite: newsSource is empty!"));
-	wxCHECK_RET(data.IsValid(), _T("NewsWrite: data is not valid!"));
+	wxCHECK_RET(!newsSource.IsEmpty(), wxT_2("NewsWrite: newsSource is empty!"));
+	wxCHECK_RET(data.IsValid(), wxT_2("NewsWrite: data is not valid!"));
 	
 	newsMap[newsSource] = data;
 }
@@ -851,36 +847,36 @@ const wxString ProMan::GetSaveDialogCaptionText(ProMan::SaveDialogContext contex
 	switch (context) {
 		case ON_PROFILE_SWITCH:
 #if PROFILE_DEBUGGING
-			wxLogDebug(_T("contents of private copy at save prompt on profile switch:"));
+			wxLogDebug(wxT_2("contents of private copy at save prompt on profile switch:"));
 			LogConfigContents(*ProMan::proman->privateCopy);
-			wxLogDebug(_T("contents of current profile at save prompt on profile switch:"));
+			wxLogDebug(wxT_2("contents of current profile at save prompt on profile switch:"));
 			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
-			return _T("Save changes to current profile?");
+			return _("Save changes to current profile?");
 			break;
 
 		case ON_PROFILE_CREATE:
 #if PROFILE_DEBUGGING
-			wxLogDebug(_T("contents of private copy at save prompt on profile create:"));
+			wxLogDebug(wxT_2("contents of private copy at save prompt on profile create:"));
 			LogConfigContents(*ProMan::proman->privateCopy);
-			wxLogDebug(_T("contents of current profile at save prompt on profile create:"));
+			wxLogDebug(wxT_2("contents of current profile at save prompt on profile create:"));
 			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
-			return _T("Save changes to current profile?");
+			return _("Save changes to current profile?");
 			break;
 
 		case ON_EXIT:
 #if PROFILE_DEBUGGING
-			wxLogDebug(_T("contents of private copy at save prompt on exit:"));
+			wxLogDebug(wxT_2("contents of private copy at save prompt on exit:"));
 			LogConfigContents(*ProMan::proman->privateCopy);
-			wxLogDebug(_T("contents of current profile at save prompt on exit:"));
+			wxLogDebug(wxT_2("contents of current profile at save prompt on exit:"));
 			LogConfigContents(*ProMan::proman->currentProfile);
 #endif
-			return _T("Save changes to current profile?");
+			return _("Save changes to current profile?");
 			break;
 
 		default:
-			wxCHECK_MSG(false, wxEmptyString, _T("ProMan::GetSaveDialogCaptionText: provided context is invalid"));
+			wxCHECK_MSG(false, wxEmptyString, wxT_2("ProMan::GetSaveDialogCaptionText: provided context is invalid"));
 			break;
 	}
 }
@@ -890,27 +886,27 @@ const wxString ProMan::GetSaveDialogMessageText(ProMan::SaveDialogContext contex
 												const wxString& profileName) {
 	switch (context) {
 		case ON_PROFILE_SWITCH:
-			return wxString::Format(_T("Save changes to profile '%s' before switching profiles?"),
+			return wxString::Format(_("Save changes to profile '%s' before switching profiles?"),
 				profileName.c_str());
 			break;
 			
 		case ON_PROFILE_CREATE:
-			return wxString::Format(_T("Save changes to profile '%s' before creating a new profile?"),
+			return wxString::Format(_("Save changes to profile '%s' before creating a new profile?"),
 				profileName.c_str());
 			break;
 			
 		case ON_EXIT:
 #if IS_WIN32
-			return wxString::Format(_T("Save changes to profile '%s' before exiting?"),
+			return wxString::Format(_("Save changes to profile '%s' before exiting?"),
 				profileName.c_str());
 #else
-			return wxString::Format(_T("Save changes to profile '%s' before quitting?"),
+			return wxString::Format(_("Save changes to profile '%s' before quitting?"),
 				profileName.c_str());
 #endif
 			break;
 			
 		default:
-			wxCHECK_MSG(false, wxEmptyString, _T("ProMan::GetSaveDialogMessageText: provided context is invalid"));
+			wxCHECK_MSG(false, wxEmptyString, wxT_2("ProMan::GetSaveDialogMessageText: provided context is invalid"));
 			break;
 	}
 }
@@ -924,7 +920,7 @@ bool ProMan::DoesProfileExist(wxString name) {
 
 /** Returns an wxArrayString of all of the profile names. */
 wxArrayString ProMan::GetAllProfileNames() {
-	wxArrayString out(this->profiles.size());
+	wxArrayString out;
 
 	ProfileMap::iterator iter = this->profiles.begin();
 	do {
@@ -939,7 +935,7 @@ void SaveProfileToDisk(wxFileConfig* toSave, const wxString& name)
 {
 	wxString profileFilename;
 	if ( !toSave->Read(PRO_CFG_MAIN_FILENAME, &profileFilename) ) {
-		wxLogError(_T("Profile '%s' does not have a file name. Cannot save it."),
+		wxLogError(wxT_2("Profile '%s' does not have a file name. Cannot save it."),
 			name.c_str());
 		// FIXME maybe make a new file and save the current profile there
 	} else {
@@ -948,7 +944,7 @@ void SaveProfileToDisk(wxFileConfig* toSave, const wxString& name)
 		wxASSERT( file.IsOk() );
 		wxFFileOutputStream configOutput(file.GetFullPath());
 		toSave->Save(configOutput);
-		wxLogDebug(_T("Profile '%s' saved to '%s'"),
+		wxLogDebug(wxT_2("Profile '%s' saved to '%s'"),
 			name.c_str(), file.GetFullPath().c_str());
 	}
 }
@@ -958,7 +954,7 @@ void SaveProfileToDisk(wxFileConfig* toSave, const wxString& name)
 void ProMan::SaveCurrentProfile(bool quiet) {
 	wxConfigBase* configbase = wxFileConfig::Get(false);
 	if ( configbase == NULL ) {
-		wxLogError(_T("There is no global file config."));
+		wxLogError(wxT_2("There is no global file config."));
 		return;
 	}
 	wxFileConfig* config = dynamic_cast<wxFileConfig*>(configbase);
@@ -966,12 +962,12 @@ void ProMan::SaveCurrentProfile(bool quiet) {
 		SaveProfileToDisk(config, this->currentProfileName.c_str());
 		this->ResetPrivateCopy();
 		if (!quiet) {
-			wxLogStatus(_T("Profile '%s' saved"), this->currentProfileName.c_str());				
+			wxLogStatus(_("Profile '%s' saved"), this->currentProfileName.c_str());				
 		}
-		wxLogDebug(_T("Current config%s saved."),
-			quiet ? _T(" quietly") : wxEmptyString);
+		wxLogDebug(wxT_2("Current config%s saved."),
+			quiet ? wxT_2(" quietly") : wxEmptyString);
 	} else {
-		wxLogError(_T("Configbase is not a wxFileConfig."));
+		wxLogError(wxT_2("Configbase is not a wxFileConfig."));
 	}
 }
 
@@ -998,11 +994,11 @@ bool ProMan::SwitchTo(wxString name) {
 	} else {
 		if (this->currentProfile != NULL && this->HasUnsavedChanges()) {
 			if (this->isAutoSaving) {
-				wxLogDebug(_T("Auto saving current profile %s before switching profiles"),
+				wxLogDebug(wxT_2("Auto saving current profile %s before switching profiles"),
 					this->currentProfileName.c_str());
 				this->SaveCurrentProfile();
 			} else {
-				wxLogDebug(_T("Reverting unsaved changes to current profile %s before switching"),
+				wxLogDebug(wxT_2("Reverting unsaved changes to current profile %s before switching"),
 					this->currentProfileName.c_str());
 				this->RevertCurrentProfile();
 			}
@@ -1022,7 +1018,7 @@ bool ProMan::SwitchTo(wxString name) {
 /** Creates a profile from a fullyqualified path. */
 bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileName& sourceFile)
 {
-	wxLogDebug(_T("Importing profile in '%s' as '%s'"),
+	wxLogDebug(wxT_2("Importing profile in '%s' as '%s'"),
 		sourceFile.GetFullPath().c_str(), newProfileName.c_str());
 	wxFileConfig *sourceConfig = LoadProfileFromFile(sourceFile);
 
@@ -1039,7 +1035,7 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileConfig *s
 	}
 
 	if (!this->CreateNewProfile(newProfileName)) {
-		wxLogWarning(_T("New profile creation failed."));
+		wxLogWarning(wxT_2("New profile creation failed."));
 		return false;
 	}
 
@@ -1047,10 +1043,10 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileConfig *s
 	{
 		/* We just created this profile it had better exist */
 		wxFileConfig* newProfileConfig = this->profiles[newProfileName];
-		wxCHECK_MSG(newProfileConfig != NULL, false, _T("Create returned true but did not create profile"));
+		wxCHECK_MSG(newProfileConfig != NULL, false, wxT_2("Create returned true but did not create profile"));
 
 #if PROFILE_DEBUGGING
-		wxLogDebug(_T("contents of new profile '%s' before clone:"), newProfileName.c_str());
+		wxLogDebug(wxT_2("contents of new profile '%s' before clone:"), newProfileName.c_str());
 		LogConfigContents(*newProfileConfig);
 #endif
 
@@ -1058,9 +1054,9 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxFileConfig *s
 		SaveProfileToDisk(newProfileConfig, newProfileName);
 
 #if PROFILE_DEBUGGING
-		wxLogDebug(_T("contents of new profile '%s' after clone:"), newProfileName.c_str());
+		wxLogDebug(wxT_2("contents of new profile '%s' after clone:"), newProfileName.c_str());
 		LogConfigContents(*newProfileConfig);
-		wxLogDebug(_T("contents of cloned from profile '%s' after clone:"), cloneFromProfileName.c_str());
+		wxLogDebug(wxT_2("contents of cloned from profile '%s' after clone:"), cloneFromProfileName.c_str());
 		LogConfigContents(*cloneFromProfileConfig);
 #endif
 
@@ -1078,11 +1074,11 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& clone
 
 	if (cloneFromProfileName.IsEmpty())
 	{
-		wxLogDebug(_T("Creating blank profile '%s'"), newProfileName.c_str());
+		wxLogDebug(wxT_2("Creating blank profile '%s'"), newProfileName.c_str());
 	}
 	else
 	{
-		wxLogDebug(_T("Cloning original profile (%s) to '%s'"),
+		wxLogDebug(wxT_2("Cloning original profile (%s) to '%s'"),
 			cloneFromProfileName.c_str(), newProfileName.c_str());
 		if (!this->DoesProfileExist(cloneFromProfileName))
 		{
@@ -1091,7 +1087,7 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& clone
 		}
 		cloneSource = this->profiles[cloneFromProfileName];
 		wxCHECK_MSG( cloneSource != NULL, false,
-			wxString::Format(_T("Cannot find profile '%s' from which to clone"),
+			wxString::Format(wxT_2("Cannot find profile '%s' from which to clone"),
 				cloneFromProfileName.c_str()) );
 	}
 
@@ -1099,24 +1095,24 @@ bool ProMan::CreateProfile(const wxString& newProfileName, const wxString& clone
 }
 
 bool ProMan::DeleteProfile(wxString name) {
-	wxLogDebug(_T("Deleting profile: %s"), name.c_str());
+	wxLogDebug(wxT_2("Deleting profile: %s"), name.c_str());
 	if ( name == ProMan::DEFAULT_PROFILE_NAME ) {
 		wxLogWarning(_("Cannot delete 'Default' profile."));
 		return false;
 	}
 	if ( name == this->currentProfileName ) {
 		wxLogInfo(
-			_T("Deleting current profile. Switching to '%s' profile"),
+			_("Deleting current profile. Switching to '%s' profile"),
 			ProMan::DEFAULT_PROFILE_NAME.c_str());
 		this->SwitchTo(ProMan::DEFAULT_PROFILE_NAME);
 	}
 	if ( this->DoesProfileExist(name) ) {
-		wxLogDebug(_T(" Profile exists"));
+		wxLogDebug(wxT_2(" Profile exists"));
 		wxFileConfig* config = this->profiles[name];
 
 		wxString filename;
 		if ( !config->Read(PRO_CFG_MAIN_FILENAME, &filename) ) {
-			wxLogWarning(_T("Unable to get filename to delete %s"), name.c_str());
+			wxLogWarning(wxT_2("Unable to get filename to delete %s"), name.c_str());
 			return false;
 		}
 
@@ -1124,7 +1120,7 @@ bool ProMan::DeleteProfile(wxString name) {
 		file.Assign(GetProfileStorageFolder(), filename);
 
 		if ( file.FileExists() ) {
-			wxLogDebug(_T(" Backing file exists"));
+			wxLogDebug(wxT_2(" Backing file exists"));
 			if ( wxRemoveFile(file.GetFullPath()) ) {
 				this->profiles.erase(this->profiles.find(name));
 				delete config;

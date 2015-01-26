@@ -52,9 +52,15 @@ IMPLEMENT_APP(wxLauncher);
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
 	{wxCMD_LINE_SWITCH, NULL, wxT_2("session-only"),
 	_("Do not remember the profile that is selected at exit")},
-	{wxCMD_LINE_SWITCH, NULL, wxT_2("add-profile"),
-	_("Add profile PROFILE from FILE. If PROFILE already exists"
+#if wxVERSION_NUMBER > 20899
+	{wxCMD_LINE_SWITCH, NULL, "add-profile",
+	_("Add profile PROFILE from FILE. If PROFILE already exists
 	" it will not be overwritten. *Operator*")},
+#else
+	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
+	_T("Add profile PROFILE from FILE. If PROFILE already exists")
+	_T(" it will not be overwritten. *Operator*")},
+#endif
 	{wxCMD_LINE_SWITCH, NULL, wxT_2("select-profile"),
 	_("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
 	{wxCMD_LINE_OPTION, NULL, wxT_2("profile"),
@@ -69,7 +75,7 @@ const static wxCmdLineEntryDesc CmdLineOptions[] = {
 void wxLauncher::OnInitCmdLine(wxCmdLineParser& parser)
 {
 	parser.SetDesc(CmdLineOptions);
-	parser.SetSwitchChars(_T("-")); // always use -, even on windows
+	parser.SetSwitchChars(wxT_2("-")); // always use -, even on windows
 
 	wxApp::OnInitCmdLine(parser);
 }
@@ -145,12 +151,21 @@ bool displaySplash(wxSplashScreen **splashWindow)
 		} else {
 			expectedDir = wxFileName(::wxGetCwd(), wxT_2(RESOURCES_PATH));	
 		}
+#if wxVERSION_NUMBER > 20899
 		wxLogFatalError(wxString::Format(
-			_T("Unable to load splash image. ")
-			_T("This normally means that you are running the Launcher from a folder")
+			_("Unable to load splash image."
+			" This normally means that you are running the Launcher from a folder"
+			" that the launcher does not know how to find the resource folder from."
+			"\n\nThe launcher is expecting (%s) to contain the resource images."),
+			expectedDir.GetFullPath().c_str()).c_str());
+#else
+		wxLogFatalError(wxString::Format(
+			_T("Unable to load splash image.")
+			_T(" This normally means that you are running the Launcher from a folder")
 			_T(" that the launcher does not know how to find the resource folder from.")
 			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
 			expectedDir.GetFullPath().c_str()).c_str());
+#endif
 		return false;
 	}
 	return true;
@@ -175,26 +190,26 @@ bool wxLauncher::OnInit() {
 		return false; // base said abort so abort
 
 	wxLog::SetActiveTarget(new Logger());
-	wxLogInfo(_T("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
-	wxLogInfo(_T("Build \"%s\" committed on (%s)"), HGVersion, HGDate);
-	wxLogInfo(wxDateTime(time(NULL)).Format(_T("%c")));
+	wxLogInfo(wxT_2("wxLauncher Version %d.%d.%d"), MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
+	wxLogInfo(wxT_2("Build \"%s\" committed on (%s)"), GITVersion, GITDate);
+	wxLogInfo(wxDateTime(time(NULL)).Format(wxT_2("%c")));
 
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 #if HAS_SDL == 1
 	if ( 0 != SDL_InitSubSystem(SDL_INIT_VIDEO) ) {
-	  wxLogFatalError(_T("SDL_InitSubSystem failed"));
+	  wxLogFatalError(wxT_2("SDL_InitSubSystem failed"));
 	}
 #endif
 	// Little hack to deal with people starting the launcher from the bin folder
-	if ( !wxFileName::DirExists(_T(RESOURCES_PATH)) ) {
+	if ( !wxFileName::DirExists(wxT_2(RESOURCES_PATH)) ) {
 		wxFileName resourceDir;
 		resourceDir.AssignDir(::wxGetCwd());
-		resourceDir.AppendDir(_T(".."));
-		resourceDir.AppendDir(_T(RESOURCES_PATH));
+		resourceDir.AppendDir(wxT_2(".."));
+		resourceDir.AppendDir(wxT_2(RESOURCES_PATH));
 		if ( resourceDir.DirExists() ) {
-			wxFileName newWorkingDir(::wxGetCwd(), _T(".."));
+			wxFileName newWorkingDir(::wxGetCwd(), wxT_2(".."));
 			::wxSetWorkingDirectory(newWorkingDir.GetFullPath());
 		}
 	}
@@ -203,12 +218,12 @@ bool wxLauncher::OnInit() {
 	if (!displaySplash(&splashWindow))
 		return false;
 
-	wxLogInfo(_T("Initializing profiles..."));
+	wxLogInfo(wxT_2("Initializing profiles..."));
 	ProMan::Flags promanFlags = ProMan::None;
 	if (mKeepForSessionOnly)
 		promanFlags = promanFlags | ProMan::NoUpdateLastProfile;
 	if ( !ProMan::Initialize(promanFlags) ) {
-		wxLogFatalError(_T("ProfileManager failed to initialize. Aborting! See log file for more details."));
+		wxLogFatalError(wxT_2("ProfileManager failed to initialize. Aborting! See log file for more details."));
 		return false;
 	}
 	if (mProfileOperator != ProManOperator::none)
@@ -220,23 +235,23 @@ bool wxLauncher::OnInit() {
 	wxFileSystem::AddHandler(new wxArchiveFSHandler);
 	wxFileSystem::AddHandler(new wxInternetFSHandler);
 
-	wxLogInfo(_T("Initializing SkinSystem..."));
+	wxLogInfo(wxT_2("Initializing SkinSystem..."));
 	SkinSystem::Initialize();
 
-	wxLogInfo(_T("Initializing HelpManager..."));
+	wxLogInfo(wxT_2("Initializing HelpManager..."));
 	HelpManager::Initialize();
 	
-	wxLogInfo(_T("Initializing FlagListManager..."));
+	wxLogInfo(wxT_2("Initializing FlagListManager..."));
 	FlagListManager::Initialize();
 	
-	wxLogInfo(_T("Initializing ProfileProxy..."));
+	wxLogInfo(wxT_2("Initializing ProfileProxy..."));
 	ProfileProxy::Initialize();
 
-	wxLogInfo(_T("wxLauncher starting up."));
+	wxLogInfo(wxT_2("wxLauncher starting up."));
 
 
 	MainWindow* window = new MainWindow();
-	wxLogStatus(_T("MainWindow is complete"));
+	wxLogStatus(_("MainWindow is complete"));
 	window->Show(true);
 #if NDEBUG // will autodelete when timout runs out in debug
 	splashWindow->Show(false);
@@ -249,7 +264,7 @@ bool wxLauncher::OnInit() {
 	wxCommandEvent tcMgrInitEvent;
 	TCManager::Get()->CurrentProfileChanged(tcMgrInitEvent);
 
-	wxLogStatus(_T("Ready."));
+	wxLogStatus(_("Ready."));
 	return true;
 }
 
@@ -272,7 +287,7 @@ int wxLauncher::OnExit() {
 
 	}
 
-	wxLogInfo(_T("wxLogger shutdown complete."));
+	wxLogInfo(_("wxLogger shutdown complete."));
 
 	return wxApp::OnExit();
 }
