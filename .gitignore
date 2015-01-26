@@ -1,0 +1,10 @@
+build
+builds
+personal
+code/version.cpp
+*/generated/*
+output
+*.pyc
+*~
+*.orig
+*.rej
