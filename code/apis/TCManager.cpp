@@ -39,10 +39,10 @@ TCManager::~TCManager() {
 }
 
 TCManager* TCManager::manager = NULL;
-TCEventHandlers TCManager::TCChangedHandlers;
-TCEventHandlers TCManager::TCBinaryChangedHandlers;
-TCEventHandlers TCManager::TCActiveModChangedHandlers;
-TCEventHandlers TCManager::TCFredBinaryChangedHandlers;
+EventHandlers TCManager::TCChangedHandlers;
+EventHandlers TCManager::TCBinaryChangedHandlers;
+EventHandlers TCManager::TCActiveModChangedHandlers;
+EventHandlers TCManager::TCFredBinaryChangedHandlers;
 
 void TCManager::Initialize() {
 	if ( !IsInitialized() ) {
@@ -75,9 +75,6 @@ DEFINE_EVENT_TYPE(EVT_TC_CHANGED);
 DEFINE_EVENT_TYPE(EVT_TC_BINARY_CHANGED);
 DEFINE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED);
 DEFINE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED);
-
-#include <wx/listimpl.cpp> // required magic incatation
-WX_DEFINE_LIST(TCEventHandlers);
 
 void TCManager::RegisterTCBinaryChanged(wxEvtHandler *handler) {
 	wxASSERT_MSG(TCBinaryChangedHandlers.IndexOf(handler) == wxNOT_FOUND,
@@ -138,7 +135,7 @@ void TCManager::UnRegisterTCFredBinaryChanged(wxEvtHandler *handler) {
 void TCManager::GenerateTCChanged() {
 	wxCommandEvent event(EVT_TC_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_TC_CHANGED event"));
-	TCEventHandlers::iterator iter = TCChangedHandlers.begin();
+	EventHandlers::iterator iter = TCChangedHandlers.begin();
 	while (iter != TCChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
@@ -149,7 +146,7 @@ void TCManager::GenerateTCChanged() {
 void TCManager::GenerateTCBinaryChanged() {
 	wxCommandEvent event(EVT_TC_BINARY_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_TC_BINARY_CHANGED event"));
-	TCEventHandlers::iterator iter = TCBinaryChangedHandlers.begin();
+	EventHandlers::iterator iter = TCBinaryChangedHandlers.begin();
 	while (iter != TCBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
@@ -160,7 +157,7 @@ void TCManager::GenerateTCBinaryChanged() {
 void TCManager::GenerateTCActiveModChanged() {
 	wxCommandEvent event(EVT_TC_ACTIVE_MOD_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_TC_ACTIVE_MOD_CHANGED event"));
-	TCEventHandlers::iterator iter = TCActiveModChangedHandlers.begin();
+	EventHandlers::iterator iter = TCActiveModChangedHandlers.begin();
 	while (iter != TCActiveModChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
@@ -171,8 +168,8 @@ void TCManager::GenerateTCActiveModChanged() {
 void TCManager::GenerateTCFredBinaryChanged() {
 	wxCommandEvent event(EVT_TC_FRED_BINARY_CHANGED, wxID_NONE);
 	wxLogDebug(_T("Generating EVT_TC_FRED_BINARY_CHANGED event"));
-	TCEventHandlers::iterator iter = TCFredBinaryChangedHandlers.begin();
-	while (iter != TCBinaryChangedHandlers.end()) {
+	EventHandlers::iterator iter = TCFredBinaryChangedHandlers.begin();
+	while (iter != TCFredBinaryChangedHandlers.end()) {
 		wxEvtHandler* current = *iter;
 		current->AddPendingEvent(event);
 		wxLogDebug(_T(" Sent EVT_TC_FRED_BINARY_CHANGED event to %p"), current);
