@@ -31,16 +31,16 @@ public:
 	void SetStatusBarTarget(StatusBar *bar);
 
 	/* Compatiblity with 2.8.x */
-#if wxVERSION_NUMBER > 20899
-	virtual void DoLogRecord(
-		wxLogLevel level,
-		const wxString& msg,
-		const wxLogRecordInfo& info);
-#else
+#if wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 8
 	virtual void DoLog(
 		wxLogLevel level,
 		const wxChar *msg,
 		time_t time);
+#else
+	virtual void DoLogRecord(
+		wxLogLevel level,
+		const wxString& msg,
+		const wxLogRecordInfo& info);
 #endif
 	
 	virtual void Flush();

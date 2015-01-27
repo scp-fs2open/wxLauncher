@@ -69,22 +69,22 @@ Logger::~Logger() {
 
 /** Overridden as per wxWidgets docs to implement a wxLog. */
 /* Compatiblity with 2.8.x */
-#if wxVERSION_NUMBER > 20899
-void Logger::DoLogRecord(
-	wxLogLevel level,
-	const wxString& msg,
-	const wxLogRecordInfo& info)
-{
-	wxString timestr = wxDateTime(info.timestamp).Format(
-		wxT_2("%y%j%H%M%S"),
-		wxDateTime::GMT0);
-#else
+#if wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 8
 void Logger::DoLog(
 		wxLogLevel level,
 		const wxChar *msg,
 		time_t time)
 {
 	wxString timestr = wxDateTime(time).Format(
+		wxT_2("%y%j%H%M%S"),
+		wxDateTime::GMT0);
+#else
+void Logger::DoLogRecord(
+	wxLogLevel level,
+	const wxString& msg,
+	const wxLogRecordInfo& info)
+{
+	wxString timestr = wxDateTime(info.timestamp).Format(
 		wxT_2("%y%j%H%M%S"),
 		wxDateTime::GMT0);
 #endif
