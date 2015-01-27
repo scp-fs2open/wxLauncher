@@ -964,7 +964,7 @@ void ProMan::SaveCurrentProfile(bool quiet) {
 			wxLogStatus(_("Profile '%s' saved"), this->currentProfileName.c_str());				
 		}
 		wxLogDebug(wxT_2("Current config%s saved."),
-			quiet ? wxT_2(" quietly") : wxEmptyString);
+			quiet ? wxT_2(" quietly") : wxT_2(""));
 	} else {
 		wxLogError(wxT_2("Configbase is not a wxFileConfig."));
 	}

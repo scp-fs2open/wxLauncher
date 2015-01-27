@@ -125,6 +125,12 @@ wxLauncher::wxLauncher()
 {
 }
 
+static char* DISPLAY_SPLASH_FAIL_TEXT = 
+	"Unable to load splash image."
+	" This normally means that you are running the Launcher from a folder"
+	" that the launcher does not know how to find the resource folder from."
+	"\n\nThe launcher is expecting (%s) to contain the resource images.";
+
 /** Display the splash screen.
 
 \param splashWindow Out. Point to splash window if created. NULL otherwise.
@@ -151,21 +157,9 @@ bool displaySplash(wxSplashScreen **splashWindow)
 		} else {
 			expectedDir = wxFileName(::wxGetCwd(), wxT_2(RESOURCES_PATH));	
 		}
-#if wxVERSION_NUMBER > 20899
-		wxLogFatalError(wxString::Format(
-			_("Unable to load splash image."
-			" This normally means that you are running the Launcher from a folder"
-			" that the launcher does not know how to find the resource folder from."
-			"\n\nThe launcher is expecting (%s) to contain the resource images."),
+		wxString errmsg(DISPLAY_SPLASH_FAIL_TEXT, wxMBConvUTF8());
+		wxLogFatalError(wxString::Format(wxGetTranslation(errmsg),
 			expectedDir.GetFullPath().c_str()).c_str());
-#else
-		wxLogFatalError(wxString::Format(
-			_T("Unable to load splash image.")
-			_T(" This normally means that you are running the Launcher from a folder")
-			_T(" that the launcher does not know how to find the resource folder from.")
-			_T("\n\nThe launcher is expecting (%s) to contain the resource images."),
-			expectedDir.GetFullPath().c_str()).c_str());
-#endif
 		return false;
 	}
 	return true;
