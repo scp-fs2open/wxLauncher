@@ -23,7 +23,7 @@
 #include "controls/ModList.h"
 #include "apis/EventHandlers.h"
 
-DEFINE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED);
 
 EventHandlers ResolutionMap::resolutionMapChangedHandlers;
 

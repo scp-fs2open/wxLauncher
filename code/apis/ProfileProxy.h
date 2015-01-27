@@ -33,11 +33,11 @@
    whenever possible. */
 
 /** Indicates the proxy has reset itself. */
-DECLARE_EVENT_TYPE(EVT_PROXY_RESET, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_PROXY_RESET);
 
 /** Indicates the proxy has successfully processed flag data from the flag file
  and profile. */
-DECLARE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY);
 
 WX_DECLARE_STRING_HASH_MAP(int, FlagStringToIndexMap);
 

@@ -28,8 +28,8 @@
 
 #include <wx/tokenzr.h>
 
-DEFINE_EVENT_TYPE(EVT_PROXY_RESET);
-DEFINE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_PROXY_RESET);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_PROXY_FLAG_DATA_READY);
 
 void ProfileProxy::RegisterProxyReset(wxEvtHandler *handler) {
 	wxASSERT(ProfileProxy::IsInitialized());

@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
-DEFINE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
 
 EventHandlers SkinSystem::TCSkinChangedHandlers;
 

@@ -25,8 +25,8 @@
 EventHandlers CmdLineManager::CmdLineChangedHandlers;
 EventHandlers CmdLineManager::CustomFlagsChangedHandlers;
 
-DEFINE_EVENT_TYPE(EVT_CMD_LINE_CHANGED);
-DEFINE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_CMD_LINE_CHANGED);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED);
 
 void CmdLineManager::RegisterCmdLineChanged(wxEvtHandler *handler) {
 	wxASSERT_MSG(CmdLineChangedHandlers.IndexOf(handler) == wxNOT_FOUND,

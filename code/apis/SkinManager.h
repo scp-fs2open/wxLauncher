@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "datastructures/NewsSource.h"
 
 /** TC skin has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_SKIN_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_TC_SKIN_CHANGED);
 
 /** Holds a skin's information.  */
 /** The Set() functions return true on success, false otherwise. */

@@ -24,9 +24,9 @@
 #include "apis/EventHandlers.h"
 
 /** Command line has changed. */
-DECLARE_EVENT_TYPE(EVT_CMD_LINE_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_CMD_LINE_CHANGED);
 /** Custom flags have changed. */
-DECLARE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_CUSTOM_FLAGS_CHANGED);
 
 class CmdLineManager {
 private:

@@ -26,13 +26,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/EventHandlers.h"
 
 /** Selected TC has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_TC_CHANGED);
 /** Selected binary has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_BINARY_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_TC_BINARY_CHANGED);
 /** Active mod has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_TC_ACTIVE_MOD_CHANGED);
 /** Selected FRED binary has changed. */
-DECLARE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_TC_FRED_BINARY_CHANGED);
 
 class TCManager: public wxEvtHandler {
 public:

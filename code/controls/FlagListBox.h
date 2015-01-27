@@ -63,7 +63,7 @@ private:
 WX_DECLARE_LIST(FlagListCheckBoxItem, FlagListCheckBoxItems);
 
 /** Flag list box is ready for use. */
-DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
 
 class FlagListBox: public wxVListBox {
 public:
