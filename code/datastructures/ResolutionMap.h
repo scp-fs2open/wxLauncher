@@ -30,7 +30,7 @@
 // then this map will need to be cleared whenever the user presses the button.
 
 /** ResolutionMap has changed. */
-DECLARE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED);
 
 struct ResolutionData {
 	ResolutionData() { } // required for wxHashMap, unfortunately

@@ -28,7 +28,7 @@
 
 /** Flag file processing status has changed.
  The event's int value indicates the FlagFileProcessingStatus. */
-DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
 
 WX_DECLARE_OBJARRAY(wxFileName, FlagFileArray);
 

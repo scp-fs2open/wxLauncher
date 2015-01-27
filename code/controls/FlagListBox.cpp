@@ -66,7 +66,7 @@ FlagListCheckBoxItem::~FlagListCheckBoxItem() {
 #include <wx/listimpl.cpp> // Magic Incantation
 WX_DEFINE_LIST(FlagListCheckBoxItems);
 
-DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_FLAG_LIST_BOX_READY);
 
 void FlagListBox::RegisterFlagListBoxReady(wxEvtHandler *handler) {
 	wxASSERT_MSG(flagListBoxReadyHandlers.IndexOf(handler) == wxNOT_FOUND,

@@ -22,6 +22,14 @@
 #include <wx/wx.h>
 #include <wx/event.h>
 
+#if wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 8
+#define LAUNCHER_DECLARE_EVENT_TYPE(name) DECLARE_EVENT_TYPE(name, wxID_ANY)
+#define LAUNCHER_DEFINE_EVENT_TYPE(name) DEFINE_EVENT_TYPE(name)
+#else
+#define LAUNCHER_DECLARE_EVENT_TYPE(name) wxDECLARE_EVENT(name, wxCommandEvent)
+#define LAUNCHER_DEFINE_EVENT_TYPE(name) wxDEFINE_EVENT(name, wxCommandEvent)
+#endif
+
 WX_DECLARE_LIST(wxEvtHandler, EventHandlers);
 
 #endif

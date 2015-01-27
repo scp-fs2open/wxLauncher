@@ -29,9 +29,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 WX_DECLARE_STRING_HASH_MAP( wxFileConfig*, ProfileMap );
 
 /** event is generated anytime the number of profiles in the manager change. */
-DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE, -1);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_PROFILE_CHANGE);
 /** Event is generated anytime the currently selected profile is changed. */
-DECLARE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED, -1);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_CURRENT_PROFILE_CHANGED);
 
 /** Stores data about downloaded news. */
 struct NewsData {

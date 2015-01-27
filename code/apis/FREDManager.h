@@ -26,7 +26,7 @@
 #include "apis/EventHandlers.h"
 
 /** FRED enabled status has changed. */
-DECLARE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED, wxID_ANY);
+LAUNCHER_DECLARE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED);
 
 class FREDManager {
 public:

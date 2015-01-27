@@ -20,7 +20,7 @@
 #include "apis/ProfileManager.h"
 #include "global/ProfileKeys.h"
 
-DEFINE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED);
+LAUNCHER_DEFINE_EVENT_TYPE(EVT_FRED_ENABLED_CHANGED);
 
 EventHandlers FREDManager::FREDEnabledChangedHandlers;
 
