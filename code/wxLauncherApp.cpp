@@ -52,14 +52,14 @@ IMPLEMENT_APP(wxLauncher);
 const static wxCmdLineEntryDesc CmdLineOptions[] = {
 	{wxCMD_LINE_SWITCH, NULL, wxT_2("session-only"),
 	_("Do not remember the profile that is selected at exit")},
-#if wxVERSION_NUMBER > 20899
-	{wxCMD_LINE_SWITCH, NULL, "add-profile",
-	_("Add profile PROFILE from FILE. If PROFILE already exists
-	" it will not be overwritten. *Operator*")},
-#else
+#if wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 8
 	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
 	_T("Add profile PROFILE from FILE. If PROFILE already exists")
 	_T(" it will not be overwritten. *Operator*")},
+#else
+	{wxCMD_LINE_SWITCH, NULL, _("add-profile"),
+	_("Add profile PROFILE from FILE. If PROFILE already exists"
+	" it will not be overwritten. *Operator*")},
 #endif
 	{wxCMD_LINE_SWITCH, NULL, wxT_2("select-profile"),
 	_("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
