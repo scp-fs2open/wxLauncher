@@ -34,7 +34,7 @@ Xcode, KDevelop, and of course autotools.
 Requirements shortlist:
 All platforms:
  - CMake 2.8
- - wxWidgets 2.8.10+ (but not 2.9.x)
+ - wxWidgets 2.8.10+ or 3.0.2
  - Python 2.6+ (but not 3.x)
  - Markdown in Python
 Windows
@@ -49,15 +49,18 @@ Optional components
 All platforms:
  - OpenAL
 
-wxLauncher is built using CMake.  Only version 2.8 has been 
-tested (and the CMake file enforces this).  CMake can be 
+wxLauncher is built using CMake.  Only version 2.8 or later has
+been tested (and the CMake file enforces this).  CMake can be 
 downloaded in binary form, from the [CMake Home Page] or if you
 run Linux, from your distro's package repository.
   [Cmake Home Page]: http://cmake.org
 
 wxLauncher is a wxWidgets-based application. It can 
-only be built with wxWidgets version 2.8.10 or higher 
-installed on your system.
+only be built with wxWidgets version 2.8.10 or higher.
+Version 0.9.5 has been tested with:
+  - 2.8.12 (no STL)
+  - 2.8.12 (STL)
+  - 3.0.2 (no STL)
 wxWidgets homepage:
 	http://www.wxwidgets.org/
 	
@@ -105,16 +108,19 @@ from [Microsoft] for free.
 
 wxLauncher's source can be explored from the project's
 source page:
-	http://code.google.com/p/wxlauncher/source/checkout
+	https://github.com/wxLauncher/wxlauncher/
   
-To get the source, you'll need Mercurial:
-	http://mercurial.selenic.com/
-or the TortoiseHG frontend (which includes Mercurial):
-	http://tortoisehg.bitbucket.org/
+To get the source, you'll need Git:
+	http://git-scm.com/
+or the TortioseGit frontend (which includes Git):
+	http://tortiosegit.org
+or the package manager of your Linux Distro, sometimes called
+'git-scm';
+or the Homebrew Project for OS X.
 
-Once Mercurial is installed, you can get a copy of the source
+Once Git is installed, you can get a copy of the source
 by running the following command in a folder of your choice:
-	hg clone https://code.google.com/p/wxlauncher/
+	git clone https://code.google.com/p/wxlauncher/
   
 Building - Windows
 ==================
@@ -138,7 +144,7 @@ wrong python".
 - Check DEVELOPMENT_MODE if you are going to be debugging wxLauncher. Make sure
 that it is unchecked if you plan on distributing the code as with this checked,
 the launcher will only run on the dev machine. This option changes where the
-launcher looks for files to display as the default interface.
+launcher looks for files to display such as the default interface.
 - Check USE_JOYSTICK, USE_OPENAL, and/or USE_SPEECH if you want those options compiled in.
 - If USE_OPENAL is checked, OPENAL_INCLUDE_DIR will appear. Set it to the include
 folder in the OpenAL SDK folder.
@@ -185,8 +191,8 @@ that might also work, but it can't be guaranteed.
 - Download and install the most recent version of Python 2 if you don't
 already have at least Python 2.6; Python 3 will not work
 - Download and install Markdown in Python (link is provided above)
-- Download and install Mercurial, making sure that you select the version of
-  Mercurial for your version of OS X
+- Download and install Git, making sure that you select the version of
+  Git for your version of OS X
 - Download the wxLauncher source
 - Download and install CMake 2.8
 - Download and build wxWidgets 2.8.12 (use the wxMac version). Once you've
