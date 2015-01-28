@@ -10,8 +10,8 @@ cmake_policy(SET CMP0043 OLD)
 project(wxlauncher CXX C) 
 
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 10)
-set(VERSION_PATCH 0)
+set(VERSION_MINOR 9)
+set(VERSION_PATCH 5)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/include")
 
