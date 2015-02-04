@@ -5,24 +5,10 @@
 if(IS_WIN32) # and WIN64
   # find the runtime files
   if(CMAKE_BUILD_TYPE MATCHES Debug)
-	set(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/Debug_NonRedist/x86/Microsoft.VC90.DebugCRT")
-	foreach(dll_name msvcm90d.dll msvcp90d.dll msvcr90d.dll Microsoft.VC90.DebugCRT.manifest)
-		find_file(DLLPATH_${dll_name} ${dll_name}
-		  PATHS ${VC9_RUNTIME_LOCATIONS}
-		  NO_DEFAULT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH)
-		install(FILES ${DLLPATH_${dll_name}} DESTINATION bin)
-	endforeach()
-    find_file(wxLauncher_pdb wxlauncher.pdb PATHS ${CMAKE_CURRENT_BINARY_DIR})
     install(FILES ${wxLauncher_pdb} DESTINATION bin)
-  else()
-	set(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT")
-	foreach(dll_name msvcp90.dll msvcm90.dll msvcr90.dll Microsoft.VC90.CRT.manifest)
-		find_file(DLLPATH_${dll_name} ${dll_name}
-		  PATHS ${VC9_RUNTIME_LOCATIONS}
-		  NO_DEFAULT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH)
-		install(FILES ${DLLPATH_${dll_name}} DESTINATION bin)
-	endforeach()
+    set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
   endif()
+  include(InstallRequiredSystemLibraries)
 endif() # IS_WIN32
   
 set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
