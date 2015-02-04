@@ -5,7 +5,15 @@
 if(IS_WIN32) # and WIN64
   # find the runtime files
   if(CMAKE_BUILD_TYPE MATCHES Debug)
-    install(FILES ${wxLauncher_pdb} DESTINATION bin)
+    # Determine the name of the pdb on the first run of CMake.
+    # From Cmake mailing list:
+    # http://www.cmake.org/pipermail/cmake/2007-October/016924.html
+    # First, build the full name of the EXE.
+    install(CODE "set(wxLauncher_pdb ${CMAKE_CURRENT_BINARY_DIR}/\${${project}_BUILD_NAME_\${CMAKE_INSTALL_CONFIG_NAME}})")
+    # Then, replace .exe with .pdb.
+    install(CODE "string(REPLACE .exe .pdb wxLauncher_pdb \${wxLauncher_pdb})")
+    # Finally, get it installed.
+    install(CODE "install(FILES ${wxLauncher_pdb} DESTINATION bin)")
     set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
   endif()
   include(InstallRequiredSystemLibraries)
