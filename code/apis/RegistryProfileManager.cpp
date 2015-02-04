@@ -28,7 +28,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/stdpaths.h>
 #include <wx/wfstream.h>
 #if PLATFORM_USES_REGISTRY == 1
-#include <windows.h>
+#include <Windows.h>
+#include <Sddl.h>
+
+#if _MSC_VER >= 1800
+#include <VersionHelpers.h>
+#endif
+
 #endif
 
 #include "global/MemoryDebugging.h"
@@ -59,16 +65,169 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define REG_DATA_NOT_STRING _T("Registry key lookup above line %d is not a DWORD")
 #endif
 
+#if PLATFORM_USES_REGISTRY == 1
+
+typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+
+class WinAPI
+{
+private:
+	static bool inited;
+
+	static LPFN_ISWOW64PROCESS fnIsWOW64Process;
+public:
+	static bool IsInited()
+	{
+		return inited;
+	}
+
+	static bool GetUserSID(wxString& outStr)
+	{
+		HANDLE hToken = NULL;
+		if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken) == FALSE)
+		{
+			wxLogError(_("Failed to get process token. Error Code: 0x%08x"), GetLastError());
+			return false;
+		}
+
+		DWORD dwBufferSize;
+		GetTokenInformation(hToken, TokenUser, NULL, 0, &dwBufferSize);
+
+		PTOKEN_USER ptkUser = (PTOKEN_USER) new BYTE[dwBufferSize];
+		if (ptkUser == NULL)
+		{
+			wxLogError(_T("ptkUser is NULL"));
+			return false;
+		}
+
+		if (GetTokenInformation(hToken, TokenUser, ptkUser, dwBufferSize, &dwBufferSize) == 0)
+		{
+			wxLogError(_("Failed to get token information.  Error Code: 0x%08x"), GetLastError());
+			return false;
+		}
+
+		if (IsValidSid(ptkUser->User.Sid) == FALSE)
+		{
+			wxLogError(_("SID structure is Invalid"));
+			delete[] ptkUser;
+			return false;
+		}
+
+		LPTSTR sidName = NULL;
+		if (ConvertSidToStringSid(ptkUser->User.Sid, &sidName) == 0)
+		{
+			wxLogError(_("Failed to convert SID structure to string. Error Code: 0x%08x"),
+				GetLastError());
+			delete[] ptkUser;
+			return false;
+		}
+
+		outStr.assign(sidName);
+
+		LocalFree(sidName);
+		delete[] ptkUser;
+
+		return true;
+	}
+
+	static void Init()
+	{
+		HMODULE hKernel32 = GetModuleHandle(TEXT("Kernel32"));
+		fnIsWOW64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(hKernel32, "IsWow64Process");
+
+		/* Use "Version Helper APIs" if available because GetVersionEx may
+		not be available in versions of Windows after 8.1 */
+#if _MSC_VER >= 1800
+		if (IsWindowsVistaOrGreater())
+		{
+#else
+		OSVERSIONINFO versionInfo;
+		versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		GetVersionEx(&versionInfo);
+
+		/* The first version of Windows to have registry virtualization is
+		Vista, aka 6.0 */
+		if (versionInfo.dwMajorVersion >= 6)
+		{
+#endif
+			userSIDValid = GetUserSID(userSID);
+		}
+
+		inited = true;
+	}
+
+	static bool IsWow64()
+	{
+		BOOL bIsWow64 = FALSE;
+		if (fnIsWOW64Process != NULL)
+		{
+			if (!fnIsWOW64Process(GetCurrentProcess(), &bIsWow64))
+			{
+				wxLogDebug(_("Failed to determine if process runs under WOW64"));
+			}
+		}
+		return bIsWow64 == TRUE;
+	}
+
+	static wxString userSID;
+	static bool userSIDValid;
+};
+
+bool WinAPI::inited = false;
+bool WinAPI::userSIDValid = false;
+wxString WinAPI::userSID(wxT_2(""));
+LPFN_ISWOW64PROCESS WinAPI::fnIsWOW64Process = NULL;
+
+HKEY GetRegistryKeyname(wxString& out_keyname)
+{
+	// Every compiler from Visual Studio 2008 onward should have support for UAC
+#if _MSC_VER > 1400
+	if (WinAPI::userSIDValid)
+	{
+		if (WinAPI::IsWow64())
+		{
+			out_keyname = wxString::Format(wxT_2("%s_Classes\\VirtualStore\\Machine\\Software\\Wow6432Node\\%s"),
+				WinAPI::userSID.c_str(), REG_KEY_FOLDER_LOCATION.c_str());
+		}
+		else
+		{
+			out_keyname = wxString::Format(wxT_2("%s_Classes\\VirtualStore\\Machine\\Software\\%s"),
+				WinAPI::userSID.c_str(), REG_KEY_FOLDER_LOCATION.c_str());
+		}
+		return HKEY_USERS;
+	}
+	else
+	{
+		out_keyname = REG_KEY_FOLDER_LOCATION;
+		return HKEY_LOCAL_MACHINE;
+	}
+#else
+	out_keyname = REG_KEY_FOLDER_LOCATION;
+	return HKEY_LOCAL_MACHINE;
+#endif
+}
+
+#endif
+
+
 /* File contains the Win32 incatations for Pushing and Pulling the passed
 profile to/from the registry. */
 
 ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 #if PLATFORM_USES_REGISTRY == 1
+	if (!WinAPI::IsInited())
+	{
+		WinAPI::Init();
+	}
+
+	wxString keyName;
+	HKEY useKey = GetRegistryKeyname(keyName);
+
 	LONG ret = ERROR_SUCCESS;
 	HKEY regHandle = 0;
 
-	ret = RegCreateKeyExW(HKEY_LOCAL_MACHINE,
-		REG_KEY_FOLDER_LOCATION,
+	ret = RegCreateKeyExW(useKey,
+		keyName,
 		0, // Reserved
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -77,12 +236,8 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		&regHandle,
 		NULL // I don't care if the key was created before opening
 		);
-#ifdef REGISTRY_HELPER
-	// Do not attempt to call registry_helper.exe if already in registry_helper.exe
+
 	if ( ret != ERROR_SUCCESS ) {
-#else
-	if ( ret != ERROR_SUCCESS && ret != ERROR_ACCESS_DENIED) {
-#endif
 		// Call failed
 		LPWSTR message = NULL;
 		DWORD nchars = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
@@ -101,37 +256,6 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 			LocalFree(message);
 		}
 		return ProMan::AccessDenied;
-#ifndef REGISTRY_HELPER
-	} else if ( ret == ERROR_ACCESS_DENIED ) {
-		// Only try calling registry_helper.exe if not already in registry_helper.exe
-		wxString tempdir(L"profilespit");
-		wxFile outfile;
-		wxString tempfile = wxFileName::CreateTempFileName(tempdir, &outfile);
-		wxLogDebug(_T("Launching helper on %s"), tempfile.c_str());
-		wxFileOutputStream out(outfile);
-		cfg->Save(out);
-		out.Close();
-
-		wxArrayString processOutput, processError;
-		long ret = wxExecute(wxString::Format(_T("registry_helper.exe push \"%s\""), tempfile), processOutput, processError);
-		wxLogDebug(_T(" Registry helper returned 0x%08X"), ret);
-
-		for(size_t i = 0; i < processError.size(); i++) {
-			wxLogInfo(_T("EREG:%s"), processError[i]);
-		}
-		for(size_t i = 0; i < processOutput.size(); i++) {
-			wxLogInfo(_T(" REG:%s"), processOutput[i]);
-		}
-
-		::wxRemoveFile(tempfile);
-		if ( ret == ProMan::NoError ) {
-			// no error so just return, because the other process did what I needed.
-			return ProMan::NoError;
-		} else {
-			wxLogError(_T("Unable to write FS2 Open settings to the registry (0x%08X)"), ret);
-			return static_cast<ProMan::RegistryCodes>(ret);
-		}
-#endif	
 	}
 
 	// Video
@@ -512,28 +636,29 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 #if PLATFORM_USES_REGISTRY == 1
+	if (!WinAPI::IsInited())
+	{
+		WinAPI::Init();
+	}
+
+	wxString keyName;
+	HKEY useKey = GetRegistryKeyname(keyName);
+
 	LONG ret = ERROR_SUCCESS;
 	HKEY regHandle = 0;
 
-	// try opening registry with write privleges even though I do not need
-	// them because I want to trigger registry_helper here just like when
-	// tring to write the settings.
-	ret = RegCreateKeyExW(HKEY_LOCAL_MACHINE,
-		REG_KEY_FOLDER_LOCATION,
+	ret = RegCreateKeyExW(useKey,
+		keyName,
 		0, // Reserved
 		NULL,
 		REG_OPTION_NON_VOLATILE,
-		KEY_WRITE | KEY_READ,
+		KEY_READ,
 		NULL, // default security.
 		&regHandle,
 		NULL // I don't care if the key was created before opening
 		);
-#ifdef REGISTRY_HELPER
-	// Do not attempt to call registry_helper.exe if already in registry_helper.exe
+
 	if ( ret != ERROR_SUCCESS ) {
-#else
-	if ( ret != ERROR_SUCCESS && ret != ERROR_ACCESS_DENIED) {
-#endif
 		// Call failed
 		LPWSTR message = NULL;
 		DWORD nchars = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
@@ -552,102 +677,6 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 			LocalFree(message);
 		}
 		return ProMan::AccessDenied;
-#ifndef REGISTRY_HELPER
-	} else if ( ret == ERROR_ACCESS_DENIED ) {
-		// Only try calling registry_helper.exe if not already in registry_helper.exe
-		wxString tempfile = wxFileName::CreateTempFileName(wxStandardPaths::Get().GetTempDir());
-		wxLogDebug(_T("Launching helper on %s"), tempfile);
-		wxArrayString processOutput;
-		long ret = wxExecute(wxString::Format(_T("registry_helper.exe pull \"%s\""), tempfile), processOutput);
-		wxLogDebug(_T(" Registry helper returned %d"), ret);
-
-		for(size_t i = 0; i < processOutput.size(); i++) {
-			wxLogInfo(_T(" REG:%s"), processOutput[i]);
-		}
-		wxFileInputStream in(tempfile);
-		wxFileConfig inConfig(in);
-
-		// a hack to make the copying fo the items from the groups work,
-		// check if the possible entries set exist in the response from registry_helper.
-		wxString configData;
-		if ( inConfig.Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_RESOLUTION_WIDTH, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_BIT_DEPTH, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_BIT_DEPTH, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_TEXTURE_FILTER, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_TEXTURE_FILTER, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_ANISOTROPIC, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_ANISOTROPIC, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_VIDEO_ANTI_ALIAS, &configData) ) {
-			cfg->Write(PRO_CFG_VIDEO_ANTI_ALIAS, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_OPENAL_DEVICE, &configData) ) {
-			cfg->Write(PRO_CFG_OPENAL_DEVICE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_OPENAL_CAPTURE_DEVICE, &configData) ) {
-			cfg->Write(PRO_CFG_OPENAL_CAPTURE_DEVICE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_OPENAL_EFX, &configData) ) {
-			cfg->Write(PRO_CFG_OPENAL_EFX, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_OPENAL_SAMPLE_RATE, &configData) ) {
-			cfg->Write(PRO_CFG_OPENAL_SAMPLE_RATE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_VOICE, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_VOICE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_VOLUME, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_VOLUME, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_IN_TECHROOM, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_IN_TECHROOM, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_IN_BRIEFINGS, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_IN_BRIEFINGS, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_IN_GAME, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_IN_GAME, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_SPEECH_IN_MULTI, &configData) ) {
-			cfg->Write(PRO_CFG_SPEECH_IN_MULTI, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_JOYSTICK_ID, &configData) ) {
-			cfg->Write(PRO_CFG_JOYSTICK_ID, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, &configData) ) {
-			cfg->Write(PRO_CFG_JOYSTICK_FORCE_FEEDBACK, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_JOYSTICK_DIRECTIONAL, &configData) ) {
-			cfg->Write(PRO_CFG_JOYSTICK_DIRECTIONAL, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_TYPE, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_TYPE, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_SPEED, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_SPEED, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_PORT, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_PORT, configData);
-		}
-		if ( inConfig.Read(PRO_CFG_NETWORK_IP, &configData) ) {
-			cfg->Write(PRO_CFG_NETWORK_IP, configData);
-		}
-
-		if ( ret == ProMan::NoError ) {
-			// no error so just return, because the other process did what I needed.
-			return ProMan::NoError;
-		} else {
-			wxLogError(_T("Unable to read FS2 Open settings from the registry (%d)"), ret);
-			return static_cast<ProMan::RegistryCodes>(ret);
-		}
-#endif	
 	}
 	wxMBConvUTF16 textConv;
 	DWORD type = 0;

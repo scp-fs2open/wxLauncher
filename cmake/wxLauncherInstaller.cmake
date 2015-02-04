@@ -14,9 +14,6 @@ if(IS_WIN32) # and WIN64
 	endforeach()
     find_file(wxLauncher_pdb wxlauncher.pdb PATHS ${CMAKE_CURRENT_BINARY_DIR})
     install(FILES ${wxLauncher_pdb} DESTINATION bin)
-    find_file(registry_helper_pdb registry_helper.pdb PATHS ${CMAKE_CURRENT_BINARY_DIR}
-      NO_DEFAULT_PATH NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH)
-    install(FILES ${registry_helper_pdb} DESTINATION bin)
   else()
 	set(VC9_RUNTIME_LOCATIONS "C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT" "C:/Program Files/Microsoft Visual Studio 9.0/VC/redist/x86/Microsoft.VC90.CRT")
 	foreach(dll_name msvcp90.dll msvcm90.dll msvcr90.dll Microsoft.VC90.CRT.manifest)
@@ -120,7 +117,6 @@ endif()
 include(CPack)
 
 if(IS_WIN32)
-  install(TARGETS registry_helper RUNTIME DESTINATION bin)
   install(TARGETS wxlauncher RUNTIME DESTINATION bin)
 elseif(IS_APPLE)
   install(TARGETS wxlauncher 

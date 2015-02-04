@@ -112,59 +112,6 @@ endif()
 include(${wxWidgets_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/code)
 
-if(IS_WIN32) # helper is only needed on windows
-  add_executable(registry_helper WIN32
-    code/global/ids.h
-    code/global/BasicDefaults.h
-    code/global/BasicDefaults.cpp
-    code/global/ModDefaults.h
-    code/global/ModDefaults.cpp
-    code/global/ModIniKeys.h
-    code/global/ModIniKeys.cpp
-    code/global/ProfileKeys.h
-    code/global/ProfileKeys.cpp
-    code/global/RegistryKeys.h
-    code/global/RegistryKeys.cpp
-    code/global/SkinDefaults.h
-    code/global/SkinDefaults.cpp
-    code/global/Utils.h
-    code/global/Utils.cpp
-    code/apis/RegistryProfileManager.cpp
-    platform/win32/registry_helper.cpp
-    code/apis/PlatformProfileManagerShared.cpp
-    code/apis/CmdLineManager.h
-    code/apis/CmdLineManager.cpp
-    code/apis/EventHandlers.h
-    code/apis/EventHandlers.cpp
-    code/apis/FlagListManager.h
-    code/apis/FlagListManager.cpp
-    code/apis/ProfileManager.h
-    code/apis/ProfileManager.cpp
-    code/apis/ProfileProxy.h
-    code/apis/ProfileProxy.cpp
-    code/apis/SkinManager.h
-    code/apis/SkinManager.cpp
-    code/apis/TCManager.h
-    code/apis/TCManager.cpp
-    code/controls/LightingPresets.h
-    code/controls/LightingPresets.cpp
-    code/controls/ModList.h
-    code/controls/ModList.cpp
-    code/datastructures/FlagFileData.h
-    code/datastructures/FlagFileData.cpp
-    code/datastructures/FSOExecutable.h
-    code/datastructures/FSOExecutable.cpp
-    code/datastructures/NewsSource.h
-    code/datastructures/NewsSource.cpp
-    )
-  set_target_properties(registry_helper
-    PROPERTIES LINKER_LANGUAGE CXX
-    LINK_FLAGS /MANIFESTUAC:NO
-    COMPILE_DEFINITIONS REGISTRY_HELPER
-    )
-  target_link_libraries(registry_helper ${wxWidgets_LIBRARIES})
-endif()
-
 # Check to see if we have a GIT executable so that we will be able to
 # generate the version.cpp.  If we don't have a hg binary, notify and
 # create the target to copy a template version.
@@ -334,9 +281,6 @@ set_source_files_properties(
   PROPERTIES HEADER_FILE_ONLY true)
 
 add_dependencies(wxlauncher helpmaker version.cpp.maker)
-if(IS_WIN32)
-  add_dependencies(wxlauncher registry_helper)
-endif(IS_WIN32)
 
 configure_file(${CMAKE_SOURCE_DIR}/code/global/configure_launcher.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/generated/configure_launcher.h)
