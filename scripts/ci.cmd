@@ -1,11 +1,11 @@
 setlocal ENABLEEXTENSIONS
 
 :contargs
-if "%2"=="" goto doneargs
+@if "%2"=="" goto doneargs
 set %1=%2
-shift
-shift
-goto contargs
+@shift
+@shift
+@goto contargs
 
 :doneargs
 
@@ -20,5 +20,6 @@ if defined BUILDTYPE (set ARGBUILDTYPE="-DBUILDTYPE=%BUILDTYPE%")
 mkdir build
 cd build
 
+echo.
 echo Configuring build
 cmake .. -G "NMake Makefiles" %ARGBUILDTYPE% %ARGWXVER%
