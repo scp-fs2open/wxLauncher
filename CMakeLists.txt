@@ -28,40 +28,42 @@ if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
 endif()
 
 if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
-	# we are given an explict wxWidgets version we must use
-	# which means we are probably on CI builder
-	if(WXVER MATCHES "2.8")
-		find_package(wxWidgets 2.8.10
-		  COMPONENTS base core net xml html adv qa richtext)
-	elseif(WXVER MATCHES "3.0")
-		find_package(wxWidgets 3.0.2
-		  COMPONENTS base core net xml html adv qa richtext)
-	else()
-		message(FATAL_ERROR "Unknown WXVER forced")
-	endif()
+  # we are given an explict wxWidgets version we must use
+  # which means we are probably on CI builder
+  if(WXVER MATCHES "2.8")
+    find_package(wxWidgets 2.8.10
+      COMPONENTS base core net xml html adv qa richtext)
+  elseif(WXVER MATCHES "3.0")
+    find_package(wxWidgets 3.0.2
+      COMPONENTS base core net xml html adv qa richtext)
+  else()
+    message(FATAL_ERROR "Unknown WXVER forced")
+  endif()
 
-	#ensure we have the correct version with or without stl as requested
-	message("-- Testing wxUSE_STL")
-	try_compile(HAVE_WXSTL ${CMAKE_BINARY_DIR}
-		SOURCES ${CMAKE_SOURCE_DIR}/cmake/test_wxstl.cpp
-		COMPILE_DEFINITIONS "/I${wxWidgets_LIB_DIR}/${wxWidgets_CONFIGURATION} /I${wxWidgets_ROOT_DIR}/include")
+  #ensure we have the correct version with or without stl as requested
+  if(NOT DEFINED wxUSE_STL)
+    message("-- Testing wxUSE_STL")
+    try_compile(HAVE_WXSTL ${CMAKE_BINARY_DIR}
+      SOURCES ${CMAKE_SOURCE_DIR}/cmake/test_wxstl.cpp
+      COMPILE_DEFINITIONS "/I${wxWidgets_LIB_DIR}/${wxWidgets_CONFIGURATION} /I${wxWidgets_ROOT_DIR}/include")
 
-	if(WXVER MATCHES "stl")
-		if(NOT HAVE_WXSTL)
-			message(FATAL_ERROR "wxSTL required but not provided")
-		endif()
-	else()
-		if(HAVE_WXSTL)
-			message(FATAL_ERROR "wxSTL enabled but was not requested")
-		endif()
-	endif()
+    if(WXVER MATCHES "stl")
+      if(NOT HAVE_WXSTL)
+        message(FATAL_ERROR "wxSTL required but not provided")
+      endif()
+    else()
+      if(HAVE_WXSTL)
+        message(FATAL_ERROR "wxSTL enabled but was not requested")
+      endif()
+    endif()
+  endif()
 else()
-	find_package(wxWidgets 2.8.10
-		COMPONENTS base core net xml html adv qa richtext)
-	if(NOT wxWidgets_FOUND)
-		find_package(wxWidgets 3.0.2
-			COMPONENTS base core net xml html adv qa richtext)
-	endif()
+  find_package(wxWidgets 2.8.10
+    COMPONENTS base core net xml html adv qa richtext)
+  if(NOT wxWidgets_FOUND)
+    find_package(wxWidgets 3.0.2
+      COMPONENTS base core net xml html adv qa richtext)
+  endif()
 endif()
   
 if(NOT PYTHON_EXECUTABLE)
