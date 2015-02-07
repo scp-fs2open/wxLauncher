@@ -41,19 +41,19 @@ if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   endif()
 
   #ensure we have the correct version with or without stl as requested
-  if(NOT DEFINED wxUSE_STL)
+  if(NOT DEFINED HAVE_WXUSE_STL)
     message("-- Testing wxUSE_STL")
-    try_compile(HAVE_WXSTL ${CMAKE_BINARY_DIR}
+    try_compile(HAVE_WXUSE_STL ${CMAKE_BINARY_DIR}
       SOURCES ${CMAKE_SOURCE_DIR}/cmake/test_wxstl.cpp
       COMPILE_DEFINITIONS "/I${wxWidgets_LIB_DIR}/${wxWidgets_CONFIGURATION} /I${wxWidgets_ROOT_DIR}/include")
 
     if(WXVER MATCHES "stl")
-      if(NOT HAVE_WXSTL)
-        message(FATAL_ERROR "wxSTL required but not provided")
+      if(NOT HAVE_WXUSE_STL)
+        message(FATAL_ERROR "wxUSE_STL required but not provided")
       endif()
     else()
-      if(HAVE_WXSTL)
-        message(FATAL_ERROR "wxSTL enabled but was not requested")
+      if(HAVE_WXUSE_STL)
+        message(FATAL_ERROR "wxUSE_STL enabled but was not requested")
       endif()
     endif()
   endif()
