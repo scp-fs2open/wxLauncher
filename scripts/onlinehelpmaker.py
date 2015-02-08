@@ -510,6 +510,7 @@ def make_path_in_archive(path, path1):
   return os.path.sep.join(make_path_in_archive_helper(list, list1))
   
 def make_path_in_archive_helper(list, list1):
+  logging.debug("make_path_in_archive_helper(%s, %s)", str(list), str(list1))
   if len(list) > 0 and len(list1) > 0 and list[0] == list1[0]:
     return make_path_in_archive_helper(list[1:], list1[1:])
   elif len(list) > 0 and len(list1) == 0:
