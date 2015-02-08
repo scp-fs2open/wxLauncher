@@ -72,6 +72,9 @@ else()
       COMPONENTS base core net xml html adv qa richtext)
   endif()
 endif()
+if(NOT wxWidgets_FOUND)
+  message(FATAL_ERROR "Unable to locate wxWidgets")
+endif()
   
 if(NOT PYTHON_EXECUTABLE)
   # Only try to find python iff not already given
