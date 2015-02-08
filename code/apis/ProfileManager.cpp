@@ -588,7 +588,7 @@ bool ProMan::GlobalWrite(const wxString& key, bool value) {
 // current profile access functions
 
 /** Tests whether the key strName is in the current profile. */
-bool ProMan::ProfileExists(wxString& strName) const {
+bool ProMan::ProfileExists(const wxString& strName) const {
 	if (this->currentProfile == NULL) {
 		wxLogWarning(wxT_2("attempt to check existence of key %s in null current profile"),
 			strName.c_str());

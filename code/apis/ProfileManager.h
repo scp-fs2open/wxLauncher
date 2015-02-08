@@ -76,7 +76,7 @@ public:
 	bool GlobalWrite(const wxString& key, bool value);
 	
 	bool ProfileExists(const wxChar* strName) const;
-	bool ProfileExists(wxString& strName) const;
+	bool ProfileExists(const wxString& strName) const;
 	
 	bool ProfileRead(const wxString& key, bool* b) const;
 	bool ProfileRead(const wxString& key, bool* b, bool defaultVal, bool writeBackIfAbsent = false);
