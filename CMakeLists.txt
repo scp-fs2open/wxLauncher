@@ -30,6 +30,9 @@ endif()
 if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   # we are given an explict wxWidgets version we must use
   # which means we are probably on CI builder
+  if(NOT DEFINED wxWidgets_ROOT_DIR OR NOT wxWidgets_ROOT_DIR)
+    set(wxWidgets_ROOT_DIR $ENV{WXWIDGETS${WXVER}})
+  endif()
   if(WXVER MATCHES "2.8")
     find_package(wxWidgets 2.8.10
       COMPONENTS base core net xml html adv qa richtext)
@@ -41,7 +44,11 @@ if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   endif()
 
   #ensure we have the correct version with or without stl as requested
-  if(NOT DEFINED HAVE_WXUSE_STL)
+  if(NOT DEFINED HAVE_WXUSE_STL 
+        OR NOT wxWidgets_ROOT_DIR MATCHES STL_TEST_WX_ROOT)
+    # Save for later to test if root changes
+    set(STL_TEST_WX_ROOT ${wxWidgets_ROOT_DIR})
+
     message("-- Testing wxUSE_STL")
     try_compile(HAVE_WXUSE_STL ${CMAKE_BINARY_DIR}
       SOURCES ${CMAKE_SOURCE_DIR}/cmake/test_wxstl.cpp

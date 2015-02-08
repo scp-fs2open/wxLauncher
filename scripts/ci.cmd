@@ -17,9 +17,13 @@ echo %LIBPATH%
 if defined WXVER (set ARGWXVER="-DWXVER=%WXVER%")
 if defined BUILDTYPE (set ARGBUILDTYPE="-DBUILDTYPE=%BUILDTYPE%")
 
-mkdir build
+if not defined LIBRARY_PATHS (set LIBRARY_PATHS=C:\libraries\library_paths.cmd)
+
+if exist %LIBRARY_PATHS% (call %LIBRARY_PATHS%)
+
+if not exist build (mkdir build)
 cd build
 
 echo.
 echo Configuring build
-cmake .. -G "NMake Makefiles" %ARGBUILDTYPE% %ARGWXVER%
+"%CMAKE%" .. -G "NMake Makefiles" %ARGBUILDTYPE% %ARGWXVER%
