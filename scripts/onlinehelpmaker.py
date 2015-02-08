@@ -372,10 +372,9 @@ def process_input_stage5(options, files, extrafiles):
     
     Note that this algorithm requires that os.walk generates the names in alphabetical order."""
     # relativize directory path for being in the archive
-    path_in_arc = make_path_in_archive(path, files['stage4'])
-    logging.debug("Processing directory '%s'", path_in_arc)
+    path_list = find_path_in_archive(path, files['stage4'])
+    logging.debug("Processing directory '%s'", os.path.sep.join(path_list))
     
-    path_list = path_in_arc.split(os.path.sep)
     if len(path_list) == 1 and path_list[0] == '':
       path_list = []
     level = len(path_list)
@@ -406,7 +405,8 @@ def process_input_stage5(options, files, extrafiles):
       try:
         thefiles.remove('index.stage4')
       except ValueError:
-        logging.warning("Directory %s does not have an index.help", path_in_arc)
+        logging.warning("Directory %s does not have an index.help",
+                os.path.sep.join(path_list))
     
     for file in thefiles:
       full_filename = os.path.join(path, file)
@@ -499,22 +499,23 @@ def generate_sections(path_list, last_path_list, basetab=0, orginal_path_list=No
     raise Exception("Should never get here")
     return ""
     
-def make_path_in_archive(path, path1):
-  """Return the part of the path that is in 'path' but not in 'path1'"""
-  path = os.path.normpath(path)
-  path1 = os.path.normpath(path1)
+def find_path_in_archive(pLeft, pRight):
+  """Return the parts of the path that is in 'pLeft' but not in 'pRight'"""
+  pLeft = os.path.normpath(pLeft)
+  pRight = os.path.normpath(pRight)
   
-  list = path.split(os.path.sep)
-  list1 = path1.split(os.path.sep)
+  lLeft = pLeft.split(os.path.sep)
+  lRight = pRight.split(os.path.sep)
   
-  return os.path.sep.join(make_path_in_archive_helper(list, list1))
+  return find_path_in_archive_helper(lLeft, lRight)
   
-def make_path_in_archive_helper(list, list1):
-  logging.debug("make_path_in_archive_helper(%s, %s)", str(list), str(list1))
-  if len(list) > 0 and len(list1) > 0 and list[0] == list1[0]:
-    return make_path_in_archive_helper(list[1:], list1[1:])
-  elif len(list) > 0 and len(list1) == 0:
-    return os.path.join(list)
+def find_path_in_archive_helper(lLeft, lRight):
+  logging.debug("make_path_in_archive_helper(%s, %s)",
+          str(lLeft), str(lRight))
+  if len(lLeft) > 0 and len(lRight) > 0 and lLeft[0] == lRight[0]:
+    return find_path_in_archive_helper(lLeft[1:], lRight[1:])
+  elif len(lLeft) > 0 and len(lRight) == 0:
+    return lLeft
   else:
     return []
     
