@@ -30,11 +30,11 @@ endif()
 if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   # we are given an explict wxWidgets version we must use
   # which means we are probably on CI builder
-  message(-- Explicitly told to use WXVER ${WXVER})
+  message("-- Explicitly told to use WXVER ${WXVER}")
   if(NOT DEFINED wxWidgets_ROOT_DIR OR NOT wxWidgets_ROOT_DIR)
     set(wxWidgets_ROOT_DIR $ENV{WXWIDGETS${WXVER}})
   endif()
-  message(--- Searching for wxWidgets in ${wxWidgets_ROOT_DIR})
+  message("--- Searching for wxWidgets in ${wxWidgets_ROOT_DIR}")
   if(WXVER MATCHES "2.8")
     find_package(wxWidgets 2.8.10
       COMPONENTS base core net xml html adv qa richtext)
@@ -67,7 +67,7 @@ if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
     endif()
   endif()
 else()
-  message(-- Searching for wxWidgets)
+  message("-- Searching for wxWidgets")
   find_package(wxWidgets 2.8.10
     COMPONENTS base core net xml html adv qa richtext)
   if(NOT wxWidgets_FOUND)
