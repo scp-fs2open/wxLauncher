@@ -1,4 +1,4 @@
-build
+build/*/
 builds
 personal
 code/version.cpp

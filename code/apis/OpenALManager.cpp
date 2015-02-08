@@ -25,8 +25,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 
 #if USE_OPENAL
-#include <al/al.h>
-#include <al/alc.h>
+/* Include al.h because the wxWidgets FindPackage searches for al.h
+ * because otherwise it moves around on different platforms.
+ * See the FindOpenAL.cmake file in your CMake distribution for
+ * more information. */
+#include <al.h>
+#include <alc.h>
 #endif
 
 #include "global/MemoryDebugging.h"
