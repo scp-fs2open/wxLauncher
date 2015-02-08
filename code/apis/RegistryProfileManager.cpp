@@ -227,7 +227,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	HKEY regHandle = 0;
 
 	ret = RegCreateKeyExW(useKey,
-		keyName,
+		keyName.wc_str(),
 		0, // Reserved
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -267,7 +267,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	wxString videocardValue = wxString::Format(_T("OGL -(%dx%d)x%d bit"), width, height, bitdepth);
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_VIDEO_RESOLUTION_DEPTH,
+		REG_KEY_VIDEO_RESOLUTION_DEPTH.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)videocardValue.wc_str(),
@@ -281,7 +281,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_VIDEO_TEXTURE_FILTER,
+		REG_KEY_VIDEO_TEXTURE_FILTER.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&filterMethodValue,
@@ -300,7 +300,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_VIDEO_ANISOTROPIC,
+		REG_KEY_VIDEO_ANISOTROPIC.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)oglAnisotropicFilter.wc_str(),
@@ -313,7 +313,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 		
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_VIDEO_ANTI_ALIAS,
+		REG_KEY_VIDEO_ANTI_ALIAS.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&oglAntiAliasSample,
@@ -327,7 +327,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_AUDIO_OPENAL_DEVICE,
+		REG_KEY_AUDIO_OPENAL_DEVICE.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)soundDevice.wc_str(),
@@ -339,7 +339,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	HKEY audioRegHandle = 0;
 	ret = RegCreateKeyExW(
 		regHandle,
-		REG_KEY_AUDIO_FOLDER_REGISTRY,
+		REG_KEY_AUDIO_FOLDER_REGISTRY.wc_str(),
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -358,7 +358,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		audioRegHandle,
-		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE,
+		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)playbackDevice.wc_str(),
@@ -375,7 +375,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	if (hasEntry) {
 		ret = RegSetValueExW(
 			audioRegHandle,
-			REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE,
+			REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE.wc_str(),
 			0,
 			REG_SZ,
 			(BYTE*)captureDevice.wc_str(),
@@ -390,7 +390,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	if (hasEntry) {
 		ret = RegSetValueExW(
 			audioRegHandle,
-			REG_KEY_AUDIO_OPENAL_EFX,
+			REG_KEY_AUDIO_OPENAL_EFX.wc_str(),
 			0,
 			REG_DWORD,
 			(BYTE*)&enableEFX,
@@ -408,7 +408,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	if (sampleRate != DEFAULT_AUDIO_OPENAL_SAMPLE_RATE) {
 		ret = RegSetValueExW(
 			audioRegHandle,
-			REG_KEY_AUDIO_OPENAL_SAMPLE_RATE,
+			REG_KEY_AUDIO_OPENAL_SAMPLE_RATE.wc_str(),
 			0,
 			REG_DWORD,
 			(BYTE*)&sampleRate,
@@ -426,7 +426,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_VOICE,
+		REG_KEY_SPEECH_VOICE.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&speechVoice,
@@ -455,7 +455,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_TECHROOM,
+		REG_KEY_SPEECH_IN_TECHROOM.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&inTechroom,
@@ -464,7 +464,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_BRIEFINGS,
+		REG_KEY_SPEECH_IN_BRIEFINGS.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&inBriefings,
@@ -482,7 +482,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_MULTI,
+		REG_KEY_SPEECH_IN_MULTI.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&inMulti,
@@ -496,7 +496,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_ID,
+		REG_KEY_JOYSTICK_ID.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&currentJoystick,
@@ -512,7 +512,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_FORCE_FEEDBACK,
+		REG_KEY_JOYSTICK_FORCE_FEEDBACK.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&joystickForceFeedback,
@@ -525,7 +525,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_DIRECTIONAL,
+		REG_KEY_JOYSTICK_DIRECTIONAL.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&joystickHit,
@@ -539,7 +539,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_NETWORK_TYPE,
+		REG_KEY_NETWORK_TYPE.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)networkConnectionValue.wc_str(),
@@ -552,7 +552,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_NETWORK_SPEED,
+		REG_KEY_NETWORK_SPEED.wc_str(),
 		0,
 		REG_SZ,
 		(BYTE*)connectionSpeedValue.wc_str(),
@@ -566,7 +566,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	if (forcedport != DEFAULT_NETWORK_PORT) {
 		ret = RegSetValueExW(
 			regHandle,
-			REG_KEY_NETWORK_PORT,
+			REG_KEY_NETWORK_PORT.wc_str(),
 			0,
 			REG_DWORD,
 			(BYTE*)&forcedport,
@@ -577,7 +577,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 		ret = RegDeleteValueW(
 			regHandle,
-			REG_KEY_NETWORK_PORT);
+			REG_KEY_NETWORK_PORT.wc_str());
 
 		if (ret != ERROR_FILE_NOT_FOUND) { // ignore if entry doesn't exist
 			ReturnChecker(ret, __LINE__);
@@ -592,7 +592,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	HKEY networkRegHandle = 0;
 	ret = RegCreateKeyExW(
 		regHandle,
-		REG_KEY_NETWORK_FOLDER_REGISTRY,
+		REG_KEY_NETWORK_FOLDER_REGISTRY.wc_str(),
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -605,7 +605,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 	if (networkIP != DEFAULT_NETWORK_IP) {
 		ret = RegSetValueExW(
 			networkRegHandle,
-			REG_KEY_NETWORK_IP,
+			REG_KEY_NETWORK_IP.wc_str(),
 			0,
 			REG_SZ,
 			(BYTE*)networkIP.wc_str(),
@@ -616,7 +616,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 		ret = RegDeleteValueW(
 			networkRegHandle,
-			REG_KEY_NETWORK_IP);
+			REG_KEY_NETWORK_IP.wc_str());
 
 		if (ret != ERROR_FILE_NOT_FOUND) { // ignore if entry doesn't exist
 			ReturnChecker(ret, __LINE__);
@@ -648,7 +648,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	HKEY regHandle = 0;
 
 	ret = RegCreateKeyExW(useKey,
-		keyName,
+		keyName.wc_str(),
 		0, // Reserved
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -687,7 +687,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	// Video
 	ret = RegQueryValueEx(
 		regHandle,
-		REG_KEY_VIDEO_RESOLUTION_DEPTH,
+		REG_KEY_VIDEO_RESOLUTION_DEPTH.wc_str(),
 		NULL, // Reserved
 		&type,
 		data,
@@ -749,7 +749,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_VIDEO_TEXTURE_FILTER,
+		REG_KEY_VIDEO_TEXTURE_FILTER.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -770,7 +770,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_VIDEO_ANISOTROPIC,
+		REG_KEY_VIDEO_ANISOTROPIC.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -797,7 +797,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_VIDEO_ANTI_ALIAS,
+		REG_KEY_VIDEO_ANTI_ALIAS.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -819,7 +819,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_AUDIO_OPENAL_DEVICE,
+		REG_KEY_AUDIO_OPENAL_DEVICE.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -842,7 +842,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	HKEY audioRegHandle = 0;
 	ret = RegCreateKeyExW(
 		regHandle,
-		REG_KEY_AUDIO_FOLDER_REGISTRY,
+		REG_KEY_AUDIO_FOLDER_REGISTRY.wc_str(),
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -859,7 +859,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		audioRegHandle,
-		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE,
+		REG_KEY_AUDIO_OPENAL_PLAYBACK_DEVICE.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -885,7 +885,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		audioRegHandle,
-		REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE,
+		REG_KEY_AUDIO_OPENAL_CAPTURE_DEVICE.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -911,7 +911,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		audioRegHandle,
-		REG_KEY_AUDIO_OPENAL_EFX,
+		REG_KEY_AUDIO_OPENAL_EFX.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -932,7 +932,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		audioRegHandle,
-		REG_KEY_AUDIO_OPENAL_SAMPLE_RATE,
+		REG_KEY_AUDIO_OPENAL_SAMPLE_RATE.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -954,7 +954,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_VOICE,
+		REG_KEY_SPEECH_VOICE.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -975,7 +975,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_VOLUME,
+		REG_KEY_SPEECH_VOLUME.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -996,7 +996,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_TECHROOM,
+		REG_KEY_SPEECH_IN_TECHROOM.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1017,7 +1017,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_BRIEFINGS,
+		REG_KEY_SPEECH_IN_BRIEFINGS.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1038,7 +1038,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_GAME,
+		REG_KEY_SPEECH_IN_GAME.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1059,7 +1059,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_MULTI,
+		REG_KEY_SPEECH_IN_MULTI.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1081,7 +1081,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_ID,
+		REG_KEY_JOYSTICK_ID.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1102,7 +1102,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_FORCE_FEEDBACK,
+		REG_KEY_JOYSTICK_FORCE_FEEDBACK.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1123,7 +1123,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_JOYSTICK_DIRECTIONAL,
+		REG_KEY_JOYSTICK_DIRECTIONAL.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1145,7 +1145,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_NETWORK_TYPE,
+		REG_KEY_NETWORK_TYPE.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -1171,7 +1171,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_NETWORK_SPEED,
+		REG_KEY_NETWORK_SPEED.wc_str(),
 		NULL,
 		&type,
 		data,
@@ -1197,7 +1197,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		regHandle,
-		REG_KEY_NETWORK_PORT,
+		REG_KEY_NETWORK_PORT.wc_str(),
 		NULL,
 		&type,
 		reinterpret_cast<LPBYTE>(&numberdata),
@@ -1216,7 +1216,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 	HKEY networkRegHandle = 0;
 	ret = RegCreateKeyExW(
 		regHandle,
-		REG_KEY_NETWORK_FOLDER_REGISTRY,
+		REG_KEY_NETWORK_FOLDER_REGISTRY.wc_str(),
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -1233,7 +1233,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 
 	ret = RegQueryValueExW(
 		networkRegHandle,
-		REG_KEY_NETWORK_IP,
+		REG_KEY_NETWORK_IP.wc_str(),
 		NULL,
 		&type,
 		data,
