@@ -27,3 +27,14 @@ cd build
 echo.
 echo Configuring build
 "%CMAKE%" .. -G "NMake Makefiles" %ARGBUILDTYPE% %ARGWXVER%
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%
+
+echo.
+echo Building
+nmake
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%
+
+echo.
+echo Making package
+nmake package
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%
