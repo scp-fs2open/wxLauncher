@@ -49,32 +49,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 IMPLEMENT_APP(wxLauncher);
 
-const static wxCmdLineEntryDesc CmdLineOptions[] = {
-	{wxCMD_LINE_SWITCH, NULL, wxT_2("session-only"),
-	_("Do not remember the profile that is selected at exit")},
-#if wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 8
-	{wxCMD_LINE_SWITCH, NULL, _T("add-profile"),
-	_T("Add profile PROFILE from FILE. If PROFILE already exists")
-	_T(" it will not be overwritten. *Operator*")},
-#else
-	{wxCMD_LINE_SWITCH, NULL, _("add-profile"),
-	_("Add profile PROFILE from FILE. If PROFILE already exists"
-	" it will not be overwritten. *Operator*")},
-#endif
-	{wxCMD_LINE_SWITCH, NULL, wxT_2("select-profile"),
-	_("Make PROFILE the that wxLauncher will use on next run. *Operator*")},
-	{wxCMD_LINE_OPTION, NULL, wxT_2("profile"),
-	_("The name of a profile to operate on. Operand PROFILE."),
-	wxCMD_LINE_VAL_STRING, 0},
-	{wxCMD_LINE_OPTION, NULL, wxT_2("file"),
-	_("The path to a file to operate on. Operand FILE."),
-	wxCMD_LINE_VAL_STRING, 0},
-	{wxCMD_LINE_NONE},
-};
-
 void wxLauncher::OnInitCmdLine(wxCmdLineParser& parser)
 {
-	parser.SetDesc(CmdLineOptions);
+	static const char addprofiledesc[] =
+		"Add profile PROFILE from FILE. If PROFILE "
+		"already exists it will not be overwritten. *Operator*";
+	static const char selectprofiledesc[] =
+		"Make PROFILE the that wxLauncher will use "
+		"on next run. *Operator*";
+	static const char profiledesc[] =
+		"The name of a profile to operate on. Operand PROFILE.";
+	static const char filedesc[] =
+		"The path to a file to operate on. Operand FILE.";
+	static const char sessiononlydesc[] =
+		"Do not remember the profile that is selected at exit";
+
+	/* Operators */
+	parser.AddSwitch(wxEmptyString, wxT_2("add-profile"),
+		wxGetTranslation(wxString::FromUTF8(addprofiledesc)));
+	parser.AddSwitch(wxEmptyString, wxT_2("select-profile"),
+		wxGetTranslation(wxString::FromUTF8(selectprofiledesc)));
+
+	/* Operands */
+	parser.AddOption(wxEmptyString, wxT_2("profile"),
+		wxGetTranslation(wxString::FromUTF8(profiledesc)),
+		wxCMD_LINE_VAL_STRING);
+	parser.AddOption(wxEmptyString, wxT_2("file"),
+		wxGetTranslation(wxString::FromUTF8(filedesc)),
+		wxCMD_LINE_VAL_STRING);
+
+	/* Other */
+	parser.AddSwitch(wxEmptyString, wxT_2("session-only"),
+		wxGetTranslation(wxString::FromUTF8(sessiononlydesc)));
+
 	parser.SetSwitchChars(wxT_2("-")); // always use -, even on windows
 
 	wxApp::OnInitCmdLine(parser);
