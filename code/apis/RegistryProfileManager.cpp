@@ -439,7 +439,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_VOLUME,
+		REG_KEY_SPEECH_VOLUME.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&speechVolume,
@@ -473,7 +473,7 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 	ret = RegSetValueExW(
 		regHandle,
-		REG_KEY_SPEECH_IN_GAME,
+		REG_KEY_SPEECH_IN_GAME.wc_str(),
 		0,
 		REG_DWORD,
 		(BYTE*)&inGame,
