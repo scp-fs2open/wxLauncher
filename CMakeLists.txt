@@ -2,16 +2,18 @@
 # arbitrarily following http://techbase.kde.org/Policies/CMake_Coding_Style#Upper.2Flower_casing
 
 cmake_minimum_required(VERSION 2.8)
-# Continue to support compatiable interface for _DEBUG on targets
-# see: http://www.cmake.org/cmake/help/v3.0/policy/CMP0043.html
-cmake_policy(SET CMP0043 OLD)
+if(CMAKE_MAJOR_VERSION GREATER 2)
+  # Continue to support compatiable interface for _DEBUG on targets
+  # see: http://www.cmake.org/cmake/help/v3.0/policy/CMP0043.html
+  cmake_policy(SET CMP0043 OLD)
+endif()
 
 # We don't use C but CMake on linux complains if we don't have it enabled
 project(wxlauncher CXX C) 
 
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 10)
-set(VERSION_PATCH 0)
+set(VERSION_MINOR 9)
+set(VERSION_PATCH 5)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/include")
 
