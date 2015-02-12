@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 wxLauncher Team
+Copyright (C) 2009-2011,2015 wxLauncher Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -64,11 +64,16 @@ bool JoyMan::IsInitialized() {
 \sa JoyMan::WasCompiledIn()
 */
 bool JoyMan::Initialize() {
+#if USE_JOYSTICK
 	if ( JoyMan::IsInitialized() ) {
 		wxLogDebug(_T("JoyMan already initialized with %d joysticks"),
 			joysticks.Count());
 		return true;
 	}
+#else
+	wxLogDebug(wxT_2("JoyMan was disabled at compile time"));
+	return false;
+#endif
 
 #if USE_JOYSTICK && IS_WIN32
 	UINT num = joyGetNumDevs(); // get the number of joys supported by windows.
@@ -135,8 +140,6 @@ bool JoyMan::Initialize() {
 	}
 
 	return true;
-#else
-	return false;
 #endif
 }
 
