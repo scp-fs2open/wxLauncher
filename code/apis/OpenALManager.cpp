@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2010 wxLauncher Team
+Copyright (C) 2009-2013,2015 wxLauncher Team
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -180,9 +180,9 @@ bool OpenALMan::checkForALError_(size_t line) {
 }
 #endif
 
+#if USE_OPENAL
 wxArrayString GetAvailableDevices(const ALenum deviceType) {
 	wxArrayString arr;
-#if USE_OPENAL
 	wxCHECK_MSG(OpenALMan::IsInitialized(), arr,
 		_T("GetAvailableDevices called but OpenALMan not initialized"));
 	
@@ -232,9 +232,9 @@ wxArrayString GetAvailableDevices(const ALenum deviceType) {
 	} else {
 		return arr;
 	}
-#endif
 	return arr;
 }
+#endif
 
 wxArrayString OpenALMan::GetAvailablePlaybackDevices() {
 #if USE_OPENAL
@@ -256,8 +256,8 @@ wxArrayString OpenALMan::GetAvailableCaptureDevices() {
 #endif
 }
 
-wxString GetSystemDefaultDevice(const ALenum deviceType) {
 #if USE_OPENAL
+wxString GetSystemDefaultDevice(const ALenum deviceType) {
 	wxCHECK_MSG( OpenALMan::IsInitialized(), wxEmptyString,
 		_T("GetSystemDefaultDevice called but OpenALMan not initialized"));
 	wxCHECK_MSG(deviceType == ALC_DEFAULT_DEVICE_SPECIFIER ||
@@ -296,10 +296,9 @@ wxString GetSystemDefaultDevice(const ALenum deviceType) {
 			return defaultDeviceStr;
 		}
 	}
-#else
 	return wxEmptyString;
-#endif
 }
+#endif
 
 wxString OpenALMan::GetSystemDefaultPlaybackDevice() {
 #if USE_OPENAL
