@@ -129,7 +129,7 @@ endif(DEVELOPMENT_MODE)
 
 option(PROFILE_DEBUGGING "Extra verbose debug logs that include snapshots of profile contents at important steps while auto-save is off" OFF)
 
-if($ENV{OPTIONS} STREQUAL "DisableAll")
+if(DEFINED $ENV{OPTIONS} AND $ENV{OPTIONS} STREQUAL "DisableAll")
   set(OPTION_DEFAULT OFF)
 else()
   set(OPTION_DEFAULT ON)
