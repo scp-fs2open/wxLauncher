@@ -1,126 +1,126 @@
-wxLauncher - A multi-platform dual-purpose application
-	http://code.google.com/p/wxlauncher/
+# wxLauncher: Multi-platform launcher for Freespace 2
 
 Introduction
 ============
-wxLauncher aims to give one unified answer to members of 
+[wxLauncher] aims to give one unified answer to members of 
 the Freespace 2 Open community looking for an easy way 
-to control fs2_open on various platforms and to those 
+to control `fs2_open` on various platforms and to those 
 looking for an easy way to find and get updates to their
 Freespace 2 MODs and TCs.
 
+[wxLauncher]: https://github.com/wxLauncher/wxlauncher
+
 Compatibility
 =============
-wxLauncher is built for the 3.6.9+ versions of fs2_open.
-while older versions might function, we don't officially
+wxLauncher is built for the 3.6.9+ versions of `fs2_open`.
+While older versions might function, we don't officially
 support them. Use them at your own risk.
 
-Download binaries
-=============
-Precompiled binaries can be found on the project downloads
-page:
-	http://code.google.com/p/wxlauncher/downloads/list
+Obtaining wxLauncher
+====================
+Precompiled binaries can be found on the project
+[releases page](https://github.com/wxLauncher/wxlauncher/releases)
 
-Just find the build for your system and you're set.
+Find the build for your system and you're set.
 
 Building from source
-============
+====================
 The wxLauncher requires the CMake build system for building.
 CMake is a cross-platform meta-build system; it generates the
 files that allow a platform's native build system to build the
 launcher.  CMake supports VS2005 and newer, as well as
 Xcode, KDevelop, and of course autotools.
 
-Requirements shortlist:
-All platforms:
- - CMake 2.8
- - wxWidgets 2.8.10+ or 3.0.2
- - Python 2.6+ (but not 3.x)
- - Markdown in Python
-Windows
- - Platform SDK
- - Nullsoft Scriptable Install System (NSIS)
-Linux
- - SDL 1.2
-OS X
- - SDL 1.2
+### Requirements shortlist
 
-Optional components
-All platforms:
- - OpenAL
+  * All platforms:
+      * CMake 2.8
+      * wxWidgets 2.8.10+ or 3.0.2
+      * Python 2.6+ (but not 3.x)
+      * Markdown in Python
+  * Windows
+      * Windows SDK or Platform SDK
+      * Nullsoft Scriptable Install System (NSIS)
+  * Linux
+      * SDL 1.2
+  * OS X
+      * SDL 1.2
+
+### Optional components
+  * All platforms:
+      * OpenAL or OpenALSoft
+
+### Detailed requirements
 
 wxLauncher is built using CMake.  Only version 2.8 or later has
 been tested (and the CMake file enforces this).  CMake can be 
 downloaded in binary form, from the [CMake Home Page] or if you
 run Linux, from your distro's package repository.
-  [Cmake Home Page]: http://cmake.org
+[Cmake Home Page]: http://cmake.org
 
-wxLauncher is a wxWidgets-based application. It can 
+wxLauncher is a [wxWidgets]-based application. It can 
 only be built with wxWidgets version 2.8.10 or higher.
-Version 0.9.5 has been tested with:
+Version 0.10.0 has been tested with:
   - 2.8.12 (no STL)
   - 2.8.12 (STL)
   - 3.0.2 (no STL)
-wxWidgets homepage:
-	http://www.wxwidgets.org/
+  - 3.0.2 (STL)
+[wxWidgets]: http://www.wxwidgets.org/
 	
-Python 2.6 or higher is required to build this project.
+[Python] 2.6 or higher is required to build this project.
 This project also assumes that the python executable is 
 in your PATH.  Check your operating system's documentation
 for information on how to add Python to your PATH.
-Python homepage:
-	http://www.python.org/
+[Python]: http://www.python.org/
 	
 Markdown in Python is required in order to build the 
-integrated help system. 
-Markdown in Python homepage:
-	http://freewisdom.org/projects/python-markdown/
-On debian-based systems:
-	apt-get install python-markdown
+integrated help system.
+  * [Markdown in Python homepage](http://freewisdom.org/projects/python-markdown/)
+  * On `pip` enabled installs, try: `pip install markdown`
+  * On Debian-based systems, try: `apt-get install python-markdown`
 
 The OpenAL Software Development Kit is an optional component
-needed to build this program.  OpenAL support requires the 
-preprocessor symbol USE_OPENAL=1.  This symbol is set to 1 by
-default by CMake.  You can pass -DUSE_OPENAL=0 to CMake to
+needed to build this program.  It can be downloaded from the
+[OpenAL homepage]. OpenAL support requires the 
+preprocessor symbol `USE_OPENAL=1`.  This symbol is set to 1 by
+default by CMake.  You can pass `-DUSE_OPENAL=0` to CMake to
 disable building with OpenAL support.  See the compiler specific
 instructions for getting your compiler ready to build
 with OpenAL. Note that Mac OS X ships with OpenAL pre-installed.
-OpenAL homepage:
-	http://connect.creativelabs.com/openal/default.aspx
+wxLauncher should also work with the [OpenALSoft] library.
+[OpenAL homepage]: http://connect.creativelabs.com/openal/default.aspx
+[OpenALSoft]: http://kcat.strangesoft.net/openal.html
 
 The Microsoft Windows SDK (formerly the Platform SDK) is
 required to build both this application and wxWidgets when
  on Windows.  Note that only the Windows SDK for Windows
 Vista and Windows 7 have been tested with this application.
 
-The Nullsoft Scriptable Install System (NSIS) is required on Windows to build
-the installer. The latest version at the time of writing is 2.46. Be sure to
-either install NSIS before running CMake or re-run CMake after installing NSIS.
-NSIS homepage:
-	http://nsis.sourceforge.net/
+The Nullsoft Scriptable Install System (NSIS) is required on
+Windows to build the installer. The latest version at the time
+of writing is 2.46. Be sure to either install NSIS before 
+running CMake or re-run CMake after installing NSIS. NSIS can
+be found on the [NSIS homepage](http://nsis.sourceforge.net/).
 
-wxLauncher has only been built with Microsoft's Visual Studio
-2008 Express edition.  Other VS2008 versions should work, as
-well as any version of VS2005 should work, but have not been
-tested.  Visual Studio 2008 C++ Express can be downloaded
-from [Microsoft] for free.
-[Microsoft]: http://www.microsoft.com/express/download/
+The offical wxLauncher releases for Windows are built with
+Microsoft's Visual Studio 2008 Express edition. Other
+Visual Studio versions should work, but are not routinely
+tested. [Visual Studio Express] editions can be downloaded
+and used for developing wxLauncher for free.
+[Visual Studio Express]: http://www.microsoft.com/express/download/
 
 wxLauncher's source can be explored from the project's
-source page:
-	https://github.com/wxLauncher/wxlauncher/
+[source page](https://github.com/wxLauncher/wxlauncher/)
   
 To get the source, you'll need Git:
-	http://git-scm.com/
-or the TortioseGit frontend (which includes Git):
-	http://tortiosegit.org
-or the package manager of your Linux Distro, sometimes called
-'git-scm';
-or the Homebrew Project for OS X.
+  * [Command Line Git](http://git-scm.com/)
+  * Graphical frontend: [TortioseGit](http://tortiosgit.org)
+  * Distro package manager. Sometimes called `git-scm`
+  * The Homebrew Project for OS X
 
 Once Git is installed, you can get a copy of the source
 by running the following command in a folder of your choice:
-	git clone https://code.google.com/p/wxlauncher/
+	`git clone https://code.google.com/p/wxlauncher/`
   
 Building - Windows
 ==================
