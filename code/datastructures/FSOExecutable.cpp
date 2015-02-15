@@ -268,6 +268,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				wxLogWarning(
 					_T("Token ending in 'd' is not a number (%s) in executable %s"),
 						token.c_str(), binaryname.c_str());
+				ver.string += wxString::Format(ver.string.IsEmpty() ? _T("%s") : _T(" %s") , token.c_str());
 			}
 		} else if ( token.Lower().EndsWith(_T("r"), &temp) ) {
 			if (temp.IsEmpty()) {
@@ -286,6 +287,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				wxLogWarning(
 					_T("Token ending in 'r' is not a number (%s) in executable %s"),
 						token.c_str(), binaryname.c_str());
+				ver.string += wxString::Format(ver.string.IsEmpty() ? _T("%s") : _T(" %s"), token.c_str());
 			}
 		} else if ( token.StartsWith(_T("r"), &temp) && temp.ToLong(&tempVersion) ) {
 			// must be a revision number from SirKnightly's builds
