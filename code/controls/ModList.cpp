@@ -1352,7 +1352,7 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 		(!item->website.IsEmpty()) ? 
 			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website.c_str(), _("Website")).c_str():wxEmptyString,
 		wxString::Format(_T("<a href='%s'>%s</a>"), (!item->forum.IsEmpty()) ?
-			item->forum.c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
+			item->forum.c_str():_("http://www.hard-light.net/forums/index.php?board=124.0").c_str(), _("Forum").c_str()).c_str(),
 		(!item->bugs.IsEmpty()) ?
 			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs.c_str(), _("Bugs")).c_str() : wxEmptyString,
 		(!item->support.IsEmpty()) ?
