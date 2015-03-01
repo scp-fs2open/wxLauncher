@@ -13,7 +13,7 @@ project(wxlauncher CXX C)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 9)
-set(VERSION_PATCH 5)
+set(VERSION_PATCH 6)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/include")
 
