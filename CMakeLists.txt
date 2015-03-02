@@ -74,10 +74,6 @@ else()
   message("-- Searching for wxWidgets")
   find_package(wxWidgets 2.8.10
     COMPONENTS base core net xml html adv qa richtext)
-  if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets 3.0.2
-      COMPONENTS base core net xml html adv qa richtext)
-  endif()
 endif()
 if(NOT wxWidgets_FOUND)
   message(FATAL_ERROR "Unable to locate wxWidgets")
