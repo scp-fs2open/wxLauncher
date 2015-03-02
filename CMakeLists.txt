@@ -134,7 +134,10 @@ if(DEFINED $ENV{OPTIONS} AND $ENV{OPTIONS} STREQUAL "DisableAll")
 else()
   set(OPTION_DEFAULT ON)
 endif()
-option(USE_SPEECH "Build launcher with speech support?" ${OPTION_DEFAULT})
+if(IS_WIN32)
+  # Don't offer features that can only work on Windows
+  option(USE_SPEECH "Build launcher with speech support?" ${OPTION_DEFAULT})
+endif
 option(USE_JOYSTICK "Build launcher with joystick support?" ${OPTION_DEFAULT})
 option(USE_OPENAL "Build launcher with OpenAL support?" ${OPTION_DEFAULT})
 if(USE_OPENAL)
