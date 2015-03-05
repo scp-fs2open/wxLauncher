@@ -634,8 +634,9 @@ void ModList::readIniFileString(const wxFileConfig* config,
 		}
 	}
 
-	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
-		location.IsEmpty() ? _T("Not Specified") : escapeSpecials(location).c_str());
+	wxLogDebug(wxT_2("  %s:'%s'"),
+		key.c_str(),
+		location.IsEmpty() ? wxT_2("Not Specified") : escapeSpecials(location).c_str());
 }
 
 /** re-escape the newlines in the mod.ini values. */
@@ -1348,16 +1349,51 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 
 	wxHtmlWindow* links = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxHW_SCROLLBAR_NEVER );
 	links->SetSize(SkinSystem::ModInfoDialogImageWidth, 40);
-	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
-		(!item->website.IsEmpty()) ? 
-			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website.c_str(), _("Website")).c_str():wxEmptyString,
-		wxString::Format(_T("<a href='%s'>%s</a>"), (!item->forum.IsEmpty()) ?
-			item->forum.c_str():_("http://www.hard-light.net/forums/index.php?board=124.0").c_str(), _("Forum").c_str()).c_str(),
-		(!item->bugs.IsEmpty()) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs.c_str(), _("Bugs")).c_str() : wxEmptyString,
-		(!item->support.IsEmpty()) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support.c_str(), _("Support")).c_str() : wxEmptyString
-		));
+	wxString linksWebsite;
+	if (!item->website.IsEmpty()) {
+		linksWebsite = wxString::Format(
+			wxT_2("<a href='%s'>%s</a> :: "),
+			item->website.c_str(),
+			_("Website").c_str());
+	}
+	wxString linksForum;
+	if (item->forum.IsEmpty()) {
+		// Give the default Missing and Campaigns Forum
+		linksForum = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			wxT_2("http://www.hard-light.net/forums/index.php?board=124.0"),
+			_("Forum").c_str());
+	} else {
+		linksForum = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->forum.c_str(),
+			_("Forum").c_str());
+	}
+	wxString linksBugs;
+	if (!item->bugs.IsEmpty()) {
+		linksBugs = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->bugs.c_str(),
+			_("Bugs").c_str());
+	}
+	wxString linksSupport;
+	if (!item->support.IsEmpty()) {
+		linksSupport = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->support.c_str(),
+			_("Support").c_str());
+	}
+
+	wxString linksContent = wxString::Format(
+		wxT_2("<center>%s%s%s%s%s%s%s</center>"),
+		linksWebsite.c_str(),
+		(item->website.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		linksForum.c_str(),
+		(item->bugs.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		linksBugs.c_str(),
+		(item->support.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		linksSupport.c_str());
+	links->SetPage(linksContent);
 	links->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ModInfoDialog::OnLinkClicked));
 
 	wxStaticBitmap* warning = NULL;
