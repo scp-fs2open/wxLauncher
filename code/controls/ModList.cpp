@@ -1354,7 +1354,7 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 		linksWebsite = wxString::Format(
 			wxT_2("<a href='%s'>%s</a> :: "),
 			item->website.c_str(),
-			_("Website").c_str());
+			_("Website"));
 	}
 	wxString linksForum;
 	if (item->forum.IsEmpty()) {
@@ -1362,26 +1362,26 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 		linksForum = wxString::Format(
 			wxT_2("<a href='%s'>%s</a>"),
 			wxT_2("http://www.hard-light.net/forums/index.php?board=124.0"),
-			_("Forum").c_str());
+			_("Forum"));
 	} else {
 		linksForum = wxString::Format(
 			wxT_2("<a href='%s'>%s</a>"),
 			item->forum.c_str(),
-			_("Forum").c_str());
+			_("Forum"));
 	}
 	wxString linksBugs;
 	if (!item->bugs.IsEmpty()) {
 		linksBugs = wxString::Format(
 			wxT_2("<a href='%s'>%s</a>"),
 			item->bugs.c_str(),
-			_("Bugs").c_str());
+			_("Bugs"));
 	}
 	wxString linksSupport;
 	if (!item->support.IsEmpty()) {
 		linksSupport = wxString::Format(
 			wxT_2("<a href='%s'>%s</a>"),
 			item->support.c_str(),
-			_("Support").c_str());
+			_("Support"));
 	}
 
 	wxString linksContent = wxString::Format(
