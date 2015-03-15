@@ -1387,11 +1387,11 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 	wxString linksContent = wxString::Format(
 		wxT_2("<center>%s%s%s%s%s%s%s</center>"),
 		linksWebsite.c_str(),
-		(item->website.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		(item->website.IsEmpty())?wxEmptyString:wxT(" :: "),
 		linksForum.c_str(),
-		(item->bugs.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		(item->bugs.IsEmpty())?wxEmptyString:wxT(" :: "),
 		linksBugs.c_str(),
-		(item->support.IsEmpty())?wxEmptyString:wxT_2(" :: "),
+		(item->support.IsEmpty())?wxEmptyString:wxT(" :: "),
 		linksSupport.c_str());
 	links->SetPage(linksContent);
 	links->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ModInfoDialog::OnLinkClicked));
