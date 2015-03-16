@@ -142,7 +142,7 @@ bool ProMan::Initialize(Flags flags) {
 		wxFileConfig *config = new wxFileConfig(instream);
 		
 		wxString name;
-		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(wxT_2("Profile %05d"), i));
+		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(wxT_2("Profile %05ld"), i));
 
 		ProMan::proman->profiles[name] = config;
 		wxLogDebug(wxT_2("  Opened profile named: %s"), name.c_str());
