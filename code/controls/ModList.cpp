@@ -412,7 +412,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			unsigned int counter = 1;
 			bool done = false;
 			do {
-				wxString sectionname = wxString::Format(_T("/flagset%d"), counter);
+				wxString sectionname = wxString::Format(_T("/flagset%u"), counter);
 				if ( config->Exists( sectionname )) {
 					FlagSetItem* numberedflagset = new FlagSetItem();
 
