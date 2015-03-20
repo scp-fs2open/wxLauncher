@@ -54,7 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		return ProMan::UnknownError;\
 	}
 		
-#define UNKOWN_ERROR_MSG _T("Unhandled error number %d from query above line %d")
+#define UNKOWN_ERROR_MSG _T("Unhandled error number %ld from query above line %d")
 #define REG_DATA_NOT_DWORD _T("Registry key lookup above line %d is not a DWORD")
 #define REG_DATA_NOT_STRING _T("Registry key lookup above line %d is not a DWORD")
 #endif
@@ -644,7 +644,7 @@ ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 			// no error so just return, because the other process did what I needed.
 			return ProMan::NoError;
 		} else {
-			wxLogError(_T("Unable to read FS2 Open settings from the registry (%d)"), ret);
+			wxLogError(_T("Unable to read FS2 Open settings from the registry (%ld)"), ret);
 			return static_cast<ProMan::RegistryCodes>(ret);
 		}
 #endif	

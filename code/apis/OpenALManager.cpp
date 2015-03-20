@@ -164,11 +164,11 @@ bool OpenALMan::checkForALError_(size_t line) {
 	if ( errorcode == AL_NO_ERROR ) {
 		return true;
 	} else if ( errorcode == AL_INVALID_NAME ) {
-		wxLogError(_T("OpenAL:%d: a bad name (ID) was passed to an OpenAL function"), line);
+		wxLogError(_T("OpenAL:%ld: a bad name (ID) was passed to an OpenAL function"), line);
 	} else if ( errorcode == AL_INVALID_ENUM ) {
-		wxLogError(_T("OpenAL:%d: an invalid enum value was passed to an OpenAL function"), line);
+		wxLogError(_T("OpenAL:%ld: an invalid enum value was passed to an OpenAL function"), line);
 	} else {
-		wxLogError(_T("OpenAL:%d: Unknown error number 0x%08x"), line, errorcode);
+		wxLogError(_T("OpenAL:%ld: Unknown error number 0x%08x"), line, errorcode);
 	}
 #if PLATFORM_HAS_BROKEN_OPENAL == 1
 	/** \todo a hack to fix certain OpenAL implementations that are not

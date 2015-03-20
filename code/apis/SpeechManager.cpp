@@ -133,7 +133,7 @@ bool EnumerateVoices() {
 		LPWSTR id = NULL;
 		comAVoice->GetStringValue(NULL, &id);
 		size_t idlength = wcslen(id);
-		wxLogDebug(_T("  Got string of length %d:"), idlength);
+		wxLogDebug(_T("  Got string of length %ld:"), idlength);
 		for(size_t i = 0; i < idlength; i++) {
 			wxLogDebug(_T("   %04X"), id[i]);
 		}

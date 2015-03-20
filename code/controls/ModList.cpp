@@ -204,7 +204,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 	wxArrayString foundInis(iniFinder.GetFiles());
 	
 	if ( foundInis.Count() > 0 ) {
-		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
+		wxLogDebug(_T("I found %ld .ini files:"), foundInis.Count());
 	} else {
 		wxLogDebug(_T("I did not find any .ini files."));
 	}
@@ -350,7 +350,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		
 		if ((item->minhorizontalres < DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES) ||
 				(item->minverticalres < DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES)) {
-			wxLogWarning(_T("Invalid minimum resolution %dx%d, using default"),
+			wxLogWarning(_T("Invalid minimum resolution %ldx%ld, using default"),
 				item->minhorizontalres, item->minverticalres);
 			item->minhorizontalres = DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES;
 			item->minverticalres = DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES;
@@ -736,7 +736,7 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, co
 	// don't try to read in buffer when there is nothing to read.
 	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
 	if ( read != size ) {
-		wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+		wxLogError(_T("read (%ld) not equal to size (%ld)"), read, size);
 		delete[] characterBuffer;
 		return false;
 	}
