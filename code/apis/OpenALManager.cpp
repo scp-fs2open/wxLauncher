@@ -68,17 +68,18 @@ bool OpenALMan::Initialize() {
 							   wxDL_VERBATIM) ) {
 		isInitialized = true;
 		return true;
-#else
+#elif IS_WIN32
 	} else if ( OpenALLib.Load(_T("OpenAL32")) ) {
 		isInitialized = true;
 		return true;
+#else
 	} else if ( OpenALLib.Load(_T("libopenal")) ) {
 		isInitialized = true;
 		return true;
+#endif
 	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
 		isInitialized = true;
 		return true;
-#endif
 	} else {
 		return false;
 	}
