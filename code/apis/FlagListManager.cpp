@@ -456,7 +456,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		this->data->AddFlag(flag);
 	}		
 	
-	wxLogDebug(_T(" easy_flag_size: %d, %d; flag_size: %d, %d; num_easy_flags: %d, %d; num_flags: %d, %d"),
+	wxLogDebug(_T(" easy_flag_size: %d, %lu; flag_size: %d, %lu; num_easy_flags: %d, %lu; num_flags: %d, %lu"),
 		easy_flag_size, sizeof(easy_flag_size),
 		flag_size, sizeof(flag_size),
 		num_easy_flags, sizeof(num_easy_flags),
