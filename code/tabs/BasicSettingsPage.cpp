@@ -823,7 +823,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
-	wxDirDialog filechooser(this, _T("Choose the root folder of an FS2 Open game"),
+	wxDirDialog filechooser(this, _T("Choose the root folder of an FS2 Open game."),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
 	wxString chosenDirectory;
