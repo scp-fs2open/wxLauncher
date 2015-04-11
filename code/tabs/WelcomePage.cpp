@@ -510,7 +510,7 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 
 void WelcomePage::getOrPromptUpdateNews(wxIdleEvent &WXUNUSED(event)) {
 	this->Disconnect(wxEVT_IDLE, wxIdleEventHandler(WelcomePage::getOrPromptUpdateNews));
-	wxCHECK_RET(updateNewsCheck != NULL, "checkbox is NULL");
+	wxCHECK_RET(updateNewsCheck != NULL, wxT("checkbox is NULL"));
 
 	bool updateNews;
 	if (!ProMan::GetProfileManager()->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
