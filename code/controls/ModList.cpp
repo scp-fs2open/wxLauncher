@@ -396,8 +396,10 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
-		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDRY_LIST, item->secondarylist);
 		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDARY_LIST, item->secondarylist);
+		if (item->secondarylist.IsEmpty()) {
+			readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDRY_LIST, item->secondarylist);
+		}
 
 		// flag sets
 		if ( config->Exists(_T("/flagsetideal")) ) {
