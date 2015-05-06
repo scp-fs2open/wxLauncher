@@ -738,7 +738,7 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, co
 	// don't try to read in buffer when there is nothing to read.
 	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
 	if ( read != size ) {
-		wxLogError(_T("read (%ld) not equal to size (%ld)"), read, size);
+		wxLogError(wxT("read (") SZT wxT(") not equal to size (") SZT wxT(")"), read, size);
 		delete[] characterBuffer;
 		return false;
 	}

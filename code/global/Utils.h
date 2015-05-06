@@ -39,4 +39,10 @@ namespace TextUtils {
 									bool useAppleDebugFilter = false);
 }
 
+#if _WIN32
+#define SZT wxT("%Iu")
+#else
+#define SZT wxT("%zu")
+#endif
+
 #endif
