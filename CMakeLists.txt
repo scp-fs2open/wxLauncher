@@ -132,10 +132,12 @@ if(DEFINED $ENV{OPTIONS} AND $ENV{OPTIONS} STREQUAL "DisableAll")
 else()
   set(OPTION_DEFAULT ON)
 endif()
+
 if(IS_WIN32)
   # Don't offer features that can only work on Windows
   option(USE_SPEECH "Build launcher with speech support?" ${OPTION_DEFAULT})
-endif
+endif()
+
 option(USE_JOYSTICK "Build launcher with joystick support?" ${OPTION_DEFAULT})
 option(USE_OPENAL "Build launcher with OpenAL support?" ${OPTION_DEFAULT})
 if(USE_OPENAL)
@@ -143,14 +145,32 @@ if(USE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif(USE_OPENAL)
 
-if(UNIX)
-  find_package(SDL REQUIRED)
-  include_directories(${SDL_INCLUDE_DIR})
-  set(HAS_SDL true)
+IF(UNIX)
+    INCLUDE(FindPkgConfig)
+
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+    set(SDL2_INCLUDES ${SDL2_INCLUDE_DIRS})
+else()
+    set(SDL2_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2-2_0_3/include")
+
+    IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        # 64-bit
+        set(ARCH "x64")
+    ELSE(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        # 32-bit
+        set(ARCH "x86")
+    ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+
+    set(SDL2_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2-2_0_3/lib/${ARCH}/SDL2.lib")
+    set(SDL2_DLL "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SDL2-2_0_3/lib/${ARCH}/SDL2.dll")
 endif()
+
 if(UNIX AND NOT DEFINED PLATFORM_HAS_BROKEN_OPENAL)
   set(PLATFORM_HAS_BROKEN_OPENAL TRUE)
 endif()
+
+include_directories(${SDL2_INCLUDES})
+set(HAS_SDL true)
 
 if(IS_APPLE)
   option(USING_SDL_FRAMEWORK "Check this if building with an SDL framework." ON)
@@ -343,7 +363,7 @@ foreach(temp_file ${helpmaker_temp_files})
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${temp_file})
 endforeach(temp_file)
 
-target_link_libraries(wxlauncher ${wxWidgets_LIBRARIES} ${SDL_LIBRARY})
+target_link_libraries(wxlauncher ${wxWidgets_LIBRARIES} ${SDL2_LIBRARIES})
 
 # adapted from http://www.cmake.org/Wiki/CMake_FAQ#How_can_I_apply_resources_on_Mac_OS_X_automatically.3F
 # copies necessary resources (and frameworks, if needed) to .app bundle
@@ -371,6 +391,14 @@ if(DEVELOPMENT_MODE)
   message( "Development mode is set. Building of installers is not allowed.  Set DEVELOPMENT_MODE=OFF to build installers.")
   configure_file(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake COPYONLY)
   configure_file(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackSourceConfig.cmake COPYONLY)
+
+  if(SDL2_DLL)
+    ADD_CUSTOM_COMMAND(
+        TARGET wxlauncher POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SDL2_DLL}"  "$<TARGET_FILE_DIR:wxlauncher>"
+        COMMENT "copying '${SDL2_DLL}'..."
+    )
+  endif()
 else()
   include(${LAUNCHER_CMAKE_SOURCE_DIR}/wxLauncherInstaller.cmake)
 endif()
