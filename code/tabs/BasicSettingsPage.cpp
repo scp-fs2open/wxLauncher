@@ -1611,23 +1611,26 @@ void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
 	} while ( result == TRUE );
 #elif HAS_SDL == 1
 	wxLogDebug(_T("Enumerating graphics modes with SDL"));
-	SDL_Rect** modes;
-	modes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-	
-	if ( modes == (SDL_Rect**)NULL ) {
-	  wxLogWarning(_T("Unable to retrieve any video modes"));
-	} else if ( modes == (SDL_Rect**)(-1) ) {
-	  wxLogWarning(_T("All resolutions are available.  If you get this message please report it to the developers as they do not think this response is actually possible"));
+	// FSO currently only supports the primary display
+	const int DISPLAY_INDEX = 0;
+
+	if (SDL_GetNumVideoDisplays() > 0) {
+		int numDisplayModes = SDL_GetNumDisplayModes(DISPLAY_INDEX);
+
+		SDL_DisplayMode mode;
+
+		for (int i = 0; i < numDisplayModes; ++i) {
+			if (SDL_GetDisplayMode(DISPLAY_INDEX, i, &mode) != 0) {
+				wxLogWarning(_T("SDL_GetDisplayMode failed: %s"), SDL_GetError());
+				continue;
+			}
+
+			if ((mode.w >= minHorizontalRes) && (mode.h >= minVerticalRes)) {
+				resolutions.Add(new Resolution(mode.w, mode.h, false));
+			}
+		}
 	} else {
-	  wxLogDebug(_T("Found the following video modes:"));
-	  
-	  for(int i = 0; modes[i]; i++) {
-	    wxLogDebug(_T(" %d x %d"), modes[i]->w, modes[i]->h);
-		// FIXME why is "check to see if resolution has already been added" not used here?
-		  if ((modes[i]->w >= minHorizontalRes) && (modes[i]->h >= minVerticalRes)) {
-			  resolutions.Add(new Resolution(modes[i]->w, modes[i]->h, false));
-		  }
-	  }
+		wxLogWarning(_T("SDL reported no displays!"));
 	}
 #else
 #error "BasicSettingsPage::FillResolutionDropBox not implemented because not on windows and SDL is not implemented"
