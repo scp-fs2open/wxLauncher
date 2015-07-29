@@ -30,9 +30,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace JoyMan {
 #if USE_JOYSTICK
-	bool isInitialized = false;
-	wxArrayString joysticks;
-	unsigned int numOfJoysticks = 0; //!< number of plugged in joysticks
+	ApiType currentApi = API_NATIVE;
+#if HAS_SDL
+	bool isSdlInitialized = false;
+	wxArrayString sdlJoysticks;
+	wxArrayString sdlJoystickGUIDs;
+#endif
+#if IS_WIN32
+	bool isWinInitialized = false;
+	wxArrayString winJoysticks;
+#endif
 #endif
 };
 
@@ -52,7 +59,20 @@ using namespace JoyMan;
 */
 bool JoyMan::IsInitialized() {
 #if USE_JOYSTICK
-	return isInitialized;
+#if HAS_SDL
+	if (currentApi == API_SDL)
+	{
+		return isSdlInitialized;
+	}
+#endif
+#if IS_WIN32
+	if (currentApi == API_NATIVE)
+	{
+		return isWinInitialized;
+	}
+#endif
+
+	return false;
 #else
 	return false;
 #endif
@@ -63,11 +83,12 @@ bool JoyMan::IsInitialized() {
 \note Will also return false if JoyMan is not compiled in.
 \sa JoyMan::WasCompiledIn()
 */
-bool JoyMan::Initialize() {
+bool JoyMan::Initialize(ApiType apiType) {
+	currentApi = apiType;
+
 #if USE_JOYSTICK
 	if ( JoyMan::IsInitialized() ) {
-		wxLogDebug(_T("JoyMan already initialized with %d joysticks"),
-			joysticks.Count());
+		wxLogDebug(_T("JoyMan already initialized"));
 		return true;
 	}
 #else
@@ -75,71 +96,94 @@ bool JoyMan::Initialize() {
 	return false;
 #endif
 
-#if USE_JOYSTICK && IS_WIN32
-	UINT num = joyGetNumDevs(); // get the number of joys supported by windows.
-	if ( num > 16 ) {
-		/* greater than 16 is cause for a warning because according to MSDN,
-		Windows 2000 and later support -1 thru 16 in the MM api (and windows NT
-		only supports 1 or 2).  MSDN also notes if you want more than 16 use
-		DirectInput. */
-		wxLogWarning(_T("Windows reports that the joystick driver ")
-			_T("supports more than 16 joysticks (reports %d)!"), num);
-	}
+#if USE_JOYSTICK
+#if IS_WIN32
+	if (currentApi == API_NATIVE)
+	{
+		UINT num = joyGetNumDevs(); // get the number of joys supported by windows.
+		if (num > 16) {
+			/* greater than 16 is cause for a warning because according to MSDN,
+			Windows 2000 and later support -1 thru 16 in the MM api (and windows NT
+			only supports 1 or 2).  MSDN also notes if you want more than 16 use
+			DirectInput. */
+			wxLogWarning(_T("Windows reports that the joystick driver ")
+				_T("supports more than 16 joysticks (reports %d)!"), num);
+		}
 
-	MMRESULT result = JOYERR_NOERROR;
-	JOYINFO joyinfo;
-	JOYCAPS joycaps;
-	JoyMan::numOfJoysticks = 0;
-	JoyMan::joysticks.clear();
-	int totalNumberOfJoysticks = 0;
-	
-	for (UINT counter = 0; counter < num; counter++) {
-		memset(reinterpret_cast<void*>(&joyinfo), 0, sizeof(JOYINFO));
-		
-		result = joyGetPos(counter, &joyinfo);
-		wxString joystickName;
+		MMRESULT result = JOYERR_NOERROR;
+		JOYINFO joyinfo;
+		JOYCAPS joycaps;
+		JoyMan::winJoysticks.clear();
+		int totalNumberOfJoysticks = 0;
 
-		if ( result == JOYERR_NOERROR ) {
-			// joystick plugged in
-			totalNumberOfJoysticks++;
-			memset(reinterpret_cast<void*>(&joycaps), 0, sizeof(JOYCAPS));
+		for (UINT counter = 0; counter < num; counter++) {
+			memset(reinterpret_cast<void*>(&joyinfo), 0, sizeof(JOYINFO));
 
-			result = joyGetDevCaps(counter, &joycaps, sizeof(JOYCAPS));
-			if ( result == JOYERR_NOERROR ) {
-				numOfJoysticks++;
-				joystickName = wxString(joycaps.szPname, wxMBConvUTF16());
-				joysticks.Add(joystickName);
-			} else {
-				wxLogError(_T("Error in retrieving joystick caps"));
-				continue;
+			result = joyGetPos(counter, &joyinfo);
+			wxString joystickName;
+
+			if (result == JOYERR_NOERROR) {
+				// joystick plugged in
+				totalNumberOfJoysticks++;
+				memset(reinterpret_cast<void*>(&joycaps), 0, sizeof(JOYCAPS));
+
+				result = joyGetDevCaps(counter, &joycaps, sizeof(JOYCAPS));
+				if (result == JOYERR_NOERROR) {
+					joystickName = wxString(joycaps.szPname, wxMBConvUTF16());
+					winJoysticks.Add(joystickName);
+				}
+				else {
+					wxLogError(_T("Error in retrieving joystick caps"));
+					continue;
+				}
 			}
-		} else if ( result == JOYERR_UNPLUGGED ) {
-			// unplugged
-			totalNumberOfJoysticks++;
-		} else {
-			// Joystick doesn't exist, do nothing
+			else if (result == JOYERR_UNPLUGGED) {
+				// unplugged
+				totalNumberOfJoysticks++;
+			}
+			else {
+				// Joystick doesn't exist, do nothing
+			}
 		}
+		wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
+			totalNumberOfJoysticks, static_cast<int>(winJoysticks.size()));
+		return true;
 	}
-	wxLogInfo(_T("Windows reports %d joysticks, %d seem to be plugged in."),
-			totalNumberOfJoysticks, numOfJoysticks );
-	return true;
-#elif USE_JOYSTICK && HAS_SDL
-	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-	
-	JoyMan::numOfJoysticks = 0;
-	JoyMan::joysticks.clear();
+#endif
 
-	SDL_Joystick *joy = NULL;
-	for (int i = 0; i < SDL_NumJoysticks(); i++) {
-		joy = SDL_JoystickOpen(i);
-		if ( joy != NULL ) {
-			wxString joystickName(SDL_JoystickName(i), wxConvLocal);
-			joysticks.Add(joystickName);
+#if HAS_SDL
+	if (currentApi == API_SDL)
+	{
+		SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+		JoyMan::sdlJoysticks.clear();
+		JoyMan::sdlJoystickGUIDs.clear();
+
+		SDL_Joystick *joy = NULL;
+		for (int i = 0; i < SDL_NumJoysticks(); i++) {
+			joy = SDL_JoystickOpen(i);
+			if (joy != NULL) {
+				wxString joystickName(SDL_JoystickName(joy), wxConvLocal);
+				sdlJoysticks.Add(joystickName);
+
+				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+
+				char guidStr[33];
+				SDL_JoystickGetGUIDString(guid, guidStr, 33);
+
+				wxString joystickGUID(guidStr, wxConvLocal);
+				sdlJoystickGUIDs.Add(joystickGUID);
+			}
+			SDL_JoystickClose(joy);
 		}
-		SDL_JoystickClose(joy);
-	}
 
-	return true;
+		return true;
+	}
+#endif
+
+	return false;
+#else
+	return false;
 #endif
 }
 
@@ -149,11 +193,20 @@ bool JoyMan::Initialize() {
 */
 bool JoyMan::DeInitialize() {
 #if USE_JOYSTICK
-	if ( JoyMan::IsInitialized() ) {
-		JoyMan::isInitialized = false;
-		JoyMan::numOfJoysticks = 0;
-		JoyMan::joysticks.clear();
+#if HAS_SDL
+	if ( isSdlInitialized ) {
+		JoyMan::isSdlInitialized = false;
+		JoyMan::sdlJoysticks.clear();
+		JoyMan::sdlJoystickGUIDs.clear();
 	}
+#endif
+#if IS_WIN32
+	if (isWinInitialized)
+	{
+		JoyMan::isWinInitialized = false;
+		JoyMan::winJoysticks.clear();
+	}
+#endif
 #endif
 	return true;
 }
@@ -170,7 +223,19 @@ bool JoyMan::WasCompiledIn() {
 \sa JoyMan::IsPluggedIn() */
 unsigned int JoyMan::NumberOfJoysticks() {
 #if USE_JOYSTICK
-	return JoyMan::joysticks.size();
+#if HAS_SDL
+	if (currentApi == API_SDL)
+	{
+		return sdlJoysticks.size();
+	}
+#endif
+#if IS_WIN32
+	if (currentApi == API_NATIVE)
+	{
+		return winJoysticks.size();
+	}
+#endif
+	return 0;
 #else
 	return 0;
 #endif
@@ -230,9 +295,43 @@ void JoyMan::LaunchCalibrateTool(unsigned int WXUNUSED(i)) {
 /** Returns the name of the joystick for display. */
 #if USE_JOYSTICK
 wxString JoyMan::JoystickName(unsigned int i) {
-	return JoyMan::joysticks[i];
+#if HAS_SDL
+	if (currentApi == API_SDL)
+	{
+		return sdlJoysticks[i];
+}
+#endif
+#if IS_WIN32
+	if (currentApi == API_NATIVE)
+	{
+		return winJoysticks[i];
+	}
+#endif
+	return wxEmptyString;
 #else
 wxString JoyMan::JoystickName(unsigned int) {
+	return wxEmptyString;
+#endif
+}
+
+wxString JoyMan::JoystickGUID(unsigned int i)
+{
+#if USE_JOYSTICK
+#if HAS_SDL
+	if (currentApi == API_SDL)
+	{
+		return sdlJoystickGUIDs[i];
+	}
+#endif
+#if IS_WIN32
+	if (currentApi == API_NATIVE)
+	{
+		// No GUIDs on windows
+		return wxEmptyString;
+	}
+#endif
+	return wxEmptyString;
+#else
 	return wxEmptyString;
 #endif
 }
@@ -245,7 +344,7 @@ bool JoyMan::IsJoystickPluggedIn(unsigned int i) {
 	} else {
 		// FIXME because we're using indexes to represent joysticks, there's no guarantee
 		//       that an index value always refers to the same joystick
-		return i >= JoyMan::joysticks.GetCount() ? false : !JoyMan::joysticks[i].IsEmpty();
+		return i >= JoyMan::NumberOfJoysticks() ? false : !JoyMan::JoystickName(i).IsEmpty();
 	}
 #else
 bool JoyMan::IsJoystickPluggedIn(unsigned int) {
