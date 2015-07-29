@@ -263,7 +263,7 @@ void ProMan::SaveProfilesBeforeExiting() {
 	if (this->HasUnsavedChanges()) {
 		if (this->isAutoSaving) {
 			wxLogInfo(_("autosaving profile %s before exiting"),
-				this->GetCurrentName().c_str()),
+				this->GetCurrentName().c_str());
 			this->SaveCurrentProfile();
 		} else {
 			int response = wxMessageBox(
