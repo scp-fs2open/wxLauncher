@@ -47,7 +47,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
+#ifndef WIN32
+// main needs to be handled by us as SDL interferes with wxWidgets
+IMPLEMENT_APP_NO_MAIN(wxLauncher);
+#else
+// Windows is fine and also needs special WinMain treatment
 IMPLEMENT_APP(wxLauncher);
+#endif
 
 void wxLauncher::OnInitCmdLine(wxCmdLineParser& parser)
 {
@@ -198,11 +204,6 @@ bool wxLauncher::OnInit() {
 #if MSCRTMEMORY
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
-#if HAS_SDL == 1
-	if ( 0 != SDL_InitSubSystem(SDL_INIT_VIDEO) ) {
-	  wxLogFatalError(wxT_2("SDL_InitSubSystem failed"));
-	}
-#endif
 	// Little hack to deal with people starting the launcher from the bin folder
 	if ( !wxFileName::DirExists(wxT_2(RESOURCES_PATH)) ) {
 		wxFileName resourceDir;
@@ -292,3 +293,18 @@ int wxLauncher::OnExit() {
 
 	return wxApp::OnExit();
 }
+
+#ifndef WIN32
+int main(int argc, char** argv)
+{
+#if HAS_SDL == 1
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		wxLogFatalError(wxT_2("SDL_Init failed"));
+		return 1;
+	}
+#endif
+
+	return wxEntry(argc, argv);
+}
+#endif
