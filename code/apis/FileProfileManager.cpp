@@ -24,24 +24,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
+#include "apis/FlagListManager.h"
 #include "global/BasicDefaults.h"
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
 
 #include <SDL_filesystem.h>
 
-wxFileName GetPlatformDefaultConfigFilePath() {
-	// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
-	char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
-
-	wxString wxPrefPath = wxString::FromUTF8(prefPath);
-
-	SDL_free(prefPath);
-
-	wxFileName path;
-	path.AssignDir(wxPrefPath);
-
-	return path;
+namespace
+{
+	const int BUILD_CAP_SDL = 1 << 3;
 }
 
 // NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
@@ -63,6 +55,30 @@ wxFileName GetPlatformDefaultConfigFilePathLegacy() {
 	return path;
 }
 
+wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
+	wxFileName path;
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL) {
+		// SDL builds now use the user directory on all platforms
+		// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+		char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+		wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+		SDL_free(prefPath);
+
+		path.AssignDir(wxPrefPath);
+	}
+	else {
+#if IS_LINUX // write to folder in home dir
+		path = GetPlatformDefaultConfigFilePathLegacy().GetFullPath().c_str();
+#else
+		path.AssignDir(tcPath);
+#endif
+	}
+
+	return path;
+}
+
 #define FSO_CONFIG_FILENAME _T("fs2_open.ini")
 
 #define ReturnChecker(retvalue, location) \
@@ -73,6 +89,9 @@ wxFileName GetPlatformDefaultConfigFilePathLegacy() {
 
 ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	wxFileName configFileName;
+	wxString tcPath;
+	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+
 	if ( cfg->Exists(INT_CONFIG_FILE_LOCATION) ) {
 		wxString configFileNameString;
 		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &configFileNameString)) {
@@ -82,7 +101,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		configFileName = GetPlatformDefaultConfigFilePath();
+		configFileName = GetPlatformDefaultConfigFilePath(tcPath);
 	}
 	wxASSERT_MSG( configFileName.Normalize(),
 		wxString::Format(_T("Unable to normalize PlatformDefaultConfigFilePath (%s)"),
