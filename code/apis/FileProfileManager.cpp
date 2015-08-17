@@ -37,7 +37,7 @@ namespace
 }
 
 // NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
-wxFileName GetPlatformDefaultConfigFilePathLegacy() {
+wxFileName GetPlatformDefaultConfigFilePathOld() {
 	wxFileName path;
 #if IS_WIN32
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
@@ -55,22 +55,29 @@ wxFileName GetPlatformDefaultConfigFilePathLegacy() {
 	return path;
 }
 
+wxFileName GetPlatformDefaultConfigFilePathNew() {
+	// SDL builds now use the user directory on all platforms
+	// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+	char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+	wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+	SDL_free(prefPath);
+
+	wxFileName path;
+	path.AssignDir(wxPrefPath);
+
+	return path;
+}
+
 wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
 	wxFileName path;
 	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL) {
-		// SDL builds now use the user directory on all platforms
-		// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
-		char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
-
-		wxString wxPrefPath = wxString::FromUTF8(prefPath);
-
-		SDL_free(prefPath);
-
-		path.AssignDir(wxPrefPath);
+		path = GetPlatformDefaultConfigFilePathNew();
 	}
 	else {
 #if IS_LINUX // write to folder in home dir
-		path = GetPlatformDefaultConfigFilePathLegacy().GetFullPath().c_str();
+		path = GetPlatformDefaultConfigFilePathOld().GetFullPath().c_str();
 #else
 		path.AssignDir(tcPath);
 #endif
@@ -345,7 +352,14 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		inFileName = GetPlatformDefaultConfigFilePath();
+		inFileName = GetPlatformDefaultConfigFilePathNew();
+		inFileName.SetFullName(FSO_CONFIG_FILENAME);
+
+		if (!inFileName.FileExists())
+		{
+			inFileName = GetPlatformDefaultConfigFilePathOld();
+			inFileName.SetFullName(FSO_CONFIG_FILENAME);
+		}
 	}
 	wxASSERT( inFileName.Normalize() );
 
