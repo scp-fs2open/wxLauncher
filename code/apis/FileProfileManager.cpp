@@ -28,8 +28,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
 
-// NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
+#include <SDL_filesystem.h>
+
 wxFileName GetPlatformDefaultConfigFilePath() {
+	// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+	char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+	wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+	SDL_free(prefPath);
+
+	wxFileName path;
+	path.AssignDir(wxPrefPath);
+
+	return path;
+}
+
+// NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
+wxFileName GetPlatformDefaultConfigFilePathLegacy() {
 	wxFileName path;
 #if IS_WIN32
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());

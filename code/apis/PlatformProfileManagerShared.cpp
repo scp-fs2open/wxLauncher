@@ -24,6 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/PlatformProfileManager.h"
 #include "controls/LightingPresets.h"
 #include "global/ProfileKeys.h"
+#include "apis/FlagListManager.h"
+
+namespace
+{
+	const int BUILD_CAP_SDL = 1 << 3;
+}
 
 ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	wxString modLine, flagLine, tcPath;
@@ -38,13 +44,21 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	}
 
 	wxString cmdLineString;
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL) {
+		// SDL builds now use the user directory on all platforms
+		extern wxFileName GetPlatformDefaultConfigFilePath();
+		cmdLineString += GetPlatformDefaultConfigFilePath().GetFullPath().c_str();
+	}
+	else {
 #if IS_LINUX // write to folder in home dir
-	extern wxFileName GetPlatformDefaultConfigFilePath();
-	cmdLineString += GetPlatformDefaultConfigFilePath().GetFullPath().c_str();
+		extern wxFileName GetPlatformDefaultConfigFilePathLegacy();
+		cmdLineString += GetPlatformDefaultConfigFilePathLegacy().GetFullPath().c_str();
 #else
-	cmdLineString += tcPath.c_str();
-	cmdLineString += wxFileName::GetPathSeparator();
+		cmdLineString += tcPath.c_str();
+		cmdLineString += wxFileName::GetPathSeparator();
 #endif
+	}
+
 	cmdLineString += _T("data");
 	
 #if IS_LINUX // try to rename file in root folder if exists
