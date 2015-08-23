@@ -9,7 +9,6 @@
 #cmakedefine01 USE_JOYSTICK
 #cmakedefine01 USE_OPENAL
 #cmakedefine01 PLATFORM_USES_REGISTRY
-#cmakedefine01 PLATFORM_HAS_BROKEN_OPENAL
 #cmakedefine01 PROFILE_DEBUGGING
 
 #cmakedefine01 HAS_SDL

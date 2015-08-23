@@ -60,7 +60,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		return ProMan::UnknownError;\
 	}
 		
-#define UNKOWN_ERROR_MSG _T("Unhandled error number %d from query above line %d")
+#define UNKOWN_ERROR_MSG _T("Unhandled error number %ld from query above line %d")
 #define REG_DATA_NOT_DWORD _T("Registry key lookup above line %d is not a DWORD")
 #define REG_DATA_NOT_STRING _T("Registry key lookup above line %d is not a DWORD")
 #endif

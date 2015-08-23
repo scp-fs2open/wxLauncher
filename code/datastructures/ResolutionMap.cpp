@@ -40,7 +40,7 @@ void ResolutionMap::ResolutionWrite(const wxString& shortname, const ResolutionD
 	wxASSERT(resData.IsValid());
 	
 	prefResMap[shortname] = resData;
-	wxLogDebug(_T("Wrote resolution %dx%d for mod %s"),
+	wxLogDebug(_T("Wrote resolution %ldx%ld for mod %s"),
 		resData.width, resData.height, shortname.c_str());
 	GenerateResolutionMapChanged();
 }

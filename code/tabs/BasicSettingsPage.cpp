@@ -823,7 +823,7 @@ void BasicSettingsPage::OnSelectTC(wxCommandEvent &WXUNUSED(event)) {
 	wxString directory;
 	ProMan* proman = ProMan::GetProfileManager();
 	proman->ProfileRead(PRO_CFG_TC_ROOT_FOLDER, &directory, wxEmptyString);
-	wxDirDialog filechooser(this, _T("Choose the root folder of an FS2 Open game"),
+	wxDirDialog filechooser(this, _T("Choose the root folder of an FS2 Open game."),
 		directory, wxDD_DEFAULT_STYLE|wxDD_DIR_MUST_EXIST);
 
 	wxString chosenDirectory;
@@ -1314,7 +1314,7 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 		} else {
 			const wxString InsufficientResolutionMsg(
 				wxString::Format(
-					_T("Your system does not support the minimum resolution needed to play this mod (%dx%d)."),
+					_T("Your system does not support the minimum resolution needed to play this mod (%ldx%ld)."),
 						minHorizRes, minVertRes));
 			
 			wxLogError(InsufficientResolutionMsg);
@@ -1654,7 +1654,7 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	for (unsigned int i = 0; i < resChoice.GetCount(); ++i) {
 		res = dynamic_cast<Resolution*>(resChoice.GetClientObject(i));
 		wxCHECK_MSG(res != NULL, wxNOT_FOUND,
-			wxString::Format(_T("choice does not have Resolution object at index %d"), i));
+			wxString::Format(_T("choice does not have Resolution object at index %u"), i));
 		// FIXME could be clever and only read the highest resolution in each aspect ratio group
 		if (!res->IsHeader()) {
 			int resProduct = res->GetWidth() * res->GetHeight();
@@ -1953,7 +1953,7 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 	const SoundDeviceType deviceType) {
 	
 	wxCHECK_RET((deviceType == PLAYBACK) || (deviceType == CAPTURE),
-		wxString::Format(_T("Invalid device type %d given."), deviceType));
+		wxString::Format(_T("Invalid device type %u given."), deviceType));
 	
 	WindowIDS deviceDropDownBoxID;
 	wxString deviceTypeNameAdjustment;
@@ -1987,6 +1987,7 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 		wxString::Format(
 			_T("Sound%s device drop down box has a count of %d")
 				_T(" when it should be empty; first entry is %s"),
+			deviceTypeNameAdjustment.c_str(),
 			deviceDropDownBox->GetCount(),
 			deviceDropDownBox->GetString(0).c_str()));
 	

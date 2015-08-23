@@ -376,7 +376,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		char easy_flag[32];
 		bytesRead = flagfile.Read(&easy_flag, sizeof(easy_flag));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_flag) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_flag)"), sizeof(easy_flag), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (easy_flag)"), sizeof(easy_flag), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		wxString easyFlagStr(easy_flag, wxConvUTF8, strlen(easy_flag));
@@ -397,43 +397,43 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		
 		bytesRead = flagfile.Read(&flag_string, sizeof(flag_string));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(flag_string) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (flag_string)"), sizeof(flag_string), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (flag_string)"), sizeof(flag_string), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&description, sizeof(description));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(description) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (description)"), sizeof(description), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (description)"), sizeof(description), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&fso_only, sizeof(fso_only));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(fso_only) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (fso_only)"), sizeof(fso_only), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (fso_only)"), sizeof(fso_only), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&easy_on_flags, sizeof(easy_on_flags));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_on_flags) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_on_flags)"), sizeof(easy_on_flags), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (easy_on_flags)"), sizeof(easy_on_flags), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&easy_off_flags, sizeof(easy_off_flags));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_off_flags) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_off_flags)"), sizeof(easy_off_flags), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (easy_off_flags)"), sizeof(easy_off_flags), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&easy_catagory, sizeof(easy_catagory));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(easy_catagory) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (easy_category)"), sizeof(easy_catagory), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (easy_category)"), sizeof(easy_catagory), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
 		bytesRead = flagfile.Read(&web_url, sizeof(web_url));
 		if ( (size_t)wxInvalidOffset == bytesRead || bytesRead != sizeof(web_url) ) {
-			wxLogError(_T(" Flag file is too short, expected %d, got %d bytes (web_url)"), sizeof(web_url), bytesRead);
+			wxLogError(_T(" Flag file is too short, expected %d, got %ld bytes (web_url)"), sizeof(web_url), bytesRead);
 			return FLAG_FILE_NOT_VALID;
 		}
 		
@@ -456,7 +456,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		this->data->AddFlag(flag);
 	}		
 	
-	wxLogDebug(_T(" easy_flag_size: %d, %d; flag_size: %d, %d; num_easy_flags: %d, %d; num_flags: %d, %d"),
+	wxLogDebug(_T(" easy_flag_size: %d, %lu; flag_size: %d, %lu; num_easy_flags: %d, %lu; num_flags: %d, %lu"),
 		easy_flag_size, sizeof(easy_flag_size),
 		flag_size, sizeof(flag_size),
 		num_easy_flags, sizeof(num_easy_flags),

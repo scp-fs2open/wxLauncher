@@ -172,7 +172,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxButton* deleteButton = new wxButton(this, ID_DELETE_PROFILE, _("Delete..."));
 	wxButton* saveButton = new wxButton(this, ID_SAVE_PROFILE, _("Save"));
 
-	wxCheckBox* autoSaveProfilesCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Automatically save profiles"));
+	wxCheckBox* autoSaveProfilesCheck = new wxCheckBox(this, ID_SAVE_DEFAULT_CHECK, _("Save profiles automatically"));
 	bool autosave;
 	proman->GlobalRead(GBL_CFG_MAIN_AUTOSAVEPROFILES, &autosave, true, true);
 	autoSaveProfilesCheck->SetValue(autosave);
@@ -197,10 +197,10 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 	wxHtmlWindow* newsView = new wxHtmlWindow(this, ID_NEWS_HTML_PANEL);
 	newsView->SetPage(_T(""));
 	newsView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WelcomePage::OnMouseOut));
-	wxCheckBox* updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Automatically retrieve news at startup"));
+	updateNewsCheck = new wxCheckBox(this, ID_NET_DOWNLOAD_NEWS, _("Retrieve news at startup"));
 	updateNewsCheck->SetToolTip(_("Check this to have the launcher retrieve the news the next time it runs"));
-	updateNewsCheck->SetValue(this->getOrPromptUpdateNews());
-	this->needToUpdateNews = true;
+	updateNewsCheck->Disable();
+	this->Connect(wxEVT_IDLE, wxIdleEventHandler(WelcomePage::getOrPromptUpdateNews));
 
 	wxStaticBoxSizer* newsSizer = new wxStaticBoxSizer(newsBox, wxVERTICAL);
 	newsSizer->Add(newsView, 
@@ -508,7 +508,10 @@ void WelcomePage::UpdateNews(wxIdleEvent& WXUNUSED(event)) {
 	}
 }
 
-bool WelcomePage::getOrPromptUpdateNews() {
+void WelcomePage::getOrPromptUpdateNews(wxIdleEvent &WXUNUSED(event)) {
+	this->Disconnect(wxEVT_IDLE, wxIdleEventHandler(WelcomePage::getOrPromptUpdateNews));
+	wxCHECK_RET(updateNewsCheck != NULL, wxT("checkbox is NULL"));
+
 	bool updateNews;
 	if (!ProMan::GetProfileManager()->GlobalRead(GBL_CFG_NET_DOWNLOAD_NEWS, &updateNews)) {
 		wxDialog* updateNewsQuestion = 
@@ -581,7 +584,9 @@ bool WelcomePage::getOrPromptUpdateNews() {
 		
 		updateNewsQuestion->Destroy();
 	}
-	return updateNews;
+	updateNewsCheck->SetValue(updateNews);
+	updateNewsCheck->Enable();
+	this->needToUpdateNews = true;
 }
 
 void WelcomePage::OnDownloadNewsCheck(wxCommandEvent& event) {

@@ -142,7 +142,7 @@ bool ProMan::Initialize(Flags flags) {
 		wxFileConfig *config = new wxFileConfig(instream);
 		
 		wxString name;
-		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(wxT_2("Profile %05d"), i));
+		config->Read(PRO_CFG_MAIN_NAME, &name, wxString::Format(wxT_2("Profile %05ld"), i));
 
 		ProMan::proman->profiles[name] = config;
 		wxLogDebug(wxT_2("  Opened profile named: %s"), name.c_str());
@@ -420,7 +420,7 @@ wxString ProMan::GenerateNewProfileFileName() {
 	
 	wxASSERT(proIndex <= 99999); // the maximum possible index given a 5-digit number
 	
-	return wxString::Format(wxT_2("pro%05d.ini"), static_cast<int>(proIndex));
+	return wxString::Format(wxT_2("pro%05ld.ini"), proIndex);
 }
 
 // global profile access functions
@@ -1421,7 +1421,7 @@ void ProMan::TestConfigFunctions(wxConfigBase& src) {
 	wxLogDebug(_T("are configs src and dest equal? %s"), AreConfigsEqual(*dest, src) ? _T("true") : _T("false"));
 	
 	wxLogDebug(_T("clearing dest config"));
-	wxLogDebug(_T("before clearing, dest has %d entries and %d groups"),
+	wxLogDebug(_T("before clearing, dest has %ld entries and %ld groups"),
 		dest->GetNumberOfEntries(true), dest->GetNumberOfGroups(true));
 
 	ClearConfig(*dest);

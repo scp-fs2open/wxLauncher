@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/RegistryKeys.h"
 
 // NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
-inline wxFileName GetPlatformDefaultConfigFilePath() {
+wxFileName GetPlatformDefaultConfigFilePath() {
 	wxFileName path;
 #if IS_WIN32
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
