@@ -22,7 +22,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 
 namespace JoyMan {
-	bool Initialize();
+	enum ApiType {
+		API_NATIVE,
+		API_SDL
+	};
+
+	bool Initialize(ApiType apiType);
 	bool DeInitialize();
 	bool IsInitialized();
 	bool WasCompiledIn();
@@ -33,6 +38,7 @@ namespace JoyMan {
 	bool HasCalibrateTool(unsigned int i);
 	void LaunchCalibrateTool(unsigned int i);
 	wxString JoystickName(unsigned int i);
+	wxString JoystickGUID(unsigned int i);
 	bool IsJoystickPluggedIn(unsigned int i);
 };
 

@@ -41,6 +41,7 @@ const wxString REG_KEY_SPEECH_IN_GAME				(L"SpeechIngame");
 const wxString REG_KEY_SPEECH_IN_MULTI				(L"SpeechMulti");
 
 const wxString REG_KEY_JOYSTICK_ID					(L"CurrentJoystick");
+const wxString REG_KEY_JOYSTICK_GUID				(L"CurrentJoystickGUID");
 const wxString REG_KEY_JOYSTICK_FORCE_FEEDBACK		(L"EnableJoystickFF");
 const wxString REG_KEY_JOYSTICK_DIRECTIONAL			(L"EnableHitEffect");
 

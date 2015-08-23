@@ -46,6 +46,7 @@ extern const wxString REG_KEY_SPEECH_IN_GAME;
 extern const wxString REG_KEY_SPEECH_IN_MULTI;
 
 extern const wxString REG_KEY_JOYSTICK_ID;
+extern const wxString REG_KEY_JOYSTICK_GUID;
 extern const wxString REG_KEY_JOYSTICK_FORCE_FEEDBACK;
 extern const wxString REG_KEY_JOYSTICK_DIRECTIONAL;
 
