@@ -625,7 +625,6 @@ ModList::~ModList() {
 void ModList::readIniFileString(const wxFileConfig* config,
 		const wxString& key, wxString& location) {
 	wxASSERT(config != NULL);
-	wxASSERT(location.IsEmpty());
 
 	if ( config->HasEntry(key) ) {
 		config->Read(key, &location);

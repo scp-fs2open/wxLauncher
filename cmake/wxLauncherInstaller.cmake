@@ -112,6 +112,7 @@ include(CPack)
 
 if(IS_WIN32)
   install(TARGETS wxlauncher RUNTIME DESTINATION bin)
+  install(FILES "${SDL2_DLL}" DESTINATION bin)
 elseif(IS_APPLE)
   install(TARGETS wxlauncher 
 	RUNTIME DESTINATION .
