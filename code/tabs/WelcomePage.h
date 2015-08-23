@@ -48,7 +48,8 @@ private:
 	void deleteProfile(wxChoice* combobox, ProMan* profile);
 
 	bool needToUpdateNews;
-	bool getOrPromptUpdateNews();
+	wxCheckBox* updateNewsCheck;
+	void getOrPromptUpdateNews(wxIdleEvent&);
 
 	DECLARE_EVENT_TABLE();
 };

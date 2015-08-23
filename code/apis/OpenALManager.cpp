@@ -68,17 +68,18 @@ bool OpenALMan::Initialize() {
 							   wxDL_VERBATIM) ) {
 		isInitialized = true;
 		return true;
-#else
+#elif IS_WIN32
 	} else if ( OpenALLib.Load(_T("OpenAL32")) ) {
 		isInitialized = true;
 		return true;
+#else
 	} else if ( OpenALLib.Load(_T("libopenal")) ) {
 		isInitialized = true;
 		return true;
+#endif
 	} else if ( OpenALLib.Load(_T("OpenAL")) ) {
 		isInitialized = true;
 		return true;
-#endif
 	} else {
 		return false;
 	}
@@ -164,19 +165,13 @@ bool OpenALMan::checkForALError_(size_t line) {
 	if ( errorcode == AL_NO_ERROR ) {
 		return true;
 	} else if ( errorcode == AL_INVALID_NAME ) {
-		wxLogError(_T("OpenAL:%d: a bad name (ID) was passed to an OpenAL function"), line);
+		wxLogError(_T("OpenAL:%ld: a bad name (ID) was passed to an OpenAL function"), line);
 	} else if ( errorcode == AL_INVALID_ENUM ) {
-		wxLogError(_T("OpenAL:%d: an invalid enum value was passed to an OpenAL function"), line);
+		wxLogError(_T("OpenAL:%ld: an invalid enum value was passed to an OpenAL function"), line);
 	} else {
-		wxLogError(_T("OpenAL:%d: Unknown error number 0x%08x"), line, errorcode);
+		wxLogError(_T("OpenAL:%ld: Unknown error number 0x%08x"), line, errorcode);
 	}
-#if PLATFORM_HAS_BROKEN_OPENAL == 1
-	/** \todo a hack to fix certain OpenAL implementations that are not
-	clearing the errors correctly. */
-	return true;
-#else
 	return false;
-#endif
 }
 #endif
 
@@ -332,10 +327,6 @@ wxString OpenALMan::GetCurrentVersion() {
 	wxString selectedDevice;
 	ProMan::GetProfileManager()->ProfileRead(PRO_CFG_OPENAL_DEVICE, &selectedDevice);
 
-	// clear errors, I have not done any openAL stuff, so make sure that any
-	// errors that are active are because of me.
-	checkForALError();
-
 	alcOpenDeviceType OpenDevice = 
 		GetOALFuncPtr(alcOpenDeviceType,alcOpenDevice);
 	if ( OpenDevice == NULL) {
@@ -414,10 +405,6 @@ bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 		wxLogError(_T("IsEFXSupported: playback device name is empty"));
 		return false;
 	}
-	
-	// clear errors, I have not done any openAL stuff, so make sure that any
-	// errors that are active are because of me.
-	checkForALError();
 	
 	alcOpenDeviceType OpenDevice = 
 		GetOALFuncPtr(alcOpenDeviceType, alcOpenDevice);

@@ -117,7 +117,22 @@ wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(const wxFileName& pat
 
 wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, const wxString& globPattern, bool quiet) {
 	wxArrayString files;
-	wxDir folder(path.GetPath());
+
+	// Check args because this function gets crap tossed at it to validate
+	wxString pathStr(path.GetPath());
+	if (pathStr.IsEmpty())
+	{
+		wxLogInfo(wxT("GetBinaries called with empty root folder"));
+		return files;
+	}
+
+	wxDir folder(pathStr);
+	if (!folder.IsOpened())
+	{
+		wxLogInfo(wxT("GetBinaries called on '%s' which cannot be opened"),
+			pathStr.c_str());
+		return files;
+	}
 	wxString filename;
 
 #if IS_APPLE // Binaries are directories on OSX.

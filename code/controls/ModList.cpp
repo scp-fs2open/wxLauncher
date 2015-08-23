@@ -204,7 +204,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 	wxArrayString foundInis(iniFinder.GetFiles());
 	
 	if ( foundInis.Count() > 0 ) {
-		wxLogDebug(_T("I found %d .ini files:"), foundInis.Count());
+		wxLogDebug(_T("I found %ld .ini files:"), foundInis.Count());
 	} else {
 		wxLogDebug(_T("I did not find any .ini files."));
 	}
@@ -350,7 +350,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 		
 		if ((item->minhorizontalres < DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES) ||
 				(item->minverticalres < DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES)) {
-			wxLogWarning(_T("Invalid minimum resolution %dx%d, using default"),
+			wxLogWarning(_T("Invalid minimum resolution %ldx%ld, using default"),
 				item->minhorizontalres, item->minverticalres);
 			item->minhorizontalres = DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES;
 			item->minverticalres = DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES;
@@ -412,7 +412,7 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			unsigned int counter = 1;
 			bool done = false;
 			do {
-				wxString sectionname = wxString::Format(_T("/flagset%d"), counter);
+				wxString sectionname = wxString::Format(_T("/flagset%u"), counter);
 				if ( config->Exists( sectionname )) {
 					FlagSetItem* numberedflagset = new FlagSetItem();
 
@@ -634,8 +634,9 @@ void ModList::readIniFileString(const wxFileConfig* config,
 		}
 	}
 
-	wxLogDebug(_T("  %s:'%s'"), key.c_str(),
-		location.IsEmpty() ? _T("Not Specified") : escapeSpecials(location).c_str());
+	wxLogDebug(wxT_2("  %s:'%s'"),
+		key.c_str(),
+		location.IsEmpty() ? wxT_2("Not Specified") : escapeSpecials(location).c_str());
 }
 
 /** re-escape the newlines in the mod.ini values. */
@@ -735,7 +736,7 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, co
 	// don't try to read in buffer when there is nothing to read.
 	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
 	if ( read != size ) {
-		wxLogError(_T("read (%d) not equal to size (%d)"), read, size);
+		wxLogError(_T("read (%ld) not equal to size (%ld)"), read, size);
 		delete[] characterBuffer;
 		return false;
 	}
@@ -1348,16 +1349,51 @@ ModInfoDialog::ModInfoDialog(ModItem* item, wxWindow* parent) {
 
 	wxHtmlWindow* links = new wxHtmlWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_SUNKEN | wxHW_SCROLLBAR_NEVER );
 	links->SetSize(SkinSystem::ModInfoDialogImageWidth, 40);
-	links->SetPage(wxString::Format(_T("<center>%s%s%s%s</center>"),
-		(!item->website.IsEmpty()) ? 
-			wxString::Format(_T("<a href='%s'>%s</a> :: "), item->website.c_str(), _("Website")).c_str():wxEmptyString,
-		wxString::Format(_T("<a href='%s'>%s</a>"), (!item->forum.IsEmpty()) ?
-			item->forum.c_str():_("http://www.hard-light.net/forums/index.php?board=124.0"), _("Forum")).c_str(),
-		(!item->bugs.IsEmpty()) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->bugs.c_str(), _("Bugs")).c_str() : wxEmptyString,
-		(!item->support.IsEmpty()) ?
-			wxString::Format(_T(" :: <a href='%s'>%s</a>"), item->support.c_str(), _("Support")).c_str() : wxEmptyString
-		));
+	wxString linksWebsite;
+	if (!item->website.IsEmpty()) {
+		linksWebsite = wxString::Format(
+			wxT_2("<a href='%s'>%s</a> :: "),
+			item->website.c_str(),
+			_("Website"));
+	}
+	wxString linksForum;
+	if (item->forum.IsEmpty()) {
+		// Give the default Missing and Campaigns Forum
+		linksForum = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			wxT_2("http://www.hard-light.net/forums/index.php?board=124.0"),
+			_("Forum"));
+	} else {
+		linksForum = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->forum.c_str(),
+			_("Forum"));
+	}
+	wxString linksBugs;
+	if (!item->bugs.IsEmpty()) {
+		linksBugs = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->bugs.c_str(),
+			_("Bugs"));
+	}
+	wxString linksSupport;
+	if (!item->support.IsEmpty()) {
+		linksSupport = wxString::Format(
+			wxT_2("<a href='%s'>%s</a>"),
+			item->support.c_str(),
+			_("Support"));
+	}
+
+	wxString linksContent = wxString::Format(
+		wxT_2("<center>%s%s%s%s%s%s%s</center>"),
+		linksWebsite.c_str(),
+		(item->website.IsEmpty())?wxEmptyString:wxT(" :: "),
+		linksForum.c_str(),
+		(item->bugs.IsEmpty())?wxEmptyString:wxT(" :: "),
+		linksBugs.c_str(),
+		(item->support.IsEmpty())?wxEmptyString:wxT(" :: "),
+		linksSupport.c_str());
+	links->SetPage(linksContent);
 	links->Connect(wxEVT_COMMAND_HTML_LINK_CLICKED, wxHtmlLinkEventHandler(ModInfoDialog::OnLinkClicked));
 
 	wxStaticBitmap* warning = NULL;
