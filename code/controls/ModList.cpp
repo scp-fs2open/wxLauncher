@@ -396,8 +396,10 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 			wxLogInfo(_T("  DEPRECATION WARNING: Mod '%s' uses deprecated mod.ini parameter 'secondrylist'"),
 				shortname.c_str());
 		}
-		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDRY_LIST, item->secondarylist);
 		readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDARY_LIST, item->secondarylist);
+		if (item->secondarylist.IsEmpty()) {
+			readIniFileString(config, MOD_INI_KEY_MULTIMOD_SECONDRY_LIST, item->secondarylist);
+		}
 
 		// flag sets
 		if ( config->Exists(_T("/flagsetideal")) ) {
@@ -735,7 +737,7 @@ bool ModList::ParseModIni(const wxString& modIniPath, const wxString& tcPath, co
 	// don't try to read in buffer when there is nothing to read.
 	size_t read = (size == 0) ? 0 : buf->Read(reinterpret_cast<void*>(characterBuffer), size);
 	if ( read != size ) {
-		wxLogError(_T("read (%ld) not equal to size (%ld)"), read, size);
+		wxLogError(wxT("read (") SZT wxT(") not equal to size (") SZT wxT(")"), read, size);
 		delete[] characterBuffer;
 		return false;
 	}
