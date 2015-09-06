@@ -269,7 +269,8 @@ set(GLOBAL_CODE_FILES
   code/global/Utils.cpp
   code/global/version.h
   code/global/version.cpp
-  )
+  code/global/Compatibility.cpp
+  code/global/Compatibility.h)
 source_group(Global FILES ${GLOBAL_CODE_FILES})
 set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FlagInfo.cpp

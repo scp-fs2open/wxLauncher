@@ -31,10 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <SDL_filesystem.h>
 
-namespace
-{
-	const int BUILD_CAP_SDL = 1 << 3;
-}
 
 // NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
 wxFileName GetPlatformDefaultConfigFilePathOld() {
@@ -72,11 +68,11 @@ wxFileName GetPlatformDefaultConfigFilePathNew() {
 
 wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
 	wxFileName path;
-	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL) {
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
 		path = GetPlatformDefaultConfigFilePathNew();
 	}
 	else {
-#if IS_LINUX // write to folder in home dir
+#if IS_LINUX || IS_APPLE // write to folder in home dir
 		path = GetPlatformDefaultConfigFilePathOld().GetFullPath().c_str();
 #else
 		path.AssignDir(tcPath);

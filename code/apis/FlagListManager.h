@@ -49,6 +49,13 @@ public:
 		FLAG_FILE_PROCESSING_ERROR
 	};
 
+	enum CapabilityFlags {
+		BUILD_CAPS_OPENAL = 1 << 0,
+		BUILD_CAPS_NO_D3D = 1 << 1,
+		BUILD_CAPS_NEW_SND = 1 << 2,
+		BUILD_CAPS_SDL = 1 << 3,
+	};
+
 	void OnBinaryChanged(wxCommandEvent &event);
 	
 	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
