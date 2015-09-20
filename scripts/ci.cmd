@@ -15,7 +15,7 @@ echo %LIB%
 echo %LIBPATH%
 
 if defined WXVER (set ARGWXVER="-DWXVER=%WXVER%")
-if defined BUILDTYPE (set ARGBUILDTYPE="-DBUILDTYPE=%BUILDTYPE%")
+if defined BUILDTYPE (set ARGBUILDTYPE="-DCMAKE_BUILD_TYPE=%BUILDTYPE%")
 
 if not defined LIBRARY_PATHS (set LIBRARY_PATHS=C:\libraries\library_paths.cmd)
 
