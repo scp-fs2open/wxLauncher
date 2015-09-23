@@ -199,7 +199,8 @@ HKEY GetRegistryKeyname(wxString& out_keyname)
 	}
 	else
 	{
-		out_keyname = REG_KEY_FOLDER_LOCATION;
+		out_keyname = wxString::Format(wxT_2("Software\\%s"),
+			REG_KEY_FOLDER_LOCATION.c_str());
 		return HKEY_LOCAL_MACHINE;
 	}
 #else

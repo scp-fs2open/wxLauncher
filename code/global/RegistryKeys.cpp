@@ -18,7 +18,7 @@
 
 #include "RegistryKeys.h"
 
-const wxString REG_KEY_FOLDER_LOCATION				(L"Software\\Volition\\Freespace2");
+const wxString REG_KEY_FOLDER_LOCATION				(L"Volition\\Freespace2");
 
 const wxString REG_KEY_VIDEO_RESOLUTION_DEPTH		(L"VideocardFs2open");
 const wxString REG_KEY_VIDEO_TEXTURE_FILTER			(L"TextureFilter");
