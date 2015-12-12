@@ -364,6 +364,10 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 		inFileName.SetFullName(FSO_CONFIG_FILENAME);
 	}
 
+	if (!inFileName.FileExists()) {
+		return ProMan::InputFileDoesNotExist;
+	}
+
 	wxFFileInputStream inConfigStream(inFileName.GetFullPath(), _T("rb"));
 	wxFileConfig inConfig(inConfigStream, wxMBConvUTF8());
 

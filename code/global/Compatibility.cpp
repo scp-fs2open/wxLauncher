@@ -1,6 +1,7 @@
 #include <wx/dir.h>
 #include <wx/filefn.h>
 
+#include "generated/configure_launcher.h"
 #include "apis/FlagListManager.h"
 #include "global/Compatibility.h"
 #include "global/ProfileKeys.h"
