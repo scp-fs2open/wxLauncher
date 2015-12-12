@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/EventHandlers.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
+#include "apis/FlagListManager.h"
 #include "wxLauncherApp.h"
 #include "global/ProfileKeys.h"
 
@@ -1478,7 +1479,11 @@ ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
 	wxCHECK_MSG(cfg != NULL, ProMan::UnknownError, _T("ProMan::PushProfile given null wxFileConfig!"));
 #if IS_WIN32
 	// check if binary supports configfile
-	return RegistryPushProfile(cfg);
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
+		return FilePushProfile(cfg);
+	} else {
+		return RegistryPushProfile(cfg);
+	}	
 #elif IS_LINUX || IS_APPLE
 	return FilePushProfile(cfg);
 #else
@@ -1490,8 +1495,15 @@ ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
 ProMan::RegistryCodes ProMan::PullProfile(wxFileConfig *cfg) {
 	wxCHECK_MSG(cfg != NULL, ProMan::UnknownError, _T("ProMan::PullProfile given null wxFileConfig!"));
 #if IS_WIN32
-	// check if binary supports configfile
-	return RegistryPullProfile(cfg);
+	// First try the config file
+	ProMan::RegistryCodes code = FilePullProfile(cfg);
+
+	if (code == ProMan::InputFileDoesNotExist) {
+		// No config file, use the registry
+		return RegistryPullProfile(cfg);
+	}
+
+	return code;
 #elif IS_LINUX || IS_APPLE
 	return FilePullProfile(cfg);
 #else

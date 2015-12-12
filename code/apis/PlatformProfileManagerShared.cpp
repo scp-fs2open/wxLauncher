@@ -38,7 +38,7 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	}
 
 	extern wxFileName GetPlatformDefaultConfigFilePath(const wxString&);
-	wxString cmdLineString = GetPlatformDefaultConfigFilePath(tcPath).GetFullName();
+	wxString cmdLineString = GetPlatformDefaultConfigFilePath(tcPath).GetFullPath();
 
 	cmdLineString += _T("data");
 	
