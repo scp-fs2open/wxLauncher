@@ -298,8 +298,13 @@ wxString JoyMan::JoystickName(unsigned int i) {
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		return sdlJoysticks[i];
-}
+		if (sdlJoystickGUIDs.size() <= i) {
+			return wxEmptyString;
+		}
+		else {
+			return sdlJoysticks[i];
+		}
+	}
 #endif
 #if IS_WIN32
 	if (currentApi == API_NATIVE)
@@ -320,7 +325,11 @@ wxString JoyMan::JoystickGUID(unsigned int i)
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		return sdlJoystickGUIDs[i];
+		if (sdlJoystickGUIDs.size() <= i) {
+			return wxEmptyString;
+		} else {
+			return sdlJoystickGUIDs[i];
+		}
 	}
 #endif
 #if IS_WIN32
