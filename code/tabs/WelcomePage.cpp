@@ -217,7 +217,7 @@ WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
 #if 0
 	sizer->Add(languageSizer);
 #endif
-	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Center().Border(wxTOP, 5));
+	sizer->Add(header, wxSizerFlags().Proportion(0).Expand().Border(wxTOP, 5));
 	sizer->Add(generalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(profileVerticalSizer, wxSizerFlags().Proportion(0).Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
 	sizer->Add(newsSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
