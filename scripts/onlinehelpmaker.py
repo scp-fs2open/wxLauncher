@@ -14,9 +14,9 @@ import HTMLParser
 try:
   import markdown
 except ImportError:
-  print "ERROR: Unable to import markdown the markup parser."
-  print " Make sure that markdown has been installed"
-  print "  see the ReadMe.txt for more information"
+  print("ERROR: Unable to import markdown the markup parser.")
+  print(" Make sure that markdown has been installed")
+  print("  see the ReadMe.txt for more information")
   raise
 
 from helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
