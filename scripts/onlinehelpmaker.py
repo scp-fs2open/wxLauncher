@@ -1,15 +1,12 @@
-import sqlite3
 import os
 import sys
 import atexit
 import traceback
 import shutil
 import zipfile
-import string
 from optparse import OptionParser
 import logging
 NOTICE = 25 # added level for app
-from html.parser import HTMLParser
 
 try:
   import markdown
