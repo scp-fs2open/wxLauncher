@@ -1,15 +1,12 @@
-import sqlite3
 import os
 import sys
 import atexit
 import traceback
 import shutil
 import zipfile
-import string
 from optparse import OptionParser
 import logging
 NOTICE = 25 # added level for app
-import HTMLParser
 
 try:
   import markdown
@@ -304,9 +301,9 @@ def process_input_stage3(file, options, files, extrafiles):
   outfile = open(outname, mode="w")
 
   #figure out what subdirectory of the onlinehelp I am in
-  subdir = string.replace(os.path.dirname(outname), os.path.normpath(files['stage3']), "")
+  subdir = os.path.dirname(outname).replace(os.path.normpath(files['stage3']), "")
   if subdir.startswith(os.path.sep):
-    subdir = string.replace(subdir, os.path.sep, "", 1) # I only want to remove the leading sep
+    subdir = subdir.replace(os.path.sep, "", 1) # I only want to remove the leading sep
     
   parser = Stage3Parser(options, files, file=outfile, extrafiles=extrafiles, subdir=subdir)
   parser.feed(input)
@@ -325,9 +322,9 @@ def process_input_stage4(file, options, files):
   outfile = open(outname, mode="w")
   
   #figure out what subdirectory of the onlinehelp I am in
-  subdir = string.replace(os.path.dirname(outname), os.path.normpath(files['stage4']), "")
+  subdir = os.path.dirname(outname).replace(os.path.normpath(files['stage4']), "")
   if subdir.startswith(os.path.sep):
-    subdir = string.replace(subdir, os.path.sep, "", 1) # I only want to remove the leading sep
+    subdir = subdir.replace(os.path.sep, "", 1) # I only want to remove the leading sep
 
   parser = Stage4Parser(files=files, file=outfile, options=options,
                         subdir=subdir)
