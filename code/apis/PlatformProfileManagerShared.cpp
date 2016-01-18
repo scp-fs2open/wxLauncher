@@ -102,7 +102,11 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	}
 	if ( !modLine.IsEmpty()) {
 		outStream.Write("-mod ", 5);
+
+		// Enclose the mod parameter in quotes to escape spaces
+		outStream.Write("\"", 1);
 		outStream.Write(modLine.char_str(), modLine.size());
+		outStream.Write("\"", 1);
 	}
 	if ( !flagLine.IsEmpty() ) {
 		outStream.Write(" ", 1);
