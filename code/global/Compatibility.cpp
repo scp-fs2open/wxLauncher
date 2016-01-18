@@ -19,6 +19,7 @@ namespace Compatibility
 			return true;
 		}
 
+		wxLogVerbose(_T("Synchronizing old pilot files..."));
 		wxFileName oldConfigFolder;
 #if IS_WIN32
 		wxString rootPath;
@@ -43,6 +44,7 @@ namespace Compatibility
 		if (!oldConfigFolder.DirExists())
 		{
 			// No old config folder so there are no pilot files to copy
+			wxLogVerbose(_T("  Old pilot directory does not exist, nothing to be done."));
 			return true;
 		}
 
@@ -51,6 +53,7 @@ namespace Compatibility
 		{
 			// new players directory already exists so it was already used before
 			// Don't try to copy in this case
+			wxLogVerbose(_T("  New pilot directory already exists, was probably copied before."));
 			return true;
 		}
 
@@ -66,6 +69,7 @@ namespace Compatibility
 		wxString pilotFile;
 		bool cont = oldDir.GetFirst(&pilotFile, wxEmptyString, wxDIR_FILES);
 
+		wxLogStatus(_T("Copying pilot files from '%s' to '%s'."), oldConfigFolder.GetFullPath().c_str(), newConfigFolder.GetFullPath().c_str());
 		while (cont)
 		{
 			wxFileName pilotFileName;
@@ -74,7 +78,7 @@ namespace Compatibility
 			wxFileName newPilotFile;
 			newPilotFile.Assign(newConfigFolder.GetFullPath(), pilotFile);
 
-			wxLogStatus(_T("Copying '%s' to '%s'"), pilotFileName.GetFullPath().c_str(), newPilotFile.GetFullPath().c_str());
+			wxLogVerbose(_T("  Copying '%s' to '%s'"), pilotFileName.GetFullPath().c_str(), newPilotFile.GetFullPath().c_str());
 			if (!wxCopyFile(pilotFileName.GetFullPath(), newPilotFile.GetFullPath()))
 			{
 				wxLogError(_T("Failed to copy pilot file '%s'!"), pilotFileName.GetFullPath().c_str());
@@ -83,6 +87,7 @@ namespace Compatibility
 			cont = oldDir.GetNext(&pilotFile);
 		}
 
+		wxLogVerbose(_T("  Done copying pilot files."));
 		return true;
 	}
 }
