@@ -181,6 +181,11 @@ LPFN_ISWOW64PROCESS WinAPI::fnIsWOW64Process = NULL;
 
 HKEY GetRegistryKeyname(wxString& out_keyname)
 {
+	if (!WinAPI::IsInited())
+	{
+		WinAPI::Init();
+	}
+
 	// Every compiler from Visual Studio 2008 onward should have support for UAC
 #if _MSC_VER > 1400
 	if (WinAPI::userSIDValid)
@@ -217,11 +222,6 @@ profile to/from the registry. */
 
 ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 #if PLATFORM_USES_REGISTRY == 1
-	if (!WinAPI::IsInited())
-	{
-		WinAPI::Init();
-	}
-
 	wxString keyName;
 	HKEY useKey = GetRegistryKeyname(keyName);
 
@@ -650,11 +650,6 @@ ProMan::RegistryCodes RegistryPushProfile(wxFileConfig *cfg) {
 
 ProMan::RegistryCodes RegistryPullProfile(wxFileConfig *cfg) {
 #if PLATFORM_USES_REGISTRY == 1
-	if (!WinAPI::IsInited())
-	{
-		WinAPI::Init();
-	}
-
 	wxString keyName;
 	HKEY useKey = GetRegistryKeyname(keyName);
 
