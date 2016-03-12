@@ -10,6 +10,8 @@
 namespace Compatibility
 {
 	bool SynchronizeOldPilots(ProMan* profileManager);
+
+	bool MigrateOldConfig();
 }
 
 #endif //WXLAUNCHER_COMPATIBILITY_H

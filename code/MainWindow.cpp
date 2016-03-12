@@ -189,6 +189,13 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 
+	if (!Compatibility::MigrateOldConfig()) {
+		wxLogError(_T("Failed to migrate old config!!"));
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
+		return;
+	}
+
 	if ( ProMan::NoError != p->PushCurrentProfile() ) {
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
