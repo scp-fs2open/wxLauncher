@@ -12,8 +12,8 @@ endif()
 project(wxlauncher CXX C) 
 
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 10)
-set(VERSION_PATCH 1)
+set(VERSION_MINOR 11)
+set(VERSION_PATCH 0)
 
 message("--- Configuring wxLauncher ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
