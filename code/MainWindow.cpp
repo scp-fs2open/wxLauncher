@@ -194,7 +194,8 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 
-		wxString previousWorkingDir(::wxGetCwd());
+#if !wxCHECK_VERSION(2, 9, 2)
+	wxString previousWorkingDir(::wxGetCwd());
 	// hopefully this doesn't goof anything up
 	if ( !::wxSetWorkingDirectory(folder) ) {
 		wxLogError(_T("Unable to change working directory to %s"),
@@ -203,6 +204,7 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		button->Enable();
 		return;
 	}
+#endif
 
 	if ( startFred ) {
 		this->process = new wxProcess(this, ID_FRED2_PROCESS);
@@ -219,7 +221,16 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 	}
 
 	wxLogDebug(_T("Starting a process using '%s'"), command.c_str());
+
+#if wxCHECK_VERSION(2, 9, 2)
+	wxExecuteEnv env;
+	env.cwd = folder;
+
+	long pid = ::wxExecute(command, wxEXEC_ASYNC, this->process, &env);
+#else
 	long pid = ::wxExecute(command, wxEXEC_ASYNC, this->process);
+#endif
+
 	if ( pid == 0 ) {
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
@@ -233,10 +244,12 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		wxLogInfo(_T("FS2 Open is now running..."));
 	}
 
-	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
+#if !wxCHECK_VERSION(2, 9, 2)
+	if (!::wxSetWorkingDirectory(previousWorkingDir)) {
 		wxLogError(_T("Unable to change back to working directory %s"),
 			previousWorkingDir.c_str());
 	}
+#endif
 
 	button->SetLabel(_T("Kill"));
 	button->Enable();
