@@ -340,7 +340,8 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${CODE_FILES}
   )
 set_target_properties(wxlauncher
-  PROPERTIES LINKER_LANGUAGE CXX)
+  PROPERTIES LINKER_LANGUAGE CXX
+  POSITION_INDEPENDENT_CODE ON)
 # Files that are not to be compiled directly
 set_source_files_properties(
   ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp   
