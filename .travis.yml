@@ -1,0 +1,39 @@
+language: cpp
+sudo: true
+addons:
+    apt:
+        packages:
+            - build-essential
+            - cmake
+            - libwxgtk2.8-dev
+            - libwxgtk3.0-dev
+            - libopenal-dev
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+          env: CONFIGURATION="Debug"
+        - os: linux
+          compiler: clang
+          env: CONFIGURATION="Debug"
+        - os: osx
+          compiler: clang
+          env: CONFIGURATION="Debug"
+
+        - os: linux
+          compiler: gcc
+          env: CONFIGURATION="Release"
+        - os: linux
+          compiler: clang
+          env: CONFIGURATION="Release"
+        - os: osx
+          compiler: clang
+          env: CONFIGURATION="Release"
+before_install:
+    - ./ci/travis/before_install.sh
+install:
+    - ./ci/travis/install.sh
+before_script:
+    - ./ci/travis/before_script.sh
+script:
+    - ./ci/travis/script.sh
