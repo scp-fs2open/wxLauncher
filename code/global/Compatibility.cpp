@@ -42,13 +42,13 @@ bool enumRegistryValue(HKEY parent, DWORD index, wxString& valueNameOut, wxStrin
 		break;
 	case REG_DWORD:
 	{
-		uint32_t val = *reinterpret_cast<uint32_t*>(valueBuffer); // I feel dirty...
+		ULONG val = *reinterpret_cast<ULONG*>(valueBuffer); // I feel dirty...
 		valueOut << val;
 		break;
 	}
 	case REG_QWORD:
 	{
-		uint64_t val = *reinterpret_cast<uint64_t*>(valueBuffer); // I feel dirty...
+		ULONGLONG val = *reinterpret_cast<ULONGLONG*>(valueBuffer); // I feel dirty...
 		valueOut << val;
 		break;
 	}
