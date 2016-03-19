@@ -9,6 +9,7 @@ import traceback
 import utilfunctions
 
 class VersionFileBuilder:
+  VERSION_TMPL = 'const wchar_t *GITVersion = L"%s";\nconst wchar_t *GITDate = L"%s";\n'
   def __init__(self, workfile, outfile, gitpath="git", out=sys.stdout,
   err=sys.stderr):
     self.workfile = workfile
@@ -54,26 +55,10 @@ class VersionFileBuilder:
       if not utilfunctions.make_directory_for_filename(self.workfile):
         self.out.write("  Directory already exists...\n")
       
-      out = open(self.outfile, "wb")
-      out.write('const wchar_t *GITVersion = L"')
-      out.flush()
-      
-      out.write(self.get_git_id())
-      out.flush()
-      out.write('";\n')
-      
-      out.write('const wchar_t *GITDate = L"')
-      out.flush()
-      
-      datecmd = 'log --pretty=format:%cd -n 1'
-      datecmd = datecmd.split()
-      datecmd.insert(0, self.gitpath)
-      
-      subprocess.Popen(datecmd, stdout=out).wait()
-      out.flush()
-      out.write('";\n')
-      
-      out.close()
+      with open(self.outfile, "wb") as out:
+        output = self.VERSION_TMPL % (self.get_git_id(), self.get_git_date())
+        out.write(output.encode(encoding='utf-8'))
+
       self.out.write(" Done.\n")
     else:
       self.out.write(" Up to date.\n")
@@ -90,10 +75,27 @@ class VersionFileBuilder:
     id.seek(0)
     
     rawidoutput = id.readline()
+    idoutput = rawidoutput.decode(encoding='utf-8').split('\n')
     # split on the line ending and return the first peice which will
     # contain the entire id (all of the tags, etc) of the current 
     # repository without any newlines
-    return string.split(rawidoutput, "\n")[0]
+    return idoutput[0]
+
+  def get_git_date(self):
+    """Return the git date string after stripping the newline from the
+    end of the command output"""
+    id = tempfile.TemporaryFile()
+
+    datecmd = 'log --pretty=format:%cd -n 1'
+    datecmd = datecmd.split()
+    datecmd.insert(0, self.gitpath)
+
+    subprocess.Popen(datecmd, stdout=id).wait()
+    id.seek(0)
+
+    rawdateoutput = id.readline()
+    dateoutput = rawdateoutput.decode(encoding='utf-8')
+    return dateoutput
     
   def need_to_update(self):
     """Returns False if the self.outfile is up to date, True otherwise"""
