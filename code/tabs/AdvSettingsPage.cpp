@@ -394,7 +394,7 @@ void AdvSettingsPage::OnNeedUpdateCommandLine(wxCommandEvent &WXUNUSED(event)) {
 						 wxFileName::GetPathSeparator(),
 						 exeName.c_str(),
 						 (modline.IsEmpty() ? wxEmptyString :
-							wxString::Format(_T(" -mod %s"), modline.c_str()).c_str()),
+							wxString::Format(_T(" -mod \"%s\""), modline.c_str()).c_str()),
 						 (flagFileFlags.IsEmpty() ? wxEmptyString :
 							wxString::Format(_T(" %s"), flagFileFlags.c_str()).c_str()),
 						 (lightingPresetString.IsEmpty() ? wxEmptyString :
