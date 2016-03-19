@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/imaglist.h>
 #include <wx/html/htmlwin.h>
 #include "global/ids.h"
+#include "global/Compatibility.h"
 #include "global/ProfileKeys.h"
 #include "generated/configure_launcher.h"
 #include "MainWindow.h"
@@ -188,7 +189,14 @@ void MainWindow::OnStart(wxButton* button, bool startFred) {
 		return;
 	}
 
-	if ( ProMan::NoError != ProMan::GetProfileManager()->PushCurrentProfile() ) {
+	if ( ProMan::NoError != p->PushCurrentProfile() ) {
+		button->SetLabel(defaultButtonValue);
+		button->Enable();
+		return;
+	}
+
+	if (!Compatibility::SynchronizeOldPilots(p)) {
+		wxLogError(_T("Failed to synchronize old pilot files!"));
 		button->SetLabel(defaultButtonValue);
 		button->Enable();
 		return;
