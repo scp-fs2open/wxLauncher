@@ -224,15 +224,6 @@ void FlagListManager::BeginFlagFileProcessing() {
 		}
 	}
 	
-	wxString previousWorkingDir(::wxGetCwd());
-	// hopefully this doesn't goof anything up
-	if ( !::wxSetWorkingDirectory(tempExecutionLocation.GetFullPath()) ) {
-		wxLogError(_T("Unable to change working directory to %s"),
-			tempExecutionLocation.GetFullPath().c_str());
-		this->SetProcessingStatus(CANNOT_CHANGE_WORKING_FOLDER);
-		return;
-	}
-	
 	wxString commandline;
 	// use "" to correct for spaces in path to exeFilename
 	if (exeFilename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
@@ -243,6 +234,23 @@ void FlagListManager::BeginFlagFileProcessing() {
 	
 	wxLogDebug(_T(" Called FS2 Open with command line '%s'."), commandline.c_str());
 	FlagProcess *process = new FlagProcess(flagFileLocations);
+
+#if wxCHECK_VERSION(2, 9, 2)
+	wxExecuteEnv env;
+	env.cwd = tempExecutionLocation.GetFullPath();
+
+	::wxExecute(commandline, wxEXEC_ASYNC, process, &env);
+#else
+	wxString previousWorkingDir(::wxGetCwd());
+	// hopefully this doesn't goof anything up
+	if (!::wxSetWorkingDirectory(tempExecutionLocation.GetFullPath())) {
+		wxLogError(_T("Unable to change working directory to %s"),
+			tempExecutionLocation.GetFullPath().c_str());
+		this->SetProcessingStatus(CANNOT_CHANGE_WORKING_FOLDER);
+		delete process;
+		return;
+	}
+
 	::wxExecute(commandline, wxEXEC_ASYNC, process);
 	
 	if ( !::wxSetWorkingDirectory(previousWorkingDir) ) {
@@ -251,8 +259,9 @@ void FlagListManager::BeginFlagFileProcessing() {
 		this->SetProcessingStatus(CANNOT_CHANGE_WORKING_FOLDER);
 		return;
 	}
-	
-	this->SetProcessingStatus(WAITING_FOR_FLAG_FILE);	
+#endif
+
+	this->SetProcessingStatus(WAITING_FOR_FLAG_FILE);
 }
 
 wxString FlagListManager::GetStatusMessage() const {
