@@ -37,14 +37,9 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 		lightingPresetFlagSet = LightingPresets::PresetNameToPresetFlagSet(presetName);
 	}
 
-	wxString cmdLineString;
-#if IS_LINUX // write to folder in home dir
-	extern wxFileName GetPlatformDefaultConfigFilePath();
-	cmdLineString += GetPlatformDefaultConfigFilePath().GetFullPath().c_str();
-#else
-	cmdLineString += tcPath.c_str();
-	cmdLineString += wxFileName::GetPathSeparator();
-#endif
+	extern wxFileName GetPlatformDefaultConfigFilePath(const wxString&);
+	wxString cmdLineString = GetPlatformDefaultConfigFilePath(tcPath).GetFullPath();
+
 	cmdLineString += _T("data");
 	
 #if IS_LINUX // try to rename file in root folder if exists

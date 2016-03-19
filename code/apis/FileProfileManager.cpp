@@ -24,12 +24,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "generated/configure_launcher.h"
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
+#include "apis/FlagListManager.h"
 #include "global/BasicDefaults.h"
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
 
+#include <SDL_filesystem.h>
+
+
 // NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
-wxFileName GetPlatformDefaultConfigFilePath() {
+wxFileName GetPlatformDefaultConfigFilePathOld() {
 	wxFileName path;
 #if IS_WIN32
 	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
@@ -47,6 +51,37 @@ wxFileName GetPlatformDefaultConfigFilePath() {
 	return path;
 }
 
+wxFileName GetPlatformDefaultConfigFilePathNew() {
+	// SDL builds now use the user directory on all platforms
+	// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+	char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+	wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+	SDL_free(prefPath);
+
+	wxFileName path;
+	path.AssignDir(wxPrefPath);
+
+	return path;
+}
+
+wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
+	wxFileName path;
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
+		path = GetPlatformDefaultConfigFilePathNew();
+	}
+	else {
+#if IS_LINUX || IS_APPLE // write to folder in home dir
+		path = GetPlatformDefaultConfigFilePathOld().GetFullPath().c_str();
+#else
+		path.AssignDir(tcPath);
+#endif
+	}
+
+	return path;
+}
+
 #define FSO_CONFIG_FILENAME _T("fs2_open.ini")
 
 #define ReturnChecker(retvalue, location) \
@@ -57,6 +92,9 @@ wxFileName GetPlatformDefaultConfigFilePath() {
 
 ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	wxFileName configFileName;
+	wxString tcPath;
+	cfg->Read(PRO_CFG_TC_ROOT_FOLDER, &tcPath);
+
 	if ( cfg->Exists(INT_CONFIG_FILE_LOCATION) ) {
 		wxString configFileNameString;
 		if (cfg->Read(INT_CONFIG_FILE_LOCATION, &configFileNameString)) {
@@ -66,7 +104,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		configFileName = GetPlatformDefaultConfigFilePath();
+		configFileName = GetPlatformDefaultConfigFilePath(tcPath);
 	}
 	wxASSERT_MSG( configFileName.Normalize(),
 		wxString::Format(_T("Unable to normalize PlatformDefaultConfigFilePath (%s)"),
@@ -310,13 +348,24 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		inFileName = GetPlatformDefaultConfigFilePath();
+		inFileName = GetPlatformDefaultConfigFilePathNew();
+		inFileName.SetFullName(FSO_CONFIG_FILENAME);
+
+		if (!inFileName.FileExists())
+		{
+			inFileName = GetPlatformDefaultConfigFilePathOld();
+			inFileName.SetFullName(FSO_CONFIG_FILENAME);
+		}
 	}
 	wxASSERT( inFileName.Normalize() );
 
 	if ( !inFileName.FileExists() && inFileName.DirExists() ) {
 		// was given a directory name
 		inFileName.SetFullName(FSO_CONFIG_FILENAME);
+	}
+
+	if (!inFileName.FileExists()) {
+		return ProMan::InputFileDoesNotExist;
 	}
 
 	wxFFileInputStream inConfigStream(inFileName.GetFullPath(), _T("rb"));
