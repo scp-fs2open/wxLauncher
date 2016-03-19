@@ -29,8 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * because otherwise it moves around on different platforms.
  * See the FindOpenAL.cmake file in your CMake distribution for
  * more information. */
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 #endif
 
 #include "global/MemoryDebugging.h"
