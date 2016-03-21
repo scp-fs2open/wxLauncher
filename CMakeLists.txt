@@ -340,6 +340,10 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${RESOURCE_FILES}
   ${CODE_FILES}
   )
+if (COMMAND target_compile_features)
+  target_compile_features(wxlauncher PRIVATE cxx_auto_type) # Enable C++11 because it is required for wxWidgets 3.0
+endif()
+  
 set_target_properties(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX
   POSITION_INDEPENDENT_CODE ON)
