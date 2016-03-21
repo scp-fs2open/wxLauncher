@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=wxLauncher
+Comment=A wxWidgets based launcher for FreeSpace Open
+Exec=@WXLAUNCHER_FILE@
+Icon=@RESOURCES_PATH@wxlauncher.png
+Terminal=false
+Type=Application
+Categories=Utility;Application;
