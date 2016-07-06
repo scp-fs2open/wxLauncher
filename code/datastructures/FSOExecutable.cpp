@@ -229,7 +229,16 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			break; // we've reached the end of the app name
 #endif
 		} else if ( token.ToLong(&tempVersion) && token.size() == 8 ) {
-			// must be a date from a nightly build; just ignore it
+			// must be a date from a nightly build; add it to the string
+			if (!ver.string.IsEmpty()) {
+				ver.string += _T(" ");
+			}
+			// add it in YYYY-MM-DD format
+			ver.string += token.Mid(0, 4);
+			ver.string += _T("-");
+			ver.string += token.Mid(4, 2);
+			ver.string += _T("-");
+			ver.string += token.Mid(6, 2);
 		} else if ( token.ToLong(&tempVersion) && ver.antipodes && ver.antNumber == 0) {
 			// must be antipodes number
 			if ( tempVersion > 0 ) {
@@ -328,6 +337,8 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 						antNumber, binaryname.c_str());
 				}
 			}
+		} else if ( !token.CmpNoCase(_T("avx")) ) {
+			ver.sse = 3;
 		} else if ( !token.CmpNoCase(_T("sse2")) ) {
 			ver.sse = 2;
 		} else if ( !token.CmpNoCase(_T("sse")) ) {
@@ -393,6 +404,9 @@ wxString FSOExecutable::GetVersionString() const {
 			break;
 		case 2:
 			sseStr = _T(" SSE2");
+			break;
+		case 3:
+			sseStr = _T(" AVX");
 			break;
 		default:
 			// nothing
