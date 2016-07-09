@@ -36,8 +36,8 @@ Xcode, KDevelop, and of course autotools.
   * All platforms:
       * CMake 2.8
       * wxWidgets 2.8.10+ or 3.0.2
-      * Python 2.6+ (but not 3.x)
-      * Markdown in Python
+      * Python 2.7 or Python 3.4+
+      * markdown and six in Python
   * Windows
       * Windows SDK or Platform SDK
       * Nullsoft Scriptable Install System (NSIS)
@@ -67,7 +67,7 @@ Version 0.10.0 has been tested with:
   - 3.0.2 (STL)
 [wxWidgets]: http://www.wxwidgets.org/
 	
-[Python] 2.6 or higher is required to build this project.
+[Python] 2.7 or higher is required to build this project.
 This project also assumes that the python executable is 
 in your PATH.  Check your operating system's documentation
 for information on how to add Python to your PATH.

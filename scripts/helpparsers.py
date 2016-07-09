@@ -6,16 +6,17 @@ import traceback
 import sys
 import shutil
 
-from html.parser import HTMLParser
+from six.moves import html_parser
 
 from dataclasses import Tag
 from utilfunctions import update_attribute, change_filename
 
-class OutputParser(HTMLParser):
+
+class OutputParser(html_parser.HTMLParser):
   """The class is designed to be used as a base class.  It will output the same html structure as the input file into a file like object (only needs write)."""
       
   def __init__(self, file, *args, **kwargs):
-    HTMLParser.__init__(self, *args, **kwargs)
+    html_parser.HTMLParser.__init__(self, *args, **kwargs)
     
     if hasattr(file, 'write'):
       self.outputfile = file
