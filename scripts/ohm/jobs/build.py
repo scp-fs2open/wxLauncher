@@ -139,7 +139,7 @@ def process_input_stage1(file, options, files):
     infile.close()
 
     md = markdown.Markdown(
-        extensions=['toc']
+        extensions=['markdown.extensions.toc']
     )
     output = md.convert(input)
 
