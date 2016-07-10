@@ -1,10 +1,17 @@
-These .py files are scripts that build help build the files required for wxLauncher.
+Simple scripts to help with the build of wxLauncher.
 
-== version.cpp.maker.py ==
-Generates version.cpp. Only requires that mecurial (hg) is in system path.
+version.cpp.maker.py
+====================
+Generates version.cpp. Only requires that the git source code
+management tool (git) is in system path.
 
-== onlinehelpmaker.py ==
-Generates the online (linked in with the wxLauncher) help for wxLauncher.  Has several dependencies:
+onlinehelpmaker.py
+==================
+Generates the "online" (linked in with the wxLauncher) help for
+wxLauncher.  Has several dependencies:
 
- - http://pypi.python.org/pypi/setuptools - only needed with python 2.5 and older, all newer versions of python have this package already.
- - http://www.freewisdom.org/projects/python-markdown/Installation
+ - [Markdown][markdown] for Python
+ - [Six][six] a Python 2 and 3 compatibility library
+
+[markdown]: https://pypi.python.org/pypi/Markdown
+[six]: https://pypi.python.org/pypi/six
