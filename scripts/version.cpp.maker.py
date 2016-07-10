@@ -1,4 +1,4 @@
-from optparse import OptionParser
+import argparse
 import os.path
 import sys
 
@@ -10,28 +10,28 @@ JOB = 1
 
 
 def main(argv):
-    parser = OptionParser(
-        usage="%prog <jobtype> <outfile> <workfile> [options]")
+    parser = argparse.ArgumentParser(
+        description="Build .cpp using vcs tool for inclusion in application")
+    parser.add_argument('job', choices=['build', 'rebuild', 'clean'])
+    parser.add_argument('workfile', type=os.path.normpath,
+                        help="Temp file")
+    parser.add_argument('outfile', type=os.path.normpath,
+                        help="output .cpp file")
+    parser.add_argument("--gitpath",
+                        help="name of git executable to work with."
+                        "(default is 'git'",
+                        default='git')
 
-    parser.add_option("", "--gitpath",
-                      help="use GITPATH as the executable that will be used to generate the version.cpp file.  Defaults to hg",
-                      metavar="GITPATH", default="git")
+    options = parser.parse_args(argv)
 
-    (options, args) = parser.parse_args(argv)
+    maker = VersionFileBuilder(options.workfile, options.outfile,
+                               options.gitpath)
 
-    if len(args) != 4:
-        parser.error("Incorrect number of arguments")
-
-    work = os.path.normcase(os.path.normpath(args[WORKFILE]))
-    file = os.path.normcase(os.path.normpath(args[OUTFILE]))
-
-    maker = VersionFileBuilder(work, file, options.gitpath)
-
-    if args[JOB] == "build":
+    if options.job == "build":
         maker.build()
-    elif args[JOB] == "rebuild":
+    elif options.job == "rebuild":
         maker.rebuild()
-    elif args[JOB] == "clean":
+    elif options.job == "clean":
         maker.clean()
     else:
         parser.error("Invalid JOB type. Use build, rebuild, or clean.")
@@ -41,4 +41,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])
