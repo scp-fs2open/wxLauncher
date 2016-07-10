@@ -1,31 +1,30 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+
+import logging
+
 from builtins import *
 
 import os
 import os.path
 import subprocess
-import sys
 import tempfile
-import traceback
 
 from . import utilfunctions
 
 
 class VersionFileBuilder(object):
     VERSION_TMPL = '\n'.join([
-        'const wchar_t *GITVersion = L"%s";',
-        'const wchar_t *GITDate = L"%s";',
+        'const wchar_t *GITVersion = L"{version}";',
+        'const wchar_t *GITDate = L"{date}";',
         ''
     ])
+    notices = logging.getLogger('notices')
 
-    def __init__(self, workfile, outfile, gitpath="git", out=sys.stdout,
-                 err=sys.stderr):
+    def __init__(self, workfile, outfile, gitpath="git"):
         self.workfile = workfile
         self.outfile = outfile
         self.gitpath = gitpath
-        self.out = out
-        self.err = err
 
     def rebuild(self):
         """Calls clean then build"""
@@ -36,55 +35,49 @@ class VersionFileBuilder(object):
         """Removes all temporary files and the output files that were passed,
     if they exist"""
 
-        self.out.write("Cleaning...\n")
+        self.notices.info("Cleaning...")
 
-        try:
-            self.out.write(" Removing %s: " % (self.filepath))
-            os.remove(self.filepath)
-            self.out.write("Done.\n")
-        except:
-            self.out.write("Failed!\n")
-            traceback.print_exc(None, self.err)
+        self.remove_file(self.outfile)
+        self.remove_file(self.workfile)
 
+    def remove_file(self, filename):
         try:
-            self.out.write(" Removing %s: " % (self.workfile))
-            os.remove(self.workfile)
-            self.out.write("Done.\n")
-        except:
-            self.out.write("Failed!\n")
-            traceback.print_exc(None, self.err)
+            os.remove(filename)
+            self.notices.info(' Removed %s', filename)
+        except OSError:
+            self.logger.exception(' Unable to remove %s', filename)
 
     def build(self):
-        self.out.write("Checking if build is needed...\n")
-
+        self.notices.info("Building...")
         if self.need_to_update():
-            self.out.write("Generating...\n")
+            self.notices.info("Generating...")
 
-            self.out.write(" Writing to tempfile %s.\n" % (self.workfile))
-            if not utilfunctions.make_directory_for_filename(self.workfile):
-                self.out.write("  Directory already exists...\n")
+            utilfunctions.make_directory_for_filename(self.workfile)
 
             with open(self.outfile, "wb") as out:
-                output = self.VERSION_TMPL % (
-                self.get_git_id(), self.get_git_date())
+                output = self.VERSION_TMPL.format(
+                    version=self.get_git_id(),
+                    date=self.get_git_date())
                 out.write(output.encode('utf-8'))
 
-            self.out.write(" Done.\n")
+            self.notices.info(" Version information written to %s",
+                               self.workfile)
         else:
-            self.out.write(" Up to date.\n")
+            self.notices.info(" Up to date")
 
     def get_git_id(self):
-        """Return the git id string after striping the newline from the end
-    of the command output"""
-        id = tempfile.TemporaryFile()
+        """Return the git id string suitable for inclusion in C code.
+
+        Requires striping the newline from the end of the command output"""
+        tf = tempfile.TemporaryFile()
         s = "describe --long --dirty --abbrev=10 --tags --always"
         s = s.split()
         s.insert(0, self.gitpath)
 
-        subprocess.Popen(s, stdout=id).wait()
-        id.seek(0)
+        subprocess.Popen(s, stdout=tf).wait()
+        tf.seek(0)
 
-        rawidoutput = id.readline()
+        rawidoutput = tf.readline()
         idoutput = rawidoutput.decode('utf-8').split('\n')
         # split on the line ending and return the first peice which will
         # contain the entire id (all of the tags, etc) of the current
@@ -92,33 +85,37 @@ class VersionFileBuilder(object):
         return idoutput[0]
 
     def get_git_date(self):
-        """Return the git date string after stripping the newline from the
-    end of the command output"""
-        id = tempfile.TemporaryFile()
+        """Return the git date string suitable for includsion in C code.
+
+        Requires stripping the newline from the end of the command output"""
+        tf = tempfile.TemporaryFile()
 
         datecmd = 'log --pretty=format:%cd -n 1'
         datecmd = datecmd.split()
         datecmd.insert(0, self.gitpath)
 
-        subprocess.Popen(datecmd, stdout=id).wait()
-        id.seek(0)
+        subprocess.Popen(datecmd, stdout=tf).wait()
+        tf.seek(0)
 
-        rawdateoutput = id.readline()
+        rawdateoutput = tf.readline()
         dateoutput = rawdateoutput.decode('utf-8')
         return dateoutput
 
     def need_to_update(self):
-        """Returns False if the self.outfile is up to date, True otherwise"""
-        if os.path.exists(self.workfile) == True:
-            if os.path.exists(self.outfile) == True:
+        """Check if we need to update the outfile
+        :return: False if outfile is up to date, True otherwise
+        """
+        if os.path.exists(self.workfile):
+            if os.path.exists(self.outfile):
                 # check the id to see if it has changed
                 workfile = open(self.workfile, 'rb')
                 if workfile.readline() == self.get_git_id():
                     return False
                 else:
-                    self.out.write(" git id changed\n")
+                    self.notices.info(" git id changed")
             else:
-                self.out.write(" %s does not exist\n" % (self.outfile))
+                self.notices.info(" %s does not exist", self.outfile)
         else:
-            self.out.write(" %s does not exist\n" % (self.workfile))
+            self.notices.info(" %s does not exist", self.workfile)
         return True
+

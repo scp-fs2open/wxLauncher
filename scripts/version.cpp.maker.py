@@ -1,3 +1,4 @@
+import logging
 import os.path
 import sys
 
@@ -23,6 +24,8 @@ def main(argv):
 
     maker = VersionFileBuilder(options.workfile, options.outfile,
                                options.gitpath)
+
+    logging.basicConfig(level=logging.INFO)
 
     if options.job == "build":
         maker.build()
