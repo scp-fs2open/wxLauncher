@@ -11,8 +11,8 @@ try:
 except ImportError:
   from HTMLParser import HTMLParser
 
-from scripts.ohm.dataclasses import Tag
-from scripts.ohm.utilfunctions import update_attribute, change_filename
+from .dataclasses import Tag
+from .utilfunctions import update_attribute, change_filename
 
 class OutputParser(HTMLParser):
   """The class is designed to be used as a base class.  It will output the same html structure as the input file into a file like object (only needs write)."""

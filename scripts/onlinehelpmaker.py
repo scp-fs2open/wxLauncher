@@ -1,19 +1,19 @@
+import argparse
 import atexit
 import logging
 import os
 import shutil
 import sys
-import traceback
-from optparse import OptionParser
 
-from scripts.ohm.jobs.build import build
-from scripts.ohm.jobs.clean import clean
-from scripts.ohm.jobs.rebuild import rebuild
-
-NOTICE = 25  # added level for app
-
+# hook imports so that the markdown library works on 2.6
 from future import standard_library
 standard_library.install_hooks()
+
+from ohm.jobs import call_logging_exceptions
+from ohm.jobs.build import build
+from ohm.jobs.clean import clean, rmtree_error_handler
+from ohm.jobs.rebuild import rebuild
+
 try:
     import markdown
 except ImportError:
@@ -24,48 +24,39 @@ except ImportError:
     raise
 standard_library.remove_hooks()
 
+
 def main(argv):
-    parser = OptionParser(usage="%prog <jobtype> <outfile> <indir> [options]")
-    parser.add_option("-t", "--temp",
-                      help="use TEMPDIR to store the intermedite build files",
-                      metavar="TEMPDIR")
-    parser.add_option("-q", "--quiet", action="store_true",
-                      dest="quiet", default=False,
-                      help="don't print most status messages to stdout")
-    parser.add_option("-d", "--debug", action="store_true",
-                      default=False, help="print debugging information to the screen")
-    parser.add_option("-c", "--cfile", default=None, dest="carrayfilename",
-                      metavar="FILE", help="filename to output the c array to. Defaults to same folder as outfile.")
-    parser.add_option("-a", "--alwaysbuild", action="store_true",
-                      default=False, dest="always_build",
-                      help="when building, builder should always build source files. (Usally used with filesystems that do not update the modified time)")
+    parser = argparse.ArgumentParser(
+        description="Build/rebuild/clean the online help database")
+    parser.add_argument('type', choices=["build", "rebuild", "clean"])
+    parser.add_argument('outfile', type=os.path.normpath,
+                        help="location to write .htb file to")
+    parser.add_argument('indir', type=os.path.normcase,
+                        help="path that contains the info to put the OUTFILE")
+    parser.add_argument("-t", "--temp",
+                        help="directory for intermediate build files"
+                        "(Uses system temp directory by default)",
+                        metavar="TEMPDIR")
+    parser.add_argument("-q", "--quiet", action="store_true",
+                        dest="quiet", default=False,
+                        help="don't print most status messages to stdout")
+    parser.add_argument("-d", "--debug", action="store_const",
+                        default=logging.INFO, const=logging.DEBUG,
+                        help="print debugging information to the screen")
+    parser.add_argument("-c", "--cfile", default=None, dest="carrayfilename",
+                        metavar="FILE",
+                        help="file to put the htb index in (c code)")
+    parser.add_argument("-a", "--always", action="store_true",
+                        default=False, dest="always_build",
+                        help="builder should always build source files")
 
-    (options, args) = parser.parse_args(argv)
+    options = parser.parse_args(argv)
 
-    if len(args) != 4:
-        parser.error("Incorrect number of arguments")
+    console = logging.StreamHandler()
+    console.setLevel(options.debug)
 
-    options.type = args[1]
-    options.outfile = os.path.normpath(args[2])
-    options.indir = os.path.normpath(args[3])
-
-    loglevel = logging.INFO
-    logging.addLevelName(NOTICE, "NOTICE")
-    if options.quiet:
-        loglevel = NOTICE
-    elif options.debug:
-        loglevel = logging.DEBUG
-
-    logging.basicConfig(level=loglevel, format='%(levelname)7s:%(message)s')
-
-    if options.type == "build":
-        pass
-    elif options.type == "rebuild":
-        pass
-    elif options.type == "clean":
-        pass
-    else:
-        parser.error("jobtype must be one of: build, rebuild, or clean")
+    console.setFormatter(logging.Formatter(fmt='%(levelname)7s:%(message)s'))
+    logging.getLogger('').addHandler(console)
 
     if not options.temp:
         logging.info("No working directory set. Creating one in system temp.")
@@ -91,37 +82,6 @@ def main(argv):
     sys.exit(ret)
 
 
-def call_logging_exceptions(func, *args, **kwargs):
-    """Protects the caller from all exceptions that occur in the callee. Logs the exceptions that do occur."""
-    try:
-        func(*args, **kwargs)
-    except:
-        (type, value, tb) = sys.exc_info()
-        logging.error("***EXCEPTION:")
-        logging.error(" %s: %s", type.__name__, value)
-        for filename, line, function, text in traceback.extract_tb(tb):
-            logging.error("%s:%d %s", os.path.basename(filename), line, function)
-            logging.error("   %s", text)
-
-        del tb
-        return 1
-    return 0
-
-
-def rmtree_error_handler(function, path, excinfo):
-    if function == os.remove:
-        logging.warning("  Unable to remove %s", path)
-    elif function == os.rmdir:
-        logging.warning("  Unable to remove directory %s", path)
-    else:
-        (type, value, tb) = excinfo
-        logging.error("***EXCEPTION:")
-        logging.error(" %s: %s", type.__name__, value)
-        for filename, line, function, text in traceback.extract_tb(tb):
-            logging.error("%s:%d %s", os.path.basename(filename), line, function)
-            logging.error("   %s", text)
-
-
 def enum_directories(dir):
     ret = os.path.dirname(dir).split(os.path.sep)
     if len(ret) == 1 and len(ret[0]) == 0:
@@ -131,4 +91,4 @@ def enum_directories(dir):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])

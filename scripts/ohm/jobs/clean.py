@@ -2,8 +2,9 @@ import logging
 import os
 import shutil
 import sys
+import traceback
 
-from scripts.onlinehelpmaker import NOTICE, rmtree_error_handler
+NOTICE = 25
 
 
 def clean(options):
@@ -27,3 +28,17 @@ def clean(options):
             sys.exit(2)
     else:
         logging.info(" Work directory (%s) does not exist", options.temp)
+
+
+def rmtree_error_handler(function, path, excinfo):
+    if function == os.remove:
+        logging.warning("  Unable to remove %s", path)
+    elif function == os.rmdir:
+        logging.warning("  Unable to remove directory %s", path)
+    else:
+        (type, value, tb) = excinfo
+        logging.error("***EXCEPTION:")
+        logging.error(" %s: %s", type.__name__, value)
+        for filename, line, function, text in traceback.extract_tb(tb):
+            logging.error("%s:%d %s", os.path.basename(filename), line, function)
+            logging.error("   %s", text)

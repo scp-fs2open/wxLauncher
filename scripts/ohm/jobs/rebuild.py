@@ -1,8 +1,10 @@
 import logging
 
-from scripts.ohm.jobs.build import build
-from scripts.ohm.jobs.clean import clean
-from scripts.onlinehelpmaker import NOTICE, call_logging_exceptions
+from .build import build
+from .clean import clean
+from ..jobs import call_logging_exceptions
+
+NOTICE = 25
 
 
 def rebuild(options):

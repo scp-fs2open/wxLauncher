@@ -5,9 +5,10 @@ import zipfile
 
 import markdown
 
-from scripts.helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
-from scripts.onlinehelpmaker import NOTICE
-from scripts.utilfunctions import change_filename
+from ..helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
+
+NOTICE = 25
+from ..utilfunctions import change_filename
 
 
 def build(options):
