@@ -12,7 +12,7 @@ import traceback
 from ohm import utilfunctions
 
 
-class VersionFileBuilder:
+class VersionFileBuilder(object):
     VERSION_TMPL = 'const wchar_t *GITVersion = L"%s";\nconst wchar_t *GITDate = L"%s";\n'
 
     def __init__(self, workfile, outfile, gitpath="git", out=sys.stdout,
