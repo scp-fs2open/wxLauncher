@@ -4,11 +4,10 @@ import shutil
 import sys
 import traceback
 
-NOTICE = 25
-
 
 def clean(options):
-    logging.log(NOTICE, "Cleaning..")
+    notices = logging.getLogger('notices')
+    notices.info("Cleaning..")
     logging.info("Removing outfile: %s", options.outfile)
     if os.path.exists(options.outfile):
         if os.path.isfile(options.outfile):

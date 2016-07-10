@@ -37,8 +37,9 @@ def main(argv):
                         help="directory for intermediate build files"
                         "(Uses system temp directory by default)",
                         metavar="TEMPDIR")
-    parser.add_argument("-q", "--quiet", action="store_true",
-                        dest="quiet", default=False,
+    parser.add_argument("-q", "--quiet", action="store_const",
+                        dest="quiet", default=logging.INFO,
+                        const=logging.WARNING,
                         help="don't print most status messages to stdout")
     parser.add_argument("-d", "--debug", action="store_const",
                         default=logging.INFO, const=logging.DEBUG,
@@ -52,11 +53,22 @@ def main(argv):
 
     options = parser.parse_args(argv)
 
+    console_format = logging.Formatter(fmt='%(levelname)7s:%(message)s')
     console = logging.StreamHandler()
     console.setLevel(options.debug)
 
-    console.setFormatter(logging.Formatter(fmt='%(levelname)7s:%(message)s'))
-    logging.getLogger('').addHandler(console)
+    console.setFormatter(console_format)
+    logger = logging.getLogger('')
+    logger.setLevel(options.debug)
+    logger.addHandler(console)
+
+    notices_console = logging.StreamHandler()
+    notices_console.setFormatter(console_format)
+
+    notices_logger = logging.getLogger('notices')
+    notices_logger.setLevel(options.quiet)
+    notices_logger.addHandler(notices_console)
+    notices_logger.propagate = False
 
     if not options.temp:
         logging.info("No working directory set. Creating one in system temp.")

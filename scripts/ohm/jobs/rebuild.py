@@ -4,11 +4,10 @@ from .build import build
 from .clean import clean
 from ..jobs import call_logging_exceptions
 
-NOTICE = 25
-
 
 def rebuild(options):
-    logging.log(NOTICE, "Rebuilding")
+    notices = logging.getLogger('notices')
+    notices.info("Rebuilding")
     ret = call_logging_exceptions(clean, options)
     if ret != 0:
         return ret
