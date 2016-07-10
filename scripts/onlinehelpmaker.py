@@ -8,9 +8,12 @@ from optparse import OptionParser
 import logging
 NOTICE = 25 # added level for app
 
+from future import standard_library
+standard_library.install_hooks()
 try:
   import markdown
 except ImportError:
+  markdown = None
   print("ERROR: Unable to import markdown the markup parser.")
   print(" Make sure that markdown has been installed")
   print("  see the ReadMe.txt for more information")
@@ -18,6 +21,7 @@ except ImportError:
 
 from helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
 from utilfunctions import change_filename
+standard_library.remove_hooks()
 
 def main(argv):
   parser = OptionParser(usage="%prog <jobtype> <outfile> <indir> [options]")
