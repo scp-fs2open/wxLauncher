@@ -7,12 +7,13 @@ import sys
 
 # hook imports so that the markdown library works on 2.6
 from future import standard_library
+
+from ohm.utilfunctions import rmtree_error_handler
+
 standard_library.install_hooks()
 
 from ohm.jobs import call_logging_exceptions
 from ohm.jobs.build import build
-from ohm.jobs.clean import clean, rmtree_error_handler
-from ohm.jobs.rebuild import rebuild
 
 try:
     import markdown
@@ -87,10 +88,6 @@ def main(argv):
 
     if options.type == "build":
         ret = call_logging_exceptions(build, options)
-    elif options.type == "rebuild":
-        ret = call_logging_exceptions(rebuild, options)
-    else:
-        ret = call_logging_exceptions(clean, options)
     sys.exit(ret)
 
 

@@ -1,5 +1,8 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+
+import traceback
+
 from builtins import *
 
 import logging
@@ -115,3 +118,17 @@ class ExistsButNotDirectoryError(IOError):
 
     def __str__():
         return "Path (%s) exists but is not a directory!"
+
+
+def rmtree_error_handler(function, path, excinfo):
+    if function == os.remove:
+        logging.warning("  Unable to remove %s", path)
+    elif function == os.rmdir:
+        logging.warning("  Unable to remove directory %s", path)
+    else:
+        (type, value, tb) = excinfo
+        logging.error("***EXCEPTION:")
+        logging.error(" %s: %s", type.__name__, value)
+        for filename, line, function, text in traceback.extract_tb(tb):
+            logging.error("%s:%d %s", os.path.basename(filename), line, function)
+            logging.error("   %s", text)
