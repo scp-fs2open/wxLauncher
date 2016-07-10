@@ -25,7 +25,7 @@ def build(options):
     notices.info("Building...")
     files = generate_paths(options)
 
-    if should_build(options, files):
+    if should_build(options):
         input_files = generate_input_files_list(options)
 
         helparray = list()
@@ -74,20 +74,28 @@ def generate_paths(options):
     return paths
 
 
-def should_build(options, files):
-    """Checks the all of the files touched by the compiler to see if we need to rebuild. Returns True if so."""
+def should_build(options):
+    """Should we build the output file?
+    :param options: arguments from command line
+    :return: True if the output file should be built/rebuilt
+    """
+    logger = logging.getLogger('should_build')
     if options.always_build:
+        logger.info(" Always building")
         return True
     elif not os.path.exists(options.outfile):
+        logger.info(" Outfile does not exist")
         return True
-    elif options.carrayfilename != None and not os.path.exists(options.carrayfilename):
+    elif options.carrayfilename and not os.path.exists(options.carrayfilename):
+        logger.info(" .cpp file does not exist")
         return True
-    elif check_source_newer_than_outfile(options, files):
+    elif check_source_newer_than_outfile(options):
+        logger.info(" Source files are newer than output")
         return True
     return False
 
 
-def check_source_newer_than_outfile(options, files):
+def check_source_newer_than_outfile(options):
     """Checks to see if any file in the source directory is newer than the output file."""
     try:
         outfile_time = os.path.getmtime(options.outfile)
