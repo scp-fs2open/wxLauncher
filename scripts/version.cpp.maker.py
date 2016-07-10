@@ -5,10 +5,6 @@ import argparse
 
 from ohm.version_file_builder import VersionFileBuilder
 
-WORKFILE = 3
-OUTFILE = 2
-JOB = 1
-
 
 def main(argv):
     parser = argparse.ArgumentParser(
