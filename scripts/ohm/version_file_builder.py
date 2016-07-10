@@ -9,7 +9,7 @@ import sys
 import tempfile
 import traceback
 
-from ohm import utilfunctions
+from . import utilfunctions
 
 
 class VersionFileBuilder(object):

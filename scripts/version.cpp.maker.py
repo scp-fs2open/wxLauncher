@@ -1,8 +1,9 @@
-import argparse
 import os.path
 import sys
 
-from version_file_builder import VersionFileBuilder
+import argparse
+
+from ohm.version_file_builder import VersionFileBuilder
 
 WORKFILE = 3
 OUTFILE = 2
