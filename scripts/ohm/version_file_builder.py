@@ -13,7 +13,11 @@ from . import utilfunctions
 
 
 class VersionFileBuilder(object):
-    VERSION_TMPL = 'const wchar_t *GITVersion = L"%s";\nconst wchar_t *GITDate = L"%s";\n'
+    VERSION_TMPL = '\n'.join([
+        'const wchar_t *GITVersion = L"%s";',
+        'const wchar_t *GITDate = L"%s";',
+        ''
+    ])
 
     def __init__(self, workfile, outfile, gitpath="git", out=sys.stdout,
                  err=sys.stderr):
