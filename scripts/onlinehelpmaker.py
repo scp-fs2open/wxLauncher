@@ -4,14 +4,9 @@ import logging
 import os
 import shutil
 import sys
-
-# hook imports so that the markdown library works on 2.6
-from future import standard_library
+import tempfile
 
 from ohm.utilfunctions import rmtree_error_handler
-
-standard_library.install_hooks()
-
 from ohm.jobs import call_logging_exceptions
 from ohm.jobs.build import build
 
@@ -23,12 +18,11 @@ except ImportError:
     print(" Make sure that markdown has been installed")
     print("  see the ReadMe.txt for more information")
     raise
-standard_library.remove_hooks()
 
 
 def main(argv):
     parser = argparse.ArgumentParser(
-        description="Build/rebuild/clean the online help database")
+        description="Build the online help database")
     parser.add_argument('type', choices=["build", "rebuild", "clean"])
     parser.add_argument('outfile', type=os.path.normpath,
                         help="location to write .htb file to")
