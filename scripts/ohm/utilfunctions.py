@@ -116,7 +116,7 @@ class ExistsButNotDirectoryError(IOError):
     def __init__(self, path="Not Specified"):
         self.path = path
 
-    def __str__():
+    def __str__(self):
         return "Path (%s) exists but is not a directory!"
 
 
