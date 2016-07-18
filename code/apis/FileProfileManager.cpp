@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/PlatformProfileManager.h"
 #include "apis/FlagListManager.h"
+#include "apis/JoystickManager.h"
 #include "global/BasicDefaults.h"
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
@@ -265,6 +266,12 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	cfg->Read(PRO_CFG_JOYSTICK_ID, &currentJoystick, DEFAULT_JOYSTICK_ID);
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_ID, currentJoystick);
+	ReturnChecker(ret, __LINE__);
+
+	// Joystick GUID
+	wxString currentJoystickGUID = JoyMan::JoystickGUID(currentJoystick);
+
+	ret = outConfig.Write(REG_KEY_JOYSTICK_GUID, currentJoystickGUID);
 	ReturnChecker(ret, __LINE__);
 
 
