@@ -656,40 +656,27 @@ void BasicSettingsPage::ProfileChanged(wxCommandEvent &WXUNUSED(event)) {
 	wxStaticBox* joystickBox = new wxStaticBox(this, wxID_ANY, _("Joystick"));
 
 	this->joystickSelected = new wxChoice(this, ID_JOY_SELECTED);
-#if IS_WIN32
 	this->joystickForceFeedback = new wxCheckBox(this, ID_JOY_FORCE_FEEDBACK, _("Force feedback"));
 	this->joystickDirectionalHit = new wxCheckBox(this, ID_JOY_DIRECTIONAL_HIT, _("Directional hit"));
-	this->joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
 	this->joystickDetectButton = new wxButton(this, ID_JOY_DETECT_BUTTON, _("Detect"));
-#else
-	// FIXME get Detect button working on Linux/OS X
-	wxStaticText* detectJoystickText = new wxStaticText(this, wxID_ANY,
-														_("Restart launcher to re-detect joysticks."),
-														wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+#if IS_WIN32
+	this->joystickCalibrateButton = new wxButton(this, ID_JOY_CALIBRATE_BUTTON, _("Calibrate"));
 #endif
 
 	wxBoxSizer* joystickDetectionSizer = new wxBoxSizer(wxVERTICAL);
 	joystickDetectionSizer->Add(joystickSelected, wxSizerFlags().Proportion(1).Expand().Border(wxBOTTOM, 5));
-#if IS_WIN32
 	joystickDetectionSizer->Add(joystickDetectButton, wxSizerFlags().Right());
-#else
-	joystickDetectionSizer->Add(detectJoystickText, wxSizerFlags().Center());
-#endif
 
-#if IS_WIN32
 	wxBoxSizer* joystickExtrasSizer = new wxBoxSizer(wxVERTICAL);
 	joystickExtrasSizer->Add(joystickForceFeedback, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
 	joystickExtrasSizer->Add(joystickDirectionalHit, wxSizerFlags().Expand().Border(wxBOTTOM, 5));
+#if IS_WIN32
 	joystickExtrasSizer->Add(joystickCalibrateButton, wxSizerFlags().Expand());
 #endif
 
 	wxStaticBoxSizer* joystickSizer = new wxStaticBoxSizer(joystickBox, wxHORIZONTAL);
-#if IS_WIN32
 	joystickSizer->Add(joystickDetectionSizer, 1, wxALIGN_BOTTOM|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 	joystickSizer->Add(joystickExtrasSizer, wxSizerFlags().Expand().Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-#else
-	joystickSizer->Add(joystickDetectionSizer, wxSizerFlags().Expand().Proportion(1).Border(wxLEFT|wxRIGHT|wxBOTTOM, 5));
-#endif
 
 	// Proxy
 	// sorry, but there won't be space for the proxy on any platform
@@ -1165,11 +1152,11 @@ void BasicSettingsPage::InitializeMemberVariables() {
 	this->audioSizer = NULL;
 	
 	this->joystickSelected = NULL;
-#if IS_WIN32
 	this->joystickForceFeedback = NULL;
 	this->joystickDirectionalHit = NULL;
-	this->joystickCalibrateButton = NULL;
 	this->joystickDetectButton = NULL;
+#if IS_WIN32
+	this->joystickCalibrateButton = NULL;
 #endif
 	this->isTcRootFolderValid = false;
 	this->isCurrentBinaryValid = false;
@@ -2229,11 +2216,11 @@ void BasicSettingsPage::SetupJoystickSection() {
 	if ( !JoyMan::WasCompiledIn() ) {
 		this->joystickSelected->Disable();
 		this->joystickSelected->Append(_("No Launcher Support"));
-#if IS_WIN32
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
-		this->joystickCalibrateButton->Disable();
 		this->joystickDetectButton->Disable();
+#if IS_WIN32
+		this->joystickCalibrateButton->Disable();
 #endif
 	}
 	else
@@ -2258,11 +2245,11 @@ void BasicSettingsPage::SetupJoystickSection() {
 		if (!JoyMan::Initialize(apiType)) {
 			this->joystickSelected->Disable();
 			this->joystickSelected->Append(_("Initialize Failed"));
-#if IS_WIN32
 			this->joystickForceFeedback->Disable();
 			this->joystickDirectionalHit->Disable();
-			this->joystickCalibrateButton->Disable();
 			this->joystickDetectButton->Enable();
+#if IS_WIN32
+			this->joystickCalibrateButton->Disable();
 #endif
 		}
 		else {
@@ -2278,11 +2265,11 @@ void BasicSettingsPage::SetupJoystickSection() {
 			if (JoyMan::NumberOfPluggedInJoysticks() == 0) {
 				this->joystickSelected->SetSelection(0);
 				this->joystickSelected->Disable();
-#if IS_WIN32
 				this->joystickForceFeedback->Disable();
 				this->joystickDirectionalHit->Disable();
-				this->joystickCalibrateButton->Disable();
 				this->joystickDetectButton->Enable();
+#if IS_WIN32
+				this->joystickCalibrateButton->Disable();
 #endif
 			}
 			else {
@@ -2338,6 +2325,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	} else {
 		this->joystickCalibrateButton->Disable();
 	}
+#endif
 
 	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
 		bool ff, direct;
@@ -2354,7 +2342,6 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 		this->joystickDirectionalHit->Disable();
 		this->joystickForceFeedback->Disable();
 	}
-#endif
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_ID, static_cast<long>(joynumber->GetNumber()));
 }
