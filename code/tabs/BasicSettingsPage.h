@@ -130,11 +130,11 @@ private:
 	wxSizer* audioSizer;
 
 	wxChoice* joystickSelected;
-#if IS_WIN32
 	wxCheckBox* joystickForceFeedback;
 	wxCheckBox* joystickDirectionalHit;
-	wxButton* joystickCalibrateButton;
 	wxButton* joystickDetectButton;
+#if IS_WIN32
+	wxButton* joystickCalibrateButton;
 #endif
 	bool isTcRootFolderValid;
 	bool isCurrentBinaryValid;
