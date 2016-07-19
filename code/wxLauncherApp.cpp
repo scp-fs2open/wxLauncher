@@ -138,7 +138,7 @@ wxLauncher::wxLauncher()
 {
 }
 
-static char* DISPLAY_SPLASH_FAIL_TEXT = 
+static const char* DISPLAY_SPLASH_FAIL_TEXT =
 	"Unable to load splash image."
 	" This normally means that you are running the Launcher from a folder"
 	" that the launcher does not know how to find the resource folder from."
