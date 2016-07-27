@@ -28,13 +28,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/BasicDefaults.h"
 #include "global/MemoryDebugging.h"
 
+#include <vector>
+
 namespace JoyMan {
 #if USE_JOYSTICK
 	ApiType currentApi = API_NATIVE;
 #if HAS_SDL
 	bool isSdlInitialized = false;
-	wxArrayString sdlJoysticks;
-	wxArrayString sdlJoystickGUIDs;
+	std::vector<SDL_Joystick*> sdlJoysticks;
+
+	void clearSDLJoystickList()
+	{
+		for (std::vector<SDL_Joystick*>::iterator iter = sdlJoysticks.begin(); iter != sdlJoysticks.end(); ++iter)
+		{
+			SDL_JoystickClose(*iter);
+		}
+		sdlJoysticks.clear();
+	}
 #endif
 #if IS_WIN32
 	bool isWinInitialized = false;
@@ -154,27 +164,15 @@ bool JoyMan::Initialize(ApiType apiType) {
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+		SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 
-		JoyMan::sdlJoysticks.clear();
-		JoyMan::sdlJoystickGUIDs.clear();
+		JoyMan::clearSDLJoystickList();
 
-		SDL_Joystick *joy = NULL;
 		for (int i = 0; i < SDL_NumJoysticks(); i++) {
-			joy = SDL_JoystickOpen(i);
+			SDL_Joystick* joy = SDL_JoystickOpen(i);
 			if (joy != NULL) {
-				wxString joystickName(SDL_JoystickName(joy), wxConvLocal);
-				sdlJoysticks.Add(joystickName);
-
-				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-
-				char guidStr[33];
-				SDL_JoystickGetGUIDString(guid, guidStr, 33);
-
-				wxString joystickGUID(guidStr, wxConvLocal);
-				sdlJoystickGUIDs.Add(joystickGUID);
+				sdlJoysticks.push_back(joy);
 			}
-			SDL_JoystickClose(joy);
 		}
 
 		return true;
@@ -197,7 +195,9 @@ bool JoyMan::DeInitialize() {
 	if ( isSdlInitialized ) {
 		JoyMan::isSdlInitialized = false;
 		JoyMan::sdlJoysticks.clear();
-		JoyMan::sdlJoystickGUIDs.clear();
+		JoyMan::clearSDLJoystickList();
+
+		SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
 	}
 #endif
 #if IS_WIN32
@@ -255,12 +255,31 @@ unsigned int JoyMan::NumberOfPluggedInJoysticks() {
 	return pluggedIn;
 }
 
-/** \bug Assumes all joysticks support ForceFeedback */
+/** \return @c true when the joystick supports force feedback, @c false otherwise */
 #if USE_JOYSTICK
 bool JoyMan::SupportsForceFeedback(unsigned int i) {
 	if ( i == static_cast<unsigned int>(DEFAULT_JOYSTICK_ID) ) {
 		return false;
 	} else {
+#if HAS_SDL
+		if (currentApi == API_SDL)
+		{
+			if (sdlJoysticks.size() <= i) {
+				return false;
+			}
+			else {
+				SDL_Haptic* haptic = SDL_HapticOpenFromJoystick(sdlJoysticks[i]);
+				bool hasForceFeedback = haptic != NULL;
+				
+				if (hasForceFeedback)
+				{
+					SDL_HapticClose(haptic);
+				}
+
+				return hasForceFeedback;
+			}
+		}
+#endif
 		return true;
 	}
 #else
@@ -298,11 +317,18 @@ wxString JoyMan::JoystickName(unsigned int i) {
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		if (sdlJoystickGUIDs.size() <= i) {
+		if (sdlJoysticks.size() <= i) {
 			return wxEmptyString;
 		}
 		else {
-			return sdlJoysticks[i];
+			const char* name = SDL_JoystickName(sdlJoysticks[i]);
+			if (name != NULL)
+			{
+				return wxString::FromUTF8(name);
+			} else
+			{
+				return wxEmptyString;
+			}
 		}
 	}
 #endif
@@ -325,10 +351,14 @@ wxString JoyMan::JoystickGUID(unsigned int i)
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		if (sdlJoystickGUIDs.size() <= i) {
+		if (sdlJoysticks.size() <= i) {
 			return wxEmptyString;
 		} else {
-			return sdlJoystickGUIDs[i];
+			SDL_JoystickGUID guid = SDL_JoystickGetGUID(sdlJoysticks[i]);
+
+			char guidStr[33];
+			SDL_JoystickGetGUIDString(guid, guidStr, 33);
+			return wxString::FromAscii(guidStr);
 		}
 	}
 #endif
