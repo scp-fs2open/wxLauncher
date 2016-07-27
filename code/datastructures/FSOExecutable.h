@@ -25,6 +25,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class FSOExecutable: public wxClientData {
 public:
+	enum Configuration {
+		CONFIG_RELEASE,
+		CONFIG_DEBUG,
+		CONFIG_FASTDEBUG
+	};
+
 	virtual ~FSOExecutable();
 	bool SupportsDirect3D();
 	bool SupportsOpenAL();
@@ -45,7 +51,8 @@ protected:
 	int revision;
 	bool inferno;
 	int sse;
-	bool debug;
+	bool _64bit;
+	Configuration configuration;
 	int build;
 	bool antipodes;
 	int antNumber; //!< antipodes number (such as 8)

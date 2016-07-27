@@ -34,11 +34,12 @@ FSOExecutable::FSOExecutable() {
 	revision = 0;
 	inferno = false;
 	sse = 0;
-	debug = false;
+	configuration = CONFIG_RELEASE;
 	build = 0;
 	antipodes = false;
 	antNumber = 0;
 	buildCaps = 0;
+	_64bit = false;
 }
 
 FSOExecutable::~FSOExecutable() {
@@ -276,13 +277,15 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 						tempVersion, binaryname.c_str());
 			}
 		} else if ( !token.CmpNoCase(_T("d")) || !token.CmpNoCase(_T("debug")) ) {
-			ver.debug = true;
+			ver.configuration = CONFIG_DEBUG;
+		} else if ( !token.CmpNoCase(_T("FastDbg")) ) {
+			ver.configuration = CONFIG_FASTDEBUG;
 		} else if ( token.Lower().EndsWith(_T("d"), &temp) ) {
 			if ( temp.ToLong(&tempVersion) ) {
 				// is the revision version number
 				if ( tempVersion < 1000 && tempVersion >= 0 ) {
 					ver.revision = (int)tempVersion;
-					ver.debug = true;
+					ver.configuration = CONFIG_DEBUG;
 				} else {
 					wxLogWarning(
 						_T("Revision version number out of range (%ld) in executable %s"),
@@ -301,7 +304,7 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 				// is the revision version number
 				if ( tempVersion < 1000 && tempVersion >= 0 ) {
 					ver.revision = (int)tempVersion;
-					ver.debug = false;
+					ver.configuration = CONFIG_RELEASE;
 				} else {
 					wxLogWarning(
 						_T("Revision version number out of range (%ld) in executable %s"),
@@ -358,6 +361,8 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 			}
 		} else if ( !token.CmpNoCase(_T("inf")) || !token.CmpNoCase(_T("inferno"))) {
 			ver.inferno = true;
+		} else if ( !token.CmpNoCase(_T("x64")) ) {
+			ver._64bit = true;
 		} else {
 			if (!ver.string.IsEmpty()) {
 				ver.string += _T(" ");
@@ -412,15 +417,33 @@ wxString FSOExecutable::GetVersionString() const {
 			// nothing
 			break;
 	}
+
+	wxString configString;
+	switch(this->configuration)
+	{
+		case CONFIG_RELEASE:
+			configString = _T("");
+			break;
+		case CONFIG_DEBUG:
+			configString = _T(" Debug");
+			break;
+		case CONFIG_FASTDEBUG:
+			configString = _T(" Fast Debug");
+			break;
+		default:
+			configString = _T("");
+			break;
+	}
 	
-	return wxString::Format(_T("%s%s%s%s%s%s%s%s"),
+	return wxString::Format(_T("%s%s%s%s%s%s%s%s%s"),
 		(this->binaryname.IsEmpty()) ? _T("Unknown") : this->binaryname.c_str(), // FS2 Open
 		(useFullVersion) ? wxString::Format(_T(" %d.%d.%d"), this->major, this->minor, this->revision).c_str() : wxEmptyString,
 		(this->antipodes) ? antipodesStr.c_str() : wxEmptyString,
 		(this->build == 0) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (Build %d)") : _T(" Build %d"), this->build).c_str(),
 		(this->string.IsEmpty()) ? wxEmptyString : wxString::Format((hasVersion) ? _T(" (%s)") : _T(" %s"), this->string.c_str()).c_str(),
-		(this->debug) ? _T(" Debug") : wxEmptyString,
+		configString.c_str(),
 		(this->inferno && !this->antipodes) ? _T(" Inferno") : wxEmptyString,
-		(this->sse == 0) ? wxEmptyString : sseStr.c_str()
+		(this->sse == 0) ? wxEmptyString : sseStr.c_str(),
+		(this->_64bit) ? _T(" 64-bit") : wxEmptyString
 		);
 }
