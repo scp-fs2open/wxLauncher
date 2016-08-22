@@ -237,6 +237,11 @@ namespace Compatibility
 		wxFileName oldName = GetPlatformDefaultConfigFilePathOld();
 		oldName.SetFullName(FSO_CONFIG_FILENAME);
 
+		if (!wxFile::Exists(oldName.GetFullPath())) {
+			// Old file does not exist, probably first run.
+			return true;
+		}
+
 		if (!wxCopyFile(oldName.GetFullPath(), newName.GetFullPath())) {
 			wxLogError(_T("Failed to copy old configuration file to new location!"));
 			return false;
