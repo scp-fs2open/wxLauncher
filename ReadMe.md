@@ -37,7 +37,7 @@ Xcode, KDevelop, and of course autotools.
       * CMake 2.8
       * wxWidgets 2.8.10+ or 3.0.2
       * Python 2.7 or Python 3.4+
-      * markdown and six in Python
+      * markdown for Python
   * Windows
       * Windows SDK or Platform SDK
       * Nullsoft Scriptable Install System (NSIS)
