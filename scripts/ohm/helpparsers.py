@@ -2,9 +2,7 @@ import logging
 import os
 import os.path
 import shutil
-import sys
 import tempfile
-import traceback
 
 try:
     from html.parser import HTMLParser
