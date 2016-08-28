@@ -43,11 +43,10 @@ def build(args):
 
 
 def _do_build(args, files, notices):
-    input_files = [f for f in generate_file_list(args.indir, ".help")]
     help_array = list()
     extra_files = list()
     notices.info(" Processing input files:")
-    for file_name in input_files:
+    for file_name in generate_file_list(args.indir, ".help"):
         notices.info("  %s", file_name)
         logging.info("   Stage 1")
         name1 = process_input_stage1(file_name, args, files)
