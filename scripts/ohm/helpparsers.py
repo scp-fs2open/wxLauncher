@@ -18,14 +18,13 @@ from .utilfunctions import update_attribute, change_filename
 class OutputParser(HTMLParser):
     """The class is designed to be used as a base class.  It will output the same html structure as the input file into a file like object (only needs write)."""
 
-    def __init__(self, file, *args, **kwargs):
-        HTMLParser.__init__(self, *args, **kwargs)
+    def __init__(self, f):
+        HTMLParser.__init__(self)
 
-        if hasattr(file, 'write'):
-            self.outputfile = file
+        if hasattr(f, 'write'):
+            self.outputfile = f
         else:
-            raise Exception(
-                "file is not a file like object with a write function")
+            raise ValueError("f is not a file-like")
 
         self.tagstack = list()
 
