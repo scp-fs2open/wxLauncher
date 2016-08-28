@@ -37,37 +37,36 @@ def build(args):
     files = generate_paths(args)
 
     if should_build(args):
-        input_files = [f for f in generate_file_list(args.indir, ".help")]
-
-        help_array = list()
-        extra_files = list()
-        notices.info(" Processing input files:")
-        for file_name in input_files:
-            notices.info("  %s", file_name)
-            logging.info("   Stage 1")
-            name1 = process_input_stage1(file_name, args, files)
-
-            logging.info("   Stage 2")
-            name2 = process_input_stage2(name1, args, files, help_array)
-
-            logging.info("   Stage 3")
-            name3 = process_input_stage3(name2, args, files, extra_files)
-
-            logging.info("   Stage 4")
-            name4 = process_input_stage4(name3, args, files)
-
-        logging.info(" Stage 5")
-        process_input_stage5(args, files, extra_files)
-
-        logging.info(" Stage 6")
-        process_input_stage6(args, files)
-
-        logging.info(" Generating .cpp files")
-        generate_cpp_files(args, files, help_array)
-
-        notices.info("....Done.")
+        _do_build(args, files, notices)
     else:
         notices.info(" Up to date.")
+
+
+def _do_build(args, files, notices):
+    input_files = [f for f in generate_file_list(args.indir, ".help")]
+    help_array = list()
+    extra_files = list()
+    notices.info(" Processing input files:")
+    for file_name in input_files:
+        notices.info("  %s", file_name)
+        logging.info("   Stage 1")
+        name1 = process_input_stage1(file_name, args, files)
+
+        logging.info("   Stage 2")
+        name2 = process_input_stage2(name1, args, files, help_array)
+
+        logging.info("   Stage 3")
+        name3 = process_input_stage3(name2, args, files, extra_files)
+
+        logging.info("   Stage 4")
+        name4 = process_input_stage4(name3, args, files)
+    logging.info(" Stage 5")
+    process_input_stage5(args, files, extra_files)
+    logging.info(" Stage 6")
+    process_input_stage6(args, files)
+    logging.info(" Generating .cpp files")
+    generate_cpp_files(args, files, help_array)
+    notices.info("....Done.")
 
 
 def generate_paths(options):
