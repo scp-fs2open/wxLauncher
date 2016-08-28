@@ -72,20 +72,20 @@ class OutputParser(HTMLParser):
     def write_tag(self, tag):
         """When tag stack is empty, writes tag to file passed in the constructor. When tag stack is not empty formats the tag and sets (or if the next tag.data is not None, appends) the formated string."""
         if tag.data:
-            str = "<%s%s />" % (tag.name, self.format_attributes(tag))
+            s = "<%s%s />" % (tag.name, self.format_attributes(tag))
         else:
-            str = "<%s%s>%s</%s>" % (
+            s = "<%s%s>%s</%s>" % (
                 tag.name, self.format_attributes(tag), tag.data, tag.name)
 
         if len(self.tag_stack) > 0:
             tag = self.tag_stack.pop()
             if tag.data:
-                tag.data = str
+                tag.data = s
             else:
-                tag.data += str
+                tag.data += s
             self.tag_stack.append(tag)
         else:
-            self.output_file.write(str)
+            self.output_file.write(s)
 
     def format_attributes(self, tag):
         """Returns the attributes formatted to be placed in a tag."""
