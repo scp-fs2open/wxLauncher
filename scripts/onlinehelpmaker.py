@@ -51,7 +51,7 @@ def main(argv):
                         default=False, dest="always_build",
                         help="builder should always build source files")
 
-    args = parser.parse_args(argv)
+    args = parser.parse_args(argv[1:])
 
     console_format = logging.Formatter(fmt='%(levelname)7s:%(message)s')
     console = logging.StreamHandler()
