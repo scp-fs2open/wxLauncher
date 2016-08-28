@@ -23,15 +23,6 @@ except ImportError:
 def main(argv):
     parser = argparse.ArgumentParser(
         description="Build the online help database")
-    parser.add_argument('type', choices=["build", "rebuild", "clean"])
-    parser.add_argument('outfile', type=os.path.normpath,
-                        help="location to write .htb file to")
-    parser.add_argument('indir', type=os.path.normcase,
-                        help="path that contains the info to put the OUTFILE")
-    parser.add_argument("-t", "--temp",
-                        help="directory for intermediate build files"
-                        "(Uses system temp directory by default)",
-                        metavar="TEMPDIR")
     parser.add_argument("-q", "--quiet", action="store_const",
                         dest="quiet", default=logging.INFO,
                         const=logging.WARNING,
@@ -39,49 +30,61 @@ def main(argv):
     parser.add_argument("-d", "--debug", action="store_const",
                         default=logging.INFO, const=logging.DEBUG,
                         help="print debugging information to the screen")
-    parser.add_argument("-c", "--cfile", default=None, dest="carrayfilename",
+
+    type_subparsers = parser.add_subparsers(title='operation')
+
+    bld_ps = type_subparsers.add_parser('build',
+                                        help='Assemble help database')
+    bld_ps.set_defaults(function=build, type="build")
+    bld_ps.add_argument('type', choices=["build", "rebuild", "clean"])
+    bld_ps.add_argument('outfile', type=os.path.normpath,
+                        help="location to write .htb file to")
+    bld_ps.add_argument('indir', type=os.path.normcase,
+                        help="path that contains the info to put the OUTFILE")
+    bld_ps.add_argument("-t", "--temp",
+                        help="directory for intermediate build files"
+                        "(Uses system temp directory by default)",
+                        metavar="TEMPDIR")
+    bld_ps.add_argument("-c", "--cfile", default=None, dest="carrayfilename",
                         metavar="FILE",
                         help="file to put the htb index in (c code)")
-    parser.add_argument("-a", "--always", action="store_true",
+    bld_ps.add_argument("-a", "--always", action="store_true",
                         default=False, dest="always_build",
                         help="builder should always build source files")
 
-    options = parser.parse_args(argv)
+    args = parser.parse_args(argv)
 
     console_format = logging.Formatter(fmt='%(levelname)7s:%(message)s')
     console = logging.StreamHandler()
-    console.setLevel(options.debug)
+    console.setLevel(args.debug)
 
     console.setFormatter(console_format)
     logger = logging.getLogger('')
-    logger.setLevel(options.debug)
+    logger.setLevel(args.debug)
     logger.addHandler(console)
 
     notices_console = logging.StreamHandler()
     notices_console.setFormatter(console_format)
 
     notices_logger = logging.getLogger('notices')
-    notices_logger.setLevel(options.quiet)
+    notices_logger.setLevel(args.quiet)
     notices_logger.addHandler(notices_console)
     notices_logger.propagate = False
 
-    if not options.temp:
+    if not args.temp:
         logging.info("No working directory set. Creating one in system temp.")
-        options.temp = tempfile.mkdtemp()
+        args.temp = tempfile.mkdtemp()
 
         def cleanup(dir):
             if os.path.exists(dir):
-                shutil.rmtree(options.temp, onerror=rmtree_error_handler)
+                shutil.rmtree(args.temp, onerror=rmtree_error_handler)
 
-        atexit.register(cleanup, options.temp)
+        atexit.register(cleanup, args.temp)
 
-    logging.debug("Doing a '%s'", options.type)
-    logging.debug("Using '%s' as working directory", options.temp)
-    logging.debug("Using '%s' as output file", options.outfile)
-    logging.debug("Using '%s' as input directory", options.indir)
-
-    if options.type == "build":
-        ret = call_logging_exceptions(build, options)
+    if 'function' in args:
+        ret = call_logging_exceptions(args.function, args)
+    else:
+        ret = 1
     sys.exit(ret)
 
 

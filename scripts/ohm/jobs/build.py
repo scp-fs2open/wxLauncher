@@ -10,11 +10,11 @@ from ..helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
 from ..utilfunctions import change_filename
 
 
-def build(options):
-    """Compiles the files in options.indir to the archive output options.outfile.
+def build(args):
+    """Compiles the files in args.indir to the archive output args.outfile.
 
   Compiled in several stages:
-    stage1: Transform all input files with markdown placing the results into options.temp+"/stage1".
+    stage1: Transform all input files with markdown placing the results into args.temp+"/stage1".
     stage2: Parses and strips the output of stage1 to build the list that will be made into the c-array that contains the compiled names for the detailed help of each control.
     stage3: Parses the output of stage2 to grab the images that are refered to in the the output of stage1
     stage4: Parses the output of stage1 to fix the relative hyperlinks in the output so that they will refer correctly to the correct files when in output file.
@@ -23,10 +23,14 @@ def build(options):
     """
     notices = logging.getLogger('notices')
     notices.info("Building...")
-    files = generate_paths(options)
+    logging.debug("Using '%s' as working directory", args.temp)
+    logging.debug("Using '%s' as output file", args.outfile)
+    logging.debug("Using '%s' as input directory", args.indir)
 
-    if should_build(options):
-        input_files = generate_input_files_list(options)
+    files = generate_paths(args)
+
+    if should_build(args):
+        input_files = generate_input_files_list(args)
 
         helparray = list()
         extrafiles = list()
@@ -34,25 +38,25 @@ def build(options):
         for file in input_files:
             notices.info("  %s", file)
             logging.info("   Stage 1")
-            name1 = process_input_stage1(file, options, files)
+            name1 = process_input_stage1(file, args, files)
 
             logging.info("   Stage 2")
-            name2 = process_input_stage2(name1, options, files, helparray)
+            name2 = process_input_stage2(name1, args, files, helparray)
 
             logging.info("   Stage 3")
-            name3 = process_input_stage3(name2, options, files, extrafiles)
+            name3 = process_input_stage3(name2, args, files, extrafiles)
 
             logging.info("   Stage 4")
-            name4 = process_input_stage4(name3, options, files)
+            name4 = process_input_stage4(name3, args, files)
 
         logging.info(" Stage 5")
-        process_input_stage5(options, files, extrafiles)
+        process_input_stage5(args, files, extrafiles)
 
         logging.info(" Stage 6")
-        process_input_stage6(options, files)
+        process_input_stage6(args, files)
 
         logging.info(" Generating .cpp files")
-        generate_cpp_files(options, files, helparray)
+        generate_cpp_files(args, files, helparray)
 
         notices.info("....Done.")
     else:
