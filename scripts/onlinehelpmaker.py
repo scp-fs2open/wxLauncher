@@ -82,7 +82,7 @@ def main(argv):
         atexit.register(cleanup, args.temp)
 
     if 'function' in args:
-        ret = call_logging_exceptions(args.function, args)
+        ret = args.function(args)
     else:
         ret = 1
     sys.exit(ret)
