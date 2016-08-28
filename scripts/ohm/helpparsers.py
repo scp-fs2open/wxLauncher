@@ -132,38 +132,38 @@ class Stage3Parser(OutputParser):
     def handle_startendtag(self, tag, attrs):
         """Find the image and copy it to the stage3 folder where it should
         be in the file output."""
-        ALT_INDEX = None
+        alt_index = None
         if tag == "img":
             # figure out which attribute is src
             for x in range(0, len(attrs)):
                 if attrs[x][0] == "src":
-                    SRC_INDEX = x
+                    srv_index = x
                 elif attrs[x][0] == "alt":
-                    ALT_INDEX = x
+                    alt_index = x
 
-            if attrs[SRC_INDEX][1].startswith("/"):
+            if attrs[srv_index][1].startswith("/"):
                 # manual wants an absolute path, the help manual does not support
                 # absolute path, so make sure that the image exists where the
                 # absolute path indicates, then make the path into a relative path
                 # with the approriate number of updirs
-                test = os.path.join(self.options.indir, attrs[SRC_INDEX][1][1:])
+                test = os.path.join(self.options.indir, attrs[srv_index][1][1:])
                 if not os.path.exists(test):
                     raise IOError(
-                        "Cannot find %s in base path" % (attrs[SRC_INDEX][1]))
+                        "Cannot find %s in base path" % (attrs[srv_index][1]))
 
                 # try find a valid relative path
                 subdirdepth = len(self.subdir.split(os.path.sep))
                 prefix = "../" * subdirdepth
-                relpath = os.path.join(prefix, attrs[SRC_INDEX][1][1:])
+                relpath = os.path.join(prefix, attrs[srv_index][1][1:])
                 if not os.path.exists(
                         os.path.join(self.options.indir, self.subdir, relpath)):
                     raise Exception(
-                        "Cannot relativize path: %s" % (attrs[SRC_INDEX][1]))
+                        "Cannot relativize path: %s" % (attrs[srv_index][1]))
                 else:
                     attrs = update_attribute(attrs, 'src', relpath)
 
             location1 = os.path.join(self.options.indir, self.subdir,
-                                     attrs[SRC_INDEX][1])
+                                     attrs[srv_index][1])
             location = os.path.normpath(location1)
 
             # check to make sure that the image I am including was in the onlinehelp
@@ -172,11 +172,11 @@ class Stage3Parser(OutputParser):
             logging.debug("%s - %s", location, self.options.indir)
             if location.startswith(self.options.indir):
                 dst1 = os.path.join(self.files['stage3'], self.subdir,
-                                    attrs[SRC_INDEX][1])
+                                    attrs[srv_index][1])
                 dst = os.path.normpath(dst1)
             else:
                 # get extention
-                basename = os.path.basename(attrs[SRC_INDEX][1])
+                basename = os.path.basename(attrs[srv_index][1])
                 (name, ext) = os.path.splitext(basename)
                 (file, outname) = tempfile.mkstemp(ext, name,
                                                    self.files['stage3'])
@@ -190,10 +190,10 @@ class Stage3Parser(OutputParser):
                                            makedirs=False)
                 attrs = update_attribute(attrs, 'src', filename)
 
-            if ALT_INDEX is None:
-                ALT_INDEX = SRC_INDEX
+            if alt_index is None:
+                alt_index = srv_index
             logging.debug(" Image (%s) should be in %s and copying to %s",
-                          attrs[ALT_INDEX][1], location, dst)
+                          attrs[alt_index][1], location, dst)
             try:
                 if not os.path.exists(os.path.dirname(dst)):
                     os.mkdir(os.path.dirname(dst))
