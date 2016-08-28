@@ -49,9 +49,9 @@ class OutputParser(HTMLParser):
         if len(self.tag_stack) > 0:
             tag = self.tag_stack.pop()
             if tag.data:
-                tag.data = data
-            else:
                 tag.data += data
+            else:
+                tag.data = data
             self.tag_stack.append(tag)
         else:
             self.output_file.write(data)
@@ -82,9 +82,9 @@ class OutputParser(HTMLParser):
         if len(self.tag_stack) > 0:
             tag = self.tag_stack.pop()
             if tag.data:
-                tag.data = s
-            else:
                 tag.data += s
+            else:
+                tag.data = s
             self.tag_stack.append(tag)
         else:
             self.output_file.write(s)
