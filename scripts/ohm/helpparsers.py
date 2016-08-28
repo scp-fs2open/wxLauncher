@@ -18,13 +18,13 @@ class OutputParser(HTMLParser):
 
     Currently class passes the input file through to the passed in output"""
 
-    def __init__(self, f):
+    def __init__(self, file):
         HTMLParser.__init__(self)
 
-        if hasattr(f, 'write'):
-            self.output_file = f
+        if hasattr(file, 'write'):
+            self.output_file = file
         else:
-            raise ValueError("f is not a file-like")
+            raise ValueError("file is not a file-like")
 
         self.tag_stack = list()
 
