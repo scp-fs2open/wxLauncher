@@ -37,7 +37,7 @@ def build(args):
     files = generate_paths(args)
 
     if should_build(args):
-        input_files = generate_input_files_list(args)
+        input_files = [f for f in generate_file_list(args.indir, ".help")]
 
         help_array = list()
         extra_files = list()
@@ -133,23 +133,11 @@ def check_source_newer_than_outfile(options):
     return False
 
 
-def generate_input_files_list(options):
-    """Find all input files that need processing
-
-    :return list of (.help) files to process"""
-    return generate_file_list(options.indir, ".help")
-
-
 def generate_file_list(directory, extension):
-    file_list = list()
-
     for path, dirs, files in os.walk(directory):
         for file_name in files:
             if os.path.splitext(file_name)[1] == extension:
-                # I only want the .help files
-                file_list.append(os.path.join(path, file_name))
-
-    return file_list
+                yield os.path.join(path, file_name)
 
 
 def process_input_stage1(file, options, files):
