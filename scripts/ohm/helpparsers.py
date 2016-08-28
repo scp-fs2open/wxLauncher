@@ -136,7 +136,7 @@ class Stage3Parser(OutputParser):
 
     def handle_startendtag(self, tag, attrs):
         """Find the image and copy it to the stage3 folder where it should
-        be in the file output."""
+        be in the f output."""
         alt_index = None
         srv_index = None
         if tag == "img":
@@ -184,10 +184,9 @@ class Stage3Parser(OutputParser):
                 # get extension
                 basename = os.path.basename(attrs[srv_index][1])
                 (name, ext) = os.path.splitext(basename)
-                (file, outname) = tempfile.mkstemp(ext, name,
-                                                   self.files['stage3'])
-                dst1 = outname.replace(os.getcwd(),
-                                       ".")  # make into a relative path
+                (f, outname) = tempfile.mkstemp(ext, name, self.files['stage3'])
+                # make into a relative path
+                dst1 = outname.replace(os.getcwd(), ".")
 
                 # fix up attrs
                 dst = os.path.normpath(dst1)
