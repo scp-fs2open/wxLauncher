@@ -221,21 +221,27 @@ def process_input_stage4(file, options, files):
 
     return outname
 
+HTB_HEADER_TEMPLATE = "\n".join([
+    "Contents file={contents}",
+    "Index file={index}",
+    "Title={title}",
+    "Default topic={default}",
+    "Charset=UTF-8",
+    ""])
+
 
 def process_input_stage5(options, files, extrafiles):
-    """Generate the index and table of contents for the output file from the output of stage4."""
+    """Generate the index and table of contents"""
 
     # write header file
-    headerfile_name = os.path.join(files['stage5'], "header.hhp")
-    headerfile = open(headerfile_name, mode="w")
-    headerfile.write(
-        """Contents file=%(contents)s\nIndex file=%(index)s\nTitle=%(title)s\nDefault topic=%(default)s\nCharset=UTF-8\n""" %
-        {"contents": "contents.hhc",
-         "index": "index.hhk",
-         "title": "wxLauncher User Guide",
-         "default": "index.htm"
-         })
-    headerfile.close()
+    header_file_name = os.path.join(files['stage5'], "header.hhp")
+    with open(header_file_name, mode="w") as header_file:
+        header_file.write(HTB_HEADER_TEMPLATE.format(
+            contents="contents.hhc",
+            index="index.hhk",
+            title="wxLauncher User Guide",
+            default="index.htm",
+        ))
 
     # generate both index and table of contents
     tocfile_name = os.path.join(files['stage5'], "contents.hhc")
