@@ -13,13 +13,20 @@ from ..utilfunctions import change_filename
 def build(args):
     """Compiles the files in args.indir to the archive output args.outfile.
 
-  Compiled in several stages:
-    stage1: Transform all input files with markdown placing the results into args.temp+"/stage1".
-    stage2: Parses and strips the output of stage1 to build the list that will be made into the c-array that contains the compiled names for the detailed help of each control.
-    stage3: Parses the output of stage2 to grab the images that are refered to in the the output of stage1
-    stage4: Parses the output of stage1 to fix the relative hyperlinks in the output so that they will refer correctly to the correct files when in output file.
-    stage5: Generate the index and table of contents for the output file from the output of stage4.
-    stage6: Zip up the output of stage5 and put it in the output location.
+    Compiled in several stages:
+        - stage1: Transform all input files with markdown placing the results
+        into args.temp+"/stage1".
+        - stage2: Parses and strips the output of stage1 to build the list
+        that will be made into the c-array that contains the compiled names for
+        the detailed help of each control.
+        - stage3: Parses the output of stage2 to grab the images that are
+        referred to in the the output of stage1
+        - stage4: Parses the output of stage1 to fix the relative hyperlinks in
+        the output so that they will refer correctly to the correct files when
+        in output file.
+        - stage5: Generate the index and table of contents for the output file
+        from the output of stage4.
+        - stage6: Zip up the output of stage5 and put it in the output location.
     """
     notices = logging.getLogger('notices')
     notices.info("Building...")
@@ -32,31 +39,31 @@ def build(args):
     if should_build(args):
         input_files = generate_input_files_list(args)
 
-        helparray = list()
-        extrafiles = list()
+        help_array = list()
+        extra_files = list()
         notices.info(" Processing input files:")
-        for file in input_files:
-            notices.info("  %s", file)
+        for file_name in input_files:
+            notices.info("  %s", file_name)
             logging.info("   Stage 1")
-            name1 = process_input_stage1(file, args, files)
+            name1 = process_input_stage1(file_name, args, files)
 
             logging.info("   Stage 2")
-            name2 = process_input_stage2(name1, args, files, helparray)
+            name2 = process_input_stage2(name1, args, files, help_array)
 
             logging.info("   Stage 3")
-            name3 = process_input_stage3(name2, args, files, extrafiles)
+            name3 = process_input_stage3(name2, args, files, extra_files)
 
             logging.info("   Stage 4")
             name4 = process_input_stage4(name3, args, files)
 
         logging.info(" Stage 5")
-        process_input_stage5(args, files, extrafiles)
+        process_input_stage5(args, files, extra_files)
 
         logging.info(" Stage 6")
         process_input_stage6(args, files)
 
         logging.info(" Generating .cpp files")
-        generate_cpp_files(args, files, helparray)
+        generate_cpp_files(args, files, help_array)
 
         notices.info("....Done.")
     else:
@@ -64,11 +71,14 @@ def build(args):
 
 
 def generate_paths(options):
-    """Generates the names of the paths that will be needed by the compiler during it's run, storing them in a dictionary that is returned."""
+    """Generates the names of the paths that will be needed by the compiler.
+
+    Generated names will be returned as a dictionary."""
     paths = dict()
 
     for i in range(1, 7):
-        paths['stage%d' % (i)] = os.path.join(options.temp, 'stage%d' % (i))
+        stage_name = 'stage{0}'.format(i)
+        paths[stage_name] = os.path.join(options.temp, stage_name)
 
     for path in paths.values():
         if not os.path.exists(path):
@@ -80,8 +90,8 @@ def generate_paths(options):
 
 def should_build(options):
     """Should we build the output file?
-    :param options: arguments from command line
-    :return: True if the output file should be built/rebuilt
+    :param options arguments from command line
+    :return True if the output file should be built/rebuilt
     """
     logger = logging.getLogger('should_build')
     if options.always_build:
@@ -100,28 +110,33 @@ def should_build(options):
 
 
 def check_source_newer_than_outfile(options):
-    """Checks to see if any file in the source directory is newer than the output file."""
     try:
         outfile_time = os.path.getmtime(options.outfile)
 
-        for dirpath, dirnames, filenames in os.walk(options.indir):
-            for file in filenames:
-                filepath = os.path.join(dirpath, file)
-                if os.path.getmtime(filepath) > outfile_time:
-                    logging.info("%s has been changed since outfile. Causing build", filepath)
+        for d_path, d_names, f_names in os.walk(options.indir):
+            for f_name in f_names:
+                f_path = os.path.join(d_path, f_name)
+                if os.path.getmtime(f_path) > outfile_time:
+                    logging.info(
+                        "%s has been changed since outfile. Causing build",
+                        f_path)
                     return True
-                elif os.path.getctime(filepath) > outfile_time:
-                    logging.info("%s has been created since outfile. Causing build", filepath)
+                elif os.path.getctime(f_path) > outfile_time:
+                    logging.info(
+                        "%s has been created since outfile. Causing build",
+                        f_path)
                     return True
 
-    except OSError:
-        logging.warning("Encountered a file (%s) that the os does not like. Forcing build.", "TODO")
+    except OSError as e:
+        logging.exception("OS does not like %d. Forcing build.", e.filename)
         return True
     return False
 
 
 def generate_input_files_list(options):
-    """Returns a list of all input (.help) files that need to be parsed by markdown."""
+    """Find all input files that need processing
+
+    :return list of (.help) files to process"""
     return generate_file_list(options.indir, ".help")
 
 
@@ -129,10 +144,10 @@ def generate_file_list(directory, extension):
     file_list = list()
 
     for path, dirs, files in os.walk(directory):
-        for file in files:
-            if os.path.splitext(file)[1] == extension:
+        for file_name in files:
+            if os.path.splitext(file_name)[1] == extension:
                 # I only want the .help files
-                file_list.append(os.path.join(path, file))
+                file_list.append(os.path.join(path, file_name))
 
     return file_list
 
