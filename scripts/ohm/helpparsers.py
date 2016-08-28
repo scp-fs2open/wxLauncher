@@ -275,7 +275,8 @@ class Stage5Parser(OutputParser):
             self.title = t.data
             self.tag_stack.append(t)
         elif tag == "h1" and self.title == "Untitled":
-            # make first h1 tag found into the title, will be overwritten by a title tag if it exists.
+            # make first h1 tag found into the title will be overwritten by
+            # a title tag if it exists.
             t = self.tag_stack.pop()
             self.title = t.data
             self.tag_stack.append(t)
