@@ -41,7 +41,7 @@ class OutputParser(HTMLParser):
         self.write_tag(Tag(tag, attrs))
 
     def handle_endtag(self, tagname):
-        """Finds the matching tag. If the tags are miss matched, function will go down the stack until it finds the match"""
+        """Finds the matching tag recursing until finding a match"""
         logging.debug(" End tag: %s", tagname)
         tag = self.find_match(tagname)
         self.write_tag(tag)
@@ -70,7 +70,11 @@ class OutputParser(HTMLParser):
         return tag
 
     def write_tag(self, tag):
-        """When tag stack is empty, writes tag to file passed in the constructor. When tag stack is not empty formats the tag and sets (or if the next tag.data is not None, appends) the formated string."""
+        """Write a tag out if it is top level.
+
+        When tag stack is empty, writes tag to file passed in the constructor.
+        When tag stack is not empty formats the tag and sets (or if the next
+        tag.data is not None, appends) the formatted string."""
         if tag.data:
             s = "<%s%s />" % (tag.name, self.format_attributes(tag))
         else:
@@ -134,6 +138,7 @@ class Stage3Parser(OutputParser):
         """Find the image and copy it to the stage3 folder where it should
         be in the file output."""
         alt_index = None
+        srv_index = None
         if tag == "img":
             # figure out which attribute is src
             for x in range(0, len(attrs)):
@@ -143,10 +148,10 @@ class Stage3Parser(OutputParser):
                     alt_index = x
 
             if attrs[srv_index][1].startswith("/"):
-                # manual wants an absolute path, the help manual does not support
-                # absolute path, so make sure that the image exists where the
-                # absolute path indicates, then make the path into a relative path
-                # with the approriate number of updirs
+                # manual wants an absolute path, the help manual does not
+                # support absolute path, so make sure that the image exists
+                # where the absolute path indicates, then make the path into a
+                # relative path with the appropriate number of updirs
                 test = os.path.join(self.options.indir, attrs[srv_index][1][1:])
                 if not os.path.exists(test):
                     raise IOError(
@@ -167,16 +172,16 @@ class Stage3Parser(OutputParser):
                                      attrs[srv_index][1])
             location = os.path.normpath(location1)
 
-            # check to make sure that the image I am including was in the onlinehelp
-            # folder, if not change the dst name so that it will be located
-            # correctly in the stage3 directory
+            # check to make sure that the image I am including was in the
+            # onlinehelp folder, if not change the dst name so that it will be
+            # located correctly in the stage3 directory
             logging.debug("%s - %s", location, self.options.indir)
             if location.startswith(self.options.indir):
                 dst1 = os.path.join(self.files['stage3'], self.subdir,
                                     attrs[srv_index][1])
                 dst = os.path.normpath(dst1)
             else:
-                # get extention
+                # get extension
                 basename = os.path.basename(attrs[srv_index][1])
                 (name, ext) = os.path.splitext(basename)
                 (file, outname) = tempfile.mkstemp(ext, name,
@@ -218,44 +223,47 @@ class Stage4Parser(OutputParser):
     def handle_starttag(self, tag, attrs):
         if tag == "a":
             for name, value in attrs:
-                if name == "href" and value.startswith("/"):
-                    if value.startswith("/"):
-                        # manual wants an absolute path, the help manual does not support
-                        # absolute path, so make sure that the image exists where the
-                        # absolute path indicates, then make the path into a relative path
-                        # with the approriate number of updirs
-                        test = os.path.join(self.options.indir, value[1:])
-                        if not os.path.exists(test):
-                            raise IOError(
-                                "Cannot find %s in base path" % (value))
-
-                        # try find a valid relative path
-                        subdirdepth = len(self.subdir.split(os.path.sep))
-                        prefix = "../" * subdirdepth
-                        relpath = os.path.join(prefix, value[1:])
-                        if not os.path.exists(
-                                os.path.join(self.options.indir, self.subdir,
-                                             relpath)):
-                            raise Exception(
-                                "Cannot relativize path: %s" % (value))
-                        else:
-                            attrs = update_attribute(attrs, 'src', relpath)
-                            value = relpath
-                if name == "href" and not value.startswith("http://"):
-                    # make sure the file being refered to exists in stage3
-                    check_ref = change_filename(value, ".stage3", ".",
-                                                self.files['stage3'],
-                                                makedirs=False)
-                    if not os.path.exists(check_ref):
-                        logging.debug(
-                            " File (%s) does not exist to be bundled into archive!",
-                            check_ref)
-
-                    fixed_ref = change_filename(value, ".htm", ".", ".",
-                                                makedirs=False)
-                    attrs = update_attribute(attrs, "href", fixed_ref)
-
+                attrs = self._handle_start_tag(attrs, name, value)
         OutputParser.handle_starttag(self, tag, attrs)
+
+    def _handle_start_tag(self, attrs, name, value):
+        if name == "href" and value.startswith("/"):
+            if value.startswith("/"):
+                # manual wants an absolute path, the help manual does not
+                # support absolute path, so make sure that the image exists
+                # where the absolute path indicates, then make the path into a
+                # relative path with the appropriate number of up dirs
+
+                # value is absolute but we need it relative, so drop the slash
+                if not self._path_exists(value[1:]):
+                    raise ValueError("Cannot find %s in base path", value)
+
+                # try find a valid relative path
+                subdirdepth = len(self.subdir.split(os.path.sep))
+                prefix = "../" * subdirdepth
+                relpath = os.path.join(prefix, value[1:])
+                if self._path_exists(self.subdir, relpath):
+                    raise ValueError("Cannot relativize path: %s", value)
+                else:
+                    attrs = update_attribute(attrs, 'src', relpath)
+                    value = relpath
+        if name == "href" and not value.startswith("http://"):
+            # make sure the file being referred to exists in stage3
+            check_ref = change_filename(value, ".stage3", ".",
+                                        self.files['stage3'],
+                                        makedirs=False)
+            if not os.path.exists(check_ref):
+                logging.warning(
+                    " File (%s) does not exist to be bundled into archive!",
+                    check_ref)
+
+            fixed_ref = change_filename(value, ".htm", ".", ".",
+                                        makedirs=False)
+            attrs = update_attribute(attrs, "href", fixed_ref)
+        return attrs
+
+    def _path_exists(self, *paths):
+        return os.path.exists(os.path.join(self.options.indir, *paths))
 
 
 class Stage5Parser(OutputParser):
