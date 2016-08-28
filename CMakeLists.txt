@@ -200,7 +200,7 @@ endif()
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/version_strings.cpp)
 
 add_custom_target(helpmaker ALL
-  COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py build  ${helphtblocation} ${CMAKE_SOURCE_DIR}/onlinehelp ${HELPMAKER_QUIET} ${HELPMAKER_DEBUG} -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
+  COMMAND ${PYTHON_EXECUTABLE} scripts/onlinehelpmaker.py ${HELPMAKER_QUIET} ${HELPMAKER_DEBUG} build  ${helphtblocation} ${CMAKE_SOURCE_DIR}/onlinehelp -t ${CMAKE_CURRENT_BINARY_DIR}/onlinehelpmaker -c ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_BINARY_DIR}/generated/helplinks.cpp)

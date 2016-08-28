@@ -35,7 +35,6 @@ def main(argv):
     bld_ps = type_subparsers.add_parser('build',
                                         help='Assemble help database')
     bld_ps.set_defaults(function=build, type="build")
-    bld_ps.add_argument('type', choices=["build", "rebuild", "clean"])
     bld_ps.add_argument('outfile', type=os.path.normpath,
                         help="location to write .htb file to")
     bld_ps.add_argument('indir', type=os.path.normcase,
@@ -51,7 +50,7 @@ def main(argv):
                         default=False, dest="always_build",
                         help="builder should always build source files")
 
-    args = parser.parse_args(argv[1:])
+    args = parser.parse_args(argv)
 
     console_format = logging.Formatter(fmt='%(levelname)7s:%(message)s')
     console = logging.StreamHandler()
