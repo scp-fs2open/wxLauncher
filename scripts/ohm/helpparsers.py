@@ -87,7 +87,8 @@ class OutputParser(HTMLParser):
         else:
             self.output_file.write(s)
 
-    def format_attributes(self, tag):
+    @staticmethod
+    def format_attributes(tag):
         """Returns the attributes formatted to be placed in a tag."""
         ret = ""
         if len(tag.attributes) > 0:
