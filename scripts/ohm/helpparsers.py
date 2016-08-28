@@ -205,9 +205,8 @@ class Stage3Parser(OutputParser):
                     os.mkdir(os.path.dirname(dst))
                 shutil.copy2(location, dst)
             except:
-                traceback.print_exc()
-                logging.error(" '%s' does not exist", location)
-                sys.exit(3)
+                logging.exception(" '%s' does not exist", location)
+                raise
 
             self.extrafiles.append(dst)
         OutputParser.handle_startendtag(self, tag, attrs)
