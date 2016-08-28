@@ -25,6 +25,7 @@ class VersionFileBuilder(object):
         self.workfile = workfile
         self.outfile = outfile
         self.gitpath = gitpath
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def rebuild(self):
         """Calls clean then build"""
