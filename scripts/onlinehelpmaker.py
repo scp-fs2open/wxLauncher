@@ -7,7 +7,6 @@ import sys
 import tempfile
 
 from ohm.utilfunctions import rmtree_error_handler
-from ohm.jobs import call_logging_exceptions
 from ohm.jobs.build import build
 
 try:
