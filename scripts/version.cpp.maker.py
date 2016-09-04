@@ -11,10 +11,10 @@ def main(argv):
     parser = argparse.ArgumentParser(
         description="Build .cpp using vcs tool for inclusion in application")
     parser.add_argument('job', choices=['build', 'rebuild', 'clean'])
-    parser.add_argument('workfile', type=os.path.normpath,
-                        help="Temp file")
     parser.add_argument('outfile', type=os.path.normpath,
                         help="output .cpp file")
+    parser.add_argument('workfile', type=os.path.normpath,
+                        help="Temp file")
     parser.add_argument("--gitpath",
                         help="name of git executable to work with."
                         "(default is 'git'",
