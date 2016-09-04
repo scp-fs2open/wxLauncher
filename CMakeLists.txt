@@ -11,13 +11,18 @@ endif()
 # We don't use C but CMake on linux complains if we don't have it enabled
 project(wxlauncher CXX C) 
 
+# Special source directorys
+set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
+list(INSERT CMAKE_MODULE_PATH 0 "${LAUNCHER_CMAKE_SOURCE_DIR}/include")
+set(3RD_PARTY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty)
+
+find_program(GIT_EXECUTABLE git)
+
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 12)
 set(VERSION_PATCH 0)
 
 message("--- Configuring wxLauncher ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-
-list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake/include")
 
 set(CMAKE_OSX_ARCHITECTURES i386)
 
@@ -83,8 +88,6 @@ if(NOT PYTHON_EXECUTABLE)
   # Only try to find python iff not already given
   include(FindPythonInterp) #PYTHON_EXECUTABLE
 endif()
-
-find_program(GIT_EXECUTABLE git)
 
 option(onlinehelpmaker_debug "Have the onlinehelpmaker.py script output debug information" OFF)
 if(onlinehelpmaker_debug)
@@ -383,8 +386,6 @@ if(IS_APPLE)
 endif(IS_APPLE)
 
 # packaging
-set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
-
 if(DEVELOPMENT_MODE)
   message( "Development mode is set. Building of installers is not allowed.  Set DEVELOPMENT_MODE=OFF to build installers.")
   configure_file(${CMAKE_SOURCE_DIR}/cmake/FailCPack.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CPackConfig.cmake COPYONLY)
