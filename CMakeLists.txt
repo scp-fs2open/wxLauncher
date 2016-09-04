@@ -18,11 +18,10 @@ set(3RD_PARTY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty)
 
 find_program(GIT_EXECUTABLE git)
 
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 12)
-set(VERSION_PATCH 0)
+set(VERSION_UPDATE_FROM_GIT ON)
+include(${3RD_PARTY_SOURCE_DIR}/GetVersionFromGitTag.cmake)
 
-message("--- Configuring wxLauncher ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+message("--- Configuring wxLauncher ${wxlauncher_VERSION_STRING_FULL}")
 
 set(CMAKE_OSX_ARCHITECTURES i386)
 
