@@ -18,7 +18,6 @@ set(3RD_PARTY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty)
 
 find_program(GIT_EXECUTABLE git)
 
-set(VERSION_UPDATE_FROM_GIT ON)
 include(${3RD_PARTY_SOURCE_DIR}/GetVersionFromGitTag.cmake)
 
 message("--- Configuring wxLauncher ${wxlauncher_VERSION_STRING_FULL}")
