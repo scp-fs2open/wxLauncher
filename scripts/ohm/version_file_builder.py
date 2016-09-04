@@ -53,7 +53,7 @@ class VersionFileBuilder(object):
         if self.need_to_update():
             self.notices.info("Generating...")
 
-            utilfunctions.make_directory_for_filename(self.workfile)
+            utilfunctions.make_directory_for_filename(self.outfile)
 
             with open(self.outfile, "wb") as out:
                 output = self.VERSION_TMPL.format(
@@ -62,7 +62,7 @@ class VersionFileBuilder(object):
                 out.write(output.encode('utf-8'))
 
             self.notices.info(" Version information written to %s",
-                               self.workfile)
+                              self.outfile)
         else:
             self.notices.info(" Up to date")
 
