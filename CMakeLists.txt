@@ -120,7 +120,7 @@ else(DEVELOPMENT_MODE)
     elseif(IS_APPLE)
       set(RESOURCES_PATH wxlauncher.app/Contents/Resources)
     else()
-      set(RESOURCES_PATH /usr/local/share/wxlauncher/)
+      set(RESOURCES_PATH ${CMAKE_INSTALL_PREFIX}/share/wxlauncher/)
     endif()
   endif()
   set(HELP_HTB_LOCATION ${RESOURCES_PATH}/onlinehelp.htb)
@@ -341,6 +341,10 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${RESOURCE_FILES}
   ${CODE_FILES}
   )
+if (COMMAND target_compile_features)
+  target_compile_features(wxlauncher PRIVATE cxx_auto_type) # Enable C++11 because it is required for wxWidgets 3.0
+endif()
+  
 set_target_properties(wxlauncher
   PROPERTIES LINKER_LANGUAGE CXX
   POSITION_INDEPENDENT_CODE ON)
