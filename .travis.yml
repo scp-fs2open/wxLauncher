@@ -51,3 +51,7 @@ before_script:
     - ./ci/travis/before_script.sh
 script:
     - ./ci/travis/script.sh
+cache:
+    - pip: true
+    - directories:
+        - $HOME/cmake
