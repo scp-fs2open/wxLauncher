@@ -17,11 +17,9 @@ matrix:
           
         - os: linux
           compiler: clang
-          env: CONFIGURATION="Debug"
           env: CONFIGURATION="Debug" wxWidgets_ver=2.8
         - os: linux
           compiler: clang
-          env: CONFIGURATION="Debug"
           env: CONFIGURATION="Debug" wxWidgets_ver=3.0
           
         - os: osx
@@ -30,21 +28,17 @@ matrix:
 
         - os: linux
           compiler: gcc
-          env: CONFIGURATION="Release"
-          env: CONFIGURATION="Debug" wxWidgets_ver=2.8
+          env: CONFIGURATION="Release" wxWidgets_ver=2.8
         - os: linux
           compiler: gcc
-          env: CONFIGURATION="Release"
-          env: CONFIGURATION="Debug" wxWidgets_ver=3.0
+          env: CONFIGURATION="Release" wxWidgets_ver=3.0
           
         - os: linux
           compiler: clang
-          env: CONFIGURATION="Release"
-          env: CONFIGURATION="Debug" wxWidgets_ver=2.8
+          env: CONFIGURATION="Release" wxWidgets_ver=2.8
         - os: linux
           compiler: clang
-          env: CONFIGURATION="Release"
-          env: CONFIGURATION="Debug" wxWidgets_ver=3.0
+          env: CONFIGURATION="Release" wxWidgets_ver=3.0
           
         - os: osx
           compiler: clang
