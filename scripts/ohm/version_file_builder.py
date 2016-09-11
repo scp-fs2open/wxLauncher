@@ -3,8 +3,6 @@ from __future__ import (absolute_import, division,
 
 import logging
 
-from builtins import *
-
 import os
 import os.path
 import subprocess
@@ -27,20 +25,6 @@ class VersionFileBuilder(object):
         self.gitpath = gitpath
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def rebuild(self):
-        """Calls clean then build"""
-        self.clean()
-        self.build()
-
-    def clean(self):
-        """Removes all temporary files and the output files that were passed,
-    if they exist"""
-
-        self.notices.info("Cleaning...")
-
-        self.remove_file(self.outfile)
-        self.remove_file(self.workfile)
-
     def remove_file(self, filename):
         try:
             os.remove(filename)
@@ -56,10 +40,13 @@ class VersionFileBuilder(object):
             utilfunctions.make_directory_for_filename(self.outfile)
 
             with open(self.outfile, "wb") as out:
+                git_id = self.get_git_id()
                 output = self.VERSION_TMPL.format(
-                    version=self.get_git_id(),
+                    version=git_id,
                     date=self.get_git_date())
                 out.write(output.encode('utf-8'))
+                with open(self.workfile, "wb") as work:
+                    work.write(git_id.encode('utf-8'))
 
             self.notices.info(" Version information written to %s",
                               self.outfile)
@@ -109,11 +96,11 @@ class VersionFileBuilder(object):
         if os.path.exists(self.workfile):
             if os.path.exists(self.outfile):
                 # check the id to see if it has changed
-                workfile = open(self.workfile, 'rb')
-                if workfile.readline() == self.get_git_id():
-                    return False
-                else:
-                    self.notices.info(" git id changed")
+                with open(self.workfile, 'rb') as work:
+                    if work.readline().decode('utf-8') == self.get_git_id():
+                        return False
+                    else:
+                        self.notices.info(" git id changed")
             else:
                 self.notices.info(" %s does not exist", self.outfile)
         else:

@@ -29,10 +29,6 @@ def main(argv):
 
     if options.job == "build":
         maker.build()
-    elif options.job == "rebuild":
-        maker.rebuild()
-    elif options.job == "clean":
-        maker.clean()
     else:
         parser.error("Invalid JOB type. Use build, rebuild, or clean.")
         sys.exit(2)
