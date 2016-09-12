@@ -9,8 +9,8 @@ try:
 except ImportError:
     from HTMLParser import HTMLParser
 
-from .dataclasses import Tag
-from .utilfunctions import update_attribute, change_filename
+from ohm.dataclasses import Tag
+from ohm.utilfunctions import update_attribute, change_filename
 
 
 class OutputParser(HTMLParser):

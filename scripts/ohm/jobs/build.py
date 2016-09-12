@@ -5,8 +5,7 @@ import zipfile
 
 import markdown
 
-from ..helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
-
+from ohm.help_parsers.helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
 from ..utilfunctions import change_filename
 
 
