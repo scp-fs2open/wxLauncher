@@ -80,10 +80,9 @@ def main(argv):
         atexit.register(cleanup, args.temp)
 
     if 'function' in args:
-        ret = args.function(args)
+        return args.function(args)
     else:
-        ret = 1
-    sys.exit(ret)
+        parser.error("No sub-command selected")
 
 
 def enum_directories(dir):
@@ -95,4 +94,4 @@ def enum_directories(dir):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    sys.exit(main(sys.argv[1:]))
