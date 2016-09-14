@@ -325,16 +325,18 @@ def process_input_stage5(options, files, extrafiles):
             parser.close()
             outfile.close()
 
+            filename_in_indexes = filename_in_archive.replace('\\', '/')
+
             tocfile.write(INDEXES_FILE_TEMPLATE % {
                 "tab": "\t"*level,
                 "name": parser.title,
-                "file": filename_in_archive
+                "file": filename_in_indexes
             })
 
             indexfile.write(INDEXES_FILE_TEMPLATE % {
                 "tab": "\t",
                 "name": parser.title,
-                "file": filename_in_archive
+                "file": filename_in_indexes
             })
 
     tocfile.write(generate_sections([], last_path_list))
