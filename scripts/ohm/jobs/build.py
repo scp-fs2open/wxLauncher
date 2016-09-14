@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import logging
 import os
 import shutil
@@ -5,7 +7,8 @@ import zipfile
 
 import markdown
 
-from ohm.help_parsers.helpparsers import Stage2Parser, Stage3Parser, Stage4Parser, Stage5Parser
+from ..help_parsers.helpparsers import (Stage2Parser, Stage3Parser,
+                                        Stage4Parser, Stage5Parser)
 from ..utilfunctions import change_filename
 
 
