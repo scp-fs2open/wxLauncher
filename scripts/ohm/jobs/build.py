@@ -228,6 +228,14 @@ HTB_HEADER_TEMPLATE = "\n".join([
     "Charset=UTF-8",
     ""])
 
+INDEXES_FILE_TEMPLATE = "\n".join([
+    '%(tab)s<li>',
+    '%(tab)s\t<object type="text/sitemap">',
+    '%(tab)s\t\t<param name="Name" value="%(name)s">',
+    '%(tab)s\t\t<param name="Local" value="%(file)s">',
+    '%(tab)s\t</object>',
+    ''])
+
 
 def process_input_stage5(options, files, extrafiles):
     """Generate the index and table of contents"""
@@ -317,17 +325,17 @@ def process_input_stage5(options, files, extrafiles):
             parser.close()
             outfile.close()
 
-            tocfile.write(
-                """%(tab)s<li> <object type="text/sitemap">\n%(tab)s     <param name="Name" value="%(name)s">\n%(tab)s     <param name="Local" value="%(file)s">\n%(tab)s    </object>\n""" % {
-                    "tab": "     " * level,
-                    "name": parser.title,
-                    "file": filename_in_archive,})
+            tocfile.write(INDEXES_FILE_TEMPLATE % {
+                "tab": "\t"*level,
+                "name": parser.title,
+                "file": filename_in_archive
+            })
 
-            indexfile.write(
-                """%(tab)s<li> <object type="text/sitemap">\n%(tab)s\t<param name="Name" value="%(name)s">\n%(tab)s\t<param name="Local" value="%(file)s">\n%(tab)s </object>\n""" % {
-                    "tab": "\t",
-                    "name": parser.title,
-                    "file": filename_in_archive,})
+            indexfile.write(INDEXES_FILE_TEMPLATE % {
+                "tab": "\t",
+                "name": parser.title,
+                "file": filename_in_archive
+            })
 
     tocfile.write(generate_sections([], last_path_list))
     tocfile.write("</ul>\n")
