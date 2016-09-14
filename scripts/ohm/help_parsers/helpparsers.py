@@ -48,7 +48,7 @@ class OutputParser(HTMLParser):
         logging.debug(" Data: %s", data)
         if len(self.tag_stack) > 0:
             tag = self.tag_stack.pop()
-            if tag.data:
+            if tag.data is not None:
                 tag.data += data
             else:
                 tag.data = data
@@ -73,7 +73,7 @@ class OutputParser(HTMLParser):
         When tag stack is empty, writes tag to file passed in the constructor.
         When tag stack is not empty formats the tag and sets (or if the next
         tag.data is not None, appends) the formatted string."""
-        if tag.data:
+        if tag.data is None:
             s = "<%s%s />" % (tag.name, self.format_attributes(tag))
         else:
             s = "<%s%s>%s</%s>" % (
@@ -81,7 +81,7 @@ class OutputParser(HTMLParser):
 
         if len(self.tag_stack) > 0:
             tag = self.tag_stack.pop()
-            if tag.data:
+            if tag.data is not None:
                 tag.data += s
             else:
                 tag.data = s
@@ -238,7 +238,7 @@ class Stage4Parser(OutputParser):
                 subdirdepth = len(self.subdir.split(os.path.sep))
                 prefix = "../" * subdirdepth
                 relpath = os.path.join(prefix, value[1:])
-                if self._path_exists(self.subdir, relpath):
+                if not self._path_exists(self.subdir, relpath):
                     raise ValueError("Cannot relativize path: %s", value)
                 else:
                     attrs = update_attribute(attrs, 'src', relpath)
