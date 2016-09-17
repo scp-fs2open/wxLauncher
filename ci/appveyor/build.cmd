@@ -1,6 +1,8 @@
 setlocal ENABLEEXTENSIONS
 
-call %VCVARSALL% %ARCH%
+echo on
+
+call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %ARCH%
 echo %INCLUDE%
 echo %LIB%
 echo %LIBPATH%
