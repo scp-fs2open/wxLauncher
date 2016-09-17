@@ -1647,8 +1647,12 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	for (unsigned int i = 0; i < resChoice.GetCount(); ++i) {
 		res = dynamic_cast<Resolution*>(resChoice.GetClientObject(i));
 		wxCHECK_MSG(res != NULL, wxNOT_FOUND,
-			wxString::Format(_T("choice does not have Resolution object at index %u"), i));
-		// FIXME could be clever and only read the highest resolution in each aspect ratio group
+			wxString::Format(
+				_T("choice does not have Resolution object at index %u"), i));
+
+		// We could store somewhere the highest resolutions for each
+		// aspect ratio but 'n' is pretty small, so it is not
+		// worth the space or complexity tradeoff
 		if (!res->IsHeader()) {
 			int resProduct = res->GetWidth() * res->GetHeight();
 			if (resProduct > maxResProduct) {
@@ -1658,10 +1662,12 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 		}
 	}
 	
-	wxCHECK_MSG(maxResIndex > -1, wxNOT_FOUND, _T("maximum Resolution was not found"));
+	wxCHECK_MSG(maxResIndex > -1, wxNOT_FOUND,
+		_T("maximum Resolution was not found"));
 	
 	res = dynamic_cast<Resolution*>(resChoice.GetClientObject(maxResIndex));
-	wxCHECK_MSG(res != NULL, wxNOT_FOUND, _T("Choice is missing max Resolution object"));
+	wxCHECK_MSG(res != NULL, wxNOT_FOUND,
+		_T("Choice is missing max Resolution object"));
 	width = res->GetWidth();
 	height = res->GetHeight();
 	
@@ -1670,21 +1676,29 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	return maxResIndex;
 }
 
-void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event)) {
+void BasicSettingsPage::OnSelectVideoResolution(
+	wxCommandEvent &WXUNUSED(event))
+{
 	wxChoice* choice = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
-	wxCHECK_RET( choice != NULL, _T("Unable to find resolution combo"));
+	wxCHECK_RET( choice != NULL,
+		_T("Unable to find resolution combo"));
 
 	Resolution* res = dynamic_cast<Resolution*>(
 		choice->GetClientObject(choice->GetSelection()));
-	wxCHECK_RET( res != NULL, _T("Choice does not have Resolution objects"));
+	wxCHECK_RET( res != NULL,
+		_T("Choice does not have Resolution objects"));
 
-	if (res->IsHeader()) { // then advance to first resolution in the header's list
+	if (res->IsHeader()) {
+		// User picked aspect ratio, turn that into a real
+		// resolution rather than an aspect ratio
 		choice->SetSelection(choice->GetSelection() + 1);
 	}
 	
-	res = dynamic_cast<Resolution*>(choice->GetClientObject(choice->GetSelection()));
-	wxCHECK_RET( res != NULL, _T("after adjusting selection from header, Choice does not have Resolution objects"));
+	res = dynamic_cast<Resolution*>(
+		choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( res != NULL,
+		_T("Cho2ce does not have Resolution objects"));
 	
 	const long width = static_cast<long>(res->GetWidth());
 	const long height = static_cast<long>(res->GetHeight());
@@ -1698,9 +1712,11 @@ void BasicSettingsPage::OnSelectVideoResolution(wxCommandEvent &WXUNUSED(event))
 	
 	// update ResolutionMap
 	const ModItem* activeMod = ModList::GetActiveMod();
-	wxCHECK_RET(activeMod != NULL, _T("OnSelectVideoResolution: activeMod is NULL!"));
+	wxCHECK_RET(activeMod != NULL,
+		_T("OnSelectVideoResolution: activeMod is NULL!"));
 	
-	ResolutionMap::ResolutionWrite(activeMod->shortname, ResolutionData(width, height));
+	ResolutionMap::ResolutionWrite(activeMod->shortname,
+		ResolutionData(width, height));
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
