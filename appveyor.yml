@@ -5,4 +5,4 @@ environment:
                 - ARCH: "x86"
                 - BUILDTYPE: Release
 build_script:
-        - cmd: %APPVEYOR_BUILD_FOLDER/ci/appveyor/build.cmd
+        - cmd: "%APPVEYOR_BUILD_FOLDER/ci/appveyor/build.cmd"
