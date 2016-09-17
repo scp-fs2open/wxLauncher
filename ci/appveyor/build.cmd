@@ -2,12 +2,13 @@ setlocal ENABLEEXTENSIONS
 
 echo on
 
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %ARCH%
+call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %Platform%
 echo %INCLUDE%
 echo %LIB%
 echo %LIBPATH%
 
 set
+dir
 
 cd %APPVEYOR_BUILD_FOLDER%
 if not exist build (mkdir build)
