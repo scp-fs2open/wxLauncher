@@ -118,13 +118,10 @@ EVT_TEXT_ENTER(ID_CLONE_PROFILE_NEWNAME, CloneProfileDialog::OnPressEnterKey)
 EVT_CHECKBOX(ID_CLONE_PROFILE_CHECKBOX, CloneProfileDialog::OnClickCloneCheckbox)
 END_EVENT_TABLE()
 
-WelcomePage::WelcomePage(wxWindow* parent): wxPanel(parent, wxID_ANY) {
-	// member varirable init
-	this->lastLinkInfo = NULL;
+WelcomePage::WelcomePage(wxWindow* parent):
+	wxPanel(parent, wxID_ANY), lastLinkInfo(NULL), needToUpdateNews(false)
+{
 	ProMan* proman = ProMan::GetProfileManager();
-
-	wxLogDebug(_T("WelcomePage is at %p."), this);
-	
 	SkinSystem::RegisterTCSkinChanged(this);
 
 #if 0
