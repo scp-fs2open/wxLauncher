@@ -164,7 +164,10 @@ bool JoyMan::Initialize(ApiType apiType) {
 #if HAS_SDL
 	if (currentApi == API_SDL)
 	{
-		SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC);
+		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
+			wxLogError(wxT_2("SDL Joystick failed to initialize."));
+			return false;
+		}
 
 		JoyMan::clearSDLJoystickList();
 
