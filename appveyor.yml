@@ -2,7 +2,10 @@ shallow_clone: true
 environment:
         matrix:
                 - WXVER: "2.8"
-                - ARCH: "x86"
-                - BUILDTYPE: Release
+platform:
+        - x86
+configuration:
+        - RelDbgInfo
+        - Debug
 build_script:
-        - cmd: "%APPVEYOR_BUILD_FOLDER/ci/appveyor/build.cmd"
+        - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
