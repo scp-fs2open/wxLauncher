@@ -47,11 +47,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h" // Last include for memory debugging
 
-#ifndef WIN32
-// main needs to be handled by us as SDL interferes with wxWidgets
+#if IS_LINUX
+// main needs to be handled by us on non-Mac *nix as SDL interferes with wxWidgets
 IMPLEMENT_APP_NO_MAIN(wxLauncher);
 #else
 // Windows is fine and also needs special WinMain treatment
+// OS X can't have SDL2 and wxWidgets 3 both initializing at startup
 IMPLEMENT_APP(wxLauncher);
 #endif
 
@@ -283,8 +284,8 @@ int wxLauncher::OnExit() {
 		HelpManager::DeInitialize();
 		SkinSystem::DeInitialize();
 
-#if HAS_SDL == 1
-		SDL_Quit();
+#if HAS_SDL
+		SDL_QuitSubSystem(SDL_INIT_VIDEO);
 #endif
 
 	}
@@ -294,11 +295,11 @@ int wxLauncher::OnExit() {
 	return wxApp::OnExit();
 }
 
-#ifndef WIN32
+#if IS_LINUX
 int main(int argc, char** argv)
 {
 #if HAS_SDL == 1
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
 		wxLogFatalError(wxT_2("SDL_Init failed"));
 		return 1;

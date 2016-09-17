@@ -316,6 +316,8 @@ set(API_CODE_FILES
   code/apis/ProfileManagerOperator.cpp
   code/apis/ProfileProxy.h
   code/apis/ProfileProxy.cpp
+  code/apis/resolution_manager.hpp
+  code/apis/resolution_manager.cpp
   code/apis/SkinManager.h
   code/apis/SkinManager.cpp
   code/apis/SpeechManager.h
