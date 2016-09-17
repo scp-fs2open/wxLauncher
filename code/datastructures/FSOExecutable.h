@@ -44,6 +44,7 @@ public:
 	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
+	static bool SmellsLikeGitCommitHash(const wxString& str);
 	wxString GetVersionString() const;
 protected:
 	int major;
@@ -54,6 +55,8 @@ protected:
 	bool _64bit;
 	Configuration configuration;
 	int build;
+	long year;
+	long month;
 	bool antipodes;
 	int antNumber; //!< antipodes number (such as 8)
 	wxString string;

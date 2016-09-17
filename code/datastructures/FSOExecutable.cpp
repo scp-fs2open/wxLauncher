@@ -23,23 +23,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "global/MemoryDebugging.h"
 
+// on linux these seem to be defined to be gnu_dev_*
+#ifdef major
+#undef major
+#endif
+#ifdef minor
+#undef minor
+#endif
+
 enum BuildCapabilities_enum {
 	SUPPORT_OPENAL			= 1<<0,
 	NOT_SUPPORT_DIRECT3D	= 1<<1,
 } BuildCapabilities;
 
-FSOExecutable::FSOExecutable() {
-	major = 0;
-	minor = 0;
-	revision = 0;
-	inferno = false;
-	sse = 0;
-	configuration = CONFIG_RELEASE;
-	build = 0;
-	antipodes = false;
-	antNumber = 0;
-	buildCaps = 0;
-	_64bit = false;
+FSOExecutable::FSOExecutable():
+	major(0), minor(0), revision(0),
+	inferno(false), sse(0), _64bit(false),
+	configuration(CONFIG_RELEASE),
+	build(0), year(0), month(0),
+	antipodes(false),antNumber(0),
+	buildCaps(0)
+{
 }
 
 FSOExecutable::~FSOExecutable() {
@@ -229,18 +233,34 @@ FSOExecutable FSOExecutable::GetBinaryVersion(wxString binaryname) {
 		} else if ( !token.CmpNoCase(_T("app")) ) {
 			break; // we've reached the end of the app name
 #endif
-		} else if ( token.ToLong(&tempVersion) && token.size() == 8 ) {
+		} else if (token.ToLong(&tempVersion) && token.size() == 8) {
 			// must be a date from a nightly build; add it to the string
 			if (!ver.string.IsEmpty()) {
 				ver.string += _T(" ");
 			}
+			wxString year(token.Mid(0, 4));
+			wxString month(token.Mid(4, 2));
+			wxString day(token.Mid(6, 2));
+
+			year.ToLong(&ver.year);
+			year.ToLong(&ver.month);
+			// not interested in the day at this time
+
 			// add it in YYYY-MM-DD format
-			ver.string += token.Mid(0, 4);
+			ver.string += year;
 			ver.string += _T("-");
-			ver.string += token.Mid(4, 2);
+			ver.string += month;
 			ver.string += _T("-");
-			ver.string += token.Mid(6, 2);
-		} else if ( token.ToLong(&tempVersion) && ver.antipodes && ver.antNumber == 0) {
+			ver.string += day;
+		} else if ( (ver.year > 2015 || (ver.year == 2015 && ver.month > 5))
+			&& token.size() == 7 && SmellsLikeGitCommitHash(token))
+		{
+			// must be a commit hash on a nightly build
+			if (ver.string.size() > 0) {
+				ver.string += _T(' ');
+			}
+			ver.string += token;
+		} else if (token.ToLong(&tempVersion) && ver.antipodes && ver.antNumber == 0) {
 			// must be antipodes number
 			if ( tempVersion > 0 ) {
 				ver.antNumber = (int)tempVersion;
@@ -446,4 +466,34 @@ wxString FSOExecutable::GetVersionString() const {
 		(this->sse == 0) ? wxEmptyString : sseStr.c_str(),
 		(this->_64bit) ? _T(" 64-bit") : wxEmptyString
 		);
+}
+
+bool FSOExecutable::SmellsLikeGitCommitHash(const wxString & str)
+{
+	auto c = str.begin();
+	while (c != str.end()) {
+		switch (int(*c)) {
+		case _T('0'):
+		case _T('1'):
+		case _T('2'):
+		case _T('3'):
+		case _T('4'):
+		case _T('5'):
+		case _T('6'):
+		case _T('7'):
+		case _T('8'):
+		case _T('9'):
+		case _T('a'):
+		case _T('b'):
+		case _T('c'):
+		case _T('d'):
+		case _T('e'):
+		case _T('f'):
+			break;
+		default:
+			return false;
+		}
+		c++;
+	}
+	return true;
 }
