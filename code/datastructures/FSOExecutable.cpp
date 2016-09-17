@@ -28,18 +28,14 @@ enum BuildCapabilities_enum {
 	NOT_SUPPORT_DIRECT3D	= 1<<1,
 } BuildCapabilities;
 
-FSOExecutable::FSOExecutable() {
-	major = 0;
-	minor = 0;
-	revision = 0;
-	inferno = false;
-	sse = 0;
-	configuration = CONFIG_RELEASE;
-	build = 0;
-	antipodes = false;
-	antNumber = 0;
-	buildCaps = 0;
-	_64bit = false;
+FSOExecutable::FSOExecutable():
+	major(0), minor(0), revision(0),
+	inferno(false), sse(0),
+	configuration(CONFIG_RELEASE),
+	build(0),
+	antipodes(false),antNumber(0),
+	buildCaps(0), _64bit(false)
+{
 }
 
 FSOExecutable::~FSOExecutable() {
