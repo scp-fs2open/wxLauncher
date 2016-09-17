@@ -1,4 +1,4 @@
-shallow_clone: true
+clone_depth: 5
 environment:
         matrix:
                 - WXVER: "2.8"
