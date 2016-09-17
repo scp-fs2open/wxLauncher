@@ -1987,10 +1987,11 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 	wxASSERT(!deviceProfileEntryName.IsEmpty());
 	
 	if (availableDevices.IsEmpty()) {
-		wxASSERT_MSG(deviceType == CAPTURE,
-			_T("No sound devices were found on the system."));
-		
-		wxLogDebug(_T("No capture devices were found on the system."));
+		if (deviceType == PLAYBACK) {
+			wxLogWarning(_T("No playback devices were found on the system."));
+		} else {
+			wxLogInfo(_T("No capture devices were found on the system."));
+		}
 		return;
 	}
 	
