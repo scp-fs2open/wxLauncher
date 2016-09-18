@@ -30,7 +30,7 @@ if (Test-Path $wxfile) {
 }
 if (-Not (Test-Path $wxfile)) {
 	echo "Fetching zip"
-	Invoke-WebRequest $wxurl -outfile $wxfile
+	(new-object net.webclient).DownloadFile($wxurl, $wxfile)
 }
 
 $sum = Get-FileHash -LiteralPath $wxfile -Algorithm "SHA256"
