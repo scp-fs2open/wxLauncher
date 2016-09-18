@@ -21,8 +21,3 @@ echo.
 echo Building
 nmake
 if ERRORLEVEL 1 exit /b %ERRORLEVEL%
-
-echo.
-echo Making package
-nmake package
-if ERRORLEVEL 1 exit /b %ERRORLEVEL%
