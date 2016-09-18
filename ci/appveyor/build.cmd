@@ -10,7 +10,7 @@ cd build
 
 echo.
 echo Configuring build
-cmake .. -G "NMake Makefiles" -DWXVER=%WXVER% -DCMAKE_BUILD_TYPE=%BUILDTYPE%
+cmake .. -G "NMake Makefiles" -DWXVER=%WXVER% -DCMAKE_BUILD_TYPE=%Configuration%
 if ERRORLEVEL 1 exit /b %ERRORLEVEL%
 
 echo.

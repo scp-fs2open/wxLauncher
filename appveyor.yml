@@ -6,5 +6,7 @@ platform:
 configuration:
         - RelDbgInfo
         - Debug
+before_build:
+        - ps1: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
 build_script:
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
