@@ -7,5 +7,5 @@ configuration:
         - RelDbgInfo
         - Debug
 build_script:
-        - "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
+        - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
