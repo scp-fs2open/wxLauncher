@@ -2,9 +2,6 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
 import traceback
-
-from builtins import *
-
 import logging
 import os
 import os.path
