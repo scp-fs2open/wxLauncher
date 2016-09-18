@@ -55,6 +55,7 @@ public:
 	};
 	static bool Initialize(Flags flags = None);
 	static bool DeInitialize();
+	static bool IsInitialized() { return isInitialized; }
 	static ProMan* GetProfileManager();
 
 	virtual ~ProMan();

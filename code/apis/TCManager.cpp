@@ -31,7 +31,9 @@ cases and will be able to update the information. */
 /** Contructor. Static class does nothing. */
 TCManager::TCManager() {
 	wxLogDebug(_T("TCManager is at %p."), this);
-	ProMan::GetProfileManager()->AddEventHandler(this);
+	if (ProMan::IsInitialized()) {
+		ProMan::GetProfileManager()->AddEventHandler(this);
+	}
 }
 /** Destructor. Static class does nothing. */
 TCManager::~TCManager() {
