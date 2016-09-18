@@ -1,4 +1,6 @@
 environment:
+        WXWIDGETS2.8: C:\wxMSW-2.8.12
+        WXWIDGETS3.1: C:\wxWidgets-3.1.0
         matrix:
                 - WXVER: "2.8"
 platform:
@@ -7,7 +9,5 @@ configuration:
         - RelDbgInfo
         - Debug
 build_script:
-        - set WXWIDGETS2.8=C:\wxMSW-2.8.12
-        - set WXWIDGETS3.1=C:\wxWidgets-3.1.0
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
