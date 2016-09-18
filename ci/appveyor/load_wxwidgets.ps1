@@ -18,8 +18,10 @@ if (Test-Path $wxdir) {
 	echo "$($wxdir) already exists"
 	exit 0
 }
+echo "$($wxdir) is missing. Getting wx"
 
 if (Test-Path $wxfile) {
+	echo "Zip exists"
 	$sum = Get-FileHash -LiteralPath $wxfile -Algorithm "SHA256"
 	if ($sum.Hash -ne $sha2sum) {
 		echo "Current file hash doesn't match"
@@ -27,6 +29,7 @@ if (Test-Path $wxfile) {
 	}
 }
 if (-Not (Test-Path $wxfile)) {
+	echo "Fetching zip"
 	Invoke-WebRequest $wxurl -outfile $wxfile
 }
 
