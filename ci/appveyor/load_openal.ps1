@@ -11,7 +11,7 @@ if (Test-Path $openaldir) {
 	echo "$($openaldir) already exists"
 	exit 0
 }
-echo "$($openaldir) is missing. Getting wx"
+echo "$($openaldir) is missing. Getting openal"
 
 if (Test-Path $openalfile) {
 	echo "Zip exists"

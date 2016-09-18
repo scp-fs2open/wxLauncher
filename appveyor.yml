@@ -12,7 +12,9 @@ platform:
 configuration:
         - RelDbgInfo
         - Debug
-build_script:
+install:
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_openal.ps1"
+        - %PYTHON%\Scripts\pip.exe install markdown
+build_script:
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
