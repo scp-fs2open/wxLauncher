@@ -1,12 +1,14 @@
+Get-Childitem -Path Env:* | Sort-Object Name
+
 if ($ENV:WXVER -eq "2.8") {
 	$wxurl = "https://github.com/wxWidgets/wxWidgets/releases/download/v2.8.12/wxMSW-2.8.12.zip"
-	$wxdir = $ENV:WXWIDGETS2.8
+	$wxdir = ${ENV:WXWIDGETS2.8}
 	$wxfile = "wxMSW-2.8.12.zip"
 	$sha2sum = "307D713D8AFFBED69A89418D9C9073193AADFEF4B16DA3D8EF68558A9F57AE88"
 	$7zipoutdir = "C:\"
 } else {
 	$wxurl = "https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.7z"
-	$wxdir = $ENV:WXWIDGETS3.1
+	$wxdir = ${ENV:WXWIDGETS3.1}
 	$wxfile = "wxWidgets-3.1.0.7z"
 	$sha2sum = "FDB970D6D3278B5ABD999E6F87295C2162E64184826D07B1AA26AB1E3E46BA27"
 	$7zipoutdir = $wxdir
