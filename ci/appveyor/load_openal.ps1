@@ -44,10 +44,4 @@ cd $openaldir
 
 cd build
 
-echo "Configuring..."
-$configure_args = "..", "-G", "NMake Makefiles", "-DCMAKE_BUILD_TYPE=Release"
-& cmake $configure_args
-
-echo "Building"
-$build_args = "--build", "."
-& cmake $build_args
+& "$($start_dir.Path)\ci\appveyor\build_wxwidgets.cmd"
