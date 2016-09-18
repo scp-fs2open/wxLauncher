@@ -1,8 +1,12 @@
 environment:
         WXWIDGETS2.8: C:/wxMSW-2.8.12
         WXWIDGETS3.1: C:/wxWidgets-3.1.0
+        OPENAL: C:\openal-soft-1.17.2
+        OPENAL_LIBRARY: C:\openal-soft-1.17.2\build\OpenAL.lib
+        OPENAL_INCLUDE_DIR: C:\openal-soft-1.17.2\include\AL
         matrix:
                 - WXVER: "2.8"
+                - WXVER: "3.1"
 platform:
         - x86
 configuration:
@@ -10,4 +14,5 @@ configuration:
         - Debug
 build_script:
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
+        - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_openal.ps1"
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
