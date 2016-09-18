@@ -604,7 +604,9 @@ ModList::ModList(wxWindow *parent, wxSize& size, wxString tcPath)
 
 /** the dtor.  Cleans up stuff. */
 ModList::~ModList() {
-	SkinSystem::UnRegisterTCSkinChanged(this);
+	if (SkinSystem::IsInitialized()) {
+		SkinSystem::UnRegisterTCSkinChanged(this);
+	}
 	
 	if ( this->configFiles != NULL ) {
 		delete this->configFiles;
