@@ -44,4 +44,4 @@ cd $openaldir
 
 cd build
 
-& "$($start_dir.Path)\ci\appveyor\build_wxwidgets.cmd"
+& "$($start_dir.Path)\ci\appveyor\build_openal.cmd"
