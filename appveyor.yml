@@ -6,7 +6,9 @@ environment:
         OPENAL_INCLUDE_DIR: C:\openal-soft-1.17.2\include\AL
         matrix:
                 - WXVER: "2.8"
+                  PYTHON: "C:\\Python35"
                 - WXVER: "3.1"
+                  PYTHON: "C:\\Python35"
 platform:
         - x86
 configuration:
