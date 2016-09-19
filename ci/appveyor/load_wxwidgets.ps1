@@ -22,7 +22,7 @@ if (Test-Path $wxdir) {
 echo "$($wxdir) is missing. Getting wx"
 
 if (Test-Path $wxfile) {
-	echo "Zip exists"
+	echo "Zip exists $wxfile"
 	$sum = Get-FileHash -LiteralPath $wxfile -Algorithm "SHA256"
 	if ($sum.Hash -ne $wxsum) {
 		echo "Current file hash doesn't match"
@@ -30,7 +30,7 @@ if (Test-Path $wxfile) {
 	}
 }
 if (-Not (Test-Path $wxfile)) {
-	echo "Fetching zip"
+	echo "Fetching $wxfile from $wxurl"
 	(new-object net.webclient).DownloadFile($wxurl, $wxfile)
 }
 
