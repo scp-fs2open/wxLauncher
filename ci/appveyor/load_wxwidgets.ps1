@@ -2,10 +2,22 @@ Get-Childitem -Path Env:* | Sort-Object Name
 
 $start_dir = $pwd
 switch ($ENV:WXVER) {
-	"2.8" {$wxdir = ${ENV:WXWIDGETS2.8} }
-	"2.8-stl" {$wxdir = ${ENV:WXWIDGETS2.8-stl} }
-	"3.1" {$wxdir = ${ENV:WXWIDGETS3.1} }
-	"3.1-stl" {$wxdir = ${ENV:WXWIDGETS3.1-stl} }
+	"2.8" {
+		$wxdir = ${ENV:WXWIDGETS2.8}
+		$stl = 'No'
+	}
+	"2.8-stl" {
+		$wxdir = ${ENV:WXWIDGETS2.8-stl}
+		$stl = 'Yes'
+	}
+	"3.1" {
+		$wxdir = ${ENV:WXWIDGETS3.1}
+		$stl = 'No'
+	}
+	"3.1-stl" {
+		$wxdir = ${ENV:WXWIDGETS3.1-stl}
+		$stl = 'Yes'
+	}
 	default {
 		echo "$($ENV:WXVER) is unhandled"
 		exit 4
@@ -50,6 +62,13 @@ cd $wxdir
 
 # Include is not needed and can be removed http://stackoverflow.com/a/17144445
 (Get-Content src/msw/window.cpp) -replace '#include <pbt.h>', '' | Set-Content src/msw/window.cpp
+$setuph = "include/msw/setup.h"
+if ($stl -eq 'Yes') {
+	echo "Mangling $setuph"
+	(Get-Content $setuph) -replace '#define wxUSE_STL 0', '#define wxUSE_STL 1' | Set-Content $setuph
+} else {
+	echo "Not magngling $setuph"
+}
 
 cd build\msw
 
