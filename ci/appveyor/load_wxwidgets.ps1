@@ -1,7 +1,7 @@
 Get-Childitem -Path Env:* | Sort-Object Name
 
 $start_dir = $pwd
-$wxdir = ${ENV:WXWIDGETS$`{ENV:WXVER}}
+$wxdir = ${ENV:WXWIDGETS$`{ENV:WXVER`}}
 $wxfile = $ENV:WXFILE
 $wxurl = $ENV:WXURL
 $wxsum = $ENV:WXSUM
