@@ -1,7 +1,16 @@
 Get-Childitem -Path Env:* | Sort-Object Name
 
 $start_dir = $pwd
-$wxdir = ${ENV:WXWIDGETS$`{ENV:WXVER`}}
+switch ($ENV:WXVER) {
+	"2.8" {$wxdir = ${ENV:WXWIDGETS2.8} }
+	"2.8-stl" {$wxdir = ${ENV:WXWIDGETS2.8-stl} }
+	"3.1" {$wxdir = ${ENV:WXWIDGETS3.1} }
+	"3.1-stl" {$wxdir = ${ENV:WXWIDGETS3.1-stl} }
+	default {
+		echo "$($ENV:WXVER) is unhandled"
+		exit 4
+	}
+}
 $wxfile = $ENV:WXFILE
 $wxurl = $ENV:WXURL
 $wxsum = $ENV:WXSUM
