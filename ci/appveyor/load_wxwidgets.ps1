@@ -1,20 +1,10 @@
 Get-Childitem -Path Env:* | Sort-Object Name
 
-if ($ENV:WXVER -eq "2.8") {
-	$wxurl = "https://github.com/wxWidgets/wxWidgets/releases/download/v2.8.12/wxMSW-2.8.12.zip"
-	$wxdir = ${ENV:WXWIDGETS2.8}
-	$wxfile = "wxMSW-2.8.12.zip"
-	$sha2sum = "307D713D8AFFBED69A89418D9C9073193AADFEF4B16DA3D8EF68558A9F57AE88"
-	$7zipoutdir = "C:\"
-} else {
-	$wxurl = "https://github.com/wxWidgets/wxWidgets/releases/download/v3.1.0/wxWidgets-3.1.0.7z"
-	$wxdir = ${ENV:WXWIDGETS3.1}
-	$wxfile = "wxWidgets-3.1.0.7z"
-	$sha2sum = "FDB970D6D3278B5ABD999E6F87295C2162E64184826D07B1AA26AB1E3E46BA27"
-	$7zipoutdir = $wxdir
-}
-
 $start_dir = $pwd
+$wxdir = ${ENV:WXWIDGETS${ENV:WXVER}}
+$wxfile = $ENV:WXFILE
+$wxurl = $ENV:WXURL
+$wxsum = $ENV:WXSUM
 
 if (Test-Path $wxdir) {
 	echo "$($wxdir) already exists"
@@ -25,7 +15,7 @@ echo "$($wxdir) is missing. Getting wx"
 if (Test-Path $wxfile) {
 	echo "Zip exists"
 	$sum = Get-FileHash -LiteralPath $wxfile -Algorithm "SHA256"
-	if ($sum.Hash -ne $sha2sum) {
+	if ($sum.Hash -ne $wxsum) {
 		echo "Current file hash doesn't match"
 		Remove-Item $wxfile
 	}
@@ -36,20 +26,18 @@ if (-Not (Test-Path $wxfile)) {
 }
 
 $sum = Get-FileHash -LiteralPath $wxfile -Algorithm "SHA256"
-if ($sum.Hash -ne $sha2sum) {
+if ($sum.Hash -ne $wxsum) {
 	echo "ERROR: $($wxfile) is corrupt"
-	echo "Orig: $($sha2sum)"
+	echo "Orig: $($wxsum)"
 	echo "Calc: $($sum.Hash)"
 	exit 3
 }
 
-$unzip_args = "x", $wxfile, "-o$($7zipoutdir)"
+$unzip_args = "x", $wxfile, "-y", "-oC:/"
 
 & "C:\Program Files\7-zip\7z.exe" $unzip_args
 
 cd $wxdir
-
-if ($stl) {}
 
 # Include is not needed and can be removed http://stackoverflow.com/a/17144445
 (Get-Content src/msw/window.cpp) -replace '#include <pbt.h>', '' | Set-Content src/msw/window.cpp

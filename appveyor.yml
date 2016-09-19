@@ -1,13 +1,22 @@
 environment:
-        WXWIDGETS2.8: C:/wxMSW-2.8.12
-        WXWIDGETS3.1: C:/wxWidgets-3.1.0
+        WXSUM: 51784F296EB791209C9AD1BCBEADBCFCBEB57872611DBE5FF322D180E8491E9D
+        WXFILE: wxlauncher_widgets-1.0.1.7z
+        WXURL: "https://dl.bintray.com/issmneur/generic/:wxlauncher_widgets-1.0.1.7z"
+        WXWIDGETS2.8: C:/wx/wxMSW-2.8.12
+        WXWIDGETS2.8-stl: C:/wx/wxMSW-2.8.12-stl
+        WXWIDGETS3.1: C:/wx/wxWidgets-3.1.0
+        WXWIDGETS3.1-stl: C:/wx/wxWidgets-3.1.0-stl
         OPENAL: C:\openal-soft-1.17.2
         OPENAL_LIBRARY: C:\openal-soft-1.17.2\build\OpenAL.lib
         OPENAL_INCLUDE_DIR: C:\openal-soft-1.17.2\include\AL
         matrix:
                 - WXVER: "2.8"
                   PYTHON: "C:\\Python35"
+                - WXVER: "2.8-stl"
+                  PYTHON: "C:\\Python35"
                 - WXVER: "3.1"
+                  PYTHON: "C:\\Python35"
+                - WXVER: "3.1-stl"
                   PYTHON: "C:\\Python35"
 platform:
         - x86
@@ -20,3 +29,13 @@ install:
         - "%PYTHON%\\Scripts\\pip.exe install markdown"
 build_script:
         - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
+cache:
+        - C:\wx\wxMSW-2.8.12\include -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12-stl\include -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12-stl\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0\include -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0-stl\include -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0-stl\lib\vc_lib -> appveyor.yml
+        - C:\openal-soft-1.17.2 -> appveyor.yml
