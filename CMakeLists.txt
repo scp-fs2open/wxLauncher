@@ -22,8 +22,6 @@ include(${3RD_PARTY_SOURCE_DIR}/GetVersionFromGitTag.cmake)
 
 message("--- Configuring wxLauncher ${wxlauncher_VERSION_STRING_FULL}")
 
-set(CMAKE_OSX_ARCHITECTURES i386)
-
 if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
   if(WIN32)
     set(IS_WIN32 TRUE)
@@ -146,7 +144,22 @@ if(USE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif(USE_OPENAL)
 
-IF(UNIX)
+if(IS_APPLE)
+    # look for SDL2
+    find_library(SDL2_FRAMEWORK SDL2)
+    if (NOT SDL2_FRAMEWORK)
+        message(FATAL_ERROR "SDL2 not found")
+    endif()
+    set(SDL2_INCLUDES ${SDL2_FRAMEWORK}/Headers)
+    set(SDL2_LIBRARIES ${SDL2_FRAMEWORK})
+
+    # from https://github.com/scp-fs2open/fs2open.github.com/blob/master/cmake/platform-darwin.cmake
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+    # required to get SDL2.framework to work
+    SET(CMAKE_SKIP_RPATH FALSE)
+    SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks/)
+elseif(UNIX)
     INCLUDE(FindPkgConfig)
 
     PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
@@ -170,7 +183,7 @@ include_directories(${SDL2_INCLUDES})
 set(HAS_SDL true)
 
 if(IS_APPLE)
-  option(USING_SDL_FRAMEWORK "Check this if building with an SDL framework." ON)
+  option(USING_SDL2_FRAMEWORK "Check this if building with an SDL2 framework." ON)
 endif()
 
 # Make PLATFORM_USES_REGISTRY true only on windows, so that wxLauncher
@@ -393,10 +406,11 @@ if(IS_APPLE)
     COMMAND cp ${PROJECT_SOURCE_DIR}/resources/* ${APP_RESOURCES_PATH}
     COMMAND cp ${helphtblocation} ${APP_RESOURCES_PATH}
     COMMAND cp ${PROJECT_SOURCE_DIR}/platform/macosx/wxlauncher.icns ${APP_RESOURCES_PATH})
-  if(USING_SDL_FRAMEWORK) # then copy the framework into the app
+  if(USING_SDL2_FRAMEWORK) # then copy the framework into the app
+    # using -a because of https://github.com/scp-fs2open/fs2open.github.com/pull/955/commits/5bf9db07a83f42c49344596216a1d667edf31f56
     add_custom_command(TARGET wxlauncher POST_BUILD
-      COMMAND cp -R ${SDL_LIBRARY} ${APP_FRAMEWORKS_PATH})
-  endif(USING_SDL_FRAMEWORK)
+      COMMAND cp -a ${SDL2_FRAMEWORK} ${APP_FRAMEWORKS_PATH})
+  endif(USING_SDL2_FRAMEWORK)
 endif(IS_APPLE)
 
 # packaging
