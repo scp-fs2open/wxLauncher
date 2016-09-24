@@ -1,7 +1,7 @@
 environment:
         WXSUM: EA219E64377E78AA5CDB7C438A5D3E19B91FD22EB9DE33FA21447EF0EEA794D9
         WXFILE: wxlauncher_widgets-1.0.2.7z
-        WXURL: "https://dl.bintray.com/issmneur/generic/:wxlauncher_widgets-1.0.2.7z"
+        WXURL: "https://dl.bintray.com/issmneur/generic/wxlauncher_widgets-1.0.2.7z"
         WXWIDGETS2.8: C:/wx/wxMSW-2.8.12
         WXWIDGETS2.8-stl: C:/wx/wxMSW-2.8.12-stl
         WXWIDGETS3.1: C:/wx/wxWidgets-3.1.0
