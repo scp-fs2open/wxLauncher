@@ -57,6 +57,7 @@ if ($sum.Hash -ne $wxsum) {
 $unzip_args = "x", $wxfile, "-y", "-oC:/"
 
 & "C:\Program Files\7-zip\7z.exe" $unzip_args
+if ($exitcode -gt 0) exit $exitcode
 
 cd $wxdir
 
@@ -81,4 +82,4 @@ if ($ENV:Configuration -eq "Debug") {
 echo "Building UNICODE=1 $($buildtype)"
 $build_args = "UNICODE=1", $buildtype
 & "$($start_dir.Path)\ci\appveyor\build_wxwidgets.cmd" $build_args
-
+if ($exitcode -gt 0) exit $exitcode

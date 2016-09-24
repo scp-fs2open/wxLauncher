@@ -36,12 +36,15 @@ if ($sum.Hash -ne $sha2sum) {
 
 $unzip_args = "x", $openalfile, "-y"
 & "C:\Program Files\7-zip\7z.exe" $unzip_args
+if ($exitcode -gt 0) exit $exitcode
 
 $unzip_args = "x", $openaltar, "-y", "-o$($7zipoutdir)"
 & "C:\Program Files\7-zip\7z.exe" $unzip_args
+if ($exitcode -gt 0) exit $exitcode
 
 cd $openaldir
 
 cd build
 
 & "$($start_dir.Path)\ci\appveyor\build_openal.cmd"
+if ($exitcode -gt 0) exit $exitcode

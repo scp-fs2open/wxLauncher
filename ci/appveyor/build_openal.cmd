@@ -11,6 +11,8 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %Pla
 
 echo "Configuring..."
 cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%
 
 echo "Building"
 cmake .. --build .
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%

@@ -10,3 +10,4 @@ set %1=%2
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" %Platform%
 
 nmake -f makefile.vc BUILD=%BUILD% UNICODE=1
+if ERRORLEVEL 1 exit /b %ERRORLEVEL%
