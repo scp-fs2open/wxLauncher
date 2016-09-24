@@ -37,7 +37,9 @@ TCManager::TCManager() {
 }
 /** Destructor. Static class does nothing. */
 TCManager::~TCManager() {
-	ProMan::GetProfileManager()->RemoveEventHandler(this);
+	if (ProMan::IsInitialized()) {
+		ProMan::GetProfileManager()->RemoveEventHandler(this);
+	}
 }
 
 TCManager* TCManager::manager = NULL;
