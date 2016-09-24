@@ -60,6 +60,7 @@ $unzip_args = "x", $wxfile, "-y", "-oC:/"
 
 cd $wxdir
 
+
 # Include is not needed and can be removed http://stackoverflow.com/a/17144445
 (Get-Content src/msw/window.cpp) -replace '#include <pbt.h>', '' | Set-Content src/msw/window.cpp
 $setuph = "include/wx/msw/setup.h"
