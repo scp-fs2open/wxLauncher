@@ -77,7 +77,11 @@ StatusBar::StatusBar(wxWindow *parent)
 }
 
 StatusBar::~StatusBar() {
-	dynamic_cast<Logger*>(wxLog::GetActiveTarget())->SetStatusBarTarget(NULL);
+	// logger could be null if Logger already destroyed, so must check
+	Logger* logger = dynamic_cast<Logger*>(wxLog::GetActiveTarget());
+	if (logger) {
+		logger->SetStatusBarTarget(NULL);
+	}
 }
 
 void StatusBar::OnSize(wxSizeEvent& WXUNUSED(event)) {
