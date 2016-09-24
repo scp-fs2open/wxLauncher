@@ -6,6 +6,7 @@ addons:
             - build-essential
             - cmake
             - libopenal-dev
+osx_image: xcode7.3
 matrix:
     include:
         - os: linux
