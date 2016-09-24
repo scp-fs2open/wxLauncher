@@ -24,7 +24,7 @@ configuration:
         - Release
         - Debug
 install:
-        - ps: git describe --tags | Set-Variable -Name tag; appveyor UpdateBuild -Version "$tag-{build}"
+        - ps: git describe --tags | Set-Variable -Name tag; appveyor UpdateBuild -Version "$tag"
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
         - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_openal.ps1"
         - "%PYTHON%\\Scripts\\pip.exe install markdown"
