@@ -98,29 +98,39 @@ bool IsFileToIgnore(const wxString& filename) {
 }
 #endif
 
+wxString EXECUTABLE_START_PATTERN(_T("fs2_open"));
+wxString FRED_EXECUTABLE_START_PATTERN(_T("fred2_open"));
 #if IS_WIN32
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_*.exe")
-#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*.exe")
+wxString EXECUTABLE_END_PATTERN(_T(".exe"));
 #elif IS_LINUX
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_*")
-#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*")
+wxString EXECUTABLE_END_PATTERN(wxEmptyString);
 #elif IS_APPLE
-#define EXECUTABLE_GLOB_PATTERN _T("fs2_*.app")
-#define FRED_EXECUTABLE_GLOB_PATTERN _T("fred2_*.app")
+wxString EXECUTABLE_END_PATTERN(_T(".app"));
 #else
 #error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
 #endif
 
 // quiet is for when you just want to check whether there are FSO/FRED binaries
-wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, bool quiet) {
-	return FSOExecutable::GetBinariesFromRootFolder(path, EXECUTABLE_GLOB_PATTERN, quiet);
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(
+	const wxFileName& path, bool quiet)
+{
+	return FSOExecutable::GetBinariesFromRootFolder(
+		path, EXECUTABLE_START_PATTERN, EXECUTABLE_END_PATTERN, quiet);
 }
 
-wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(const wxFileName& path, bool quiet) {
-	return FSOExecutable::GetBinariesFromRootFolder(path, FRED_EXECUTABLE_GLOB_PATTERN, quiet);
+wxArrayString FSOExecutable::GetFredBinariesFromRootFolder(
+	const wxFileName& path, bool quiet)
+{
+	return FSOExecutable::GetBinariesFromRootFolder(
+		path, FRED_EXECUTABLE_START_PATTERN, EXECUTABLE_END_PATTERN, quiet);
 }
 
-wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, const wxString& globPattern, bool quiet) {
+wxArrayString FSOExecutable::GetBinariesFromRootFolder(
+	const wxFileName& path,
+	const wxString& startPattern,
+	const wxString& endPattern,
+	bool quiet)
+{
 	wxArrayString files;
 
 	// Check args because this function gets crap tossed at it to validate
@@ -141,27 +151,31 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 	wxString filename;
 
 #if IS_APPLE // Binaries are directories on OSX.
-	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_DIRS);
+	bool cont = folder.GetFirst(&filename, wxEmptyString, wxDIR_DIRS);
 #else
-	bool cont = folder.GetFirst(&filename, globPattern, wxDIR_FILES);
+	bool cont = folder.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
 #endif
 
-	while (cont) {
+	for (; cont; cont = folder.GetNext(&filename)) {
+		wxString lowerFilename(filename.Lower());
+
+		// filter out "launcher" binaries (particularly on OSX)
+		// otherwise they endup in the binary list
+		if (lowerFilename.Contains(_T("launcher"))) {
+			continue;
+		}
+		if (!lowerFilename.StartsWith(startPattern)) {
+			continue;
+		}
 #if IS_LINUX
-		if ( !IsFileToIgnore(filename) ) {
+		if (!IsFileToIgnore(filename)) {
+			continue;
+		}
 #endif
+		if (!lowerFilename.EndsWith(wxEmptyString)) {
+			continue;
+		}
 		files.Add(filename);
-#if IS_LINUX
-		}
-#endif
-		cont = folder.GetNext(&filename);
-	}
-
-	// filter out launcher binaries (at least on OSX)
-	for (int i = files.GetCount() - 1; i >= 0; --i) {
-		if (files[i].Lower().Find(_T("launcher")) != wxNOT_FOUND) {
-			files.RemoveAt(i);
-		}
 	}
 	
 #if IS_APPLE
@@ -177,7 +191,7 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(const wxFileName& path, c
 #endif
 	
 	if (!quiet) {
-		wxString execType = globPattern.Lower().Find(_T("fred")) == wxNOT_FOUND ? _T("FS2") : _T("FRED2");
+		wxString execType = startPattern.Lower().Find(_T("fred")) == wxNOT_FOUND ? _T("FS2") : _T("FRED2");
 		wxLogInfo(_T(" Found %d %s Open executables in '%s'"),
 			files.GetCount(), execType.c_str(), path.GetPath().c_str());
 		

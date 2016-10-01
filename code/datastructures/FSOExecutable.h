@@ -41,8 +41,10 @@ public:
 	static bool IsRootFolderValid(const wxFileName& path, bool quiet = false);
 	static bool HasFSOExecutables(const wxFileName& path);
 
-	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
-	static wxArrayString GetFredBinariesFromRootFolder(const wxFileName &path, bool quiet = false);
+	static wxArrayString GetBinariesFromRootFolder(
+		const wxFileName &path, bool quiet = false);
+	static wxArrayString GetFredBinariesFromRootFolder(
+		const wxFileName &path, bool quiet = false);
 	static FSOExecutable GetBinaryVersion(wxString binaryname);
 	static bool SmellsLikeGitCommitHash(const wxString& str);
 	wxString GetVersionString() const;
@@ -65,7 +67,11 @@ protected:
 	wxByte buildCaps;
 private:
 	FSOExecutable();
-	static wxArrayString GetBinariesFromRootFolder(const wxFileName &path, const wxString &globPattern, bool quiet);
+	static wxArrayString GetBinariesFromRootFolder(
+		const wxFileName &path,
+		const wxString &startPattern,
+		const wxString &endPattern,
+		bool quiet);
 };
 
 inline bool FSOExecutable::ExecutableNameEqualTo(const wxString& str) const {
