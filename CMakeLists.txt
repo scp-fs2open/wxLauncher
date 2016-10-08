@@ -11,12 +11,20 @@ endif()
 # We don't use C but CMake on linux complains if we don't have it enabled
 project(wxlauncher CXX C) 
 
+find_program(GIT_EXECUTABLE git)
+if(NOT GIT_EXECUTABLE)
+	message(FATAL_ERROR "Unable to locate 'git' commandline tool. "
+		"Please:\n"
+		" - Install commandline git\n"
+		" - Make sure that commandline git is on your path\n"
+		" - Call cmake with -DGIT_EXECUTABLE=<full path to git>")
+endif()
+
 # Special source directorys
 set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 list(INSERT CMAKE_MODULE_PATH 0 "${LAUNCHER_CMAKE_SOURCE_DIR}/include")
 set(3RD_PARTY_SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty)
 
-find_program(GIT_EXECUTABLE git)
 
 include(${3RD_PARTY_SOURCE_DIR}/GetVersionFromGitTag.cmake)
 
