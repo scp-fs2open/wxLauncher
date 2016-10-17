@@ -50,6 +50,9 @@ if(USE_3RDPARTY)
 	message("--- Using 3rd party source directory")
 	execute_process(COMMAND ${CMAKE_COMMAND}
 		-P ${3RD_PARTY_SOURCE_DIR}/build_deps.cmake
+		-DIS_WIN32=${IS_WIN32}
+                -DIS_LINUX=${IS_LINUX}
+		-DIS_APPLE=${IS_APPLE}
 		WORKING_DIRECTORY ${3RD_PARTY_SOURCE_DIR}
 		RESULT_VARIABLE USE_3RDPARTY_BUILD
 		)
