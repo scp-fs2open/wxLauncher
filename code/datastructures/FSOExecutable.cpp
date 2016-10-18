@@ -168,11 +168,11 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(
 			continue;
 		}
 #if IS_LINUX
-		if (!IsFileToIgnore(filename)) {
+		if (IsFileToIgnore(lowerFilename)) {
 			continue;
 		}
 #endif
-		if (!lowerFilename.EndsWith(wxEmptyString)) {
+		if (!lowerFilename.EndsWith(endPattern)) {
 			continue;
 		}
 		files.Add(filename);
