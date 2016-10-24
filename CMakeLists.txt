@@ -20,19 +20,7 @@ if(NOT GIT_EXECUTABLE)
 		" - Call cmake with -DGIT_EXECUTABLE=<full path to git>")
 endif()
 
-if(NOT(DEFINED IS_WIN32 OR DEFINED IS_LINUX OR DEFINED IS_APPLE))
-	if(WIN32)
-		set(IS_WIN32 TRUE)
-		set(USE_3RDPARTY_DEFAULT ON)
-	elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-		set(IS_APPLE TRUE)
-		set(USE_3RDPARTY_DEFAULT ON)
-	else()
-		set(IS_LINUX TRUE)
-		set(USE_3RDPARTY_DEFAULT OFF)
-	endif()
-endif()
-
+include(cmake/wxl_platforms.cmake)
 # Special source directories
 set(LAUNCHER_CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/cmake)
 include(${LAUNCHER_CMAKE_SOURCE_DIR}/setup_submodules.cmake)
@@ -50,9 +38,6 @@ if(USE_3RDPARTY)
 	message("--- Using 3rd party source directory")
 	execute_process(COMMAND ${CMAKE_COMMAND}
 		-P ${3RD_PARTY_SOURCE_DIR}/build_deps.cmake
-		-DIS_WIN32=${IS_WIN32}
-                -DIS_LINUX=${IS_LINUX}
-		-DIS_APPLE=${IS_APPLE}
 		WORKING_DIRECTORY ${3RD_PARTY_SOURCE_DIR}
 		RESULT_VARIABLE USE_3RDPARTY_BUILD
 		)
