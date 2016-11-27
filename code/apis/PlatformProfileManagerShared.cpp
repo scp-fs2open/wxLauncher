@@ -20,10 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/wfstream.h>
+#include <sstream>
 #include "generated/configure_launcher.h"
 #include "apis/PlatformProfileManager.h"
 #include "controls/LightingPresets.h"
 #include "global/ProfileKeys.h"
+#include "global/BasicDefaults.h"
 
 ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 	wxString modLine, flagLine, tcPath;
@@ -111,6 +113,13 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 		outStream.Write(" ", 1);
 		outStream.Write(lightingPresetFlagSet.char_str(), lightingPresetFlagSet.size());
 	}
+	// work around some problems with writing to the registry on Windows
+	int width, height;
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_WIDTH, &width, DEFAULT_VIDEO_RESOLUTION_WIDTH);
+	cfg->Read(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, &height, DEFAULT_VIDEO_RESOLUTION_HEIGHT);
+	std::stringstream res;
+        res << " -res " <<  width << "x" << height;
+	outStream.Write(res.str().c_str(), res.str().size());
 	if ( !outStream.Close() ) {
 		return ProMan::UnknownError;
 	}
