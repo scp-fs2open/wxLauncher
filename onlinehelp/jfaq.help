@@ -18,7 +18,7 @@ The launcher is published under the [GNU General Public License v2][gpl]![][le],
 
 ## Why is it called wxLauncher?
 The name was chosen because the launcher is built using the [wxWidgets][]![][le] GUI toolkit, which allows it to run on multiple platforms.
-[wxWidgets]: http://www.wxwidgets.org/
+[wxWidgets]: https://www.wxwidgets.org/
 
 ## On what platforms does wxLauncher run?
 wxLauncher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X.
@@ -27,7 +27,7 @@ wxLauncher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X
 Check the [authors][]![][li] section for details.
 
 ## What about my privacy?
-wxLauncher does not send any data over the Internet, so your privacy is safe. You don't have to take our word for it, though: if you have the necessary technical knowledge, you can examine the [source code][source]![][le] and see for yourself. If you don't, but would like to know what happens when wxLauncher goes online, you can check the [privacy][privacy]![][li] page in the [Other information][technical]![][li] section.
+wxLauncher does not send any data over the Internet, so your privacy is safe. You don't have to take our word for it, though: if you have the necessary technical knowledge, you can examine the [source code][source]![][le] and see for yourself. If you don't, but would like to know what happens when wxLauncher goes online, you can check the [privacy][privacy]![][li] page in the [Other information][technical]![][li] section. You may also disable this feature quite easily.
 
 ## Are there any translations available?
 Not yet, although there will be for the official release of version 1.0.
@@ -53,11 +53,11 @@ Suggestions are always welcome. Contact one of the [project owners or developers
 [li]: images/li.png
 [le]: images/le.png
 [fso]: 50TechnicalStuff/02Terminology.help
-[gpl]: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+[gpl]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 [authors]: kauthors.help
-[source]: http://code.google.com/p/wxlauncher/source/browse/
+[source]: https://github.com/scp-fs2open/wxLauncher
 [privacy]: 50TechnicalStuff/03privacy.help
 [technical]: 50TechnicalStuff/index.help
-[downloads]: http://code.google.com/p/wxlauncher/downloads/list
-[issues]: http://code.google.com/p/wxlauncher/issues/list
+[downloads]: https://github.com/scp-fs2open/wxLauncher/releases
+[issues]: https://github.com/scp-fs2open/wxLauncher/issues
 [people]: http://code.google.com/p/wxlauncher/people/list

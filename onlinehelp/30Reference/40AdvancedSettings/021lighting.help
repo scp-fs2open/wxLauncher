@@ -2,11 +2,11 @@
 
 # Lighting presets
 
-**TODO scribble: presets of lighting settings. provide link to fs wiki ., select radio button to have preset automatically included in your command line. if you'd like to edit one of the presets, select it, then click on the copy button to copy it to your custom flags, where you can edit it to your taste .**
+This page has some collections of flags that have been assembled by community members.
+Selecting one of these presets will automatically update your [[current command line][ccl]![][le] settings
+See more at the [Hard Light Wiki][presetdescs]![][le].
 
-<!-- Note that we don't have the right to pull material from the wiki and make it GPLed. -->
-
-[li]: /images/li.png
+[ccl]: 15commandline.help
 [le]: /images/le.png
 [fso]: /50TechnicalStuff/02Terminology.help
 [scp]: /50TechnicalStuff/02Terminology.help

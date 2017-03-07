@@ -2,4 +2,9 @@
 
 # Custom flags
 
-**TODO**
+If you know what flag you want, you can type it in here and it will by added to the [current command line][ccl]![][le].
+The full list of flags is available at [http://www.hard-light.net/wiki/index.php/Command-Line_Reference][flwiki]![][le]
+
+[le]: /images/le.png
+[ccl]: 15commandline.help
+[flwiki]: http://www.hard-light.net/wiki/index.php/Command-Line_Reference

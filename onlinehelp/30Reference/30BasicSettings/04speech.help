@@ -35,7 +35,7 @@ Defines the areas of the game where the simulated speech should be used. Check a
 
 * **Windows XP or older**: You can download Mike and Mary from [Microsoft's Download Center][mdc]![][le].
 * **Vista or 7**: There are no other free voices available from Microsoft (the voices available for Windows XP or older will install but Windows will not allow them to be used)
-**TODO verify the above statements** 
+<!-- **TODO verify the above statements**  -->
 
 <!-- #####All platforms
 -- if anyone knows any quality free or commercial voices that work with FS2 please add them here --

@@ -21,6 +21,6 @@ Click this to redetect the audio devices installed  on your system. Useful if yo
 
 [li]: /images/li.png
 [le]: /images/le.png
-[openalw]: http://en.wikipedia.org/wiki/OpenAL
-[openald]: http://connect.creativelabs.com/openal/Downloads/Forms/AllItems.aspx
+[openalw]: https://en.wikipedia.org/wiki/OpenAL
+[openald]: https://www.openal.org/downloads/
 [fso]: /50TechnicalStuff/02Terminology.help

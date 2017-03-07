@@ -1,9 +1,9 @@
 <title>Video</title>
 # Video
 
-This is where you configure the basic settings of the graphics engine to best suit your needs (and to best fit your computer's graphic and processing power).
+Here you configure the basic settings of the graphics engine to best suit your needs (and to best fit your computer's graphic and processing power).
 
--- screenshot with the "video" section highlighted --
+<!-- -- screenshot with the "video" section highlighted -- -->
 
 <!-- ### Graphics  (maybe use this stuff in some form)
 The graphics system to be used by the game. Currently only OpenGL is supported by the current versions of the [FSO][]![][li].
@@ -13,8 +13,8 @@ The graphics system to be used by the game. Currently only OpenGL is supported b
 ## Options supported on all platforms
 
 ### Resolution
-The number of pixels you see on the screen when playing the game. Chosing a bigger resolution increases the quality of the graphics output of the  engine but requires more processing power. If the game runs sluggish, try lowering the resolution.
-**TODO is this actually true about sluggishness? sounds iffy.**
+The number of pixels you see on the screen when playing the game. Chosing a bigger resolution increases the quality of the graphics output of the  engine but requires more processing power. If the game runs sluggishly, you could try lowering the resolution.
+<!-- **TODO is this actually true about sluggishness? sounds iffy.** -->
 
 ### Depth
 Bit depth (also called *color depth* or *screen depth*) describes the number of bits used to represent the color of a single pixel. In game terms, this means that a 32-bit depth creates a more vivid image than a 16-bit depth mode.
@@ -32,7 +32,7 @@ Anisotropic is a second filter applied to the textures you see in-game to correc
 ### Anti-aliasing
 Anti-aliasing is a technique that minimizes the "jagged edges" of any object you see in-game. Check this [Wikipedia article on anti-aliasing][aa]![][le] for a more detailed explanation. 
 
-**TODO need to say something about FXAA**
+<!-- **TODO need to say something about FXAA** -->
 
 **Tip**: In a furious dogfight, you won't notice any difference if this is turned off or set to maximum, but if you want to admire the beautiful world of FreeSpace, it could be worth using it.
 

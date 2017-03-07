@@ -1,6 +1,6 @@
 What is this?
 =============
-This folder contains the Online help for wxLauncher.  This online help is for the users and FSO modders.  The documenation of the launcher's technical details can be found in the code itself, the /docs folder, the wxLauncher wiki or the doxygen generated help.
+This folder contains the Online help for wxLauncher.  This online help is for the users and FSO modders.  The documentation of the launcher's technical details can be found in the code itself, the /docs folder, the wxLauncher wiki or the doxygen generated help.
 
 Technical details
 =================

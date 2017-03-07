@@ -2,7 +2,7 @@
 <title>Privacy: the technical details</title>
 #Privacy: the technical details
 
-As noted in the [FAQ][faq]![][li], no information is ever sent out that could endanger your privacy. Actually, what information wxLauncher sends is nothing more than a simple page request. <!-- **TODO which um kind of does endanger your privacy, at least a little bit, in that it notifies the server of your IP address.** -->
+As noted in the [FAQ][faq]![][li], besides your IP address, which is sent when making any kind of internet request, no information is ever sent out that could endanger your privacy. Actually, wxLauncher sends nothing more than a simple page request.
 
 To get the highlights, wxLauncher asks for a [specially crafted page][page]![][le] that returns a list of the current highlights in a custom format. It's like a news feed, but with no HTML or XML, just plain text.
 
