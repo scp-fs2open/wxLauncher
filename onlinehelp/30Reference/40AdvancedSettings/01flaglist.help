@@ -3,7 +3,7 @@
 # Flag list
 <!-- **TODO** -->
 
-This big list of checkboxes lets you set various flags that are passed to the FreeSpace Open executable and that enable new features added by the SCP.
+This big list of checkboxes lets you set various flags that are passed to the FreeSpace Open executable. They enable new features added by the SCP.
 To see a full description of any option, double-clicking on it will lead to its description of the [Hard Light Wiki][flwiki]![][le].
 See [Current command line][ccl]![][le] for more.
 
