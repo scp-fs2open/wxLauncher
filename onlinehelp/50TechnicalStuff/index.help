@@ -1,3 +1,13 @@
 <title>Other information</title>
 
-**TODO Under the hood, translating and stuff, terminology**
+#Other information
+
+* [Terminology][term]![][li]
+* [Privacy][priv]![][li]
+
+[li]: /images/li.png
+[term]: 02Terminology.help
+[priv]: 03privacy.help
+
+
+<!-- **TODO Under the hood, translating and stuff, terminology** -->

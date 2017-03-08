@@ -5,7 +5,7 @@
 # Terminology
 
 ## FSO
-The **FreeSpace 2 Open** (also called FreeSpace Open) engine is an [open-source][os]![][le] modification project of the retail FreeSpace 2 engine started after the public release of the original source code in 2002. The community, under the direction of the Source Code Project (or SCP), made major upgrades to the engine and made it portable to multiple operating systems.
+The **FreeSpace 2 Open** (also called FreeSpace Open) engine is an [open-source][os]![][le] modification project of the retail FreeSpace 2 engine started after the public release of the original source code in 2002. The community, under the direction of the Source Code Project (or SCP), made major upgrades to the engine and made it multi-platform for Windows, Mac and Linux.
 
 ## SCP
 The **FreeSpace 2 Source Code Project** (or FreeSpace Source Code Project or simply Source Code Project) is a central source to coordinate development of the FreeSpace 2 Open engine. It was created after the source code of the FreeSpace 2 game engine become public in order to prevent multiple diverging versions of the game from appearing. 
@@ -27,19 +27,20 @@ Examples of TCs include
 
 * [The Babylon Project][tbp]![][le] - based on the Babylon 5 universe
 * [Wing Commander Saga][wcs]![][le] - based on the Wing Commander universe
+* [Diaspora][dia]![][le] - based on the 2004 Battlestar Galactica universe
 
-Check the **Hosted** section on the [Hard Light Productions][hl]![][le] website for a more detailed list.
+Check the [**Total conversions**][tc]![][le] section on the [Hard Light Productions][hl]![][le] website for a more detailed list.
 
-**TODO I think there's a list of TCs on the Campaigns List on the FS Wiki. Maybe use that instead of Hosted section.**
-
-**Technical note:** The launcher regards FreeSpace 2 as a TC itself. ***TODO for now.***
+**Technical note:** The launcher regards FreeSpace 2 as a TC itself.
+<!-- ***TODO for now.*** -->
 
 [le]: ../images/le.png
-[os]: http://en.wikipedia.org/wiki/Open_source
+[os]: https://en.wikipedia.org/wiki/Open-source_model
 [scp]: http://scp.indiegames.us/
 [forums]: http://www.hard-light.net/forums/index.php?board=50.0
 [moddb]: http://www.hard-light.net/wiki/index.php/Mod_Database
 [fswiki]: http://www.hard-light.net/wiki/index.php/Main_Page
 [tbp]: http://babylon.hard-light.net/
-[wcs]: http://wcsaga.hard-light.net/
+[wcs]: http://wcsaga.com/
 [hl]: http://www.hard-light.net/
+[tc]: http://www.hard-light.net/wiki/index.php/Total_conversions

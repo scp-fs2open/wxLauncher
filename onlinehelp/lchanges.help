@@ -2,6 +2,42 @@
 
 # Latest changes
 
+## Version 0.10.1
+
+* **Windows** - Fix the location of the virtualized registry writing
+
+## Version 0.10.0
+
+* **Windows** - No more registry helper
+* **Windows** - Support for SDL on Windows antipodes builds
+* **All** - Auto saving that actually works
+
+## Version 0.9.6
+
+* Better wxWidgets 3.0 and SDL support
+
+## Version 0.9.5
+
+* Support for multiple versions of wxWidgets
+
+## Version 0.9.4
+
+* **Note:** These changes are based off of v0.9.1, since 0.9.2 and 0.9.3 were special releases for Diaspora
+* Mod-customizable features: **(both TCs and mods)**
+* Skin system: **(TCs only)**
+* Mod list is now sorted alphabetically
+* Default image provided for mods that don't include an image of their own
+* "Enable EFX" checkbox now appears when the selected playback device supports EFX
+* Speech voices are now listed in the correct order
+* Connection settings read from profile are now displayed correctly
+* "All features on" flag set has been restored
+* New splash image (special thanks to mjn.mixael for making this)
+* FRED launching can now be toggled with F3
+* Faster startup thanks to more efficient mod.ini search
+* Assorted bug fixes and text revisions
+* **Linux** - RESOURCES_PATH can now be user-specified (special thanks to Firartix for identifying and fixing this)
+* **Linux** - cmdline_fso.cfg is now written to ~/.fs2_open/data/ instead of FS2/TC folder
+
 ## Version 0.9.0
 
 * A brand new cross-platform launcher, the first ever to run on Windows, Linux, and OS X.

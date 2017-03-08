@@ -3,14 +3,23 @@
 #Welcome to wxLauncher
 
 ![wxLauncher logo](images/header.png "wxLauncher")
+<!-- **TODO scale down header image to fit default width of viewing area** -->
 
 <!-- Welcome to wxLauncher, your one-stop shop for FreeSpace 2 and related content. -->
 
-The [FAQ][]![][li] has basic information about wxLauncher, **TODO something about how to get started, overview of the guide's contents, etc could direct people based on what they're looking for (the possible reasons why they would've looked at the manual in the first place).** **TODO scale down header image to fit default width of viewing area**
+If you want to set up and start playing FreeSpace 2 immediately, [go here][]![start][li].
+If you're wondering about other settings, go to [basic][]![][li] or [advanced][]![][li] settings.
 
-<!-- TODO come up with something to put here. -->
+The [FAQ][]![][li] has basic information about wxLauncher.
+
+<!-- TODO overview of the guide's contents, etc -->
+<!-- TODO could direct people based on what they're looking for (the possible reasons why they would've looked at the manual in the first place).** -->
+
 <!-- You can find the [FAQ][]![][li], [Authors][1]![][li] -->
 
 [FAQ]:  jfaq.help
 <!-- [1]:    kauthors.help -->
 [li]: images/li.png
+[start]: 30Reference/30BasicSettings/01executable.help
+[start]: 30Reference/30BasicSettings/index.help
+[advanced]: 30Reference/40AdvancedSettings 

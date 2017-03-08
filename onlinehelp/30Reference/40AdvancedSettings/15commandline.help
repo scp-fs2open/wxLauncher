@@ -2,4 +2,9 @@
 
 # Current command line
 
-**TODO**
+<!-- **TODO** needs to be more fleshed out -->
+This box is automatically modified whenever you modify the flag list, or you can manually set the parameters yourself.
+See [Flag list][fl]![][le] for more.
+
+[fl]: 01flaglist.help
+[le]: /images/le.png
