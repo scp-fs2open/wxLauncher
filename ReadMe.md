@@ -2,9 +2,9 @@
 
 Introduction
 ============
-[wxLauncher] aims to give one unified answer to members of 
-the Freespace 2 Open community looking for an easy way 
-to control `fs2_open` on various platforms and to those 
+[wxLauncher] aims to give one unified answer to members of
+the Freespace 2 Open community looking for an easy way
+to control `fs2_open` on various platforms and to those
 looking for an easy way to find and get updates to their
 Freespace 2 MODs and TCs.
 
@@ -41,9 +41,7 @@ Xcode, KDevelop, and of course autotools.
   * Windows
       * Windows SDK or Platform SDK
       * Nullsoft Scriptable Install System (NSIS)
-  * Linux
-      * SDL 2
-  * OS X
+  * Linux/macOS/FreeBSD
       * SDL 2
 
 ### Optional components
@@ -53,12 +51,12 @@ Xcode, KDevelop, and of course autotools.
 ### Detailed requirements
 
 wxLauncher is built using CMake.  Only version 2.8 or later has
-been tested (and the CMake file enforces this).  CMake can be 
+been tested (and the CMake file enforces this).  CMake can be
 downloaded in binary form, from the [CMake Home Page] or if you
 run Linux, from your distro's package repository.
 [Cmake Home Page]: http://cmake.org
 
-wxLauncher is a [wxWidgets]-based application. It can 
+wxLauncher is a [wxWidgets]-based application. It can
 only be built with wxWidgets version 2.8.10 or higher.
 Version 0.10.0 has been tested with:
   - 2.8.12 (no STL)
@@ -66,14 +64,14 @@ Version 0.10.0 has been tested with:
   - 3.0.2 (no STL)
   - 3.0.2 (STL)
 [wxWidgets]: http://www.wxwidgets.org/
-	
+
 [Python] 2.7 or higher is required to build this project.
-This project also assumes that the python executable is 
+This project also assumes that the python executable is
 in your PATH.  Check your operating system's documentation
 for information on how to add Python to your PATH.
 [Python]: http://www.python.org/
-	
-Markdown in Python is required in order to build the 
+
+Markdown in Python is required in order to build the
 integrated help system.
   * [Markdown in Python homepage](https://pypi.python.org/pypi/Markdown)
   * On `pip` enabled installs, try: `pip install markdown` but for Python
@@ -82,12 +80,12 @@ integrated help system.
 
 The OpenAL Software Development Kit is an optional component
 needed to build this program.  It can be downloaded from the
-[OpenAL homepage]. OpenAL support requires the 
+[OpenAL homepage]. OpenAL support requires the
 preprocessor symbol `USE_OPENAL=1`.  This symbol is set to 1 by
 default by CMake.  You can pass `-DUSE_OPENAL=0` to CMake to
 disable building with OpenAL support.  See the compiler specific
 instructions for getting your compiler ready to build
-with OpenAL. Note that Mac OS X ships with OpenAL pre-installed.
+with OpenAL. Note that Mac macOS ships with OpenAL pre-installed.
 wxLauncher should also work with the [OpenALSoft] library.
 [OpenAL homepage]: http://connect.creativelabs.com/openal/default.aspx
 [OpenALSoft]: http://kcat.strangesoft.net/openal.html
@@ -99,7 +97,7 @@ Vista and Windows 7 have been tested with this application.
 
 The Nullsoft Scriptable Install System (NSIS) is required on
 Windows to build the installer. The latest version at the time
-of writing is 2.46. Be sure to either install NSIS before 
+of writing is 2.46. Be sure to either install NSIS before
 running CMake or re-run CMake after installing NSIS. NSIS can
 be found on the [NSIS homepage](http://nsis.sourceforge.net/).
 
@@ -112,20 +110,20 @@ and used for developing wxLauncher for free.
 
 wxLauncher's source can be explored from the project's
 [source page](https://github.com/wxLauncher/wxlauncher/)
-  
+
 To get the source, you'll need Git:
   * [Command Line Git](http://git-scm.com/)
   * Graphical frontend: [TortioseGit](http://tortiosgit.org)
   * Distro package manager. Sometimes called `git-scm`
-  * The Homebrew Project for OS X
+  * The Homebrew Project for macOS
 
 Once Git is installed, you can get a copy of the source
 by running the following command in a folder of your choice:
 	`git clone https://code.google.com/p/wxlauncher/`
-  
+
 Building - Windows
 ==================
-Run CMake in your favourite way (GUI, or on the commandline 
+Run CMake in your favourite way (GUI, or on the commandline
 ccmake (uses curses) or cmake).
 
 CMake QT Gui
@@ -134,9 +132,9 @@ Assuming the GUI, select the CMakeLists.txt in the main
 wxLauncher source directory and set your output directory
 to where you want the native build tool to be placed,
 somewhere without spaces. Click configure until the Generate
-button Enables.  The lines that are highligted red are new 
-variables that CMake has found. 
-- Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets 
+button Enables.  The lines that are highligted red are new
+variables that CMake has found.
+- Set wxWdigets_ROOT_DIR to the root directory of your wxWidgets
 source directory if it remains NOTFOUND.
 - Set PYTHON_EXECUTABLE to the python that you want to use. It may not show
 up. If it doesn't show up, it means that cmake found python automatically,
@@ -183,7 +181,7 @@ If you run into this problem, please post in this ticket
 <http://code.google.com/p/wxlauncher/issues/detail?id=99> with your distro,
 OS version, and whether you're running 32- or 64-bit.
 
-Building - OS X (tested on 10.11, El Capitan)
+Building - macOS (tested on 10.11, El Capitan)
 =============================================
 - Get Xcode from the Mac App Store (used 7.3.1)
 - Get Python 3 from python.org if you don't have it. (used 3.5.2)
@@ -191,7 +189,7 @@ Building - OS X (tested on 10.11, El Capitan)
 Use `pip3` to install Markdown rather than `pip`. By default this is in
 /usr/local/bin/pip3 . You will need root privileges.
 - Get Git, making sure that you select the version of
-  Git for your version of OS X.
+  Git for your version of macOS.
 - Clone the wxLauncher repository.
 - Get CMake 3 (used 3.6.1).
 - Get the latest stable version of wxWidgets 3 (used 3.0.2). Once you've
@@ -240,11 +238,33 @@ your wxLauncher build folder. Make sure that the build configuration you
 choose (Debug or Release) matches the build configuration you used when
 you built wxWidgets.
 
-Important known issues on OS X:
+Important known issues on macOS:
 - After startup or after a FS2 Open binary is (re-)selected, checkboxes on
 the advanced settings page may not appear until after a moment or after
 the user interacts with the advanced settings page, such as by clicking on
 the flag list.
+
+Building - FreeBSD (tested on TrueOS Desktop, 22 Feb 2017)
+=============================================
+- Download the wxLauncher source
+- Ensure the following packages are installed:
+- cmake, openal-soft, SDL2, wx28-gtk2, python, python2, python27, py27-markdown
+- cd <source directory>
+- mkdir build
+- cd build
+- A typical fully usable build configuration will look something like:
+- cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DUSE_OPENAL=1 -DUSE_JOYSTICK=1
+- -DwxWidgets_CONFIG_EXECUTABLE=/usr/local/bin/wxgtk2u-2.8-config ../
+- make
+- make install (with root privileges if necessary)
+
+Notes
+-----
+Using wx30-gtk2 currently yields a compilation error (11 March 2017)
+TrueOS desktop comes with python2/python27, but no binary 'python'.
+Installing the python package seems to just create that symlink.
+Joystick support has not been tested.  If you have a joystick working
+with FreeBSD please report test results.
 
 License
 =======
