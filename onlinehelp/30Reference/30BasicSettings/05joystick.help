@@ -9,7 +9,7 @@ This is where you select and configure your joystick.
 ### Select joystick
 This is a list if joysticks connected to your computer and recognized by the operating system. Choose the one you want to use.
 
-**Linux and Mac OS X note**: If you connect or disconnect a joystick while wxLauncher is running, you will need to restart wxLauncher for it to detect the changes.
+**Linux and macOS note**: If you connect or disconnect a joystick while wxLauncher is running, you will need to restart wxLauncher for it to detect the changes.
 
 ## Options currently supported on Windows only
 

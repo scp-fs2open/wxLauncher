@@ -21,7 +21,7 @@ The name was chosen because the launcher is built using the [wxWidgets][]![][le]
 [wxWidgets]: https://www.wxwidgets.org/
 
 ## On what platforms does wxLauncher run?
-wxLauncher runs on the same platforms as FSO, namely Windows, Linux and Mac OS X.
+wxLauncher runs on the same platforms as FSO, namely Windows, Linux, macOS, and FreeBSD.
 
 ## Who made wxLauncher?
 Check the [authors][]![][li] section for details.

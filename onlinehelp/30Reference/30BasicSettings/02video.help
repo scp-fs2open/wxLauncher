@@ -21,7 +21,7 @@ Bit depth (also called *color depth* or *screen depth*) describes the number of 
 
 **Note**: Although a 32-bit mode requires a bit more processing power than 16-bit, this option should be set to the same value as your Windows bit depth (usually 32-bit nowdays), as using a different bit depth can cause *major* slowdowns.  If your graphics card is having difficulty running FSO, the SCP suggests that you change other graphics settings and leave this one where it is now.
 
-## Options currently supported on Linux and Mac OS X only
+## Options currently supported on Linux and macOS only
 
 ### Texture filter
 The texture filter determines the method used to blend the pixels you see on a textured object/model in game with that of neighbouring pixels to create the illusion of a continuous surface. The more advanced the method, the better the result. The cost is a slight performance loss.
