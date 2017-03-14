@@ -85,7 +85,7 @@ preprocessor symbol `USE_OPENAL=1`.  This symbol is set to 1 by
 default by CMake.  You can pass `-DUSE_OPENAL=0` to CMake to
 disable building with OpenAL support.  See the compiler specific
 instructions for getting your compiler ready to build
-with OpenAL. Note that Mac macOS ships with OpenAL pre-installed.
+with OpenAL. Note that macOS ships with OpenAL pre-installed.
 wxLauncher should also work with the [OpenALSoft] library.
 [OpenAL homepage]: http://connect.creativelabs.com/openal/default.aspx
 [OpenALSoft]: http://kcat.strangesoft.net/openal.html
