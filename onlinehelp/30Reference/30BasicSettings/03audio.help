@@ -2,7 +2,7 @@
 # Audio
 Here you set the device that [FSO][]![][li] will use to output the sound effects.
 
--- screenshot with the "audio" section highlighted --
+<!-- -- screenshot with the "audio" section highlighted -- -->
 
 ###Sound device
 Lists the compatible sound devices that are installed on your system. "Generic software" works on any machine, choose that if you don't have a high-end dedicated sound card.

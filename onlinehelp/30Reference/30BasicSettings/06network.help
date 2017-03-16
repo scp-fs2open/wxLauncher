@@ -18,7 +18,7 @@ For a smooth experience, select the appropriate connection speed here.
 If you want FSO to use a specific [port][]![][le] when playing over LAN/Internet, type it here. Most users will not need to use this setting, but some may need it to handle problems with older Network Address Translation (NAT) firewalls.
 
 ### Force IP address
-Same as above, but for the [IP address][]![][le]. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.  As with **Force local port**, most users will not need to use this setting, but some may need it to get around older NAT firewalls.
+Same as above, but for the [IP address][]![ip][le]. Only version 4 addresses (the "classic" IP address - IPv4) are supported for the moment.  As with **Force local port**, most users will not need to use this setting, but some may need it to get around older NAT firewalls.
 
 [li]: /images/li.png
 [le]: /images/le.png

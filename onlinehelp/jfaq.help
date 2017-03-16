@@ -18,7 +18,6 @@ The launcher is published under the [GNU General Public License v2][gpl]![][le],
 
 ## Why is it called wxLauncher?
 The name was chosen because the launcher is built using the [wxWidgets][]![][le] GUI toolkit, which allows it to run on multiple platforms.
-[wxWidgets]: https://www.wxwidgets.org/
 
 ## On what platforms does wxLauncher run?
 wxLauncher runs on the same platforms as FSO, namely Windows, Linux, macOS, and FreeBSD.
@@ -54,6 +53,7 @@ Suggestions are always welcome. Contact one of the [project owners or developers
 [le]: images/le.png
 [fso]: 50TechnicalStuff/02Terminology.help
 [gpl]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+[wxWidgets]: https://www.wxwidgets.org/
 [authors]: kauthors.help
 [source]: https://github.com/scp-fs2open/wxLauncher
 [privacy]: 50TechnicalStuff/03privacy.help
