@@ -7,7 +7,7 @@
 
 <!-- Welcome to wxLauncher, your one-stop shop for FreeSpace 2 and related content. -->
 
-If you want to set up and start playing FreeSpace 2 immediately, [go here][]![start][li].
+If you want to set up and start playing FreeSpace 2 immediately, [go here][start]![][li].
 If you're wondering about other settings, go to [basic][]![][li] or [advanced][]![][li] settings.
 
 The [FAQ][]![][li] has basic information about wxLauncher.
@@ -21,5 +21,5 @@ The [FAQ][]![][li] has basic information about wxLauncher.
 <!-- [1]:    kauthors.help -->
 [li]: images/li.png
 [start]: 30Reference/30BasicSettings/01executable.help
-[start]: 30Reference/30BasicSettings/index.help
+[basic]: 30Reference/30BasicSettings/index.help
 [advanced]: 30Reference/40AdvancedSettings 
