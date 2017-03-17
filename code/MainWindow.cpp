@@ -285,7 +285,9 @@ void MainWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)) {
 	wxMessageBox(_T("Update"));
 }
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event)) {
-	wxMessageBox(_T("About"));
+  wxCHECK_RET( HelpManager::IsInitialized(), _T("Help is not initialized"));
+  wxString lchanges(_T("lchanges.htm"));
+  HelpManager::OpenHelpByString(lchanges);
 }
 
 void MainWindow::OnContextHelp(wxHelpEvent& event) {
