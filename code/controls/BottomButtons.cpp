@@ -42,6 +42,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		this->close = new wxButton(this, ID_CLOSE_BUTTON, _("Close"));
 #endif
 		this->help = new wxButton(this, ID_HELP_BUTTON, _("Help"));
+		this->about = new wxButton(this, ID_ABOUT_BUTTON, _("About"));
 		this->fred = new wxButton(this, ID_FRED_BUTTON, _("FRED"));
 		this->fred->Show(showFred);
 
@@ -58,6 +59,7 @@ BottomButtons::BottomButtons(wxWindow* parent, wxPoint &pos, wxSize &size) : wxP
 		sizer->Add(this->close);
 #endif
 		sizer->Add(this->help);
+		sizer->Add(this->about);
 		sizer->AddStretchSpacer(1);
 #if 0
 		sizer->Add(this->update, wxSizerFlags().ReserveSpaceEvenIfHidden());
