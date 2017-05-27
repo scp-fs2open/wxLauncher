@@ -1,0 +1,49 @@
+environment:
+        WXSUM: EA219E64377E78AA5CDB7C438A5D3E19B91FD22EB9DE33FA21447EF0EEA794D9
+        WXFILE: wxlauncher_widgets-1.0.2.7z
+        WXURL: "https://dl.bintray.com/issmneur/generic/wxlauncher_widgets-1.0.2.7z"
+        WXWIDGETS2.8: C:/wx/wxMSW-2.8.12
+        WXWIDGETS2.8-stl: C:/wx/wxMSW-2.8.12-stl
+        WXWIDGETS3.1: C:/wx/wxWidgets-3.1.0
+        WXWIDGETS3.1-stl: C:/wx/wxWidgets-3.1.0-stl
+        OPENAL: C:\openal-soft-1.17.2
+        OPENAL_LIBRARY: C:\openal-soft-1.17.2\build\OpenAL.lib
+        OPENAL_INCLUDE_DIR: C:\openal-soft-1.17.2\include\AL
+        matrix:
+                - WXVER: "2.8"
+                  PYTHON: "C:\\Python35"
+                - WXVER: "2.8-stl"
+                  PYTHON: "C:\\Python35"
+                - WXVER: "3.1"
+                  PYTHON: "C:\\Python35"
+                - WXVER: "3.1-stl"
+                  PYTHON: "C:\\Python35"
+matrix:
+        fast_finish: true
+        allow_failures:
+                - platform: x64
+platform:
+        - x86
+        - x64
+configuration:
+        - Release
+        - Debug
+install:
+        - ps: |
+                git describe --tags | Set-Variable -Name tag
+                appveyor UpdateBuild -Version "$tag-${ENV:APPVEYOR_BUILD_NUMBER}"
+        - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_wxwidgets.ps1"
+        - powershell "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/load_openal.ps1"
+        - "%PYTHON%\\Scripts\\pip.exe install markdown"
+build_script:
+        - cmd: "%APPVEYOR_BUILD_FOLDER%/ci/appveyor/build.cmd"
+cache:
+        - C:\wx\wxMSW-2.8.12\include -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12-stl\include -> appveyor.yml
+        - C:\wx\wxMSW-2.8.12-stl\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0\include -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0\lib\vc_lib -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0-stl\include -> appveyor.yml
+        - C:\wx\wxWidgets-3.1.0-stl\lib\vc_lib -> appveyor.yml
+        - C:\openal-soft-1.17.2\build -> appveyor.yml
