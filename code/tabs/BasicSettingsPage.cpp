@@ -714,7 +714,6 @@ BasicSettingsPage::~BasicSettingsPage() {
 	if ( SpeechMan::IsInitialized() ) {
 		SpeechMan::DeInitialize();
 	}
-	JoyMan::DeInitialize();
 	OpenALMan::DeInitialize();
 }
 
@@ -2038,123 +2037,79 @@ void BasicSettingsPage::OpenNonSCPWebSite(wxString url) {
 
 /** Client data for the Joystick Choice box. Stores the joysticks
 Windows ID so that we can pass it back correctly to the engine. */
-class JoyNumber: public wxClientData {
+class JoystickData: public wxClientData {
 public:
-	JoyNumber(unsigned int i) {
-		this->number = i;
+	explicit JoystickData(const FlagListManager::Joystick& stick_in, int number) {
+		this->number = number;
+		this->stick = stick_in;
 	}
 	int GetNumber() {
-		return static_cast<int>(this->number);
+		return number;
+	}
+	const FlagListManager::Joystick& GetStick() {
+		return stick;
 	}
 private:
-	unsigned int number;
+	int number = -1;
+	FlagListManager::Joystick stick;
 };
 
 void BasicSettingsPage::SetupJoystickSection() {
 	this->joystickSelected->Clear();
-	if ( !JoyMan::WasCompiledIn() ) {
+
+	this->joystickSelected->Append(_("No Joystick"), new JoystickData(FlagListManager::Joystick(), DEFAULT_JOYSTICK_ID));
+
+	auto& joysticks = FlagListManager::GetFlagListManager()->GetJoysticks();
+	for (size_t i = 0; i < joysticks.size(); ++i) {
+		this->joystickSelected->Append(joysticks[i].name, new JoystickData(joysticks[i], static_cast<int>(i)));
+	}
+
+	if (joysticks.empty()) {
+		this->joystickSelected->SetSelection(0);
 		this->joystickSelected->Disable();
-		this->joystickSelected->Append(_("No Launcher Support"));
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
-		this->joystickDetectButton->Disable();
+		this->joystickDetectButton->Enable();
 #if IS_WIN32
 		this->joystickCalibrateButton->Disable();
 #endif
 	}
-	else
-	{
-		JoyMan::ApiType apiType;
-
-#if IS_APPLE || IS_LINUX
-		// Unix always uses SDL
-		apiType = JoyMan::API_SDL;
-#else
-		// If the current executable is a SDL exe, use that API
-		if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL)
-		{
-			apiType = JoyMan::API_SDL;
-		}
-		else
-		{
-			apiType = JoyMan::API_NATIVE;
-		}
-#endif
-
-		if (!JoyMan::Initialize(apiType)) {
-			this->joystickSelected->Disable();
-			this->joystickSelected->Append(_("Initialize Failed"));
-			this->joystickForceFeedback->Disable();
-			this->joystickDirectionalHit->Disable();
-			this->joystickDetectButton->Enable();
+	else {
+		long profileJoystick;
+		unsigned int i;
+		this->joystickSelected->Enable();
 #if IS_WIN32
-			this->joystickCalibrateButton->Disable();
+		this->joystickDetectButton->Enable();
 #endif
-		}
-		else {
-			this->joystickSelected
-				->Append(_("No Joystick"), new JoyNumber(DEFAULT_JOYSTICK_ID));
-			for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++) {
-				if (JoyMan::IsJoystickPluggedIn(i)) {
-					this->joystickSelected
-						->Append(JoyMan::JoystickName(i), new JoyNumber(i));
-				}
-			}
+		ProMan::GetProfileManager()->
+			ProfileRead(PRO_CFG_JOYSTICK_ID,
+				&profileJoystick,
+				DEFAULT_JOYSTICK_ID,
+				true);
+		// set current joystick
+		for (i = 0; i < this->joystickSelected->GetCount(); i++) {
+			auto* data = dynamic_cast<JoystickData*>(this->joystickSelected->GetClientObject(i));
+			wxCHECK2_MSG(data != NULL, continue, _T("JoyNumber is not the clientObject in joystickSelected"));
 
-			if (JoyMan::NumberOfPluggedInJoysticks() == 0) {
-				this->joystickSelected->SetSelection(0);
-				this->joystickSelected->Disable();
-				this->joystickForceFeedback->Disable();
-				this->joystickDirectionalHit->Disable();
-				this->joystickDetectButton->Enable();
-#if IS_WIN32
-				this->joystickCalibrateButton->Disable();
-#endif
-			}
-			else {
-				long profileJoystick;
-				unsigned int i;
-				this->joystickSelected->Enable();
-#if IS_WIN32
-				this->joystickDetectButton->Enable();
-#endif
-				ProMan::GetProfileManager()->
-					ProfileRead(PRO_CFG_JOYSTICK_ID,
-						&profileJoystick,
-						DEFAULT_JOYSTICK_ID,
-						true);
-				// set current joystick
-				for (i = 0; i < this->joystickSelected->GetCount(); i++) {
-					JoyNumber* data = dynamic_cast<JoyNumber*>(
-						this->joystickSelected->GetClientObject(i));
-					wxCHECK2_MSG(data != NULL, continue,
-						_T("JoyNumber is not the clientObject in joystickSelected"));
-
-					if (profileJoystick == data->GetNumber()) {
-						this->joystickSelected->SetSelection(i);
-						this->SetupControlsForJoystick(i);
-						return; // All joystick controls are now setup
-					}
-				}
-				// Getting here means that the joystick is no longer installed
-				// or is not plugged in
-				if (JoyMan::IsJoystickPluggedIn(profileJoystick)) {
-					wxLogWarning(_T("Last selected joystick is not plugged in"));
-				}
-				else {
-					wxLogWarning(_T("Last selected joystick does not seem to be installed"));
-				}
-				// set to no joystick (the first selection)
-				this->joystickSelected->SetSelection(0);
-				this->SetupControlsForJoystick(0);
+			// Need to substract 1 to account for the "No Joystick" at the start
+			if (profileJoystick == data->GetNumber()) {
+				this->joystickSelected->SetSelection(i);
+				this->SetupControlsForJoystick(i);
+				return; // All joystick controls are now setup
 			}
 		}
+		// Getting here means that the joystick is no longer installed
+		// or is not plugged in
+		wxLogWarning(_T("Last selected joystick does not seem to be installed"));
+
+		// set to no joystick (the first selection)
+		this->joystickSelected->SetSelection(0);
+		this->SetupControlsForJoystick(0);
 	}
 }
 
 void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
-	JoyNumber* joynumber = dynamic_cast<JoyNumber*>(
-		this->joystickSelected->GetClientObject(i));
+	JoystickData* joynumber = dynamic_cast<JoystickData*>(this->joystickSelected->GetClientObject(i));
 	wxCHECK_RET( joynumber != NULL,
 		_T("JoyNumber is not joystickSelected's client data"));
 
@@ -2166,7 +2121,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	}
 #endif
 
-	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
+	if ( joynumber->GetStick().is_haptic ) {
 		bool ff, direct;
 		ProMan::GetProfileManager()->ProfileRead(
 			PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, DEFAULT_JOYSTICK_DIRECTIONAL, true);
@@ -2201,21 +2156,19 @@ void BasicSettingsPage::OnCheckDirectionalHit(
 		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_DIRECTIONAL, event.IsChecked());
 }
 
-void BasicSettingsPage::OnCalibrateJoystick(
-	wxCommandEvent &WXUNUSED(event)) {
-		JoyNumber *data = dynamic_cast<JoyNumber*>(
-			this->joystickSelected->GetClientObject(
-			this->joystickSelected->GetSelection()));
-		wxCHECK_RET( data != NULL,
-			_T("joystickSelected does not have JoyNumber as clientdata"));
+void BasicSettingsPage::OnCalibrateJoystick(wxCommandEvent &WXUNUSED(event)) {
+	JoystickData *data = dynamic_cast<JoystickData*>(
+		this->joystickSelected->GetClientObject(
+		this->joystickSelected->GetSelection()));
+	wxCHECK_RET( data != NULL,
+		_T("joystickSelected does not have JoyNumber as clientdata"));
 
-		JoyMan::LaunchCalibrateTool(data->GetNumber());
+	JoyMan::LaunchCalibrateTool(data->GetNumber());
 }
 
 void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
-		if ( JoyMan::DeInitialize() ) {
-			this->SetupJoystickSection();
-		}
+	// This triggers a new flag file generation which will pick up new josticks
+	TCManager::GenerateTCBinaryChanged();
 }
 
 //////////// ProxyChoice

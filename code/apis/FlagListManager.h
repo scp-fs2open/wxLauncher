@@ -61,6 +61,12 @@ public:
 		bool sdl = false;
 	};
 
+	struct Joystick {
+		wxString name;
+		wxString guid;
+		bool is_haptic = false;
+	};
+
 	void OnBinaryChanged(wxCommandEvent &event);
 	
 	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
@@ -86,6 +92,8 @@ public:
 	/** Gets the build capabilities of the currently selected FSO executable.
 	 Should only be called when processing succeeds. */
 	BuildCaps GetBuildCaps() const;
+
+	const std::vector<Joystick>& GetJoysticks() const;
 
 private:
 	enum CapabilityFlags {
@@ -136,7 +144,7 @@ private:
 
 	BuildCaps buildCaps;
 
-	json flags_json = nullptr;
+	std::vector<Joystick> joysticks;
 
 	class FlagProcess: public wxProcess {
 	public:

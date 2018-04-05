@@ -20,6 +20,7 @@
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
+#include "apis/JoystickManager.h"
 #include "datastructures/FSOExecutable.h"
 #include "global/ProfileKeys.h"
 
@@ -97,6 +98,10 @@ void FlagListManager::DeInitialize() {
 		}
 		FlagListManager::ffProcessingStatusChangedHandlers.Clear();
 	}
+
+	if (JoyMan::IsInitialized()) {
+		JoyMan::DeInitialize();
+	}
 	
 	FlagListManager* temp = FlagListManager::flagListManager;
 	FlagListManager::flagListManager = NULL;
@@ -118,6 +123,8 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 FlagListManager::FlagListManager()
 : data(NULL), proxyData(NULL) {
 	TCManager::RegisterTCBinaryChanged(this);
+
+
 }
 
 FlagListManager::~FlagListManager() {
@@ -349,9 +356,6 @@ FlagListManager::BuildCaps FlagListManager::GetBuildCaps() const {
 }
 
 FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileName& flagfilename) {
-	// Reset this in case there was a valid structure before
-	this->flags_json = nullptr;
-
 	if (!flagfilename.FileExists()) {
 		wxLogError(_T("The FS2 Open executable did not generate a flag file."));
 		return FLAG_FILE_NOT_GENERATED;
@@ -491,6 +495,37 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 	this->buildCaps.newSound = buildCaps & BUILD_CAPS_NEW_SND;
 	this->buildCaps.sdl = buildCaps & BUILD_CAPS_SDL;
 
+	// Since the old method does not provide joystick information we generate that here
+	if (!JoyMan::IsInitialized()) {
+		JoyMan::ApiType apiType;
+#if IS_WIN32
+		// If the current executable is a SDL exe, use that API
+		if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl)
+		{
+			apiType = JoyMan::API_SDL;
+		}
+		else
+		{
+			apiType = JoyMan::API_NATIVE;
+		}
+#else
+		// Unix always uses SDL
+		apiType = JoyMan::API_SDL;
+#endif
+		if (!JoyMan::Initialize(apiType)) {
+			wxLogWarning(_T("Failed to initialize joysticks"));
+		}
+	}
+
+	joysticks.clear();
+	for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); ++i) {
+		Joystick stick;
+		stick.name = JoyMan::JoystickName(i);
+		stick.guid = JoyMan::JoystickGUID(i);
+		stick.is_haptic = JoyMan::SupportsForceFeedback(i);
+		joysticks.push_back(stick);
+	}
+
 	this->data->GenerateFlagSets();
 	
 	this->proxyData = this->data->GenerateProxyFlagData();
@@ -515,8 +550,6 @@ void FlagListManager::convertAndAddJsonFlag(const json& data) {
 
 FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::string& data) {
 	// Reset this in case there was a valid structure before
-	this->flags_json = nullptr;
-
 	try {
 		auto flags_json = json::parse(data);
 
@@ -531,6 +564,15 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 
 		for (auto& flag : flags) {
 			convertAndAddJsonFlag(flag);
+		}
+
+		joysticks.clear();
+		for (auto& joystick : flags_json.at("joysticks")) {
+			Joystick stick;
+			stick.name = jsonToWxString(joystick.at("name"));
+			stick.guid = jsonToWxString(joystick.at("guid"));
+			stick.is_haptic = joystick.at("is_haptic").get<bool>();
+			joysticks.push_back(stick);
 		}
 
 		this->data->GenerateFlagSets();
@@ -569,6 +611,9 @@ FlagListManager::FlagFileProcessingStatus FlagListManager::GetFlagFileProcessing
 	} else {
 		return FlagListManager::FLAG_FILE_PROCESSING_ERROR;
 	}
+}
+const std::vector<FlagListManager::Joystick>& FlagListManager::GetJoysticks() const {
+	return joysticks;
 }
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
