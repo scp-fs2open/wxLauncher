@@ -458,5 +458,5 @@ bool OpenALMan::BuildHasNewSoundCode() {
 	wxCHECK_MSG(FlagListManager::GetFlagListManager()->IsProcessingOK(), false,
 		_T("Flag file processing has not (yet) succeeded."));
 	
-	return (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_NEW_SND) > 0;
+	return (FlagListManager::GetFlagListManager()->GetBuildCaps().newSound) > 0;
 }

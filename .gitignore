@@ -8,3 +8,9 @@ output
 *~
 *.orig
 *.rej
+
+# CLion
+.idea
+
+# Visual Studio Code
+.vscode

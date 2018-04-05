@@ -69,7 +69,7 @@ wxFileName GetPlatformDefaultConfigFilePathNew() {
 
 wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
 	wxFileName path;
-	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl) {
 		path = GetPlatformDefaultConfigFilePathNew();
 	}
 	else {

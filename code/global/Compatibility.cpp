@@ -87,7 +87,7 @@ namespace Compatibility
 {
 	bool SynchronizeOldPilots(ProMan* profileManager)
 	{
-		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL))
+		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps().sdl))
 		{
 			// Nothing to do, we have an old build
 			return true;
@@ -167,7 +167,7 @@ namespace Compatibility
 
 	bool MigrateOldConfig()
 	{
-		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL))
+		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps().sdl))
 		{
 			// Nothing to do, we have an old build
 			return true;

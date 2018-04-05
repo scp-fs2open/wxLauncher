@@ -23,7 +23,7 @@
 #include "datastructures/FSOExecutable.h"
 #include "global/ProfileKeys.h"
 
-#include "global/MemoryDebugging.h"
+#include <vector>
 
 /** \class FlagListManager
  FlagListManager is used to notify controls that have registered with it
@@ -35,6 +35,10 @@ LAUNCHER_DEFINE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
 EventHandlers FlagListManager::ffProcessingStatusChangedHandlers;
+
+static wxString jsonToWxString(const json& str) {
+	return wxString::FromUTF8(str.get<std::string>().c_str());
+}
 
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
 	wxASSERT(FlagListManager::IsInitialized());
@@ -112,7 +116,7 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 }
 
 FlagListManager::FlagListManager()
-: data(NULL), proxyData(NULL), buildCaps(0) {
+: data(NULL), proxyData(NULL) {
 	TCManager::RegisterTCBinaryChanged(this);
 }
 
@@ -146,7 +150,7 @@ void FlagListManager::DeleteExistingData() {
 		delete temp;
 	}
 	
-	this->buildCaps = 0;
+	this->buildCaps = BuildCaps();
 }
 
 void FlagListManager::BeginFlagFileProcessing() {
@@ -227,13 +231,14 @@ void FlagListManager::BeginFlagFileProcessing() {
 	wxString commandline;
 	// use "" to correct for spaces in path to exeFilename
 	if (exeFilename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
-		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -get_flags");
+		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -parse_cmdline_only -get_flags json_v1");
 	} else {
-		commandline = exeFilename.GetFullPath() + _T(" -get_flags");
+		commandline = exeFilename.GetFullPath() + _T(" -parse_cmdline_only -get_flags json_v1");
 	}
 	
 	wxLogDebug(_T(" Called FS2 Open with command line '%s'."), commandline.c_str());
 	FlagProcess *process = new FlagProcess(flagFileLocations);
+	process->Redirect();
 
 #if wxCHECK_VERSION(2, 9, 2)
 	wxExecuteEnv env;
@@ -336,14 +341,17 @@ ProxyFlagData* FlagListManager::GetProxyFlagData() {
 	return temp;
 }
 
-wxByte FlagListManager::GetBuildCaps() const {
-	wxCHECK_MSG(this->IsProcessingOK(), 0,
+FlagListManager::BuildCaps FlagListManager::GetBuildCaps() const {
+	wxCHECK_MSG(this->IsProcessingOK(), BuildCaps(),
 		_T("attempt to get build caps even though processing hasn't succeeded"));
 	
 	return this->buildCaps;
 }
 
 FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileName& flagfilename) {
+	// Reset this in case there was a valid structure before
+	this->flags_json = nullptr;
+
 	if (!flagfilename.FileExists()) {
 		wxLogError(_T("The FS2 Open executable did not generate a flag file."));
 		return FLAG_FILE_NOT_GENERATED;
@@ -478,14 +486,70 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		wxLogInfo(_T(" Old build that does not output its capabilities, must not support OpenAL"));
 		buildCaps = 0;
 	}
-	this->buildCaps = buildCaps;
-	
+	this->buildCaps.openAL = buildCaps & BUILD_CAPS_OPENAL;
+	this->buildCaps.noD3D = buildCaps & BUILD_CAPS_NO_D3D;
+	this->buildCaps.newSound = buildCaps & BUILD_CAPS_NEW_SND;
+	this->buildCaps.sdl = buildCaps & BUILD_CAPS_SDL;
+
 	this->data->GenerateFlagSets();
 	
 	this->proxyData = this->data->GenerateProxyFlagData();
 	
 	return PROCESSING_OK;
 }
+
+void FlagListManager::convertAndAddJsonFlag(const json& data) {
+	auto flag = new Flag();
+
+	flag->flagString = jsonToWxString(data.at("name"));
+	flag->shortDescription = jsonToWxString(data.at("description"));
+	flag->webURL = jsonToWxString(data.at("web_url"));
+	flag->fsoCatagory = jsonToWxString(data.at("type"));
+	flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
+
+	flag->easyEnable = data.at("on_flags").get<int>();
+	flag->easyDisable = data.at("off_flags").get<int>();
+
+	this->data->AddFlag(flag);
+}
+
+FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::string& data) {
+	// Reset this in case there was a valid structure before
+	this->flags_json = nullptr;
+
+	try {
+		auto flags_json = json::parse(data);
+
+		auto easy_flags = flags_json.at("easy_flags");
+
+		for (auto& easy_flag : easy_flags) {
+			auto str = wxString::FromUTF8(easy_flag.get<std::string>().c_str());
+			this->data->AddEasyFlag(str);
+		}
+
+		auto flags = flags_json.at("flags");
+
+		for (auto& flag : flags) {
+			convertAndAddJsonFlag(flag);
+		}
+
+		this->data->GenerateFlagSets();
+
+		this->proxyData = this->data->GenerateProxyFlagData();
+
+		return PROCESSING_OK;
+	} catch (const json::type_error& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	} catch (const json::out_of_range& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	} catch (const json::parse_error& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	}
+}
+
 
 void FlagListManager::SetProcessingStatus(const ProcessingStatus& processingStatus) {
 	this->processingStatus = processingStatus;
@@ -513,30 +577,49 @@ FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
 
 void FlagListManager::FlagProcess::OnTerminate(int pid, int status) {
 	wxLogDebug(_T(" FS2 Open returned %d when polled for the flags"), status);
-	
-	// Find the flag file
-	wxFileName flagfile;
-	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
-		bool exists = flagFileLocations[i].FileExists();
-		if (exists) {
-			flagfile = flagFileLocations[i];
-			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
-				flagFileLocations[i].GetFullPath().c_str(),
-				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+
+	auto stream = GetInputStream();
+	std::string content;
+	char buffer[1024];
+	while (true) {
+		stream->Read(buffer, 1024);
+
+		if (stream->LastRead() > 0) {
+			content.append(buffer, buffer + stream->LastRead());
+		} else {
+			break;
 		}
 	}
-	
-	if ( !flagfile.FileExists() ) {
-		FlagListManager::GetFlagListManager()->SetProcessingStatus(FLAG_FILE_NOT_GENERATED);
-		wxLogError(_T(" FS2 Open did not generate a flag file."));
-		return;
-	}
-	
-	FlagListManager::GetFlagListManager()->SetProcessingStatus(
-		FlagListManager::GetFlagListManager()->ParseFlagFile(flagfile));
-	
-	if ( FlagListManager::GetFlagListManager()->IsProcessingOK() ) {
-		::wxRemoveFile(flagfile.GetFullPath());
+
+	// If the build does not support JSON output then the output will be empty
+	if (content.empty()) {
+		// Find the flag file
+		wxFileName flagfile;
+		for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
+			bool exists = flagFileLocations[i].FileExists();
+			if (exists) {
+				flagfile = flagFileLocations[i];
+				wxLogDebug(_T(" Searching for flag file at %s ... %s"),
+						   flagFileLocations[i].GetFullPath().c_str(),
+						   (flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+			}
+		}
+
+		if ( !flagfile.FileExists() ) {
+			FlagListManager::GetFlagListManager()->SetProcessingStatus(FLAG_FILE_NOT_GENERATED);
+			wxLogError(_T(" FS2 Open did not generate a flag file."));
+			return;
+		}
+
+		FlagListManager::GetFlagListManager()->SetProcessingStatus(
+			FlagListManager::GetFlagListManager()->ParseFlagFile(flagfile));
+
+		if ( FlagListManager::GetFlagListManager()->IsProcessingOK() ) {
+			::wxRemoveFile(flagfile.GetFullPath());
+		}
+	} else {
+		FlagListManager::GetFlagListManager()->SetProcessingStatus(FlagListManager::GetFlagListManager()->ParseJsonData(
+			content));
 	}
 	
 	delete this;
