@@ -29,13 +29,13 @@ EventHandlers ResolutionMap::resolutionMapChangedHandlers;
 
 PreferredResolutionMap ResolutionMap::prefResMap;
 
-const ResolutionData* ResolutionMap::ResolutionRead(const wxString& shortname) {
+const ResolutionMapData* ResolutionMap::ResolutionRead(const wxString& shortname) {
 	PreferredResolutionMap::const_iterator it = prefResMap.find(shortname);
 	
 	return (it == prefResMap.end()) ? NULL : &it->second;
 }
 
-void ResolutionMap::ResolutionWrite(const wxString& shortname, const ResolutionData& resData) {
+void ResolutionMap::ResolutionWrite(const wxString& shortname, const ResolutionMapData& resData) {
 	wxASSERT(!shortname.IsEmpty());
 	wxASSERT(resData.IsValid());
 	

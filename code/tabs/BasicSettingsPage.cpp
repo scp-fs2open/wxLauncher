@@ -21,13 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 #include <wx/choicebk.h>
-#include <wx/gbsizer.h>
-#include <wx/hyperlink.h>
 
 #include "generated/configure_launcher.h"
 
 #if HAS_SDL == 1
-#include "SDL.h"
 #endif
 
 #include "tabs/BasicSettingsPage.h"
@@ -46,13 +43,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
 #include "datastructures/ResolutionMap.h"
-
-#include "global/MemoryDebugging.h" // Last include for memory debugging
-
-namespace
-{
-	const int BUILD_CAP_SDL = 1 << 3;
-}
 
 /** A mechanism for allowing a network settings option's description (GUI label)
  to differ from its corresponding registry value. */
@@ -1246,7 +1236,8 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	wxChoice* resolutionCombo = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
 	wxCHECK_RET(resolutionCombo != NULL, _T("Unable to find resolution combo"));
-	
+
+	resolutionCombo->Clear();
 	FillResolutionDropBox(resolutionCombo, minHorizRes, minVertRes);
 	
 	long width = 0, height = 0;
@@ -1257,7 +1248,7 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	wxString resString;
 	
 	// first try reading from ResolutionMap
-	const ResolutionData* resDataPtr = ResolutionMap::ResolutionRead(shortname);
+	auto resDataPtr = ResolutionMap::ResolutionRead(shortname);
 		
 	if (resDataPtr != NULL) {
 		width = resDataPtr->width;
@@ -1323,8 +1314,8 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	// update profile and ResolutionMap
 	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_WIDTH, width);
 	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, height);
-	
-	ResolutionMap::ResolutionWrite(shortname, ResolutionData(width, height));
+
+	ResolutionMap::ResolutionWrite(shortname, ResolutionMapData(width, height));
 }
 
 /** Adjust the resolution drop down box according to the active mod's restrictions. */
@@ -1420,33 +1411,112 @@ void BasicSettingsPage::ShowSettings(const bool showSettings) {
 	}
 }
 
-void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
-	const long minHorizontalRes, const long minVerticalRes)
+class ResolutionData: public wxClientData {
+ public:
+	explicit ResolutionData(const FlagListManager::Resolution& res_in, bool header) {
+		this->is_header = header;
+		this->resolution = res_in;
+	}
+	bool IsHeader() const {
+		return is_header;
+	}
+	const FlagListManager::Resolution& GetResolution() const {
+		return resolution;
+	}
+	wxString GetResString() const {
+		return is_header ? wxString::Format(_T("--- %d:%d ---"), resolution.width, resolution.height)
+						 : wxString::Format(CFG_RES_FORMAT_STRING, resolution.width, resolution.height);
+	}
+ private:
+	bool is_header = false;
+	FlagListManager::Resolution resolution;
+};
+
+// brought to you by http://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+static int ComputeGCD(int a, int b) {
+	wxASSERT_MSG(a > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): a must be positive"), a, b));
+	wxASSERT_MSG(b > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): b must be positive"), a, b));
+
+	//	part of the original algorithm, but irrelevant, since a and b are positive
+	//	if (a == 0) {
+	//		return b;
+	//	}
+	while (b != 0) {
+		if (a > b) {
+			a = a - b;
+		} else {
+			b = b - a;
+		}
+	}
+	return a;
+}
+
+// Assumed resolutions has been sorted using CompareResolutions
+static void AddHeaders(std::vector<ResolutionData*>& resolutions) {
+	if (resolutions.empty()) {
+		wxLogWarning(_T("AddHeaders: provided ResolutionArray is empty"));
+		return;
+	}
+
+	std::vector<std::pair<size_t, ResolutionData*>> headers;
+
+	int lastAspectWidth = -1;
+	int lastAspectHeight = -1;
+
+	// find aspect ratios and determine where the aspect ratio headers should be inserted
+	for (size_t i = 0, n = resolutions.size(); i < n; ++i) {
+		auto width = resolutions[i]->GetResolution().width;
+		auto height = resolutions[i]->GetResolution().height;
+		auto gcd = ComputeGCD(width, height);
+		width /= gcd;
+		height /= gcd;
+
+		// special exception: 8:5 should be 16:10
+		if ((width == 8) && (height == 5)) {
+			width *= 2;
+			height *= 2;
+		}
+
+		if ((width != lastAspectWidth) || (height != lastAspectHeight)) {
+			wxLogDebug(_T(" found aspect ratio %d:%d"), width, height);
+			FlagListManager::Resolution res;
+			res.width = width;
+			res.height = height;
+
+			headers.push_back(std::make_pair(i, new ResolutionData(res, true)));
+			lastAspectWidth = width;
+			lastAspectHeight = height;
+		}
+	}
+
+	// now insert the headers into resolutions
+	// must insert in reverse to avoid messing up insertion indexes
+	for (auto iter = headers.rbegin(); iter != headers.rend(); ++iter) {
+		resolutions.insert(resolutions.begin() + iter->first, iter->second);
+	}
+}
+
+void
+BasicSettingsPage::FillResolutionDropBox(wxChoice* resChoice, const long minHorizontalRes, const long minVerticalRes)
 {
-	ResolutionMan::ResolutionArray resolutions;
-	ResolutionMan::ApiType apiType;
 	auto flagListManager = FlagListManager::GetFlagListManager();
 
 	if (flagListManager->IsProcessingOK()) {
-#if IS_WIN32
-		// If the current executable is a SDL exe, use that API
-		if (flagListManager->GetBuildCaps() & BUILD_CAP_SDL) {
-			apiType = ResolutionMan::API_SDL;
-		} else {
-			apiType = ResolutionMan::API_WIN32;
-		}
-#else
-		// OSX and Linux always use the SDL api
-		apiType = ResolutionMan::API_SDL;
-#endif
-		ResolutionMan::EnumerateGraphicsModes(apiType, resolutions,
-			minHorizontalRes, minVerticalRes);
+		auto resolutions = flagListManager->GetResolutions();
 
-		for (auto it = resolutions.begin(), end = resolutions.end();
-			it != end; ++it)
-		{
-			auto p = dynamic_cast<ResolutionMan::Resolution*>(*it);
-			resChoice->Append(p->GetResString(), p);
+		// Sort resolutions in descending order
+		std::sort(resolutions.begin(), resolutions.end(), std::greater<FlagListManager::Resolution>());
+
+		std::vector<ResolutionData*> boxData;
+		for (auto& res : resolutions) {
+			if (res.width >= minHorizontalRes && res.height >= minVerticalRes) {
+				boxData.push_back(new ResolutionData(res, false));
+			}
+		}
+		AddHeaders(boxData);
+
+		for (auto& resData : boxData) {
+			resChoice->Append(resData->GetResString(), resData);
 		}
 	}
 }
@@ -1462,10 +1532,9 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	
 	int maxResIndex = -1;
 	int maxResProduct = 0;
-	ResolutionMan::Resolution* res;
 
 	for (unsigned int i = 0; i < resChoice.GetCount(); ++i) {
-		res = dynamic_cast<ResolutionMan::Resolution*>(
+		auto res = dynamic_cast<ResolutionData*>(
 			resChoice.GetClientObject(i));
 		wxCHECK_MSG(res != NULL, wxNOT_FOUND,
 			wxString::Format(
@@ -1475,7 +1544,7 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 		// aspect ratio but 'n' is pretty small, so it is not
 		// worth the space or complexity tradeoff
 		if (!res->IsHeader()) {
-			int resProduct = res->GetWidth() * res->GetHeight();
+			int resProduct = res->GetResolution().width * res->GetResolution().height;
 			if (resProduct > maxResProduct) {
 				maxResIndex = i;
 				maxResProduct = resProduct;
@@ -1486,12 +1555,10 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	wxCHECK_MSG(maxResIndex > -1, wxNOT_FOUND,
 		_T("maximum Resolution was not found"));
 	
-	res = dynamic_cast<ResolutionMan::Resolution*>(
-		resChoice.GetClientObject(maxResIndex));
-	wxCHECK_MSG(res != NULL, wxNOT_FOUND,
-		_T("Choice is missing max Resolution object"));
-	width = res->GetWidth();
-	height = res->GetHeight();
+	auto res = dynamic_cast<ResolutionData*>(resChoice.GetClientObject(maxResIndex));
+	wxCHECK_MSG(res != NULL, wxNOT_FOUND, _T("Choice is missing max Resolution object"));
+	width = res->GetResolution().width;
+	height = res->GetResolution().height;
 	
 	wxLogDebug(_T("Found max resolution of %s at index %d"),
 		res->GetResString().c_str(), maxResIndex);
@@ -1506,10 +1573,8 @@ void BasicSettingsPage::OnSelectVideoResolution(
 	wxCHECK_RET( choice != NULL,
 		_T("Unable to find resolution combo"));
 
-	auto res = dynamic_cast<ResolutionMan::Resolution*>(
-		choice->GetClientObject(choice->GetSelection()));
-	wxCHECK_RET( res != NULL,
-		_T("Choice does not have Resolution objects"));
+	auto res = dynamic_cast<ResolutionData*>(choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( res != NULL, _T("Choice does not have Resolution objects"));
 
 	if (res->IsHeader()) {
 		// User picked aspect ratio, turn that into a real
@@ -1517,13 +1582,12 @@ void BasicSettingsPage::OnSelectVideoResolution(
 		choice->SetSelection(choice->GetSelection() + 1);
 	}
 	
-	res = dynamic_cast<ResolutionMan::Resolution*>(
-		choice->GetClientObject(choice->GetSelection()));
+	res = dynamic_cast<ResolutionData*>(choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( res != NULL,
 		_T("Cho2ce does not have Resolution objects"));
 	
-	const long width = static_cast<long>(res->GetWidth());
-	const long height = static_cast<long>(res->GetHeight());
+	const long width = static_cast<long>(res->GetResolution().width);
+	const long height = static_cast<long>(res->GetResolution().height);
 	
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_RESOLUTION_WIDTH,
@@ -1536,9 +1600,8 @@ void BasicSettingsPage::OnSelectVideoResolution(
 	const ModItem* activeMod = ModList::GetActiveMod();
 	wxCHECK_RET(activeMod != NULL,
 		_T("OnSelectVideoResolution: activeMod is NULL!"));
-	
-	ResolutionMap::ResolutionWrite(activeMod->shortname,
-		ResolutionData(width, height));
+
+	ResolutionMap::ResolutionWrite(activeMod->shortname, ResolutionMapData(width, height));
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
@@ -2055,6 +2118,10 @@ private:
 };
 
 void BasicSettingsPage::SetupJoystickSection() {
+	if (!FlagListManager::GetFlagListManager()->IsProcessingOK()) {
+		return;
+	}
+
 	this->joystickSelected->Clear();
 
 	this->joystickSelected->Append(_("No Joystick"), new JoystickData(FlagListManager::Joystick(), DEFAULT_JOYSTICK_ID));

@@ -21,6 +21,7 @@
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/JoystickManager.h"
+#include "apis/resolution_manager.hpp"
 #include "datastructures/FSOExecutable.h"
 #include "global/ProfileKeys.h"
 
@@ -495,35 +496,60 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 	this->buildCaps.newSound = buildCaps & BUILD_CAPS_NEW_SND;
 	this->buildCaps.sdl = buildCaps & BUILD_CAPS_SDL;
 
-	// Since the old method does not provide joystick information we generate that here
-	if (!JoyMan::IsInitialized()) {
-		JoyMan::ApiType apiType;
+	{
+		// Since the old method does not provide joystick information we generate that here
+		if (!JoyMan::IsInitialized()) {
+			JoyMan::ApiType apiType;
 #if IS_WIN32
-		// If the current executable is a SDL exe, use that API
-		if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl)
-		{
-			apiType = JoyMan::API_SDL;
-		}
-		else
-		{
-			apiType = JoyMan::API_NATIVE;
-		}
+            // If the current executable is a SDL exe, use that API
+            if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl)
+            {
+                apiType = JoyMan::API_SDL;
+            }
+            else
+            {
+                apiType = JoyMan::API_NATIVE;
+            }
 #else
-		// Unix always uses SDL
-		apiType = JoyMan::API_SDL;
+			// Unix always uses SDL
+			apiType = JoyMan::API_SDL;
 #endif
-		if (!JoyMan::Initialize(apiType)) {
-			wxLogWarning(_T("Failed to initialize joysticks"));
+			if (!JoyMan::Initialize(apiType)) {
+				wxLogWarning(_T("Failed to initialize joysticks"));
+			}
+		}
+
+		joysticks.clear();
+		for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); ++i) {
+			Joystick stick;
+			stick.name = JoyMan::JoystickName(i);
+			stick.guid = JoyMan::JoystickGUID(i);
+			stick.is_haptic = JoyMan::SupportsForceFeedback(i);
+			joysticks.push_back(stick);
 		}
 	}
+	{
+		ResolutionMan::ApiType apiType;
+#if IS_WIN32
+		// If the current executable is a SDL exe, use that API
+		if (flagListManager->GetBuildCaps().sdl) {
+			apiType = ResolutionMan::API_SDL;
+		} else {
+			apiType = ResolutionMan::API_WIN32;
+		}
+#else
+		// OSX and Linux always use the SDL api
+		apiType = ResolutionMan::API_SDL;
+#endif
 
-	joysticks.clear();
-	for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); ++i) {
-		Joystick stick;
-		stick.name = JoyMan::JoystickName(i);
-		stick.guid = JoyMan::JoystickGUID(i);
-		stick.is_haptic = JoyMan::SupportsForceFeedback(i);
-		joysticks.push_back(stick);
+		resolutions.clear();
+		auto res_vector = ResolutionMan::EnumerateGraphicsModes(apiType);
+		for (auto& res : res_vector) {
+			Resolution newRes;
+			newRes.width = res.width;
+			newRes.height = res.height;
+			resolutions.push_back(newRes);
+		}
 	}
 
 	this->data->GenerateFlagSets();
@@ -575,6 +601,18 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 			joysticks.push_back(stick);
 		}
 
+		resolutions.clear();
+		auto displays = flags_json.at("displays");
+		if (!displays.empty()) {
+			auto primary = displays[0];
+			for (auto& mode : primary.at("modes")) {
+				Resolution newRes;
+				newRes.width = mode.at("x").get<int>();
+				newRes.height = mode.at("y").get<int>();
+				resolutions.push_back(newRes);
+			}
+		}
+
 		this->data->GenerateFlagSets();
 
 		this->proxyData = this->data->GenerateProxyFlagData();
@@ -614,6 +652,9 @@ FlagListManager::FlagFileProcessingStatus FlagListManager::GetFlagFileProcessing
 }
 const std::vector<FlagListManager::Joystick>& FlagListManager::GetJoysticks() const {
 	return joysticks;
+}
+const std::vector<FlagListManager::Resolution>& FlagListManager::GetResolutions() const {
+	return resolutions;
 }
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
@@ -668,4 +709,44 @@ void FlagListManager::FlagProcess::OnTerminate(int pid, int status) {
 	}
 	
 	delete this;
+}
+bool FlagListManager::Resolution::operator==(const FlagListManager::Resolution& rhs) const {
+	return width == rhs.width && height == rhs.height;
+}
+bool FlagListManager::Resolution::operator!=(const FlagListManager::Resolution& rhs) const {
+	return !(rhs == *this);
+}
+bool FlagListManager::Resolution::operator<(const FlagListManager::Resolution& rhs) const {
+	// compare the two width/height ratios by cross-multiplying and comparing the results
+
+	auto value1 = width * rhs.height;
+	auto value2 = rhs.width * height;
+	// first compare aspect ratio
+	if (value1 < value2) {
+		return true;
+	}
+	else if (value1 > value2) {
+		return false;
+	}
+	else {
+		// then compare size if aspect ratios are equal
+		if (width < rhs.width) {
+			return true;
+		}
+		else if (width > rhs.width) {
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+}
+bool FlagListManager::Resolution::operator>(const FlagListManager::Resolution& rhs) const {
+	return rhs < *this;
+}
+bool FlagListManager::Resolution::operator<=(const FlagListManager::Resolution& rhs) const {
+	return !(rhs < *this);
+}
+bool FlagListManager::Resolution::operator>=(const FlagListManager::Resolution& rhs) const {
+	return !(*this < rhs);
 }

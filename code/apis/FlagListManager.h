@@ -67,6 +67,18 @@ public:
 		bool is_haptic = false;
 	};
 
+	struct Resolution {
+		int width = -1;
+		int height = -1;
+
+		bool operator==(const Resolution& rhs) const;
+		bool operator!=(const Resolution& rhs) const;
+		bool operator<(const Resolution& rhs) const;
+		bool operator>(const Resolution& rhs) const;
+		bool operator<=(const Resolution& rhs) const;
+		bool operator>=(const Resolution& rhs) const;
+	};
+
 	void OnBinaryChanged(wxCommandEvent &event);
 	
 	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
@@ -94,6 +106,8 @@ public:
 	BuildCaps GetBuildCaps() const;
 
 	const std::vector<Joystick>& GetJoysticks() const;
+
+	const std::vector<Resolution>& GetResolutions() const;
 
 private:
 	enum CapabilityFlags {
@@ -145,6 +159,8 @@ private:
 	BuildCaps buildCaps;
 
 	std::vector<Joystick> joysticks;
+
+	std::vector<Resolution> resolutions;
 
 	class FlagProcess: public wxProcess {
 	public:
