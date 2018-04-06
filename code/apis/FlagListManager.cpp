@@ -27,6 +27,8 @@
 
 #include <vector>
 
+#include <SDL_filesystem.h>
+
 /** \class FlagListManager
  FlagListManager is used to notify controls that have registered with it
  that the flag file processing's status has changed. It also extracts
@@ -551,6 +553,33 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 			resolutions.push_back(newRes);
 		}
 	}
+	{
+		configLocation.Clear();
+		if (this->buildCaps.sdl) {
+			// SDL builds now use the user directory on all platforms
+			// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+			char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+			wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+			SDL_free(prefPath);
+
+			configLocation.AssignDir(wxPrefPath);
+		} else {
+#if IS_WIN32
+			configLocation = wxFileName();
+#elif IS_APPLE
+			configLocation.AssignHomeDir();
+			configLocation.AppendDir(_T("Library"));
+			configLocation.AppendDir(_T("FS2_Open"));
+#elif IS_LINUX
+			configLocation.AssignHomeDir();
+			configLocation.AppendDir(_T(".fs2_open"));
+#else
+# error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+		}
+	}
 
 	this->data->GenerateFlagSets();
 	
@@ -579,16 +608,12 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 	try {
 		auto flags_json = json::parse(data);
 
-		auto easy_flags = flags_json.at("easy_flags");
-
-		for (auto& easy_flag : easy_flags) {
+		for (auto& easy_flag : flags_json.at("easy_flags")) {
 			auto str = wxString::FromUTF8(easy_flag.get<std::string>().c_str());
 			this->data->AddEasyFlag(str);
 		}
 
-		auto flags = flags_json.at("flags");
-
-		for (auto& flag : flags) {
+		for (auto& flag : flags_json.at("flags")) {
 			convertAndAddJsonFlag(flag);
 		}
 
@@ -612,6 +637,8 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 				resolutions.push_back(newRes);
 			}
 		}
+
+		configLocation = jsonToWxString(flags_json.at("pref_path"));
 
 		this->data->GenerateFlagSets();
 
@@ -655,6 +682,12 @@ const std::vector<FlagListManager::Joystick>& FlagListManager::GetJoysticks() co
 }
 const std::vector<FlagListManager::Resolution>& FlagListManager::GetResolutions() const {
 	return resolutions;
+}
+wxFileName FlagListManager::GetConfigLocation(const wxString& def_path) const {
+	if (!configLocation.IsOk()) {
+		return wxFileName(def_path);
+	}
+	return configLocation;
 }
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)

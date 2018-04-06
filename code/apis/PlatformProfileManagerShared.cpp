@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wfstream.h>
 #include "generated/configure_launcher.h"
 #include "apis/PlatformProfileManager.h"
+#include "apis/FlagListManager.h"
 #include "controls/LightingPresets.h"
 #include "global/ProfileKeys.h"
 
@@ -37,8 +38,7 @@ ProMan::RegistryCodes PushCmdlineFSO(wxFileConfig *cfg) {
 		lightingPresetFlagSet = LightingPresets::PresetNameToPresetFlagSet(presetName);
 	}
 
-	extern wxFileName GetPlatformDefaultConfigFilePath(const wxString&);
-	wxString cmdLineString = GetPlatformDefaultConfigFilePath(tcPath).GetFullPath();
+	wxString cmdLineString = FlagListManager::GetFlagListManager()->GetConfigLocation(tcPath).GetFullPath();
 
 	cmdLineString += _T("data");
 	

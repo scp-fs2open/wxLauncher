@@ -109,6 +109,8 @@ public:
 
 	const std::vector<Resolution>& GetResolutions() const;
 
+	wxFileName GetConfigLocation(const wxString& def_path = "") const;
+
 private:
 	enum CapabilityFlags {
 		BUILD_CAPS_OPENAL = 1 << 0,
@@ -161,6 +163,8 @@ private:
 	std::vector<Joystick> joysticks;
 
 	std::vector<Resolution> resolutions;
+
+	wxFileName configLocation;
 
 	class FlagProcess: public wxProcess {
 	public:
