@@ -79,6 +79,25 @@ public:
 		bool operator>=(const Resolution& rhs) const;
 	};
 
+	struct OpenAlDevice {
+		wxString name;
+		bool supports_efx = false;
+	};
+
+	struct OpenAlInfo {
+		bool initialized = false;
+
+		std::vector<OpenAlDevice> playbackDevices;
+		std::vector<OpenAlDevice> captureDevices;
+
+		OpenAlDevice defaultPlaybackDevice;
+		OpenAlDevice defaultCaptureDevice;
+
+		wxString version;
+
+		bool EfxSupported(const wxString& device) const;
+	};
+
 	void OnBinaryChanged(wxCommandEvent &event);
 	
 	static void RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler);
@@ -110,6 +129,8 @@ public:
 	const std::vector<Resolution>& GetResolutions() const;
 
 	wxFileName GetConfigLocation(const wxString& def_path = "") const;
+
+	const OpenAlInfo& GetOpenAlInfo() const;
 
 private:
 	enum CapabilityFlags {
@@ -165,6 +186,8 @@ private:
 	std::vector<Resolution> resolutions;
 
 	wxFileName configLocation;
+
+	OpenAlInfo openAlInfo;
 
 	class FlagProcess: public wxProcess {
 	public:

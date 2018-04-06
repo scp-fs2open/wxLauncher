@@ -24,9 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "generated/configure_launcher.h"
 
-#if HAS_SDL == 1
-#endif
-
 #include "tabs/BasicSettingsPage.h"
 #include "global/BasicDefaults.h"
 #include "global/ids.h"
@@ -36,9 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/SpeechManager.h"
-#include "apis/OpenALManager.h"
 #include "apis/JoystickManager.h"
-#include "apis/resolution_manager.hpp"
 #include "apis/HelpManager.h"
 #include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
@@ -704,7 +699,6 @@ BasicSettingsPage::~BasicSettingsPage() {
 	if ( SpeechMan::IsInitialized() ) {
 		SpeechMan::DeInitialize();
 	}
-	OpenALMan::DeInitialize();
 }
 
 /// Event Handling
@@ -1774,17 +1768,19 @@ void BasicSettingsPage::OnSelectSoundDevice(wxCommandEvent &event) {
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
 
-	if (OpenALMan::BuildHasNewSoundCode()) {
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps().newSound) {
 		wxCheckBox* enableEFX = dynamic_cast<wxCheckBox*>(
 			wxWindow::FindWindowById(ID_ENABLE_EFX));
 		wxCHECK_RET(enableEFX != NULL, _T("Unable to find enable EFX checkbox"));
 
-		enableEFX->Show(OpenALMan::IsEFXSupported(openaldevice->GetStringSelection()));
+		auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
+		enableEFX->Show(alInfo.EfxSupported(openaldevice->GetStringSelection()));
 	}
 }
 
 void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	wxChoice* captureDevice = dynamic_cast<wxChoice*>(
@@ -1796,14 +1792,14 @@ void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
 }
 
 void BasicSettingsPage::OnToggleEnableEFX(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_EFX, event.IsChecked());
 }
 
 void BasicSettingsPage::OnChangeSampleRate(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	wxTextCtrl* sampleRateBox = dynamic_cast<wxTextCtrl*>(
@@ -1838,35 +1834,34 @@ void BasicSettingsPage::OnDownloadOpenAL(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void BasicSettingsPage::OnDetectOpenAL(wxCommandEvent& WXUNUSED(event)) {
-	if ( !OpenALMan::IsInitialized() ) {
-		this->SetupOpenALSection();
-	}
+	// This triggers a new flag file generation which will pick up new OpenAL devices
+	TCManager::GenerateTCBinaryChanged();
 }
 
-void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
-	const SoundDeviceType deviceType) {
-	
+void BasicSettingsPage::InitializeSoundDeviceDropDownBox(const SoundDeviceType deviceType) {
 	wxCHECK_RET((deviceType == PLAYBACK) || (deviceType == CAPTURE),
 		wxString::Format(_T("Invalid device type %u given."), deviceType));
-	
+
+	auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
 	WindowIDS deviceDropDownBoxID;
 	wxString deviceTypeNameAdjustment;
 	wxString deviceProfileEntryName;
-	wxArrayString availableDevices;
-	wxString defaultDevice;
+	std::vector<FlagListManager::OpenAlDevice> availableDevices;
+	FlagListManager::OpenAlDevice defaultDevice;
 	
 	if (deviceType == PLAYBACK) {
 		deviceDropDownBoxID = ID_SELECT_SOUND_DEVICE;
 		// (deviceTypeNameAdjustment remains empty in this case)
 		deviceProfileEntryName = PRO_CFG_OPENAL_DEVICE;
-		availableDevices = OpenALMan::GetAvailablePlaybackDevices();
-		defaultDevice = OpenALMan::GetSystemDefaultPlaybackDevice();
+		availableDevices = alInfo.playbackDevices;
+		defaultDevice = alInfo.defaultPlaybackDevice;
 	} else {
 		deviceDropDownBoxID = ID_SELECT_CAPTURE_DEVICE;
 		deviceTypeNameAdjustment = _T(" capture");
 		deviceProfileEntryName = PRO_CFG_OPENAL_CAPTURE_DEVICE;
-		availableDevices = OpenALMan::GetAvailableCaptureDevices();
-		defaultDevice = OpenALMan::GetSystemDefaultCaptureDevice();
+		availableDevices = alInfo.captureDevices;
+		defaultDevice = alInfo.defaultCaptureDevice;
 	}
 	
 	wxChoice* deviceDropDownBox = dynamic_cast<wxChoice*>(
@@ -1887,7 +1882,7 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 	
 	wxASSERT(!deviceProfileEntryName.IsEmpty());
 	
-	if (availableDevices.IsEmpty()) {
+	if (availableDevices.empty()) {
 		if (deviceType == PLAYBACK) {
 			wxLogWarning(_T("No playback devices were found on the system."));
 		} else {
@@ -1896,12 +1891,14 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 		return;
 	}
 	
-	wxASSERT_MSG(!defaultDevice.IsEmpty(),
+	wxASSERT_MSG(!defaultDevice.name.empty(),
 		wxString::Format(_T("No default sound%s device was found."),
 			deviceTypeNameAdjustment.c_str()));
 	
 	// update device drop down box and select a device
-	deviceDropDownBox->Append(availableDevices);
+	for (auto& device : availableDevices) {
+		deviceDropDownBox->Append(device.name);
+	}
 	
 	wxString device;
 	
@@ -1909,16 +1906,16 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 		deviceDropDownBox->SetStringSelection(device);
 	} else {
 		wxLogDebug(_T("Reported default sound%s device: %s"),
-			deviceTypeNameAdjustment.c_str(), defaultDevice.c_str());
+			deviceTypeNameAdjustment.c_str(), defaultDevice.name.c_str());
 		
-		if (!defaultDevice.IsEmpty() &&
-			(deviceDropDownBox->FindString(defaultDevice) != wxNOT_FOUND)) {
-			deviceDropDownBox->SetStringSelection(defaultDevice);
+		if (!defaultDevice.name.empty() &&
+			(deviceDropDownBox->FindString(defaultDevice.name) != wxNOT_FOUND)) {
+			deviceDropDownBox->SetStringSelection(defaultDevice.name);
 		} else {
 			wxLogWarning(
 				_T("Default sound%s device %s not found. Using first entry %s."),
 				deviceTypeNameAdjustment.c_str(),
-				defaultDevice.c_str(),
+				defaultDevice.name.c_str(),
 				deviceDropDownBox->GetString(0).c_str());
 			deviceDropDownBox->SetSelection(0);
 		}
@@ -1937,16 +1934,9 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 }
 
 void BasicSettingsPage::SetupOpenALSection() {
-	if ( !OpenALMan::WasCompiledIn() ) {
-		wxLogWarning(_T("Launcher was not compiled to support OpenAL"));
-		if (this->openALVersion != NULL) {
-			this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
-		}
-		this->soundDeviceText->Disable();
-		this->soundDeviceCombo->Disable();
-		this->downloadOpenALButton->Disable();
-		this->detectOpenALButton->Disable();
-	} else if ( !OpenALMan::Initialize() ) {
+	auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
+	if ( !alInfo.initialized ) {
 		wxLogError(_T("Unable to initialize OpenAL"));
 		if (this->openALVersion != NULL) {
 			this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));			
@@ -1963,7 +1953,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		wxASSERT_MSG(!soundDeviceCombo->IsEmpty(),
 			_T("sound device combo box is empty!"));
 		
-		if (OpenALMan::BuildHasNewSoundCode()) {
+		if (FlagListManager::GetFlagListManager()->GetBuildCaps().newSound) {
 			if (this->captureDeviceCombo->IsEmpty()) {
 				this->InitializeSoundDeviceDropDownBox(CAPTURE);
 			}
@@ -2012,13 +2002,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 			this->audioSizer->Show(this->audioNewSoundSizer, true);
 			
 			const wxString playbackDevice(this->soundDeviceCombo->GetStringSelection());
-			if (!OpenALMan::IsEFXSupported(playbackDevice)) {
-				wxLogDebug(
-					_T("Playback device '%s' does not support EFX.")
-					_T(" Hiding Enable EFX checkbox."),
-						playbackDevice.c_str());
-				this->audioNewSoundSizer->Hide(efxCheckBox);
-			}
+			efxCheckBox->Show(alInfo.EfxSupported(playbackDevice));
 			
 			if (this->captureDeviceCombo->IsEmpty()) {
 				this->audioNewSoundDeviceSizer->Hide(this->captureDeviceCombo);
@@ -2085,7 +2069,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
 		
-		wxLogInfo(OpenALMan::GetCurrentVersion());
+		wxLogInfo(_("Detected OpenAL version: %s"), alInfo.version.c_str());
 		
 		this->audioOldSoundSizer->Hide(this->openALVersion);
 		

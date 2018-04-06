@@ -21,11 +21,10 @@
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/JoystickManager.h"
+#include "apis/OpenALManager.h"
 #include "apis/resolution_manager.hpp"
 #include "datastructures/FSOExecutable.h"
 #include "global/ProfileKeys.h"
-
-#include <vector>
 
 #include <SDL_filesystem.h>
 
@@ -105,7 +104,10 @@ void FlagListManager::DeInitialize() {
 	if (JoyMan::IsInitialized()) {
 		JoyMan::DeInitialize();
 	}
-	
+	if (OpenALMan::IsInitialized()) {
+		OpenALMan::DeInitialize();
+	}
+
 	FlagListManager* temp = FlagListManager::flagListManager;
 	FlagListManager::flagListManager = NULL;
 	delete temp;
@@ -580,6 +582,37 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 #endif
 		}
 	}
+	{
+		openAlInfo = OpenAlInfo();
+		if (!OpenALMan::IsInitialized()) {
+			openAlInfo.initialized = OpenALMan::Initialize();
+		} else {
+			openAlInfo.initialized = true;
+		}
+
+		if (openAlInfo.initialized) {
+			for (auto& device : OpenALMan::GetAvailablePlaybackDevices()) {
+				OpenAlDevice dev;
+				dev.name = device;
+				dev.supports_efx = OpenALMan::IsEFXSupported(device);
+
+				openAlInfo.playbackDevices.push_back(dev);
+			}
+			for (auto& device : OpenALMan::GetAvailableCaptureDevices()) {
+				OpenAlDevice dev;
+				dev.name = device;
+				openAlInfo.captureDevices.push_back(dev);
+			}
+
+			openAlInfo.defaultPlaybackDevice.name = OpenALMan::GetSystemDefaultPlaybackDevice();
+			openAlInfo.defaultPlaybackDevice.supports_efx =
+				OpenALMan::IsEFXSupported(OpenALMan::GetSystemDefaultPlaybackDevice());
+
+			openAlInfo.defaultCaptureDevice.name = OpenALMan::GetSystemDefaultCaptureDevice();
+
+			openAlInfo.version = OpenALMan::GetCurrentVersion();
+		}
+	}
 
 	this->data->GenerateFlagSets();
 	
@@ -617,6 +650,13 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 			convertAndAddJsonFlag(flag);
 		}
 
+		auto& caps_array = flags_json.at("caps");
+		buildCaps = BuildCaps();
+		buildCaps.openAL = std::find(caps_array.begin(), caps_array.end(), "OpenAL") != caps_array.end();
+		buildCaps.noD3D = std::find(caps_array.begin(), caps_array.end(), "No D3D") != caps_array.end();
+		buildCaps.newSound = std::find(caps_array.begin(), caps_array.end(), "New Sound") != caps_array.end();
+		buildCaps.sdl = std::find(caps_array.begin(), caps_array.end(), "SDL") != caps_array.end();
+
 		joysticks.clear();
 		for (auto& joystick : flags_json.at("joysticks")) {
 			Joystick stick;
@@ -639,6 +679,48 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 		}
 
 		configLocation = jsonToWxString(flags_json.at("pref_path"));
+
+		{
+			openAlInfo = OpenAlInfo();
+			openAlInfo.initialized = true;
+
+			auto& openal_obj = flags_json.at("openal");
+			for (auto& playback_dev : openal_obj.at("playback_devices")) {
+				OpenAlDevice dev;
+				dev.name = jsonToWxString(playback_dev);
+
+				try {
+					auto& efx_obj = openal_obj.at("efx_support");
+					dev.supports_efx = efx_obj.at(playback_dev.get<std::string>()).get<bool>();
+				} catch (const json::out_of_range& err) {
+					dev.supports_efx = false;
+				}
+
+				openAlInfo.playbackDevices.push_back(dev);
+			}
+			for (auto& device : openal_obj.at("capture_devices")) {
+				OpenAlDevice dev;
+				dev.name = jsonToWxString(device);
+				openAlInfo.captureDevices.push_back(dev);
+			}
+
+			OpenAlDevice dev;
+			dev.name = jsonToWxString(openal_obj.at("default_playback"));
+
+			try {
+				auto& efx_obj = openal_obj.at("efx_support");
+				dev.supports_efx = efx_obj.at(openal_obj.at("default_playback").get<std::string>()).get<bool>();
+			} catch (const json::out_of_range& err) {
+				dev.supports_efx = false;
+			}
+			openAlInfo.defaultPlaybackDevice = dev;
+
+			openAlInfo.defaultCaptureDevice.name = jsonToWxString(openal_obj.at("default_capture"));
+
+			openAlInfo.version = wxString::Format("%d.%d",
+												  openal_obj.at("version_major").get<int>(),
+												  openal_obj.at("version_minor").get<int>());
+		}
 
 		this->data->GenerateFlagSets();
 
@@ -688,6 +770,9 @@ wxFileName FlagListManager::GetConfigLocation(const wxString& def_path) const {
 		return wxFileName(def_path);
 	}
 	return configLocation;
+}
+const FlagListManager::OpenAlInfo& FlagListManager::GetOpenAlInfo() const {
+	return openAlInfo;
 }
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
@@ -782,4 +867,15 @@ bool FlagListManager::Resolution::operator<=(const FlagListManager::Resolution& 
 }
 bool FlagListManager::Resolution::operator>=(const FlagListManager::Resolution& rhs) const {
 	return !(*this < rhs);
+}
+bool FlagListManager::OpenAlInfo::EfxSupported(const wxString& device) const {
+	if (device == defaultPlaybackDevice.name) {
+		return defaultPlaybackDevice.supports_efx;
+	}
+	for (auto& dev : playbackDevices) {
+		if (dev.name == device) {
+			return dev.supports_efx;
+		}
+	}
+	return false;
 }
