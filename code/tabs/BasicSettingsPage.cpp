@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/wx.h>
 #include <wx/filename.h>
 #include <wx/choicebk.h>
+#include <wx/gbsizer.h>
 
 #include "generated/configure_launcher.h"
 

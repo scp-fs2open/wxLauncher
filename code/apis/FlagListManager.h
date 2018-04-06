@@ -191,10 +191,14 @@ private:
 
 	class FlagProcess: public wxProcess {
 	public:
-		FlagProcess(FlagFileArray flagFileLocations);
+		explicit FlagProcess(FlagFileArray flagFileLocations);
 		virtual void OnTerminate(int pid, int status);
 	private:
+		void OnReadTimer(wxTimerEvent& event);
+
 		FlagFileArray flagFileLocations;
+		std::string _output;
+		wxTimer _timer;
 	};
 	
 	DECLARE_EVENT_TABLE()

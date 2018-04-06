@@ -218,7 +218,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	// Joystick GUID
 	wxString currentJoystickGUID;
 	auto& joysticks = FlagListManager::GetFlagListManager()->GetJoysticks();
-	if (currentJoystick >= 0 && currentJoystick < joysticks.size()) {
+	if (currentJoystick >= 0 && currentJoystick < (int) joysticks.size()) {
 		currentJoystickGUID = joysticks[currentJoystick].guid;
 	}
 

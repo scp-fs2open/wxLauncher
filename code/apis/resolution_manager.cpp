@@ -33,14 +33,12 @@ available resolutions for the BasicSettingsTab.
 using namespace ResolutionMan;
 
 #ifdef WIN32
-void EnumerateGraphicsModes_win32(
-	ResolutionArray &out_modes,
-	const DWORD minHorizontalRes,
-	const DWORD minVerticalRes)
+std::vector<Resolution> EnumerateGraphicsModes_win32()
 {
 	DEVMODE deviceMode;
 	DWORD modeCounter = 0;
 	BOOL result;
+	std::vector<Resolution> out_modes;
 
 	wxLogDebug(_T("Enumerating graphics modes with Win32"));
 
@@ -58,32 +56,31 @@ void EnumerateGraphicsModes_win32(
 				deviceMode.dmDisplayFrequency,
 				deviceMode.dmDisplayFlags);
 
-			Resolution candidate(
-				deviceMode.dmPelsWidth, deviceMode.dmPelsHeight, false);
+			Resolution candidate;
+			candidate.width = deviceMode.dmPelsWidth;
+			candidate.height = deviceMode.dmPelsHeight;
 
 			// check to see if the resolution has already been added
 			// since the current out_modes list is unsorted we need to
 			// iterate over all of the existing ones
 			bool resExists = false;
-			for (auto it = out_modes.begin(), end = out_modes.end();
-				it != end; ++it)
+			for (auto it = out_modes.begin(), end = out_modes.end(); it != end; ++it)
 			{
-				Resolution* p = (Resolution*)(*it);
-				if ((p)->IsSameResolution(candidate)) {
+				if (it->width == candidate.width && it->height == candidate.height) {
 					resExists = true;
 					break; // no need to keep looking
 				}
 			}
 
-			if (!resExists &&
-				(deviceMode.dmPelsWidth >= minHorizontalRes) &&
-				(deviceMode.dmPelsHeight >= minVerticalRes))
+			if (!resExists)
 			{
-				out_modes.Add(candidate.New());
+				out_modes.push_back(candidate);
 			}
 		}
 		modeCounter++;
 	} while (result == TRUE);
+
+	return out_modes;
 }
 #endif
 
@@ -150,4 +147,5 @@ std::vector<Resolution> ResolutionMan::EnumerateGraphicsModes(ApiType type)
 		return EnumerateGraphicsModes_sdl();
 	}
 #endif
+	return std::vector<Resolution>();
 }

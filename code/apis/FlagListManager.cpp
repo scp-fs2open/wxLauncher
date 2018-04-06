@@ -250,13 +250,12 @@ void FlagListManager::BeginFlagFileProcessing() {
 	
 	wxLogDebug(_T(" Called FS2 Open with command line '%s'."), commandline.c_str());
 	FlagProcess *process = new FlagProcess(flagFileLocations);
-	process->Redirect();
 
 #if wxCHECK_VERSION(2, 9, 2)
 	wxExecuteEnv env;
 	env.cwd = tempExecutionLocation.GetFullPath();
 
-	::wxExecute(commandline, wxEXEC_ASYNC, process, &env);
+	auto x = ::wxExecute(commandline, wxEXEC_ASYNC, process, &env);
 #else
 	wxString previousWorkingDir(::wxGetCwd());
 	// hopefully this doesn't goof anything up
@@ -506,7 +505,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 			JoyMan::ApiType apiType;
 #if IS_WIN32
             // If the current executable is a SDL exe, use that API
-            if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl)
+            if (this->buildCaps.sdl)
             {
                 apiType = JoyMan::API_SDL;
             }
@@ -536,7 +535,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		ResolutionMan::ApiType apiType;
 #if IS_WIN32
 		// If the current executable is a SDL exe, use that API
-		if (flagListManager->GetBuildCaps().sdl) {
+		if (this->buildCaps.sdl) {
 			apiType = ResolutionMan::API_SDL;
 		} else {
 			apiType = ResolutionMan::API_WIN32;
@@ -692,7 +691,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 				try {
 					auto& efx_obj = openal_obj.at("efx_support");
 					dev.supports_efx = efx_obj.at(playback_dev.get<std::string>()).get<bool>();
-				} catch (const json::out_of_range& err) {
+				} catch (const json::out_of_range&) {
 					dev.supports_efx = false;
 				}
 
@@ -710,7 +709,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 			try {
 				auto& efx_obj = openal_obj.at("efx_support");
 				dev.supports_efx = efx_obj.at(openal_obj.at("default_playback").get<std::string>()).get<bool>();
-			} catch (const json::out_of_range& err) {
+			} catch (const json::out_of_range&) {
 				dev.supports_efx = false;
 			}
 			openAlInfo.defaultPlaybackDevice = dev;
@@ -776,27 +775,36 @@ const FlagListManager::OpenAlInfo& FlagListManager::GetOpenAlInfo() const {
 }
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
-: flagFileLocations(flagFileLocations) {
+: wxProcess(nullptr), flagFileLocations(flagFileLocations), _timer(this) {
+	Redirect();
+
+	Bind(wxEVT_TIMER, &FlagListManager::FlagProcess::OnReadTimer, this);
+	
+	// Start the input reader timer
+	_timer.Start(250);
+}
+
+void FlagListManager::FlagProcess::OnReadTimer(wxTimerEvent& event) {
+	char buffer[1024];
+	while(GetInputStream()->CanRead()) {
+		GetInputStream()->Read(buffer, 1024);
+		_output.append(buffer, buffer + GetInputStream()->LastRead());
+	}
 }
 
 void FlagListManager::FlagProcess::OnTerminate(int pid, int status) {
 	wxLogDebug(_T(" FS2 Open returned %d when polled for the flags"), status);
+	_timer.Stop();
 
-	auto stream = GetInputStream();
-	std::string content;
+	// Read the rest of the process output
 	char buffer[1024];
-	while (true) {
-		stream->Read(buffer, 1024);
-
-		if (stream->LastRead() > 0) {
-			content.append(buffer, buffer + stream->LastRead());
-		} else {
-			break;
-		}
+	while (GetInputStream()->CanRead()) {
+		GetInputStream()->Read(buffer, 1024);
+		_output.append(buffer, buffer + GetInputStream()->LastRead());
 	}
 
 	// If the build does not support JSON output then the output will be empty
-	if (content.empty()) {
+	if (_output.empty()) {
 		// Find the flag file
 		wxFileName flagfile;
 		for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
@@ -823,11 +831,12 @@ void FlagListManager::FlagProcess::OnTerminate(int pid, int status) {
 		}
 	} else {
 		FlagListManager::GetFlagListManager()->SetProcessingStatus(FlagListManager::GetFlagListManager()->ParseJsonData(
-			content));
+			_output));
 	}
 	
 	delete this;
 }
+
 bool FlagListManager::Resolution::operator==(const FlagListManager::Resolution& rhs) const {
 	return width == rhs.width && height == rhs.height;
 }
