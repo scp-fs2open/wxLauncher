@@ -7,7 +7,7 @@ CMAKE_BINS_TMP=/tmp/cmake.tar.gz
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]
 then
-    sudo apt-get install -y ninja-build libsdl2-dev  libwxgtk$wxWidgets_ver-dev
+    sudo apt-get install -y libwxgtk$wxWidgets_ver-dev
 
     if [ ! -x $HOME/cmake/bin/cmake ]
     then

@@ -1479,7 +1479,7 @@ ProMan::RegistryCodes ProMan::PushProfile(wxFileConfig *cfg) {
 	wxCHECK_MSG(cfg != NULL, ProMan::UnknownError, _T("ProMan::PushProfile given null wxFileConfig!"));
 #if IS_WIN32
 	// check if binary supports configfile
-	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps().sdl) {
 		return FilePushProfile(cfg);
 	} else {
 		return RegistryPushProfile(cfg);

@@ -7,8 +7,6 @@
   !define PATCH  "@CPACK_PACKAGE_VERSION_PATCH@"
   !define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
   
-  !define UKP "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
-
 ;--------------------------------
 ;Variables
 
@@ -21,11 +19,6 @@
   Var ADD_TO_PATH_CURRENT_USER
   Var INSTALL_DESKTOP
   Var IS_DEFAULT_INSTALLDIR
-  ; The already INstalled Version bits.
-  Var INVMAJOR
-  Var INVMINOR
-  Var INVPATCH
-  Var UNINSTALLER_DIR
 ;--------------------------------
 ;Include Modern UI
 
@@ -43,6 +36,9 @@
 
   ;Set compression
   SetCompressor @CPACK_NSIS_COMPRESSOR@
+
+  ;Require administrator access
+  RequestExecutionLevel admin
 
 @CPACK_NSIS_DEFINES@   
 
@@ -126,7 +122,7 @@ Var AR_RegFlags
  "exit_${SecName}:"
 !macroend
  
-!macro RemoveSection SecName
+!macro RemoveSection_CPack SecName
   ;  This macro is used to call section's Remove_... macro
   ;from the uninstaller.
   ;Input: section index constant name specified in Section command.
@@ -161,13 +157,6 @@ Var AR_RegFlags
   !define MUI_HEADERIMAGE
   !define MUI_ABORTWARNING
     
-;--------------------------------
-; path functions
-
-!verbose 3
-!include "WinMessages.NSH"
-!verbose 4
-
 ;----------------------------------------
 ; based upon a script of "Written by KiCHiK 2003-01-18 05:57:02"
 ;----------------------------------------
@@ -546,6 +535,8 @@ FunctionEnd
 ; Define some macro setting for the gui
 @CPACK_NSIS_INSTALLER_MUI_ICON_CODE@
 @CPACK_NSIS_INSTALLER_ICON_CODE@
+@CPACK_NSIS_INSTALLER_MUI_WELCOMEFINISH_CODE@
+@CPACK_NSIS_INSTALLER_MUI_UNWELCOMEFINISH_CODE@
 @CPACK_NSIS_INSTALLER_MUI_COMPONENTS_DESC@
 @CPACK_NSIS_INSTALLER_MUI_FINISHPAGE_RUN_CODE@
 
@@ -644,6 +635,7 @@ Section "-Core installation"
   ;Use the entire tree produced by the INSTALL target.  Keep the
   ;list of directories here in sync with the RMDir commands below.
   SetOutPath "$INSTDIR"
+  @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
   @CPACK_NSIS_FULL_INSTALL@
   
   ;Store installation folder
@@ -691,18 +683,6 @@ Section "-Core installation"
   Call ConditionalAddToRegisty
   Push "Contact"
   Push "@CPACK_NSIS_CONTACT@"
-  Call ConditionalAddToRegisty
-  Push "VersionMajor"
-  Push "@CPACK_PACKAGE_VERSION_MAJOR@"
-  Call ConditionalAddToRegisty
-  Push "VersionMinor"
-  Push "@CPACK_PACKAGE_VERSION_MINOR@"
-  Call ConditionalAddToRegisty
-  Push "VersionPatch"
-  Push "@CPACK_PACKAGE_VERSION_PATCH@"
-  Call ConditionalAddToRegisty
-  Push ""
-  Push "$INSTDIR"
   Call ConditionalAddToRegisty
   !insertmacro MUI_INSTALLOPTIONS_READ $INSTALL_DESKTOP "NSIS.InstallOptions.ini" "Field 5" "State"
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
@@ -860,7 +840,7 @@ Section "Uninstall"
   DeleteRegKey SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"
 
   ; Removes all optional components
-  !insertmacro SectionList "RemoveSection"
+  !insertmacro SectionList "RemoveSection_CPack"
   
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
     
@@ -919,6 +899,30 @@ SectionEnd
 ; "Program Files" for AllUsers, "My Documents" for JustMe...
 
 Function .onInit
+  StrCmp "@CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL@" "ON" 0 inst
+
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "UninstallString"
+  StrCmp $0 "" inst
+
+  MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION \
+  "@CPACK_NSIS_PACKAGE_NAME@ is already installed. $\n$\nDo you want to uninstall the old version before installing the new one?" \
+  /SD IDYES IDYES uninst IDNO inst
+  Abort
+
+;Run the uninstaller
+uninst:
+  ClearErrors
+  StrLen $2 "\Uninstall.exe"
+  StrCpy $3 $0 -$2 # remove "\Uninstall.exe" from UninstallString to get path
+  ExecWait '"$0" /S _?=$3' ;Do not copy the uninstaller to a temp file
+
+  IfErrors uninst_failed inst
+uninst_failed:
+  MessageBox MB_OK|MB_ICONSTOP "Uninstall failed."
+  Abort
+
+
+inst:
   ; Reads components status for registry
   !insertmacro SectionList "InitSection"
 
@@ -942,12 +946,12 @@ Function .onInit
   Pop $0
   UserInfo::GetAccountType
   Pop $1
-  StrCmp $1 "Admin" 0 +3
+  StrCmp $1 "Admin" 0 +4
     SetShellVarContext all
     ;MessageBox MB_OK 'User "$0" is in the Admin group'
     StrCpy $SV_ALLUSERS "AllUsers"
     Goto done
-  StrCmp $1 "Power" 0 +3
+  StrCmp $1 "Power" 0 +4
     SetShellVarContext all
     ;MessageBox MB_OK 'User "$0" is in the Power Users group'
     StrCpy $SV_ALLUSERS "AllUsers"
@@ -966,49 +970,4 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
 
   noOptionsPage:
-  ; check for an older version
-  ClearErrors
-  ReadRegDWORD $INVMAJOR SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionMajor"
-  ReadRegDWORD $INVMINOR SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionMinor"
-  ReadRegDWORD $INVPATCH SHCTX "Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@"	"VersionPatch"
-  
-  ; now to check with current versions
-  ; if version not equal then offer uninstall
-  ; if version is older then do uninstall
-  ; if version is newer then prompt an offer to uninstall
-  IntCmp $INVMAJOR "@CPACK_PACKAGE_VERSION_MAJOR@" 0 douninstall new_ver_inst
-  IntCmp $INVMINOR "@CPACK_PACKAGE_VERSION_MINOR@" 0 douninstall new_ver_inst
-  IntCmp $INVPATCH "@CPACK_PACKAGE_VERSION_PATCH@" 0 douninstall new_ver_inst
-  
-  MessageBox MB_YESNO|MB_ICONQUESTION \
-  	"You already have $INVMAJOR.$INVMINOR.$INVPATCH of @CPACK_NSIS_DISPLAY_NAME@ installed. Reinstall?" \
-  	/SD IDYES IDYES douninstall
-  Abort "@CPACK_NSIS_DISPLAY_NAME@ is already installed."
-  
-new_ver_inst:
-	MessageBox MB_YESNO|MB_ICONQUESTION \
-		"Newer version $0.$1.$2 is already installed. \
-		Downgrade to \
-		@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@?" \
-		/SD IDNO IDYES douninstall
-	Abort "Newer @CPACK_NSIS_DISPLAY_NAME@ already installed."
-
-douninstall:
-	ReadRegStr $UNINSTALLER_DIR SHCTX \
-		"Software\Microsoft\Windows\CurrentVersion\Uninstall\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" ""
-	IfFileExists "$UNINSTALLER_DIR\Uninstall.exe" actuallyuninstall
-	DetailPrint "$UNINSTALLER_DIR\Uninstall.exe does not exist"
-	goto notinstalled 	; just give up
-	
-actuallyuninstall:
-	DetailPrint "Uninstalling old @CPACK_NSIS_DISPLAY_NAME@"
-	Exec '"$UNINSTALLER_DIR\Uninstall.exe" /S'
-unistallerexists:
-	Sleep 100
-	IfFileExists "$UNINSTALLER_DIR\Uninstall.exe" unistallerexists
-	Sleep 1000
-	
-	
-	  
-notinstalled:
 FunctionEnd

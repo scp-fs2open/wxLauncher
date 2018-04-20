@@ -32,9 +32,9 @@
 /** ResolutionMap has changed. */
 LAUNCHER_DECLARE_EVENT_TYPE(EVT_RESOLUTION_MAP_CHANGED);
 
-struct ResolutionData {
-	ResolutionData() { } // required for wxHashMap, unfortunately
-	ResolutionData(long width, long height) : width(width), height(height) { }
+struct ResolutionMapData {
+	ResolutionMapData() { } // required for wxHashMap, unfortunately
+	ResolutionMapData(long width, long height) : width(width), height(height) { }
 	bool IsValid() const {
 		return (width >= DEFAULT_MOD_RESOLUTION_MIN_HORIZONTAL_RES) &&
 			(height >= DEFAULT_MOD_RESOLUTION_MIN_VERTICAL_RES);
@@ -44,13 +44,13 @@ struct ResolutionData {
 };
 
 WX_DECLARE_STRING_HASH_MAP(
-	ResolutionData,
+	ResolutionMapData,
 	PreferredResolutionMap);
 
 class ResolutionMap {
 public:
-	static const ResolutionData* ResolutionRead(const wxString& shortname);
-	static void ResolutionWrite(const wxString& shortname, const ResolutionData& resData);
+	static const ResolutionMapData* ResolutionRead(const wxString& shortname);
+	static void ResolutionWrite(const wxString& shortname, const ResolutionMapData& resData);
 	static bool HasEntryForActiveMod();
 	
 	static void RegisterResolutionMapChanged(wxEvtHandler *handler);

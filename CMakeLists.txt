@@ -296,6 +296,10 @@ set(GLOBAL_CODE_FILES
   code/global/Compatibility.cpp
   code/global/Compatibility.h)
 source_group(Global FILES ${GLOBAL_CODE_FILES})
+set(LIB_FILES
+    code/lib/json.hpp
+)
+source_group(Lib FILES ${LIB_FILES})
 set(DATASTRUCTURE_CODE_FILES
   code/datastructures/FlagInfo.cpp
   code/datastructures/FlagFileData.h
@@ -362,6 +366,7 @@ add_executable(wxlauncher WIN32 MACOSX_BUNDLE
   ${GUI_CONTROL_CODE_FILES}
   ${GLOBAL_CODE_FILES}
   ${DATASTRUCTURE_CODE_FILES}
+  ${LIB_FILES}
   ${API_CODE_FILES}
   ${RESOURCE_FILES}
   ${CODE_FILES}

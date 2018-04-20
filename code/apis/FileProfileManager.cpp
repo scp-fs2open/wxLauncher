@@ -30,59 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "global/ProfileKeys.h"
 #include "global/RegistryKeys.h"
 
-#include <SDL_filesystem.h>
-
-
-// NOTE: this function is also used by PushCmdlineFSO() in PlatformProfileManagerShared.cpp
-wxFileName GetPlatformDefaultConfigFilePathOld() {
-	wxFileName path;
-#if IS_WIN32
-	path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
-	path.AppendDir(_T("FS2 Open"));
-#elif IS_APPLE
-	path.AssignHomeDir();
-	path.AppendDir(_T("Library"));
-	path.AppendDir(_T("FS2_Open"));
-#elif IS_LINUX
-	path.AssignHomeDir();
-	path.AppendDir(_T(".fs2_open"));
-#else
-# error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
-#endif
-	return path;
-}
-
-wxFileName GetPlatformDefaultConfigFilePathNew() {
-	// SDL builds now use the user directory on all platforms
-	// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
-	char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
-
-	wxString wxPrefPath = wxString::FromUTF8(prefPath);
-
-	SDL_free(prefPath);
-
-	wxFileName path;
-	path.AssignDir(wxPrefPath);
-
-	return path;
-}
-
-wxFileName GetPlatformDefaultConfigFilePath(const wxString& tcPath) {
-	wxFileName path;
-	if (FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL) {
-		path = GetPlatformDefaultConfigFilePathNew();
-	}
-	else {
-#if IS_LINUX || IS_APPLE // write to folder in home dir
-		path = GetPlatformDefaultConfigFilePathOld().GetFullPath().c_str();
-#else
-		path.AssignDir(tcPath);
-#endif
-	}
-
-	return path;
-}
-
 #define FSO_CONFIG_FILENAME _T("fs2_open.ini")
 
 #define ReturnChecker(retvalue, location) \
@@ -105,7 +52,7 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		configFileName = GetPlatformDefaultConfigFilePath(tcPath);
+		configFileName = FlagListManager::GetFlagListManager()->GetConfigLocation(tcPath);
 	}
 	wxASSERT_MSG( configFileName.Normalize(),
 		wxString::Format(_T("Unable to normalize PlatformDefaultConfigFilePath (%s)"),
@@ -269,7 +216,11 @@ ProMan::RegistryCodes FilePushProfile(wxFileConfig *cfg) {
 	ReturnChecker(ret, __LINE__);
 
 	// Joystick GUID
-	wxString currentJoystickGUID = JoyMan::JoystickGUID(currentJoystick);
+	wxString currentJoystickGUID;
+	auto& joysticks = FlagListManager::GetFlagListManager()->GetJoysticks();
+	if (currentJoystick >= 0 && currentJoystick < (int) joysticks.size()) {
+		currentJoystickGUID = joysticks[currentJoystick].guid;
+	}
 
 	ret = outConfig.Write(REG_KEY_JOYSTICK_GUID, currentJoystickGUID);
 	ReturnChecker(ret, __LINE__);
@@ -355,14 +306,8 @@ ProMan::RegistryCodes FilePullProfile(wxFileConfig *cfg) {
 			return ProMan::UnknownError;
 		}
 	} else {
-		inFileName = GetPlatformDefaultConfigFilePathNew();
+		inFileName = FlagListManager::GetFlagListManager()->GetConfigLocation();
 		inFileName.SetFullName(FSO_CONFIG_FILENAME);
-
-		if (!inFileName.FileExists())
-		{
-			inFileName = GetPlatformDefaultConfigFilePathOld();
-			inFileName.SetFullName(FSO_CONFIG_FILENAME);
-		}
 	}
 	wxASSERT( inFileName.Normalize() );
 

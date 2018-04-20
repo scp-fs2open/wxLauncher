@@ -160,4 +160,8 @@ enum StatusBarIconIDs {
 	ID_SB_MAX_ID,
 };
 
+enum FlagProcessIDs {
+	ID_FLAG_PROCESS_TIMER = wxID_HIGHEST + 1
+};
+
 #endif

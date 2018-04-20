@@ -40,7 +40,6 @@ namespace OpenALMan {
 	wxString GetSystemDefaultCaptureDevice();
 	
 	bool IsEFXSupported(const wxString& playbackDeviceName);
-	bool BuildHasNewSoundCode();
 };
 
 #endif

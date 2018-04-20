@@ -80,14 +80,29 @@ void copyValuesIntoConfig(HKEY key, wxFileConfig& config, const wxString& sectio
 
 #define FSO_CONFIG_FILENAME _T("fs2_open.ini")
 
-extern wxFileName GetPlatformDefaultConfigFilePathNew();
-extern wxFileName GetPlatformDefaultConfigFilePathOld();
-
 namespace Compatibility
 {
+	wxFileName GetPlatformDefaultConfigFilePathOld() {
+		wxFileName path;
+	#if IS_WIN32
+		path.AssignDir(wxStandardPaths::Get().GetUserConfigDir());
+		path.AppendDir(_T("FS2 Open"));
+	#elif IS_APPLE
+		path.AssignHomeDir();
+		path.AppendDir(_T("Library"));
+		path.AppendDir(_T("FS2_Open"));
+	#elif IS_LINUX
+		path.AssignHomeDir();
+		path.AppendDir(_T(".fs2_open"));
+	#else
+	# error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+	#endif
+		return path;
+	}
+
 	bool SynchronizeOldPilots(ProMan* profileManager)
 	{
-		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL))
+		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps().sdl))
 		{
 			// Nothing to do, we have an old build
 			return true;
@@ -111,7 +126,7 @@ namespace Compatibility
 		oldConfigFolder.AppendDir(_T("data"));
 		oldConfigFolder.AppendDir(_T("players"));
 
-		wxFileName newConfigFolder(GetPlatformDefaultConfigFilePathNew());
+		auto newConfigFolder = FlagListManager::GetFlagListManager()->GetConfigLocation();
 		newConfigFolder.AppendDir(_T("data"));
 		newConfigFolder.AppendDir(_T("players"));
 
@@ -167,13 +182,13 @@ namespace Compatibility
 
 	bool MigrateOldConfig()
 	{
-		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps() & FlagListManager::BUILD_CAPS_SDL))
+		if (!(FlagListManager::GetFlagListManager()->GetBuildCaps().sdl))
 		{
 			// Nothing to do, we have an old build
 			return true;
 		}
 
-		wxFileName newName = GetPlatformDefaultConfigFilePathNew();
+		wxFileName newName = FlagListManager::GetFlagListManager()->GetConfigLocation();
 		newName.SetFullName(FSO_CONFIG_FILENAME);
 
 		if (wxFile::Exists(newName.GetFullPath())) {

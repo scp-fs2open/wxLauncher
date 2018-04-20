@@ -389,7 +389,7 @@ wxString OpenALMan::GetCurrentVersion() {
 
 	(*CloseDevice)(device);
 
-	return wxString::Format(_("Detected OpenAL version: %s"), Version.c_str());
+	return Version;
 #else
 	return wxEmptyString;
 #endif
@@ -448,15 +448,4 @@ bool OpenALMan::IsEFXSupported(const wxString& playbackDeviceName) {
 #else
 	return false;
 #endif
-}
-
-bool OpenALMan::BuildHasNewSoundCode() {
-	wxCHECK_MSG(OpenALMan::IsInitialized(), false,
-		_T("OpenALMan has not been initialized."));
-	wxCHECK_MSG(FlagListManager::IsInitialized(), false,
-		_T("FlagListManager has not been initialized."));
-	wxCHECK_MSG(FlagListManager::GetFlagListManager()->IsProcessingOK(), false,
-		_T("Flag file processing has not (yet) succeeded."));
-	
-	return (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_NEW_SND) > 0;
 }
