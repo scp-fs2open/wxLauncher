@@ -24,6 +24,7 @@
 #include "apis/OpenALManager.h"
 #include "apis/resolution_manager.hpp"
 #include "datastructures/FSOExecutable.h"
+#include "global/ids.h"
 #include "global/ProfileKeys.h"
 
 #include <SDL_filesystem.h>
@@ -255,7 +256,7 @@ void FlagListManager::BeginFlagFileProcessing() {
 	wxExecuteEnv env;
 	env.cwd = tempExecutionLocation.GetFullPath();
 
-	auto x = ::wxExecute(commandline, wxEXEC_ASYNC, process, &env);
+	::wxExecute(commandline, wxEXEC_ASYNC, process, &env);
 #else
 	wxString previousWorkingDir(::wxGetCwd());
 	// hopefully this doesn't goof anything up
@@ -716,7 +717,7 @@ FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::stri
 
 			openAlInfo.defaultCaptureDevice.name = jsonToWxString(openal_obj.at("default_capture"));
 
-			openAlInfo.version = wxString::Format("%d.%d",
+			openAlInfo.version = wxString::Format(wxT("%d.%d"),
 												  openal_obj.at("version_major").get<int>(),
 												  openal_obj.at("version_minor").get<int>());
 		}
@@ -774,12 +775,15 @@ const FlagListManager::OpenAlInfo& FlagListManager::GetOpenAlInfo() const {
 	return openAlInfo;
 }
 
+
+BEGIN_EVENT_TABLE(FlagListManager::FlagProcess, wxProcess)
+		EVT_TIMER(ID_FLAG_PROCESS_TIMER, FlagListManager::FlagProcess::OnReadTimer)
+END_EVENT_TABLE()
+
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
-: wxProcess(nullptr), flagFileLocations(flagFileLocations), _timer(this) {
+: wxProcess(nullptr), flagFileLocations(flagFileLocations), _timer(this, ID_FLAG_PROCESS_TIMER) {
 	Redirect();
 
-	Bind(wxEVT_TIMER, &FlagListManager::FlagProcess::OnReadTimer, this);
-	
 	// Start the input reader timer
 	_timer.Start(250);
 }

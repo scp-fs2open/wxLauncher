@@ -128,7 +128,7 @@ public:
 
 	const std::vector<Resolution>& GetResolutions() const;
 
-	wxFileName GetConfigLocation(const wxString& def_path = "") const;
+	wxFileName GetConfigLocation(const wxString& def_path = wxEmptyString) const;
 
 	const OpenAlInfo& GetOpenAlInfo() const;
 
@@ -199,6 +199,9 @@ private:
 		FlagFileArray flagFileLocations;
 		std::string _output;
 		wxTimer _timer;
+
+	 protected:
+		DECLARE_EVENT_TABLE()
 	};
 	
 	DECLARE_EVENT_TABLE()
