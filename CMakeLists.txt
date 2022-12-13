@@ -73,7 +73,7 @@ if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   endif()
 else()
   message("-- Searching for wxWidgets")
-  find_package(wxWidgets 2.8.10
+  find_package(wxWidgets
     COMPONENTS base core net xml html adv qa richtext)
 endif()
 if(NOT wxWidgets_FOUND)
