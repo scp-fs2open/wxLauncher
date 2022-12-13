@@ -158,7 +158,7 @@ else()
             DESTINATION share/applications
             RENAME wxlauncher.desktop)
     install(FILES resources/wxlauncher.png
-            DESTINATION share/pixmaps/hicolor/256x256/apps)
+            DESTINATION share/icons/hicolor/256x256/apps)
   else()
     message(STATUS "The CMake version is too old to support desktop file generation. CMake 3.0 or newer required")
   endif()
