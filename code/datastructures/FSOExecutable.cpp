@@ -192,8 +192,8 @@ wxArrayString FSOExecutable::GetBinariesFromRootFolder(
 	
 	if (!quiet) {
 		wxString execType = startPattern.Lower().Find(_T("fred")) == wxNOT_FOUND ? _T("FS2") : _T("FRED2");
-		wxLogInfo(_T(" Found %d %s Open executables in '%s'"),
-			files.GetCount(), execType.c_str(), path.GetPath().c_str());
+		wxLogInfo(_T(" Found %u %s Open executables in '%s'"),
+			static_cast<unsigned>(files.GetCount()), execType.c_str(), path.GetPath().c_str());
 		
 		for (size_t i = 0, n = files.GetCount(); i < n; ++i) {
 			wxLogDebug(_T("Found executable: %s"), files.Item(i).c_str());

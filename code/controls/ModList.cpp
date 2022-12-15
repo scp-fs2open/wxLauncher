@@ -50,7 +50,7 @@ const wxString NO_MOD(_("(No mod)"));
 // to keep the presets box from overlapping with flag list
 const size_t MAX_PRESET_NAME_LENGTH = 32;
 
-class ModInfoDialog: wxDialog {
+class ModInfoDialog: public wxDialog {
 public:
 	ModInfoDialog(ModItem* item, wxWindow* parent);
 	void OnLinkClicked(wxHtmlLinkEvent &event);

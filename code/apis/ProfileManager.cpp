@@ -136,7 +136,7 @@ bool ProMan::Initialize(Flags flags) {
 	wxArrayString foundProfiles;
 	wxDir::GetAllFiles(GetProfileStorageFolder(), &foundProfiles, wxT_2("pro?????.ini"));
 
-	wxLogInfo(wxT_2(" Found %d profile(s)."), foundProfiles.Count());
+	wxLogInfo(wxT_2(" Found %u profile(s)."), static_cast<unsigned>(foundProfiles.Count()));
 	for( size_t i = 0; i < foundProfiles.Count(); i++) {
 		wxLogDebug(wxT_2("  Opening %s"), foundProfiles[i].c_str());
 		wxFFileInputStream instream(foundProfiles[i]);
@@ -1430,8 +1430,8 @@ void ProMan::TestConfigFunctions(wxConfigBase& src) {
 	wxLogDebug(_T("contents of dest config after clearing:"));
 	LogConfigContents(*dest);
 	
-	wxLogDebug(_T("after clearing, dest has %d entries and %d groups"),
-		dest->GetNumberOfEntries(true), dest->GetNumberOfGroups(true));
+	wxLogDebug(_T("after clearing, dest has %u entries and %u groups"),
+		static_cast<unsigned>(dest->GetNumberOfEntries(true)), static_cast<unsigned>(dest->GetNumberOfGroups(true)));
 	
 	wxLogDebug(_T("recopying src to dest"));
 	
