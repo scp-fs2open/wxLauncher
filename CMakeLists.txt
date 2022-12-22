@@ -46,6 +46,9 @@ if(DEFINED WXVER AND NOT WXVER MATCHES "PLATFORM")
   elseif(WXVER MATCHES "3.0")
     find_package(wxWidgets 3.0.2
       COMPONENTS base core net xml html adv qa richtext)
+  elseif(WXVER MATCHES "3.1")
+    find_package(wxWidgets 3.1.0
+      COMPONENTS base core net xml html adv qa richtext)
   else()
     message(FATAL_ERROR "Unknown WXVER forced")
   endif()
