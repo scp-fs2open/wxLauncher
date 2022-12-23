@@ -20,10 +20,14 @@
 #include "apis/FlagListManager.h"
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
+#include "apis/JoystickManager.h"
+#include "apis/OpenALManager.h"
+#include "apis/resolution_manager.hpp"
 #include "datastructures/FSOExecutable.h"
+#include "global/ids.h"
 #include "global/ProfileKeys.h"
 
-#include "global/MemoryDebugging.h"
+#include <SDL_filesystem.h>
 
 /** \class FlagListManager
  FlagListManager is used to notify controls that have registered with it
@@ -35,6 +39,10 @@ LAUNCHER_DEFINE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
 WX_DEFINE_OBJARRAY(FlagFileArray);
 
 EventHandlers FlagListManager::ffProcessingStatusChangedHandlers;
+
+static wxString jsonToWxString(const json& str) {
+	return wxString::FromUTF8(str.get<std::string>().c_str());
+}
 
 void FlagListManager::RegisterFlagFileProcessingStatusChanged(wxEvtHandler *handler) {
 	wxASSERT(FlagListManager::IsInitialized());
@@ -93,7 +101,14 @@ void FlagListManager::DeInitialize() {
 		}
 		FlagListManager::ffProcessingStatusChangedHandlers.Clear();
 	}
-	
+
+	if (JoyMan::IsInitialized()) {
+		JoyMan::DeInitialize();
+	}
+	if (OpenALMan::IsInitialized()) {
+		OpenALMan::DeInitialize();
+	}
+
 	FlagListManager* temp = FlagListManager::flagListManager;
 	FlagListManager::flagListManager = NULL;
 	delete temp;
@@ -112,8 +127,10 @@ FlagListManager* FlagListManager::GetFlagListManager() {
 }
 
 FlagListManager::FlagListManager()
-: data(NULL), proxyData(NULL), buildCaps(0) {
+: data(NULL), proxyData(NULL) {
 	TCManager::RegisterTCBinaryChanged(this);
+
+
 }
 
 FlagListManager::~FlagListManager() {
@@ -146,7 +163,7 @@ void FlagListManager::DeleteExistingData() {
 		delete temp;
 	}
 	
-	this->buildCaps = 0;
+	this->buildCaps = BuildCaps();
 }
 
 void FlagListManager::BeginFlagFileProcessing() {
@@ -227,9 +244,9 @@ void FlagListManager::BeginFlagFileProcessing() {
 	wxString commandline;
 	// use "" to correct for spaces in path to exeFilename
 	if (exeFilename.GetFullPath().Find(_T(" ")) != wxNOT_FOUND) {
-		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -get_flags");
+		commandline = _T("\"") + exeFilename.GetFullPath() +  _T("\"") + _T(" -parse_cmdline_only -get_flags json_v1");
 	} else {
-		commandline = exeFilename.GetFullPath() + _T(" -get_flags");
+		commandline = exeFilename.GetFullPath() + _T(" -parse_cmdline_only -get_flags json_v1");
 	}
 	
 	wxLogDebug(_T(" Called FS2 Open with command line '%s'."), commandline.c_str());
@@ -336,8 +353,8 @@ ProxyFlagData* FlagListManager::GetProxyFlagData() {
 	return temp;
 }
 
-wxByte FlagListManager::GetBuildCaps() const {
-	wxCHECK_MSG(this->IsProcessingOK(), 0,
+FlagListManager::BuildCaps FlagListManager::GetBuildCaps() const {
+	wxCHECK_MSG(this->IsProcessingOK(), BuildCaps(),
 		_T("attempt to get build caps even though processing hasn't succeeded"));
 	
 	return this->buildCaps;
@@ -478,14 +495,250 @@ FlagListManager::ProcessingStatus FlagListManager::ParseFlagFile(const wxFileNam
 		wxLogInfo(_T(" Old build that does not output its capabilities, must not support OpenAL"));
 		buildCaps = 0;
 	}
-	this->buildCaps = buildCaps;
-	
+	this->buildCaps.openAL = buildCaps & BUILD_CAPS_OPENAL;
+	this->buildCaps.noD3D = buildCaps & BUILD_CAPS_NO_D3D;
+	this->buildCaps.newSound = buildCaps & BUILD_CAPS_NEW_SND;
+	this->buildCaps.sdl = buildCaps & BUILD_CAPS_SDL;
+
+	{
+		// Since the old method does not provide joystick information we generate that here
+		if (!JoyMan::IsInitialized()) {
+			JoyMan::ApiType apiType;
+#if IS_WIN32
+            // If the current executable is a SDL exe, use that API
+            if (this->buildCaps.sdl)
+            {
+                apiType = JoyMan::API_SDL;
+            }
+            else
+            {
+                apiType = JoyMan::API_NATIVE;
+            }
+#else
+			// Unix always uses SDL
+			apiType = JoyMan::API_SDL;
+#endif
+			if (!JoyMan::Initialize(apiType)) {
+				wxLogWarning(_T("Failed to initialize joysticks"));
+			}
+		}
+
+		joysticks.clear();
+		for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); ++i) {
+			Joystick stick;
+			stick.name = JoyMan::JoystickName(i);
+			stick.guid = JoyMan::JoystickGUID(i);
+			stick.is_haptic = JoyMan::SupportsForceFeedback(i);
+			joysticks.push_back(stick);
+		}
+	}
+	{
+		ResolutionMan::ApiType apiType;
+#if IS_WIN32
+		// If the current executable is a SDL exe, use that API
+		if (this->buildCaps.sdl) {
+			apiType = ResolutionMan::API_SDL;
+		} else {
+			apiType = ResolutionMan::API_WIN32;
+		}
+#else
+		// OSX and Linux always use the SDL api
+		apiType = ResolutionMan::API_SDL;
+#endif
+
+		resolutions.clear();
+		auto res_vector = ResolutionMan::EnumerateGraphicsModes(apiType);
+		for (auto& res : res_vector) {
+			Resolution newRes;
+			newRes.width = res.width;
+			newRes.height = res.height;
+			resolutions.push_back(newRes);
+		}
+	}
+	{
+		configLocation.Clear();
+		if (this->buildCaps.sdl) {
+			// SDL builds now use the user directory on all platforms
+			// The sdl parameters are defined in the FSO code in the file code/osapi.cpp
+			char* prefPath = SDL_GetPrefPath("HardLightProductions", "FreeSpaceOpen");
+
+			wxString wxPrefPath = wxString::FromUTF8(prefPath);
+
+			SDL_free(prefPath);
+
+			configLocation.AssignDir(wxPrefPath);
+		} else {
+#if IS_WIN32
+			configLocation = wxFileName();
+#elif IS_APPLE
+			configLocation.AssignHomeDir();
+			configLocation.AppendDir(_T("Library"));
+			configLocation.AppendDir(_T("FS2_Open"));
+#elif IS_LINUX
+			configLocation.AssignHomeDir();
+			configLocation.AppendDir(_T(".fs2_open"));
+#else
+# error "One of IS_WIN32, IS_LINUX, IS_APPLE must evaluate to true"
+#endif
+		}
+	}
+	{
+		openAlInfo = OpenAlInfo();
+		if (!OpenALMan::IsInitialized()) {
+			openAlInfo.initialized = OpenALMan::Initialize();
+		} else {
+			openAlInfo.initialized = true;
+		}
+
+		if (openAlInfo.initialized) {
+			for (auto& device : OpenALMan::GetAvailablePlaybackDevices()) {
+				OpenAlDevice dev;
+				dev.name = device;
+				dev.supports_efx = OpenALMan::IsEFXSupported(device);
+
+				openAlInfo.playbackDevices.push_back(dev);
+			}
+			for (auto& device : OpenALMan::GetAvailableCaptureDevices()) {
+				OpenAlDevice dev;
+				dev.name = device;
+				openAlInfo.captureDevices.push_back(dev);
+			}
+
+			openAlInfo.defaultPlaybackDevice.name = OpenALMan::GetSystemDefaultPlaybackDevice();
+			openAlInfo.defaultPlaybackDevice.supports_efx =
+				OpenALMan::IsEFXSupported(OpenALMan::GetSystemDefaultPlaybackDevice());
+
+			openAlInfo.defaultCaptureDevice.name = OpenALMan::GetSystemDefaultCaptureDevice();
+
+			openAlInfo.version = OpenALMan::GetCurrentVersion();
+		}
+	}
+
 	this->data->GenerateFlagSets();
 	
 	this->proxyData = this->data->GenerateProxyFlagData();
 	
 	return PROCESSING_OK;
 }
+
+void FlagListManager::convertAndAddJsonFlag(const json& data) {
+	auto flag = new Flag();
+
+	flag->flagString = jsonToWxString(data.at("name"));
+	flag->shortDescription = jsonToWxString(data.at("description"));
+	flag->webURL = jsonToWxString(data.at("web_url"));
+	flag->fsoCatagory = jsonToWxString(data.at("type"));
+	flag->isRecomendedFlag = false; // much better from a UI point of view than "true"
+
+	flag->easyEnable = data.at("on_flags").get<int>();
+	flag->easyDisable = data.at("off_flags").get<int>();
+
+	this->data->AddFlag(flag);
+}
+
+FlagListManager::ProcessingStatus FlagListManager::ParseJsonData(const std::string& data) {
+	// Reset this in case there was a valid structure before
+	try {
+		auto flags_json = json::parse(data);
+
+		for (auto& easy_flag : flags_json.at("easy_flags")) {
+			auto str = wxString::FromUTF8(easy_flag.get<std::string>().c_str());
+			this->data->AddEasyFlag(str);
+		}
+
+		for (auto& flag : flags_json.at("flags")) {
+			convertAndAddJsonFlag(flag);
+		}
+
+		auto& caps_array = flags_json.at("caps");
+		buildCaps = BuildCaps();
+		buildCaps.openAL = std::find(caps_array.begin(), caps_array.end(), "OpenAL") != caps_array.end();
+		buildCaps.noD3D = std::find(caps_array.begin(), caps_array.end(), "No D3D") != caps_array.end();
+		buildCaps.newSound = std::find(caps_array.begin(), caps_array.end(), "New Sound") != caps_array.end();
+		buildCaps.sdl = std::find(caps_array.begin(), caps_array.end(), "SDL") != caps_array.end();
+
+		joysticks.clear();
+		for (auto& joystick : flags_json.at("joysticks")) {
+			Joystick stick;
+			stick.name = jsonToWxString(joystick.at("name"));
+			stick.guid = jsonToWxString(joystick.at("guid"));
+			stick.is_haptic = joystick.at("is_haptic").get<bool>();
+			joysticks.push_back(stick);
+		}
+
+		resolutions.clear();
+		auto displays = flags_json.at("displays");
+		if (!displays.empty()) {
+			auto primary = displays[0];
+			for (auto& mode : primary.at("modes")) {
+				Resolution newRes;
+				newRes.width = mode.at("x").get<int>();
+				newRes.height = mode.at("y").get<int>();
+				resolutions.push_back(newRes);
+			}
+		}
+
+		configLocation = jsonToWxString(flags_json.at("pref_path"));
+
+		{
+			openAlInfo = OpenAlInfo();
+			openAlInfo.initialized = true;
+
+			auto& openal_obj = flags_json.at("openal");
+			for (auto& playback_dev : openal_obj.at("playback_devices")) {
+				OpenAlDevice dev;
+				dev.name = jsonToWxString(playback_dev);
+
+				try {
+					auto& efx_obj = openal_obj.at("efx_support");
+					dev.supports_efx = efx_obj.at(playback_dev.get<std::string>()).get<bool>();
+				} catch (const json::out_of_range&) {
+					dev.supports_efx = false;
+				}
+
+				openAlInfo.playbackDevices.push_back(dev);
+			}
+			for (auto& device : openal_obj.at("capture_devices")) {
+				OpenAlDevice dev;
+				dev.name = jsonToWxString(device);
+				openAlInfo.captureDevices.push_back(dev);
+			}
+
+			OpenAlDevice dev;
+			dev.name = jsonToWxString(openal_obj.at("default_playback"));
+
+			try {
+				auto& efx_obj = openal_obj.at("efx_support");
+				dev.supports_efx = efx_obj.at(openal_obj.at("default_playback").get<std::string>()).get<bool>();
+			} catch (const json::out_of_range&) {
+				dev.supports_efx = false;
+			}
+			openAlInfo.defaultPlaybackDevice = dev;
+
+			openAlInfo.defaultCaptureDevice.name = jsonToWxString(openal_obj.at("default_capture"));
+
+			openAlInfo.version = wxString::Format(wxT("%d.%d"),
+												  openal_obj.at("version_major").get<int>(),
+												  openal_obj.at("version_minor").get<int>());
+		}
+
+		this->data->GenerateFlagSets();
+
+		this->proxyData = this->data->GenerateProxyFlagData();
+
+		return PROCESSING_OK;
+	} catch (const json::type_error& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	} catch (const json::out_of_range& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	} catch (const json::parse_error& err) {
+		wxLogInfo(_T(" Failed to parse JSON returned by engine: %s"), err.what());
+		return FLAG_FILE_NOT_VALID;
+	}
+}
+
 
 void FlagListManager::SetProcessingStatus(const ProcessingStatus& processingStatus) {
 	this->processingStatus = processingStatus;
@@ -506,38 +759,136 @@ FlagListManager::FlagFileProcessingStatus FlagListManager::GetFlagFileProcessing
 		return FlagListManager::FLAG_FILE_PROCESSING_ERROR;
 	}
 }
+const std::vector<FlagListManager::Joystick>& FlagListManager::GetJoysticks() const {
+	return joysticks;
+}
+const std::vector<FlagListManager::Resolution>& FlagListManager::GetResolutions() const {
+	return resolutions;
+}
+wxFileName FlagListManager::GetConfigLocation(const wxString& def_path) const {
+	if (!configLocation.IsOk()) {
+		return wxFileName(def_path);
+	}
+	return configLocation;
+}
+const FlagListManager::OpenAlInfo& FlagListManager::GetOpenAlInfo() const {
+	return openAlInfo;
+}
+
+
+BEGIN_EVENT_TABLE(FlagListManager::FlagProcess, wxProcess)
+		EVT_TIMER(ID_FLAG_PROCESS_TIMER, FlagListManager::FlagProcess::OnReadTimer)
+END_EVENT_TABLE()
 
 FlagListManager::FlagProcess::FlagProcess(FlagFileArray flagFileLocations)
-: flagFileLocations(flagFileLocations) {
+: wxProcess(nullptr), flagFileLocations(flagFileLocations), _timer(this, ID_FLAG_PROCESS_TIMER) {
+	Redirect();
+
+	// Start the input reader timer
+	_timer.Start(250);
+}
+
+void FlagListManager::FlagProcess::OnReadTimer(wxTimerEvent& event) {
+	char buffer[1024];
+	while(GetInputStream()->CanRead()) {
+		GetInputStream()->Read(buffer, 1024);
+		_output.append(buffer, buffer + GetInputStream()->LastRead());
+	}
 }
 
 void FlagListManager::FlagProcess::OnTerminate(int pid, int status) {
 	wxLogDebug(_T(" FS2 Open returned %d when polled for the flags"), status);
-	
-	// Find the flag file
-	wxFileName flagfile;
-	for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
-		bool exists = flagFileLocations[i].FileExists();
-		if (exists) {
-			flagfile = flagFileLocations[i];
-			wxLogDebug(_T(" Searching for flag file at %s ... %s"),
-				flagFileLocations[i].GetFullPath().c_str(),
-				(flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+	_timer.Stop();
+
+	// Read the rest of the process output
+	char buffer[1024];
+	while (GetInputStream()->CanRead()) {
+		GetInputStream()->Read(buffer, 1024);
+		_output.append(buffer, buffer + GetInputStream()->LastRead());
+	}
+
+	// If the build does not support JSON output then the output will be empty
+	if (_output.empty()) {
+		// Find the flag file
+		wxFileName flagfile;
+		for( size_t i = 0; i < flagFileLocations.Count(); i++ ) {
+			bool exists = flagFileLocations[i].FileExists();
+			if (exists) {
+				flagfile = flagFileLocations[i];
+				wxLogDebug(_T(" Searching for flag file at %s ... %s"),
+						   flagFileLocations[i].GetFullPath().c_str(),
+						   (flagFileLocations[i].FileExists())? _T("Located") : _T("Not Here"));
+			}
 		}
-	}
-	
-	if ( !flagfile.FileExists() ) {
-		FlagListManager::GetFlagListManager()->SetProcessingStatus(FLAG_FILE_NOT_GENERATED);
-		wxLogError(_T(" FS2 Open did not generate a flag file."));
-		return;
-	}
-	
-	FlagListManager::GetFlagListManager()->SetProcessingStatus(
-		FlagListManager::GetFlagListManager()->ParseFlagFile(flagfile));
-	
-	if ( FlagListManager::GetFlagListManager()->IsProcessingOK() ) {
-		::wxRemoveFile(flagfile.GetFullPath());
+
+		if ( !flagfile.FileExists() ) {
+			FlagListManager::GetFlagListManager()->SetProcessingStatus(FLAG_FILE_NOT_GENERATED);
+			wxLogError(_T(" FS2 Open did not generate a flag file."));
+			return;
+		}
+
+		FlagListManager::GetFlagListManager()->SetProcessingStatus(
+			FlagListManager::GetFlagListManager()->ParseFlagFile(flagfile));
+
+		if ( FlagListManager::GetFlagListManager()->IsProcessingOK() ) {
+			::wxRemoveFile(flagfile.GetFullPath());
+		}
+	} else {
+		FlagListManager::GetFlagListManager()->SetProcessingStatus(FlagListManager::GetFlagListManager()->ParseJsonData(
+			_output));
 	}
 	
 	delete this;
+}
+
+bool FlagListManager::Resolution::operator==(const FlagListManager::Resolution& rhs) const {
+	return width == rhs.width && height == rhs.height;
+}
+bool FlagListManager::Resolution::operator!=(const FlagListManager::Resolution& rhs) const {
+	return !(rhs == *this);
+}
+bool FlagListManager::Resolution::operator<(const FlagListManager::Resolution& rhs) const {
+	// compare the two width/height ratios by cross-multiplying and comparing the results
+
+	auto value1 = width * rhs.height;
+	auto value2 = rhs.width * height;
+	// first compare aspect ratio
+	if (value1 < value2) {
+		return true;
+	}
+	else if (value1 > value2) {
+		return false;
+	}
+	else {
+		// then compare size if aspect ratios are equal
+		if (width < rhs.width) {
+			return true;
+		}
+		else if (width > rhs.width) {
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+}
+bool FlagListManager::Resolution::operator>(const FlagListManager::Resolution& rhs) const {
+	return rhs < *this;
+}
+bool FlagListManager::Resolution::operator<=(const FlagListManager::Resolution& rhs) const {
+	return !(rhs < *this);
+}
+bool FlagListManager::Resolution::operator>=(const FlagListManager::Resolution& rhs) const {
+	return !(*this < rhs);
+}
+bool FlagListManager::OpenAlInfo::EfxSupported(const wxString& device) const {
+	if (device == defaultPlaybackDevice.name) {
+		return defaultPlaybackDevice.supports_efx;
+	}
+	for (auto& dev : playbackDevices) {
+		if (dev.name == device) {
+			return dev.supports_efx;
+		}
+	}
+	return false;
 }

@@ -26,6 +26,11 @@
 #include "datastructures/FlagFileData.h"
 #include "apis/EventHandlers.h"
 
+#include <lib/json.hpp>
+
+// for convenience
+using json = nlohmann::json;
+
 /** Flag file processing status has changed.
  The event's int value indicates the FlagFileProcessingStatus. */
 LAUNCHER_DECLARE_EVENT_TYPE(EVT_FLAG_FILE_PROCESSING_STATUS_CHANGED);
@@ -49,11 +54,48 @@ public:
 		FLAG_FILE_PROCESSING_ERROR
 	};
 
-	enum CapabilityFlags {
-		BUILD_CAPS_OPENAL = 1 << 0,
-		BUILD_CAPS_NO_D3D = 1 << 1,
-		BUILD_CAPS_NEW_SND = 1 << 2,
-		BUILD_CAPS_SDL = 1 << 3,
+	struct BuildCaps {
+		bool openAL = false;
+		bool noD3D = false;
+		bool newSound = false;
+		bool sdl = false;
+	};
+
+	struct Joystick {
+		wxString name;
+		wxString guid;
+		bool is_haptic = false;
+	};
+
+	struct Resolution {
+		int width = -1;
+		int height = -1;
+
+		bool operator==(const Resolution& rhs) const;
+		bool operator!=(const Resolution& rhs) const;
+		bool operator<(const Resolution& rhs) const;
+		bool operator>(const Resolution& rhs) const;
+		bool operator<=(const Resolution& rhs) const;
+		bool operator>=(const Resolution& rhs) const;
+	};
+
+	struct OpenAlDevice {
+		wxString name;
+		bool supports_efx = false;
+	};
+
+	struct OpenAlInfo {
+		bool initialized = false;
+
+		std::vector<OpenAlDevice> playbackDevices;
+		std::vector<OpenAlDevice> captureDevices;
+
+		OpenAlDevice defaultPlaybackDevice;
+		OpenAlDevice defaultCaptureDevice;
+
+		wxString version;
+
+		bool EfxSupported(const wxString& device) const;
 	};
 
 	void OnBinaryChanged(wxCommandEvent &event);
@@ -80,9 +122,24 @@ public:
 	
 	/** Gets the build capabilities of the currently selected FSO executable.
 	 Should only be called when processing succeeds. */
-	wxByte GetBuildCaps() const;
+	BuildCaps GetBuildCaps() const;
+
+	const std::vector<Joystick>& GetJoysticks() const;
+
+	const std::vector<Resolution>& GetResolutions() const;
+
+	wxFileName GetConfigLocation(const wxString& def_path = wxEmptyString) const;
+
+	const OpenAlInfo& GetOpenAlInfo() const;
 
 private:
+	enum CapabilityFlags {
+		BUILD_CAPS_OPENAL = 1 << 0,
+		BUILD_CAPS_NO_D3D = 1 << 1,
+		BUILD_CAPS_NEW_SND = 1 << 2,
+		BUILD_CAPS_SDL = 1 << 3,
+	};
+
 	FlagListManager();
 	void DeleteExistingData();
 	
@@ -111,6 +168,9 @@ private:
 	};
 	ProcessingStatus processingStatus; //!< has processing succeeded
 	ProcessingStatus ParseFlagFile(const wxFileName& flagfile);
+
+	void convertAndAddJsonFlag(const json& data);
+	ProcessingStatus ParseJsonData(const std::string& data);
 	
 	void SetProcessingStatus(const ProcessingStatus& processingStatus);
 	inline const ProcessingStatus& GetProcessingStatus() const { return this->processingStatus; }
@@ -118,15 +178,30 @@ private:
 	
 	FlagFileData* data;
 	ProxyFlagData* proxyData;
-	
-	wxByte buildCaps;
-	
+
+	BuildCaps buildCaps;
+
+	std::vector<Joystick> joysticks;
+
+	std::vector<Resolution> resolutions;
+
+	wxFileName configLocation;
+
+	OpenAlInfo openAlInfo;
+
 	class FlagProcess: public wxProcess {
 	public:
-		FlagProcess(FlagFileArray flagFileLocations);
+		explicit FlagProcess(FlagFileArray flagFileLocations);
 		virtual void OnTerminate(int pid, int status);
 	private:
+		void OnReadTimer(wxTimerEvent& event);
+
 		FlagFileArray flagFileLocations;
+		std::string _output;
+		wxTimer _timer;
+
+	 protected:
+		DECLARE_EVENT_TABLE()
 	};
 	
 	DECLARE_EVENT_TABLE()

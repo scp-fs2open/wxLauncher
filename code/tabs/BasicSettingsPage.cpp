@@ -22,13 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <wx/filename.h>
 #include <wx/choicebk.h>
 #include <wx/gbsizer.h>
-#include <wx/hyperlink.h>
 
 #include "generated/configure_launcher.h"
-
-#if HAS_SDL == 1
-#include "SDL.h"
-#endif
 
 #include "tabs/BasicSettingsPage.h"
 #include "global/BasicDefaults.h"
@@ -39,20 +34,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "apis/ProfileManager.h"
 #include "apis/TCManager.h"
 #include "apis/SpeechManager.h"
-#include "apis/OpenALManager.h"
 #include "apis/JoystickManager.h"
-#include "apis/resolution_manager.hpp"
 #include "apis/HelpManager.h"
 #include "controls/ModList.h"
 #include "datastructures/FSOExecutable.h"
 #include "datastructures/ResolutionMap.h"
-
-#include "global/MemoryDebugging.h" // Last include for memory debugging
-
-namespace
-{
-	const int BUILD_CAP_SDL = 1 << 3;
-}
 
 /** A mechanism for allowing a network settings option's description (GUI label)
  to differ from its corresponding registry value. */
@@ -714,8 +700,6 @@ BasicSettingsPage::~BasicSettingsPage() {
 	if ( SpeechMan::IsInitialized() ) {
 		SpeechMan::DeInitialize();
 	}
-	JoyMan::DeInitialize();
-	OpenALMan::DeInitialize();
 }
 
 /// Event Handling
@@ -1247,7 +1231,8 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	wxChoice* resolutionCombo = dynamic_cast<wxChoice*>(
 		wxWindow::FindWindowById(ID_RESOLUTION_COMBO, this));
 	wxCHECK_RET(resolutionCombo != NULL, _T("Unable to find resolution combo"));
-	
+
+	resolutionCombo->Clear();
 	FillResolutionDropBox(resolutionCombo, minHorizRes, minVertRes);
 	
 	long width = 0, height = 0;
@@ -1258,7 +1243,7 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	wxString resString;
 	
 	// first try reading from ResolutionMap
-	const ResolutionData* resDataPtr = ResolutionMap::ResolutionRead(shortname);
+	auto resDataPtr = ResolutionMap::ResolutionRead(shortname);
 		
 	if (resDataPtr != NULL) {
 		width = resDataPtr->width;
@@ -1324,8 +1309,8 @@ void BasicSettingsPage::SetUpResolution(const long minHorizRes, const long minVe
 	// update profile and ResolutionMap
 	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_WIDTH, width);
 	proman->ProfileWrite(PRO_CFG_VIDEO_RESOLUTION_HEIGHT, height);
-	
-	ResolutionMap::ResolutionWrite(shortname, ResolutionData(width, height));
+
+	ResolutionMap::ResolutionWrite(shortname, ResolutionMapData(width, height));
 }
 
 /** Adjust the resolution drop down box according to the active mod's restrictions. */
@@ -1421,33 +1406,112 @@ void BasicSettingsPage::ShowSettings(const bool showSettings) {
 	}
 }
 
-void BasicSettingsPage::FillResolutionDropBox(wxChoice *resChoice,
-	const long minHorizontalRes, const long minVerticalRes)
+class ResolutionData: public wxClientData {
+ public:
+	explicit ResolutionData(const FlagListManager::Resolution& res_in, bool header) {
+		this->is_header = header;
+		this->resolution = res_in;
+	}
+	bool IsHeader() const {
+		return is_header;
+	}
+	const FlagListManager::Resolution& GetResolution() const {
+		return resolution;
+	}
+	wxString GetResString() const {
+		return is_header ? wxString::Format(_T("--- %d:%d ---"), resolution.width, resolution.height)
+						 : wxString::Format(CFG_RES_FORMAT_STRING, resolution.width, resolution.height);
+	}
+ private:
+	bool is_header = false;
+	FlagListManager::Resolution resolution;
+};
+
+// brought to you by http://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations
+static int ComputeGCD(int a, int b) {
+	wxASSERT_MSG(a > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): a must be positive"), a, b));
+	wxASSERT_MSG(b > 0, wxString::Format(_T("ComputeGCD(a=%d, b=%d): b must be positive"), a, b));
+
+	//	part of the original algorithm, but irrelevant, since a and b are positive
+	//	if (a == 0) {
+	//		return b;
+	//	}
+	while (b != 0) {
+		if (a > b) {
+			a = a - b;
+		} else {
+			b = b - a;
+		}
+	}
+	return a;
+}
+
+// Assumed resolutions has been sorted using CompareResolutions
+static void AddHeaders(std::vector<ResolutionData*>& resolutions) {
+	if (resolutions.empty()) {
+		wxLogWarning(_T("AddHeaders: provided ResolutionArray is empty"));
+		return;
+	}
+
+	std::vector<std::pair<size_t, ResolutionData*>> headers;
+
+	int lastAspectWidth = -1;
+	int lastAspectHeight = -1;
+
+	// find aspect ratios and determine where the aspect ratio headers should be inserted
+	for (size_t i = 0, n = resolutions.size(); i < n; ++i) {
+		auto width = resolutions[i]->GetResolution().width;
+		auto height = resolutions[i]->GetResolution().height;
+		auto gcd = ComputeGCD(width, height);
+		width /= gcd;
+		height /= gcd;
+
+		// special exception: 8:5 should be 16:10
+		if ((width == 8) && (height == 5)) {
+			width *= 2;
+			height *= 2;
+		}
+
+		if ((width != lastAspectWidth) || (height != lastAspectHeight)) {
+			wxLogDebug(_T(" found aspect ratio %d:%d"), width, height);
+			FlagListManager::Resolution res;
+			res.width = width;
+			res.height = height;
+
+			headers.push_back(std::make_pair(i, new ResolutionData(res, true)));
+			lastAspectWidth = width;
+			lastAspectHeight = height;
+		}
+	}
+
+	// now insert the headers into resolutions
+	// must insert in reverse to avoid messing up insertion indexes
+	for (auto iter = headers.rbegin(); iter != headers.rend(); ++iter) {
+		resolutions.insert(resolutions.begin() + iter->first, iter->second);
+	}
+}
+
+void
+BasicSettingsPage::FillResolutionDropBox(wxChoice* resChoice, const long minHorizontalRes, const long minVerticalRes)
 {
-	ResolutionMan::ResolutionArray resolutions;
-	ResolutionMan::ApiType apiType;
 	auto flagListManager = FlagListManager::GetFlagListManager();
 
 	if (flagListManager->IsProcessingOK()) {
-#if IS_WIN32
-		// If the current executable is a SDL exe, use that API
-		if (flagListManager->GetBuildCaps() & BUILD_CAP_SDL) {
-			apiType = ResolutionMan::API_SDL;
-		} else {
-			apiType = ResolutionMan::API_WIN32;
-		}
-#else
-		// OSX and Linux always use the SDL api
-		apiType = ResolutionMan::API_SDL;
-#endif
-		ResolutionMan::EnumerateGraphicsModes(apiType, resolutions,
-			minHorizontalRes, minVerticalRes);
+		auto resolutions = flagListManager->GetResolutions();
 
-		for (auto it = resolutions.begin(), end = resolutions.end();
-			it != end; ++it)
-		{
-			auto p = dynamic_cast<ResolutionMan::Resolution*>(*it);
-			resChoice->Append(p->GetResString(), p);
+		// Sort resolutions in descending order
+		std::sort(resolutions.begin(), resolutions.end(), std::greater<FlagListManager::Resolution>());
+
+		std::vector<ResolutionData*> boxData;
+		for (auto& res : resolutions) {
+			if (res.width >= minHorizontalRes && res.height >= minVerticalRes) {
+				boxData.push_back(new ResolutionData(res, false));
+			}
+		}
+		AddHeaders(boxData);
+
+		for (auto& resData : boxData) {
+			resChoice->Append(resData->GetResString(), resData);
 		}
 	}
 }
@@ -1463,10 +1527,9 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	
 	int maxResIndex = -1;
 	int maxResProduct = 0;
-	ResolutionMan::Resolution* res;
 
 	for (unsigned int i = 0; i < resChoice.GetCount(); ++i) {
-		res = dynamic_cast<ResolutionMan::Resolution*>(
+		auto res = dynamic_cast<ResolutionData*>(
 			resChoice.GetClientObject(i));
 		wxCHECK_MSG(res != NULL, wxNOT_FOUND,
 			wxString::Format(
@@ -1476,7 +1539,7 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 		// aspect ratio but 'n' is pretty small, so it is not
 		// worth the space or complexity tradeoff
 		if (!res->IsHeader()) {
-			int resProduct = res->GetWidth() * res->GetHeight();
+			int resProduct = res->GetResolution().width * res->GetResolution().height;
 			if (resProduct > maxResProduct) {
 				maxResIndex = i;
 				maxResProduct = resProduct;
@@ -1487,12 +1550,10 @@ int BasicSettingsPage::GetMaxSupportedResolution(const wxChoice& resChoice, long
 	wxCHECK_MSG(maxResIndex > -1, wxNOT_FOUND,
 		_T("maximum Resolution was not found"));
 	
-	res = dynamic_cast<ResolutionMan::Resolution*>(
-		resChoice.GetClientObject(maxResIndex));
-	wxCHECK_MSG(res != NULL, wxNOT_FOUND,
-		_T("Choice is missing max Resolution object"));
-	width = res->GetWidth();
-	height = res->GetHeight();
+	auto res = dynamic_cast<ResolutionData*>(resChoice.GetClientObject(maxResIndex));
+	wxCHECK_MSG(res != NULL, wxNOT_FOUND, _T("Choice is missing max Resolution object"));
+	width = res->GetResolution().width;
+	height = res->GetResolution().height;
 	
 	wxLogDebug(_T("Found max resolution of %s at index %d"),
 		res->GetResString().c_str(), maxResIndex);
@@ -1507,10 +1568,8 @@ void BasicSettingsPage::OnSelectVideoResolution(
 	wxCHECK_RET( choice != NULL,
 		_T("Unable to find resolution combo"));
 
-	auto res = dynamic_cast<ResolutionMan::Resolution*>(
-		choice->GetClientObject(choice->GetSelection()));
-	wxCHECK_RET( res != NULL,
-		_T("Choice does not have Resolution objects"));
+	auto res = dynamic_cast<ResolutionData*>(choice->GetClientObject(choice->GetSelection()));
+	wxCHECK_RET( res != NULL, _T("Choice does not have Resolution objects"));
 
 	if (res->IsHeader()) {
 		// User picked aspect ratio, turn that into a real
@@ -1518,13 +1577,12 @@ void BasicSettingsPage::OnSelectVideoResolution(
 		choice->SetSelection(choice->GetSelection() + 1);
 	}
 	
-	res = dynamic_cast<ResolutionMan::Resolution*>(
-		choice->GetClientObject(choice->GetSelection()));
+	res = dynamic_cast<ResolutionData*>(choice->GetClientObject(choice->GetSelection()));
 	wxCHECK_RET( res != NULL,
 		_T("Cho2ce does not have Resolution objects"));
 	
-	const long width = static_cast<long>(res->GetWidth());
-	const long height = static_cast<long>(res->GetHeight());
+	const long width = static_cast<long>(res->GetResolution().width);
+	const long height = static_cast<long>(res->GetResolution().height);
 	
 	ProMan::GetProfileManager()->ProfileWrite(
 		PRO_CFG_VIDEO_RESOLUTION_WIDTH,
@@ -1537,9 +1595,8 @@ void BasicSettingsPage::OnSelectVideoResolution(
 	const ModItem* activeMod = ModList::GetActiveMod();
 	wxCHECK_RET(activeMod != NULL,
 		_T("OnSelectVideoResolution: activeMod is NULL!"));
-	
-	ResolutionMap::ResolutionWrite(activeMod->shortname,
-		ResolutionData(width, height));
+
+	ResolutionMap::ResolutionWrite(activeMod->shortname, ResolutionMapData(width, height));
 }
 
 void BasicSettingsPage::OnSelectVideoDepth(wxCommandEvent &WXUNUSED(event)) {
@@ -1712,17 +1769,19 @@ void BasicSettingsPage::OnSelectSoundDevice(wxCommandEvent &event) {
 
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_DEVICE, openaldevice->GetStringSelection());
 
-	if (OpenALMan::BuildHasNewSoundCode()) {
+	if (FlagListManager::GetFlagListManager()->GetBuildCaps().newSound) {
 		wxCheckBox* enableEFX = dynamic_cast<wxCheckBox*>(
 			wxWindow::FindWindowById(ID_ENABLE_EFX));
 		wxCHECK_RET(enableEFX != NULL, _T("Unable to find enable EFX checkbox"));
 
-		enableEFX->Show(OpenALMan::IsEFXSupported(openaldevice->GetStringSelection()));
+		auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
+		enableEFX->Show(alInfo.EfxSupported(openaldevice->GetStringSelection()));
 	}
 }
 
 void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	wxChoice* captureDevice = dynamic_cast<wxChoice*>(
@@ -1734,14 +1793,14 @@ void BasicSettingsPage::OnSelectCaptureDevice(wxCommandEvent &event) {
 }
 
 void BasicSettingsPage::OnToggleEnableEFX(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_OPENAL_EFX, event.IsChecked());
 }
 
 void BasicSettingsPage::OnChangeSampleRate(wxCommandEvent &event) {
-	wxCHECK_RET(OpenALMan::BuildHasNewSoundCode(),
+	wxCHECK_RET(FlagListManager::GetFlagListManager()->GetBuildCaps().newSound,
 		_T("Selected FSO build doesn't have new sound code."));
 	
 	wxTextCtrl* sampleRateBox = dynamic_cast<wxTextCtrl*>(
@@ -1776,35 +1835,34 @@ void BasicSettingsPage::OnDownloadOpenAL(wxCommandEvent &WXUNUSED(event)) {
 }
 
 void BasicSettingsPage::OnDetectOpenAL(wxCommandEvent& WXUNUSED(event)) {
-	if ( !OpenALMan::IsInitialized() ) {
-		this->SetupOpenALSection();
-	}
+	// This triggers a new flag file generation which will pick up new OpenAL devices
+	TCManager::GenerateTCBinaryChanged();
 }
 
-void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
-	const SoundDeviceType deviceType) {
-	
+void BasicSettingsPage::InitializeSoundDeviceDropDownBox(const SoundDeviceType deviceType) {
 	wxCHECK_RET((deviceType == PLAYBACK) || (deviceType == CAPTURE),
 		wxString::Format(_T("Invalid device type %u given."), deviceType));
-	
+
+	auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
 	WindowIDS deviceDropDownBoxID;
 	wxString deviceTypeNameAdjustment;
 	wxString deviceProfileEntryName;
-	wxArrayString availableDevices;
-	wxString defaultDevice;
+	std::vector<FlagListManager::OpenAlDevice> availableDevices;
+	FlagListManager::OpenAlDevice defaultDevice;
 	
 	if (deviceType == PLAYBACK) {
 		deviceDropDownBoxID = ID_SELECT_SOUND_DEVICE;
 		// (deviceTypeNameAdjustment remains empty in this case)
 		deviceProfileEntryName = PRO_CFG_OPENAL_DEVICE;
-		availableDevices = OpenALMan::GetAvailablePlaybackDevices();
-		defaultDevice = OpenALMan::GetSystemDefaultPlaybackDevice();
+		availableDevices = alInfo.playbackDevices;
+		defaultDevice = alInfo.defaultPlaybackDevice;
 	} else {
 		deviceDropDownBoxID = ID_SELECT_CAPTURE_DEVICE;
 		deviceTypeNameAdjustment = _T(" capture");
 		deviceProfileEntryName = PRO_CFG_OPENAL_CAPTURE_DEVICE;
-		availableDevices = OpenALMan::GetAvailableCaptureDevices();
-		defaultDevice = OpenALMan::GetSystemDefaultCaptureDevice();
+		availableDevices = alInfo.captureDevices;
+		defaultDevice = alInfo.defaultCaptureDevice;
 	}
 	
 	wxChoice* deviceDropDownBox = dynamic_cast<wxChoice*>(
@@ -1825,7 +1883,7 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 	
 	wxASSERT(!deviceProfileEntryName.IsEmpty());
 	
-	if (availableDevices.IsEmpty()) {
+	if (availableDevices.empty()) {
 		if (deviceType == PLAYBACK) {
 			wxLogWarning(_T("No playback devices were found on the system."));
 		} else {
@@ -1834,12 +1892,14 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 		return;
 	}
 	
-	wxASSERT_MSG(!defaultDevice.IsEmpty(),
+	wxASSERT_MSG(!defaultDevice.name.empty(),
 		wxString::Format(_T("No default sound%s device was found."),
 			deviceTypeNameAdjustment.c_str()));
 	
 	// update device drop down box and select a device
-	deviceDropDownBox->Append(availableDevices);
+	for (auto& device : availableDevices) {
+		deviceDropDownBox->Append(device.name);
+	}
 	
 	wxString device;
 	
@@ -1847,16 +1907,16 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 		deviceDropDownBox->SetStringSelection(device);
 	} else {
 		wxLogDebug(_T("Reported default sound%s device: %s"),
-			deviceTypeNameAdjustment.c_str(), defaultDevice.c_str());
+			deviceTypeNameAdjustment.c_str(), defaultDevice.name.c_str());
 		
-		if (!defaultDevice.IsEmpty() &&
-			(deviceDropDownBox->FindString(defaultDevice) != wxNOT_FOUND)) {
-			deviceDropDownBox->SetStringSelection(defaultDevice);
+		if (!defaultDevice.name.empty() &&
+			(deviceDropDownBox->FindString(defaultDevice.name) != wxNOT_FOUND)) {
+			deviceDropDownBox->SetStringSelection(defaultDevice.name);
 		} else {
 			wxLogWarning(
 				_T("Default sound%s device %s not found. Using first entry %s."),
 				deviceTypeNameAdjustment.c_str(),
-				defaultDevice.c_str(),
+				defaultDevice.name.c_str(),
 				deviceDropDownBox->GetString(0).c_str());
 			deviceDropDownBox->SetSelection(0);
 		}
@@ -1875,16 +1935,9 @@ void BasicSettingsPage::InitializeSoundDeviceDropDownBox(
 }
 
 void BasicSettingsPage::SetupOpenALSection() {
-	if ( !OpenALMan::WasCompiledIn() ) {
-		wxLogWarning(_T("Launcher was not compiled to support OpenAL"));
-		if (this->openALVersion != NULL) {
-			this->openALVersion->SetLabel(_("Launcher was not compiled to support OpenAL"));
-		}
-		this->soundDeviceText->Disable();
-		this->soundDeviceCombo->Disable();
-		this->downloadOpenALButton->Disable();
-		this->detectOpenALButton->Disable();
-	} else if ( !OpenALMan::Initialize() ) {
+	auto& alInfo = FlagListManager::GetFlagListManager()->GetOpenAlInfo();
+
+	if ( !alInfo.initialized ) {
 		wxLogError(_T("Unable to initialize OpenAL"));
 		if (this->openALVersion != NULL) {
 			this->openALVersion->SetLabel(_("Unable to initialize OpenAL"));			
@@ -1901,7 +1954,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		wxASSERT_MSG(!soundDeviceCombo->IsEmpty(),
 			_T("sound device combo box is empty!"));
 		
-		if (OpenALMan::BuildHasNewSoundCode()) {
+		if (FlagListManager::GetFlagListManager()->GetBuildCaps().newSound) {
 			if (this->captureDeviceCombo->IsEmpty()) {
 				this->InitializeSoundDeviceDropDownBox(CAPTURE);
 			}
@@ -1950,13 +2003,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 			this->audioSizer->Show(this->audioNewSoundSizer, true);
 			
 			const wxString playbackDevice(this->soundDeviceCombo->GetStringSelection());
-			if (!OpenALMan::IsEFXSupported(playbackDevice)) {
-				wxLogDebug(
-					_T("Playback device '%s' does not support EFX.")
-					_T(" Hiding Enable EFX checkbox."),
-						playbackDevice.c_str());
-				this->audioNewSoundSizer->Hide(efxCheckBox);
-			}
+			efxCheckBox->Show(alInfo.EfxSupported(playbackDevice));
 			
 			if (this->captureDeviceCombo->IsEmpty()) {
 				this->audioNewSoundDeviceSizer->Hide(this->captureDeviceCombo);
@@ -2023,7 +2070,7 @@ void BasicSettingsPage::SetupOpenALSection() {
 		this->soundDeviceText->Enable();
 		this->soundDeviceCombo->Enable();
 		
-		wxLogInfo(OpenALMan::GetCurrentVersion());
+		wxLogInfo(_("Detected OpenAL version: %s"), alInfo.version.c_str());
 		
 		this->audioOldSoundSizer->Hide(this->openALVersion);
 		
@@ -2038,123 +2085,83 @@ void BasicSettingsPage::OpenNonSCPWebSite(wxString url) {
 
 /** Client data for the Joystick Choice box. Stores the joysticks
 Windows ID so that we can pass it back correctly to the engine. */
-class JoyNumber: public wxClientData {
+class JoystickData: public wxClientData {
 public:
-	JoyNumber(unsigned int i) {
-		this->number = i;
+	explicit JoystickData(const FlagListManager::Joystick& stick_in, int number) {
+		this->number = number;
+		this->stick = stick_in;
 	}
 	int GetNumber() {
-		return static_cast<int>(this->number);
+		return number;
+	}
+	const FlagListManager::Joystick& GetStick() {
+		return stick;
 	}
 private:
-	unsigned int number;
+	int number = -1;
+	FlagListManager::Joystick stick;
 };
 
 void BasicSettingsPage::SetupJoystickSection() {
+	if (!FlagListManager::GetFlagListManager()->IsProcessingOK()) {
+		return;
+	}
+
 	this->joystickSelected->Clear();
-	if ( !JoyMan::WasCompiledIn() ) {
+
+	this->joystickSelected->Append(_("No Joystick"), new JoystickData(FlagListManager::Joystick(), DEFAULT_JOYSTICK_ID));
+
+	auto& joysticks = FlagListManager::GetFlagListManager()->GetJoysticks();
+	for (size_t i = 0; i < joysticks.size(); ++i) {
+		this->joystickSelected->Append(joysticks[i].name, new JoystickData(joysticks[i], static_cast<int>(i)));
+	}
+
+	if (joysticks.empty()) {
+		this->joystickSelected->SetSelection(0);
 		this->joystickSelected->Disable();
-		this->joystickSelected->Append(_("No Launcher Support"));
 		this->joystickForceFeedback->Disable();
 		this->joystickDirectionalHit->Disable();
-		this->joystickDetectButton->Disable();
+		this->joystickDetectButton->Enable();
 #if IS_WIN32
 		this->joystickCalibrateButton->Disable();
 #endif
 	}
-	else
-	{
-		JoyMan::ApiType apiType;
-
-#if IS_APPLE || IS_LINUX
-		// Unix always uses SDL
-		apiType = JoyMan::API_SDL;
-#else
-		// If the current executable is a SDL exe, use that API
-		if (FlagListManager::GetFlagListManager()->GetBuildCaps() & BUILD_CAP_SDL)
-		{
-			apiType = JoyMan::API_SDL;
-		}
-		else
-		{
-			apiType = JoyMan::API_NATIVE;
-		}
-#endif
-
-		if (!JoyMan::Initialize(apiType)) {
-			this->joystickSelected->Disable();
-			this->joystickSelected->Append(_("Initialize Failed"));
-			this->joystickForceFeedback->Disable();
-			this->joystickDirectionalHit->Disable();
-			this->joystickDetectButton->Enable();
+	else {
+		long profileJoystick;
+		unsigned int i;
+		this->joystickSelected->Enable();
 #if IS_WIN32
-			this->joystickCalibrateButton->Disable();
+		this->joystickDetectButton->Enable();
 #endif
-		}
-		else {
-			this->joystickSelected
-				->Append(_("No Joystick"), new JoyNumber(DEFAULT_JOYSTICK_ID));
-			for (unsigned int i = 0; i < JoyMan::NumberOfJoysticks(); i++) {
-				if (JoyMan::IsJoystickPluggedIn(i)) {
-					this->joystickSelected
-						->Append(JoyMan::JoystickName(i), new JoyNumber(i));
-				}
-			}
+		ProMan::GetProfileManager()->
+			ProfileRead(PRO_CFG_JOYSTICK_ID,
+				&profileJoystick,
+				DEFAULT_JOYSTICK_ID,
+				true);
+		// set current joystick
+		for (i = 0; i < this->joystickSelected->GetCount(); i++) {
+			auto* data = dynamic_cast<JoystickData*>(this->joystickSelected->GetClientObject(i));
+			wxCHECK2_MSG(data != NULL, continue, _T("JoyNumber is not the clientObject in joystickSelected"));
 
-			if (JoyMan::NumberOfPluggedInJoysticks() == 0) {
-				this->joystickSelected->SetSelection(0);
-				this->joystickSelected->Disable();
-				this->joystickForceFeedback->Disable();
-				this->joystickDirectionalHit->Disable();
-				this->joystickDetectButton->Enable();
-#if IS_WIN32
-				this->joystickCalibrateButton->Disable();
-#endif
-			}
-			else {
-				long profileJoystick;
-				unsigned int i;
-				this->joystickSelected->Enable();
-#if IS_WIN32
-				this->joystickDetectButton->Enable();
-#endif
-				ProMan::GetProfileManager()->
-					ProfileRead(PRO_CFG_JOYSTICK_ID,
-						&profileJoystick,
-						DEFAULT_JOYSTICK_ID,
-						true);
-				// set current joystick
-				for (i = 0; i < this->joystickSelected->GetCount(); i++) {
-					JoyNumber* data = dynamic_cast<JoyNumber*>(
-						this->joystickSelected->GetClientObject(i));
-					wxCHECK2_MSG(data != NULL, continue,
-						_T("JoyNumber is not the clientObject in joystickSelected"));
-
-					if (profileJoystick == data->GetNumber()) {
-						this->joystickSelected->SetSelection(i);
-						this->SetupControlsForJoystick(i);
-						return; // All joystick controls are now setup
-					}
-				}
-				// Getting here means that the joystick is no longer installed
-				// or is not plugged in
-				if (JoyMan::IsJoystickPluggedIn(profileJoystick)) {
-					wxLogWarning(_T("Last selected joystick is not plugged in"));
-				}
-				else {
-					wxLogWarning(_T("Last selected joystick does not seem to be installed"));
-				}
-				// set to no joystick (the first selection)
-				this->joystickSelected->SetSelection(0);
-				this->SetupControlsForJoystick(0);
+			// Need to substract 1 to account for the "No Joystick" at the start
+			if (profileJoystick == data->GetNumber()) {
+				this->joystickSelected->SetSelection(i);
+				this->SetupControlsForJoystick(i);
+				return; // All joystick controls are now setup
 			}
 		}
+		// Getting here means that the joystick is no longer installed
+		// or is not plugged in
+		wxLogWarning(_T("Last selected joystick does not seem to be installed"));
+
+		// set to no joystick (the first selection)
+		this->joystickSelected->SetSelection(0);
+		this->SetupControlsForJoystick(0);
 	}
 }
 
 void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
-	JoyNumber* joynumber = dynamic_cast<JoyNumber*>(
-		this->joystickSelected->GetClientObject(i));
+	JoystickData* joynumber = dynamic_cast<JoystickData*>(this->joystickSelected->GetClientObject(i));
 	wxCHECK_RET( joynumber != NULL,
 		_T("JoyNumber is not joystickSelected's client data"));
 
@@ -2166,7 +2173,7 @@ void BasicSettingsPage::SetupControlsForJoystick(unsigned int i) {
 	}
 #endif
 
-	if ( JoyMan::SupportsForceFeedback(joynumber->GetNumber()) ) {
+	if ( joynumber->GetStick().is_haptic ) {
 		bool ff, direct;
 		ProMan::GetProfileManager()->ProfileRead(
 			PRO_CFG_JOYSTICK_DIRECTIONAL, &direct, DEFAULT_JOYSTICK_DIRECTIONAL, true);
@@ -2201,21 +2208,19 @@ void BasicSettingsPage::OnCheckDirectionalHit(
 		ProMan::GetProfileManager()->ProfileWrite(PRO_CFG_JOYSTICK_DIRECTIONAL, event.IsChecked());
 }
 
-void BasicSettingsPage::OnCalibrateJoystick(
-	wxCommandEvent &WXUNUSED(event)) {
-		JoyNumber *data = dynamic_cast<JoyNumber*>(
-			this->joystickSelected->GetClientObject(
-			this->joystickSelected->GetSelection()));
-		wxCHECK_RET( data != NULL,
-			_T("joystickSelected does not have JoyNumber as clientdata"));
+void BasicSettingsPage::OnCalibrateJoystick(wxCommandEvent &WXUNUSED(event)) {
+	JoystickData *data = dynamic_cast<JoystickData*>(
+		this->joystickSelected->GetClientObject(
+		this->joystickSelected->GetSelection()));
+	wxCHECK_RET( data != NULL,
+		_T("joystickSelected does not have JoyNumber as clientdata"));
 
-		JoyMan::LaunchCalibrateTool(data->GetNumber());
+	JoyMan::LaunchCalibrateTool(data->GetNumber());
 }
 
 void BasicSettingsPage::OnDetectJoystick(wxCommandEvent &WXUNUSED(event)) {
-		if ( JoyMan::DeInitialize() ) {
-			this->SetupJoystickSection();
-		}
+	// This triggers a new flag file generation which will pick up new josticks
+	TCManager::GenerateTCBinaryChanged();
 }
 
 //////////// ProxyChoice
